@@ -196,16 +196,17 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 .gxb-wrap{margin:14px 2px 0;position:relative}
 .gxb-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
 .gxc-surface{background:rgba(8,8,12,.371);-webkit-backdrop-filter:blur(11.75px) saturate(1);backdrop-filter:blur(11.75px) saturate(1);border:1px solid rgba(255,255,255,.035);box-shadow:0 15px 36px rgba(0,0,0,.23),inset 0 1px rgba(255,255,255,.05);color:#f4f7ff}
-.gxb-tile{position:relative;isolation:isolate;overflow:hidden;min-width:0;min-height:128px;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;gap:3px;text-align:left;padding:14px 12px 14px;border-radius:22px;transition:background .22s,transform .17s,border-color .22s;box-shadow:0 10px 26px rgba(0,0,0,.11);border-color:rgba(255,255,255,.045)}
+.gxb-tile{position:relative;isolation:isolate;overflow:hidden;min-width:0;min-height:110px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:3px;text-align:left;padding:12px 11px 11px;border-radius:21px;transition:background .22s,transform .17s,border-color .22s;box-shadow:0 10px 26px rgba(0,0,0,.11);border-color:rgba(255,255,255,.045)}
 .gxb-tile:active{transform:scale(.976)}
-.gxb-tile[data-ready="true"]{border-color:rgba(75,223,202,.24);background:rgba(11,31,32,.48)}
-.gxb-emoji{position:absolute;top:11px;right:11px;display:block;font-size:31px;line-height:1;opacity:1;pointer-events:none;user-select:none;transform:rotate(-8deg);transform-origin:center}
+.gxb-tile[data-ready="true"]{border-color:rgba(75,223,202,.24);background:rgba(8,8,12,.371)}
+.gxb-metric-row{position:relative;display:flex;align-items:center;width:100%;min-height:34px;min-width:0}
+.gxb-emoji{position:absolute;z-index:1;top:50%;right:-3px;display:block;font-size:30px;line-height:1;opacity:1;pointer-events:none;user-select:none;transform:translateY(-50%) rotate(-8deg);transform-origin:center}
 .gxb-tile[data-ready="true"] .gxb-emoji{animation:gxbCelebrate 2.2s cubic-bezier(.2,.8,.2,1) 2}
-@keyframes gxbCelebrate{0%,100%{transform:rotate(-8deg) scale(1)}50%{transform:rotate(1deg) scale(1.13)}}
-.gxb-label{font-size:11px;font-weight:600;color:#ced8e2;line-height:1.25;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;margin-top:25px}
-.gxb-number{font-weight:700;font-size:clamp(21px,5.9vw,26px);line-height:1.17;letter-spacing:-.045em;font-variant-numeric:tabular-nums;color:#f7fbff}
-.gxb-unit{font-size:10px;line-height:1.35;color:#afbccc;white-space:nowrap;overflow:hidden;max-width:100%;text-overflow:ellipsis}
-.gxb-mini-progress{display:block;width:100%;height:4px;min-height:4px;flex:0 0 4px;overflow:hidden;border-radius:99px;background:rgba(237,246,255,.10);margin-top:10px}
+@keyframes gxbCelebrate{0%,100%{transform:translateY(-50%) rotate(-8deg) scale(1)}50%{transform:translateY(-50%) rotate(1deg) scale(1.13)}}
+.gxb-label{position:relative;z-index:2;font-size:11px;font-weight:600;color:#ced8e2;line-height:1.25;max-width:100%;overflow:visible;white-space:normal;margin-top:0}
+.gxb-number{position:relative;z-index:2;font-weight:700;font-size:clamp(21px,5.9vw,26px);line-height:1.17;letter-spacing:-.045em;font-variant-numeric:tabular-nums;color:#f7fbff;white-space:nowrap}
+.gxb-unit{position:relative;z-index:2;font-size:10px;line-height:1.35;color:#afbccc;white-space:nowrap;overflow:hidden;max-width:100%;text-overflow:ellipsis}
+.gxb-mini-progress{display:block;width:100%;height:4px;min-height:4px;flex:0 0 4px;overflow:hidden;border-radius:99px;background:rgba(237,246,255,.10);margin-top:7px}
 .gxb-mini-progress > span{display:block;position:relative;overflow:hidden;height:100%;width:var(--gxb-pct,0%);background:linear-gradient(90deg,#8163ef,#17d8e3);border-radius:inherit;transform-origin:left;transform:scaleX(0);will-change:transform}
 .gxb-wrap.is-visible .gxb-mini-progress > span{transform:scaleX(1);transition:transform .92s cubic-bezier(.16,1,.3,1),width .62s cubic-bezier(.16,1,.3,1)}
 .gxb-mini-progress > span::after,.gxb-meter > span::after{content:"";position:absolute;inset:0;width:46%;opacity:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.64),transparent);transform:translateX(-135%);pointer-events:none}
@@ -213,7 +214,7 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 .gxb-wrap.is-visible .gxb-tile:nth-child(2) .gxb-mini-progress > span::after{animation-delay:1.18s}
 .gxb-wrap.is-visible .gxb-tile:nth-child(3) .gxb-mini-progress > span::after{animation-delay:1.31s}
 @keyframes gxbSweep{0%{opacity:0;transform:translateX(-135%)}25%{opacity:.8}83%{opacity:.58}100%{opacity:0;transform:translateX(315%)}}
-.gxb-panel{position:relative;isolation:isolate;overflow:hidden;min-width:0;min-height:300px;margin:0;border-radius:26px;padding:23px 21px 22px;background:linear-gradient(108deg,rgba(10,12,19,.89),rgba(9,13,19,.79))!important;border:1px solid rgba(150,209,225,.09);box-shadow:0 19px 43px rgba(0,0,0,.25);-webkit-backdrop-filter:blur(12px) saturate(1);backdrop-filter:blur(12px) saturate(1)}
+.gxb-panel{position:relative;isolation:isolate;overflow:hidden;min-width:0;min-height:300px;margin:0;border-radius:26px;padding:23px 21px 22px;background:rgba(8,8,12,.371)!important;border:1px solid rgba(255,255,255,.035);box-shadow:0 15px 36px rgba(0,0,0,.23),inset 0 1px rgba(255,255,255,.05);-webkit-backdrop-filter:blur(11.75px) saturate(1);backdrop-filter:blur(11.75px) saturate(1)}
 .gxb-panel::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(circle at 91% 99%,rgba(64,199,204,.055),transparent 43%)}
 .gxb-panel-inner{position:relative;z-index:1;min-width:0}
 .gxb-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
@@ -232,11 +233,11 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 .gxb-tasks li:last-child{border:0}
 .gxb-tasks small{font-size:10px;white-space:nowrap;color:#7ddacb}
 .gxb-tasks li[data-status="pending"] small{color:#cfbfdb}
-.gxb-foot{position:relative;z-index:1;display:flex;align-items:center;gap:12px;min-height:62px;margin-top:22px;padding-right:min(25vw,105px)}
+.gxb-foot{position:relative;z-index:2;display:flex;align-items:center;gap:12px;min-height:62px;margin-top:22px;padding-right:min(30vw,126px)}
 .gxb-action{min-height:44px;border:0;border-radius:22px;background:rgba(255,255,255,.095);padding:10px 17px;color:#9ae5df;font-size:11px;font-weight:700;white-space:normal;text-align:center;line-height:1.35}
 .gxb-rules{border:0;background:transparent;padding:8px 0;color:#a5bed0;font-size:10px;font-weight:600;text-decoration:underline;text-underline-offset:3px;min-height:44px}
 .gxb-foot-action{display:flex;align-items:center;flex-wrap:wrap;gap:4px 13px;max-width:100%}
-.gxb-panel-emoji{position:absolute;z-index:0;bottom:11px;right:11px;display:block;font-size:clamp(100px,28vw,124px);line-height:1;opacity:.34;pointer-events:none;user-select:none;transform:rotate(-12deg);transform-origin:center}
+.gxb-panel-emoji{position:absolute;z-index:0;bottom:3px;right:3px;display:block;font-size:clamp(136px,38vw,165px);line-height:1;opacity:.68;pointer-events:none;user-select:none;transform:rotate(-10deg);transform-origin:center}
 .gxb-rule-note{position:relative;z-index:1;margin-top:4px;padding:10px 0 0;font-size:10.5px;line-height:1.55;color:#adbecc;border-top:1px solid rgba(255,255,255,.055)}
 .gxb-feedback{min-height:15px;display:block;color:#84d7d4;font-size:10px;font-weight:600;line-height:1.5;margin-top:5px}
 .gxb-preview-label{display:block;font-size:10px;line-height:1.4;color:#899eb3;margin:14px 3px 0}
@@ -246,12 +247,12 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 .gxb-lab-toggle span{font-size:10px;color:#9caec0;line-height:1.4}
 .gxb-panel:focus-visible,.gxb-tile:focus-visible,.gxb-dismiss:focus-visible,.gxb-action:focus-visible,.gxb-rules:focus-visible{outline:2px solid #6de0ef;outline-offset:3px}
 .gxb-morph-surface,.gxb-morph-emoji{position:fixed;z-index:15;pointer-events:none;user-select:none}
-.gxb-morph-surface{border:1px solid rgba(161,208,229,.14);box-shadow:0 16px 34px rgba(0,0,0,.27);background:rgba(11,15,23,.91)}
+.gxb-morph-surface{border:1px solid rgba(255,255,255,.035);box-shadow:0 15px 36px rgba(0,0,0,.23);background:rgba(8,8,12,.371);-webkit-backdrop-filter:blur(11.75px) saturate(1);backdrop-filter:blur(11.75px) saturate(1)}
 .gxb-morph-emoji{display:block;line-height:1;text-align:center;white-space:nowrap;transform-origin:center}
 @media(max-width:380px){
  .gxb-row{gap:7px}
- .gxb-tile{min-height:125px;padding:13px 10px 12px;border-radius:19px}
- .gxb-emoji{font-size:29px;right:8px;top:9px}
+ .gxb-tile{min-height:108px;padding:11px 9px 10px;border-radius:19px}
+ .gxb-emoji{font-size:28px;right:-3px;top:50%}
  .gxb-label{font-size:10.5px}
  .gxb-number{font-size:23px}
  .gxb-unit{font-size:9.5px}
@@ -260,12 +261,12 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 }
 @media(max-width:315px){
  .gxb-row{gap:5px}
- .gxb-tile{min-height:123px;padding:12px 7px 11px}
- .gxb-emoji{font-size:25px;right:6px}
+ .gxb-tile{min-height:105px;padding:10px 7px 9px}
+ .gxb-emoji{font-size:25px;right:-4px}
  .gxb-label{font-size:10px}
  .gxb-number{font-size:21px}
  .gxb-unit{font-size:9px}
- .gxb-panel-emoji{font-size:92px;bottom:12px;right:7px}
+ .gxb-panel-emoji{font-size:118px;bottom:4px;right:0}
  .gxb-foot{padding-right:79px}
 }
 @media(prefers-reduced-motion:reduce){
@@ -328,13 +329,13 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 <section class="gxb-wrap" aria-label="Tus beneficios, vista de laboratorio">
  <div class="gxb-row" id="gxb-row" role="group" aria-label="Lealtad, Referidos y Misiones">
   <button type="button" class="gxb-tile gxc-surface" data-gxb="loyalty" aria-expanded="false" aria-controls="gxb-panel" aria-label="Lealtad, 3 de 4 pagos seguidos, abrir detalle">
-   <span class="gxb-emoji" aria-hidden="true">⭐</span><span class="gxb-label">Lealtad</span><strong class="gxb-number">3/4</strong><span class="gxb-unit">pagos seguidos</span><span class="gxb-mini-progress" aria-hidden="true"><span style="--gxb-pct:75%"></span></span>
+   <span class="gxb-label">Lealtad</span><span class="gxb-metric-row"><strong class="gxb-number">3/4</strong><span class="gxb-emoji" aria-hidden="true">⭐</span></span><span class="gxb-unit">pagos seguidos</span><span class="gxb-mini-progress" aria-hidden="true"><span style="--gxb-pct:75%"></span></span>
   </button>
   <button type="button" class="gxb-tile gxc-surface" data-gxb="referral" aria-expanded="false" aria-controls="gxb-panel" aria-label="Referidos, 1 de 3 meses validados, abrir detalle">
-   <span class="gxb-emoji" aria-hidden="true">🎁</span><span class="gxb-label">Referidos</span><strong class="gxb-number">1/3</strong><span class="gxb-unit">meses válidos</span><span class="gxb-mini-progress" aria-hidden="true"><span style="--gxb-pct:33.33%"></span></span>
+   <span class="gxb-label">Referidos</span><span class="gxb-metric-row"><strong class="gxb-number">1/3</strong><span class="gxb-emoji" aria-hidden="true">🎁</span></span><span class="gxb-unit">meses válidos</span><span class="gxb-mini-progress" aria-hidden="true"><span style="--gxb-pct:33.33%"></span></span>
   </button>
   <button type="button" class="gxb-tile gxc-surface" data-gxb="mission" aria-expanded="false" aria-controls="gxb-panel" aria-label="Misiones, 2 de 3 completadas, abrir detalle">
-   <span class="gxb-emoji" aria-hidden="true">🎯</span><span class="gxb-label">Misiones</span><strong class="gxb-number">2/3</strong><span class="gxb-unit">completadas</span><span class="gxb-mini-progress" aria-hidden="true"><span style="--gxb-pct:66.67%"></span></span>
+   <span class="gxb-label">Misiones</span><span class="gxb-metric-row"><strong class="gxb-number">2/3</strong><span class="gxb-emoji" aria-hidden="true">🎯</span></span><span class="gxb-unit">completadas</span><span class="gxb-mini-progress" aria-hidden="true"><span style="--gxb-pct:66.67%"></span></span>
   </button>
  </div>
  <div id="gxb-panel" class="gxb-panel gxc-surface" role="region" aria-label="Detalle de beneficio" hidden>
