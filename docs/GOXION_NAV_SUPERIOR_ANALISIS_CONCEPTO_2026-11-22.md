@@ -60,7 +60,7 @@ Reubicar toda la cápsula expandida justo **sobre** el texto en el encabezado, d
 
 1. Mantener **una sola navegación** DOM y los botones `#btn-tab-inicio`, `#btn-tab-catalogo`, `#btn-tab-soporte`, `switchTab`; que el estado visible no se pierda por desplazamiento o login/logout.
 2. No clonar `#gx-client-notif-launch`, `#gx-client-notif-badge` ni su sheet; el JS actual reparenta `#header-action-btn` en `.gx-header-actions`. Reconciliar header antes de añadir avatar.
-3. Sustituir/coordinatizar la vieja `#sticky-client-bar` que aparece tras 120px, eliminando duplicación visual y lectores de pantalla. No hacer una tercera barra.
+3. Sustituir o coordinar la vieja `#sticky-client-bar` que aparece tras 120px, eliminando duplicación visual y lectores de pantalla. No hacer una tercera barra.
 4. Mantener login/logout, token, expiración de sesión, PIN y accesos en sus propietarios oficiales. No cambiar cliente, pagos, calendarios B2, estado de cuenta ni notificaciones mientras se prueba el nav.
 5. No alterar ni rehacer hero/saludo congelados o tarjetas de beneficios, ahorro, servicios e historial; nav/encabezado son un trabajo local con su propio contrato.
 6. Mantener safe areas Safari, rebote, cambio de orientación, teclado, overlays de login/notificaciones, uso con lector de pantalla, targets 44px; no bloquear scroll ni disparar cambios de tamaño sobre un modal abierto.
