@@ -35,14 +35,14 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 .nav svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 .nav .active svg{color:#53dce8}
 .nav .nav-only{display:none}
-.greeting{min-height:87px;display:flex;align-items:flex-end;padding:0 9px 19px;overflow:hidden}
-.greeting h1{margin:0;font-weight:700;font-size:clamp(26px,6vw,34px);letter-spacing:-.045em;line-height:1.17;max-width:100%;text-wrap:balance}
+.greeting{height:clamp(106px,26vw,122px);min-height:0;display:flex;align-items:flex-end;padding:0 9px 19px;overflow:hidden}
+.greeting h1{margin:0;height:2.34em;flex:0 0 100%;font-weight:700;font-size:clamp(26px,6vw,34px);letter-spacing:-.045em;line-height:1.17;max-width:100%;text-wrap:balance;overflow:clip}
 .greeting .word{display:inline-block;will-change:transform,filter,opacity;white-space:pre}
 .greeting .name{color:#42e4e8}
-.focus{position:relative;z-index:1;isolation:isolate;display:grid;grid-template-columns:minmax(0,1fr) minmax(84px,30%);grid-template-rows:minmax(145px,1fr) auto;align-items:center;width:100%;min-height:277px;text-align:left;padding:29px 23px 23px 28px;overflow:hidden;border:1px solid rgba(167,190,226,.18);border-radius:32px;background:linear-gradient(142deg,var(--glass-top,rgba(25,29,48,.54)),var(--glass-middle,rgba(7,13,24,.63)) 60%,var(--glass-bottom,rgba(12,23,37,.55)));box-shadow:0 20px 52px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.075);color:var(--text);-webkit-backdrop-filter:blur(var(--glass-blur,19px)) saturate(1.35);backdrop-filter:blur(var(--glass-blur,19px)) saturate(1.35);transform:translateZ(0);transition:grid-template-columns .72s cubic-bezier(.2,.85,.2,1),border-radius .75s cubic-bezier(.2,.85,.2,1),border-color .65s ease,box-shadow .65s ease,background .6s ease}
+.focus{position:relative;z-index:1;isolation:isolate;display:grid;grid-template-columns:minmax(0,1fr) minmax(84px,30%);grid-template-rows:minmax(145px,1fr) auto;align-items:center;width:100%;min-height:277px;text-align:left;padding:29px 23px 23px 28px;overflow:hidden;border:1px solid rgba(220,237,255,.035);border-radius:32px;background:linear-gradient(142deg,var(--glass-top,rgba(25,29,48,.54)),var(--glass-middle,rgba(7,13,24,.63)) 60%,var(--glass-bottom,rgba(12,23,37,.55)));box-shadow:0 20px 52px rgba(0,0,0,.19),inset 0 1px rgba(255,255,255,.055);color:var(--text);-webkit-backdrop-filter:blur(var(--glass-blur,19px)) saturate(1.35);backdrop-filter:blur(var(--glass-blur,19px)) saturate(1.35);transform:translateZ(0);transition:grid-template-columns .72s cubic-bezier(.2,.85,.2,1),border-radius .75s cubic-bezier(.2,.85,.2,1),border-color .65s ease,box-shadow .65s ease,background .6s ease}
 .focus:before{content:"";position:absolute;inset:-65px -55px auto auto;width:250px;height:240px;border-radius:50%;background:var(--glow,rgba(65,219,232,.22));filter:blur(59px);opacity:.6;transition:background .5s,opacity .6s;z-index:-1;pointer-events:none}
-.focus:after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(115deg,rgba(255,255,255,.045),transparent 31%,transparent 73%,rgba(96,164,220,.035));pointer-events:none}
-.focus[data-tone="attention"]{--glow:rgba(242,94,119,.26);border-color:rgba(244,128,153,.21);border-radius:35px 26px 31px 30px}
+.focus:after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(127deg,rgba(255,255,255,.07) 0%,rgba(255,255,255,.015) 18%,transparent 40%,transparent 77%,rgba(96,164,220,.023));pointer-events:none}
+.focus[data-tone="attention"]{--glow:rgba(242,94,119,.26);border-radius:35px 26px 31px 30px}
 .focus[data-tone="review"]{--glow:rgba(63,183,249,.26);border-radius:28px 36px 29px 33px}
 .focus[data-tone="agreement"]{--glow:rgba(142,111,239,.28);border-radius:34px 31px 38px 28px}
 .focus[data-tone="calm"]{--glow:rgba(37,215,202,.24);border-radius:32px}
@@ -59,12 +59,13 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 .focus-title.shadow-out{position:absolute;inset:0;pointer-events:none}
 .focus-icon{position:relative;grid-column:2;grid-row:1;place-self:center;z-index:1;display:grid;place-items:center;width:100%;max-width:130px;aspect-ratio:1;color:var(--accent,#42e0e5);transition:color .5s ease}
 .focus-icon:before{content:"";position:absolute;inset:6%;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.04),transparent 70%);filter:blur(7px);pointer-events:none}
-.focus-icon svg{display:block;max-width:86%;width:100%;height:100%;overflow:visible;fill:none;stroke:currentColor;stroke-width:1.35;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 14px currentColor)}
-.focus-bottom{position:relative;z-index:1;grid-row:2;grid-column:1/-1;display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-top:14px}
-.focus-meta{font-size:11px;line-height:1.4;color:#b4c4d1;letter-spacing:-.01em;max-width:63%}
-.focus-action{display:inline-flex;align-items:center;gap:7px;color:var(--accent,#53e5ec);font-size:11.5px;line-height:1.4;font-weight:700;white-space:nowrap;margin-left:auto}
-.focus-action svg{width:17px;height:17px;stroke:currentColor;stroke-width:1.9;fill:none;stroke-linecap:round;stroke-linejoin:round;transition:transform .35s cubic-bezier(.2,.8,.2,1)}
-.focus:hover .focus-action svg{transform:translate(2px,-2px)}
+.focus-icon svg{display:block;max-width:86%;width:100%;height:100%;overflow:visible;fill:none;stroke:currentColor;stroke-width:1.35;stroke-linecap:round;stroke-linejoin:round}
+.focus-icon .icon-glow{stroke:currentColor;stroke-width:3.4;opacity:.15;fill:none;pointer-events:none}
+.focus-bottom{position:relative;z-index:1;grid-row:2;grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:14px}
+.focus-meta{font-size:11px;line-height:1.4;color:#b4c4d1;letter-spacing:-.01em;min-width:0;flex:1 1 auto}
+.focus-action{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;width:max-content;max-width:100%;min-height:38px;padding:8px 15px;border-radius:999px;border:1px solid rgba(225,239,255,.075);background:linear-gradient(145deg,rgba(224,239,255,.105),rgba(150,196,225,.035));box-shadow:inset 0 1px rgba(255,255,255,.055),0 2px 10px rgba(0,0,0,.09);color:#eaf2fa;font-size:11px;line-height:1.15;font-weight:600;white-space:nowrap;margin-left:auto;transition:background .3s ease,transform .35s cubic-bezier(.2,.85,.2,1)}
+.focus:hover .focus-action{background:linear-gradient(145deg,rgba(224,239,255,.16),rgba(150,196,225,.055))}
+.focus:active .focus-action{transform:scale(.975)}
 .focus[data-tone="attention"]{--accent:#f6a4b8}
 .focus[data-tone="review"]{--accent:#7bccff}
 .focus[data-tone="agreement"]{--accent:#c1b5ff}
@@ -110,6 +111,8 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 .detail .close{min-height:44px;width:100%;border-radius:15px;border:1px solid rgba(130,190,220,.3);background:rgba(44,71,87,.4);color:#ddfaff}
 .detail .hint{color:#80dbe7;font-size:10px;font-weight:700}
 @media (max-width:380px){
+ .greeting{height:112px;padding-bottom:17px}
+ .greeting h1{font-size:clamp(24px,6.45vw,28px)}
  .shell{padding-inline:13px}
  .header{padding-inline:5px}
  .nav{grid-template-columns:2fr .7fr .7fr}
@@ -117,6 +120,7 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
  .focus-title{font-size:clamp(21px,6.3vw,26px)}
  .focus-bottom{gap:7px}
  .focus-meta,.focus-action{font-size:10px}
+ .focus-action{padding:8px 12px;min-height:36px}
  .secondary p{font-size:10.5px}
  .progress{width:58px}
 }
@@ -173,11 +177,11 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 <button class="focus" id="focus" type="button" data-tone="calm" data-glass="on" aria-describedby="focus-meta">
  <div class="focus-copy"><div class="focus-title" id="focus-title" aria-live="polite">Todo al corriente</div></div>
  <span class="focus-icon" id="focus-icon" aria-hidden="true">
-  <svg viewBox="0 0 24 24" focusable="false"><path id="state-path" d="M20 6 9 17l-5-5"/></svg>
+  <svg viewBox="0 0 24 24" focusable="false"><use class="icon-glow" href="#state-path"/><path id="state-path" d="M20 6 9 17l-5-5"/></svg>
  </span>
  <div class="focus-bottom">
   <span class="focus-meta" id="focus-meta">Próximo corte · 15 dic</span>
-  <span class="focus-action"><span id="focus-action">Ver mi cuenta</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 18 19 5M8 5h11v11"/></svg></span>
+  <span class="focus-action"><span id="focus-action">Ver mi cuenta</span></span>
  </div>
 </button>
 </div>
@@ -208,8 +212,8 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 <option value="combined">Rechazo + aviso secundario</option>
 </select>
 <span class="testcase" id="priority-note">La tarjeta muestra solo la acción de mayor prioridad.</span>
-<label class="glass-control" for="glass-depth"><span>Profundidad del cristal</span><output id="glass-depth-value">50%</output></label>
-<input id="glass-depth" type="range" min="0" max="100" value="50" aria-label="Profundidad del cristal">
+<label class="glass-control" for="glass-depth"><span>Profundidad del cristal</span><output id="glass-depth-value">9%</output></label>
+<input id="glass-depth" type="range" min="0" max="100" value="9" aria-label="Profundidad del cristal">
 <label class="glass-control" for="beam-position"><span>Mover luz detrás</span><output id="beam-position-value">Auto</output></label>
 <input id="beam-position" type="range" min="0" max="100" value="50" aria-label="Mover la luz por debajo de la tarjeta">
 <button class="glass-compare" type="button" id="glass-compare" aria-pressed="false">Comparar sin cristal</button>
@@ -298,7 +302,7 @@ function updateGreeting(code){
  clearInterval(greetTimer);
  const urgent=['correction','incomplete','suspended','overdue','review'].includes(code);
  if(urgent){words('Hola, Mario',true);return;}
- const phrases=['Hola, Mario','Qué gusto verte, Mario','Bienvenido a tu espacio'];
+ const phrases=['Hola, Mario','Qué gusto, Mario','Bienvenido, Mario'];
  let index=0;
  words(phrases[0],true);
  if(reduced())return;
@@ -405,7 +409,7 @@ $('glass-compare').addEventListener('click',()=>{
  $('glass-compare').setAttribute('aria-pressed',String(off));
  $('glass-compare').textContent=off?'Restaurar cristal':'Comparar sin cristal';
 });
-updateGlass(50);
+updateGlass(9);
 window.GOXION_MORPH_V2=Object.freeze({isolated:true,noBackend:true,scenarios:Object.keys(snapshots),classify,render});
 render('clear',true);
 // Morphicons: librería real, cargada solo en este prototipo. SVG nativo queda disponible sin red.
