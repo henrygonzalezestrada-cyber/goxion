@@ -591,6 +591,8 @@ function words(text,name){
  const tokens=text.split(/(\s+)/);
  tokens.forEach(part=>{
   if(!part)return;
+  // Real whitespace nodes preserve wrapping; animated inline blocks hold only words.
+  if(!part.trim()){line.append(document.createTextNode(part));return}
   const s=document.createElement('span');
   s.className='word';
   s.textContent=part;
