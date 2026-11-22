@@ -138,7 +138,12 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 .after h2{font-size:14px;font-weight:700;letter-spacing:-.01em;margin:0 0 6px}
 .after p{font-size:11px;color:#8c9caf;margin:0}
 .demo-toggle{position:relative;display:block;margin:35px auto 8px;border:1px solid rgba(107,209,222,.18);background:rgba(8,18,29,.78);color:#d5eaf3;border-radius:25px;min-height:44px;padding:0 20px;white-space:nowrap;font-size:11px;font-weight:600;backdrop-filter:blur(12px)}
-.demo-panel{position:fixed;z-index:20;left:50%;top:50%;transform:translate(-50%,-50%);width:min(370px,calc(100vw - 24px));max-height:80dvh;overflow-y:auto;overscroll-behavior:contain;padding:19px;border:1px solid rgba(147,175,210,.2);border-radius:23px;background:rgba(12,17,32,.98);box-shadow:0 26px 70px rgba(0,0,0,.5);backdrop-filter:blur(23px)}
+.demo-panel{position:fixed;z-index:20;left:50%;top:calc(12px + env(safe-area-inset-top,0px));bottom:calc(12px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(370px,calc(100vw - 24px));max-height:none;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;touch-action:pan-y;padding:19px 19px 28px;border:1px solid rgba(147,175,210,.2);border-radius:23px;background:rgba(12,17,32,.98);box-shadow:0 26px 70px rgba(0,0,0,.5);backdrop-filter:blur(23px);-webkit-backdrop-filter:blur(23px)}
+html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
+.demo-panel-head{position:sticky;top:-19px;z-index:3;display:flex;align-items:center;justify-content:space-between;gap:12px;margin:-19px -19px 8px;padding:15px 13px 9px 19px;background:rgba(12,17,32,.985);border-radius:22px 22px 0 0}
+.demo-panel-head h2{margin:0}
+.demo-panel-close{flex:0 0 37px;width:37px;height:37px;border:0;border-radius:50%;background:#79e6fc;color:#071c29;font-size:23px;font-weight:500;line-height:1;display:grid;place-items:center}
+.demo-panel-close:active{background:#5bd4ed}
 .demo-panel h2{font-size:15px;margin:0 0 5px;letter-spacing:-.02em}
 .demo-panel p{font-size:10px;line-height:1.55;color:#aab7c9;margin:0 0 15px}
 .demo-panel select{width:100%;min-height:45px;border:1px solid rgba(129,161,204,.26);border-radius:13px;background:#151e2f;color:#f4f6ff;padding:0 12px;font-weight:600;font-size:12px}
@@ -444,8 +449,8 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 <button class="demo-toggle" id="demo-toggle" type="button" aria-expanded="false" aria-controls="demo-panel">Probar estados · Laboratorio</button>
 <p class="gxb-preview-label" style="text-align:center">Vista conceptual · Los beneficios utilizan datos de muestra.</p>
 </main>
-<section class="demo-panel" id="demo-panel" aria-label="Simulador de estados" hidden>
-<h2>Tarjeta dinámica</h2><p>Escenarios ficticios. No se conecta con cuentas, pagos ni notificaciones reales.</p>
+<section class="demo-panel" id="demo-panel" aria-label="Simulador de estados" role="dialog" aria-modal="true" tabindex="-1" hidden>
+<div class="demo-panel-head"><h2>Tarjeta dinámica</h2><button id="demo-panel-close" type="button" class="demo-panel-close" aria-label="Cerrar laboratorio">×</button></div><p>Escenarios ficticios. No se conecta con cuentas, pagos ni notificaciones reales.</p>
 <label for="scenario" class="hint">Situación de prueba</label>
 <select id="scenario">
 <option value="clear">Todo al corriente</option>
@@ -646,11 +651,21 @@ function openDetail(){
 function closeDetail(){const d=$('detail');if(typeof d.close==='function')d.close();else d.removeAttribute('open');}
 $('focus').addEventListener('click',openDetail);
 $('detail-close').addEventListener('click',closeDetail);
-$('demo-toggle').addEventListener('click',()=>{
+let previousDemoFocus=null;
+function setDemoOpen(open){
  const panel=$('demo-panel');
- panel.hidden=!panel.hidden;
- $('demo-toggle').setAttribute('aria-expanded',String(!panel.hidden));
- if(!panel.hidden)$('scenario').focus({preventScroll:true});
+ if(open===!panel.hidden)return;
+ if(open)previousDemoFocus=document.activeElement;
+ panel.hidden=!open;
+ document.documentElement.classList.toggle('gx-demo-open',open);
+ $('demo-toggle').setAttribute('aria-expanded',String(open));
+ if(open){panel.scrollTop=0;panel.focus({preventScroll:true})}
+ else if(previousDemoFocus && typeof previousDemoFocus.focus==='function'){previousDemoFocus.focus({preventScroll:true})}
+}
+$('demo-toggle').addEventListener('click',()=>setDemoOpen($('demo-panel').hidden));
+$('demo-panel-close').addEventListener('click',()=>setDemoOpen(false));
+$('demo-panel').addEventListener('keydown',event=>{
+ if(event.key==='Escape'){event.stopPropagation();setDemoOpen(false)}
 });
 $('scenario').addEventListener('change',e=>render(e.target.value,false));
 function setLayout(mode){
@@ -670,8 +685,7 @@ function setLayout(mode){
 }
 document.querySelectorAll('[data-layout-preset]').forEach(b=>b.addEventListener('click',()=>setLayout(b.dataset.layoutPreset)));
 document.querySelectorAll('.local-only,#session,#bell').forEach(n=>n.addEventListener('click',()=>{
- $('demo-panel').hidden=false;
- $('demo-toggle').setAttribute('aria-expanded','true');
+ setDemoOpen(true);
  $('priority-note').textContent='La navegación real permanece intacta; esta vista solo demuestra la tarjeta.';
 }));
 function updateGlass(percent){
