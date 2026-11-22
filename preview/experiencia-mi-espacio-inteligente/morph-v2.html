@@ -158,6 +158,48 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
  .glass-beam,.glass-orb,.glass-glyph{animation:none!important}
  .glass-beam{left:20%!important}
 }
+
+/* Vista de coherencia visual: muestras con datos ficticios; la geometría del
+   catálogo oficial no se modifica y estas tarjetas no usan Supabase. */
+.gxc-section{margin:45px 2px 0}
+.gxc-heading{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin:0 4px 13px}
+.gxc-heading h2{font-size:15px;letter-spacing:-.025em;line-height:1.25;font-weight:700;margin:0}
+.gxc-heading small{color:#91a3b6;font-size:9px;line-height:1.3;text-align:right}
+.gxc-rewards{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.gxc-surface{background:rgba(8,8,12,.371);-webkit-backdrop-filter:blur(11.75px) saturate(1);backdrop-filter:blur(11.75px) saturate(1);border:1px solid rgba(255,255,255,.035);box-shadow:0 15px 36px rgba(0,0,0,.23),inset 0 1px rgba(255,255,255,.05);color:#f4f7ff}
+.gxc-reward{position:relative;display:flex;flex-direction:column;overflow:hidden;isolation:isolate;min-width:0;min-height:164px;padding:18px 14px 15px;border-radius:22px;text-align:left;cursor:pointer;gap:0}
+.gxc-reward:before{content:attr(data-watermark);position:absolute;right:-8px;top:49%;transform:translateY(-50%) rotate(-14deg);font-size:94px;opacity:.14;pointer-events:none;z-index:-1}
+.gxc-reward-kicker{font-size:9px;letter-spacing:.095em;color:#aebfd1;font-weight:700}
+.gxc-reward-name{font-size:17px;line-height:1.15;letter-spacing:-.028em;margin-top:20px;max-width:90%;font-weight:700}
+.gxc-reward-detail{font-size:10.5px;line-height:1.3;color:#8fdce6;margin-top:8px;font-weight:600;max-width:92%}
+.gxc-reward[data-kind="referral"] .gxc-reward-detail{color:#b9b1ef}
+.gxc-reward-bar{margin-top:auto;width:100%;height:5px;border-radius:99px;background:rgba(235,245,255,.08);overflow:hidden}
+.gxc-reward-bar span{display:block;height:100%;width:66%;background:linear-gradient(90deg,#8c6eff,#72e5e9);border-radius:inherit}
+.gxc-reward[data-kind="referral"] .gxc-reward-bar span{width:0}
+.gxc-reward:focus-visible,.gxc-mini:focus-visible,.gxc-close:focus-visible{outline:2px solid #6de0ef;outline-offset:3px}
+.gxc-reward:active{transform:scale(.99)}
+.gxc-reward-expanded{margin:11px 0 0;padding:16px;border-radius:22px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.gxc-reward-expanded strong{font-size:13px;line-height:1.35;font-weight:700}
+.gxc-reward-expanded small{display:block;margin-top:4px;color:#abb9cb;font-size:10px;line-height:1.45}
+.gxc-close{flex-shrink:0;background:rgba(255,255,255,.08);border:0;border-radius:999px;color:#ddedf3;min-height:38px;padding:8px 12px;font-size:10px;white-space:nowrap}
+.gxc-mini-rail{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:9px}
+.gxc-mini{position:relative;display:grid;grid-template-columns:35px minmax(0,1fr) 16px;gap:9px;align-items:center;padding:10px 9px;min-width:0;min-height:76px;border-radius:16px;text-align:left}
+.gxc-mini-icon{width:34px;height:34px;display:grid;place-items:center;border-radius:10px;background:rgba(255,255,255,.035);font-size:17px}
+.gxc-mini-copy{display:flex;flex-direction:column;min-width:0;gap:4px}
+.gxc-mini-copy strong{font-size:10px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gxc-mini-copy small{font-size:9px;line-height:1.3;color:#9baabd}
+.gxc-mini-arrow{color:#9bacbf;font-size:16px}
+.gxc-note{font-size:10px;color:#8498af;line-height:1.5;margin:14px 3px 0}
+@media(max-width:345px){
+.gxc-rewards{gap:8px}
+.gxc-reward{padding:15px 11px;min-height:156px}
+.gxc-reward-name{font-size:15px}
+.gxc-mini-rail{grid-auto-columns:minmax(0,1fr);gap:6px}
+.gxc-mini{grid-template-columns:24px minmax(0,1fr) 11px;gap:5px;padding:8px 6px}
+.gxc-mini-icon{width:25px;height:25px;font-size:13px}
+.gxc-mini-copy strong{font-size:9px}
+}
+@media(prefers-reduced-motion:reduce){.gxc-reward:active{transform:none}}
 </style>
 </head>
 <body>
@@ -202,6 +244,36 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
  <div class="right"><span>3/4 pagos</span><span class="progress" aria-hidden="true"><span></span></span></div>
 </div>
 <div class="after"><h2>Tus servicios</h2><p>Consulta tus accesos, beneficios y solicitudes.</p></div>
+
+<section class="gxc-section" aria-label="Tarjetas de beneficios con el mismo cristal">
+ <header class="gxc-heading"><h2>Beneficios</h2><small>Datos de demostración</small></header>
+ <div class="gxc-rewards" id="gxc-rewards">
+   <button type="button" class="gxc-reward gxc-surface" data-kind="referral" data-watermark="🎁" aria-expanded="false" aria-controls="gxc-reward-expanded">
+     <span class="gxc-reward-kicker">REFERIDOS</span><strong class="gxc-reward-name">Invita y gana</strong>
+     <span class="gxc-reward-detail">Empieza a referir</span><span class="gxc-reward-bar" aria-hidden="true"><span></span></span>
+   </button>
+   <button type="button" class="gxc-reward gxc-surface" data-kind="mission" data-watermark="🎯" aria-expanded="false" aria-controls="gxc-reward-expanded">
+     <span class="gxc-reward-kicker">MISIONES</span><strong class="gxc-reward-name">Tu progreso</strong>
+     <span class="gxc-reward-detail">2 de 3 completadas</span><span class="gxc-reward-bar" aria-hidden="true"><span></span></span>
+   </button>
+ </div>
+ <div class="gxc-reward-expanded gxc-surface" id="gxc-reward-expanded" hidden>
+   <div><strong id="gxc-reward-expanded-title"></strong><small id="gxc-reward-expanded-caption"></small></div>
+   <button type="button" class="gxc-close" id="gxc-close">Cerrar</button>
+ </div>
+</section>
+<section class="gxc-section" aria-label="Tarjetas compactas de catálogo">
+ <header class="gxc-heading"><h2>Catálogo</h2><small>Muestras compactas</small></header>
+ <div class="gxc-mini-rail">
+  <button class="gxc-mini gxc-surface" type="button" data-catalog="a" aria-label="Ver detalle de servicio A de demostración">
+   <span class="gxc-mini-icon" aria-hidden="true">✦</span><span class="gxc-mini-copy"><strong>Servicio A</strong><small>Explorar opciones</small></span><span class="gxc-mini-arrow" aria-hidden="true">›</span>
+  </button>
+  <button class="gxc-mini gxc-surface" type="button" data-catalog="b" aria-label="Ver detalle de servicio B de demostración">
+   <span class="gxc-mini-icon" aria-hidden="true">◈</span><span class="gxc-mini-copy"><strong>Servicio B</strong><small>Explorar opciones</small></span><span class="gxc-mini-arrow" aria-hidden="true">›</span>
+  </button>
+ </div>
+ <p class="gxc-note">En el catálogo desplegable real se conservarán las transformaciones y promociones actuales. Aquí solo se compara el material de las superficies.</p>
+</section>
 </section>
 </main>
 <button class="demo-toggle" id="demo-toggle" type="button" aria-expanded="false" aria-controls="demo-panel">Probar estados</button>
@@ -479,6 +551,41 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
  const shape=paths[states[active].icon];
  iconHandle=mod.createMorph(path,shape,{reducedMotion:'user'});
 }).catch(()=>{ /* fallback SVG accesible sin la dependencia externa */ });
+})();
+
+(function(){
+ const expanded=document.getElementById('gxc-reward-expanded');
+ const title=document.getElementById('gxc-reward-expanded-title');
+ const caption=document.getElementById('gxc-reward-expanded-caption');
+ const cards=[...document.querySelectorAll('#gxc-rewards [data-kind]')];
+ const copy={
+   mission:['Tu progreso','Las misiones y recompensas siguen utilizando la lógica oficial, sin duplicar estados.'],
+   referral:['Invita y gana','Los referidos conservan su sistema de progreso y validación real.']
+ };
+ function hide(){
+   expanded.hidden=true;
+   cards.forEach(button=>button.setAttribute('aria-expanded','false'));
+ }
+ cards.forEach(button=>button.addEventListener('click',()=>{
+   const same=button.getAttribute('aria-expanded')==='true';
+   if(same){hide();return;}
+   cards.forEach(n=>n.setAttribute('aria-expanded',String(n===button)));
+   const [heading,details]=copy[button.dataset.kind];
+   title.textContent=heading;caption.textContent=details;
+   expanded.hidden=false;
+   if(!window.matchMedia('(prefers-reduced-motion:reduce)').matches&&typeof expanded.animate==='function'){
+      expanded.animate([{opacity:0,transform:'translateY(-7px)'},{opacity:1,transform:'translateY(0)'}],
+       {duration:310,easing:'cubic-bezier(.2,.82,.2,1)'});
+   }
+ }));
+ document.getElementById('gxc-close').addEventListener('click',hide);
+ document.querySelectorAll('[data-catalog]').forEach(button=>button.addEventListener('click',()=>{
+  const dialog=document.getElementById('detail');
+  document.getElementById('detail-title').textContent='Catálogo · vista conceptual';
+  document.getElementById('detail-text').textContent='Estas tarjetas usan datos ficticios. El despliegue, el carrito y las promociones de GOXION permanecen sin cambios.';
+  if(typeof dialog.showModal==='function')dialog.showModal();
+  else dialog.setAttribute('open','');
+ }));
 })();
 </script>
 <script id="goxion-wave-background" src="../../assets/js/ayuda/06-wave-background.js"></script>
