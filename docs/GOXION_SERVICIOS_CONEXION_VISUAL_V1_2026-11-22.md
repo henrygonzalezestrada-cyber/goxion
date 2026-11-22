@@ -38,13 +38,15 @@ Cuando `combinedNotices` trae más de un evento, la primera novedad conserva la 
 
 **Validación pendiente:** confrontar conteos de `+N` con las novedades que ya se presentan mediante la tarjeta de credencial, y revisar variaciones de varios avisos reales sin perder el foco ni el contenido al refrescar.
 
-## Corrección visual obligatoria · sin líneas decorativas
+## Corrección visual LOCAL en Servicios · no generalizar al feed
 
-Tras evaluar el laboratorio, el usuario **rechazó explícitamente** la línea de color que aparecía bajo el logo al abrir Servicios y el copy demasiado extenso en las tarjetas. Se eliminó del laboratorio tanto el separador con gradiente como el separador neutro; no sustituir por otra raya. El color semántico debe vivir **solo en indicador/palabras esenciales**, no en bordes, glow, halos ni encapsulados artificiales.
+Tras evaluar el laboratorio, el usuario **rechazó explícitamente** la línea de color que aparecía bajo el logo al abrir Servicios y el copy demasiado extenso en las tarjetas. Se eliminó del laboratorio tanto el separador con gradiente como el separador neutro; no sustituir por otra raya. **Dentro de Servicios**, el estado semántico se limita al indicador y al texto necesario. Esta restricción no afecta barras de progreso, emojis, títulos contrastados, morph, separaciones de tareas, logos flotantes ni contador de las otras tarjetas.
 
 En esta rama se aplicó `#view-dashboard .gx-service-divider{display:none!important}` y se quitaron bordes decorativos del disclosure de novedades. Los textos oficiales y recorridos de backend aún **no se deben resumir mecánicamente** si son necesarios para consentimiento, seguridad o información contractual: priorizar la vista compacta y usar disclosure/vistas específicas para el detalle completo.
 
-**Bloqueo de aprobación visual:** antes de fusionar el PR, confirmar que el resumen muestra solo logo, nombre y estado; que cada aviso expuesto es breve, sin repetir el estado; y que las instrucciones legales o sensibles permanecen accesibles donde corresponde. No agregar otros contenedores secundarios, ni animaciones ornamentales.
+**Bloqueo de aprobación visual de Servicios únicamente:** antes de fusionar el PR, confirmar logo, nombre, estado y cierre en compacta; avisos breves no redundantes y contenidos legales/sensibles accesibles cuando corresponda. No agregar elementos ornamentales gratuitos **en este módulo**. Las microanimaciones funcionales de beneficios, ahorro y catálogo permanecen fuera del alcance.
+
+**Contrato superior vigente:** [GOXION_FEED_CONTRATO_VISUAL_POR_COMPONENTE_2026-11-22.md](GOXION_FEED_CONTRATO_VISUAL_POR_COMPONENTE_2026-11-22.md). Esta rama NO puede redefinir las reglas de Lealtad, Referidos, Misiones, Ahorro, Hero, Catálogo ni otras experiencias.
 
 ## Escenarios mínimos antes de fusionar
 
