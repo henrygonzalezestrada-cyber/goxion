@@ -127,6 +127,7 @@
  flex:1 1 48px;width:48px;aspect-ratio:auto;border-radius:999px;
 }
 .gxn-top[data-docked="true"] .gxn-menu{top:calc(100% + 7px)}
+.gxn-top[data-docked="true"] .gxn-menu:not([hidden]){pointer-events:auto}
 .gxn-top[data-docked="true"] .gxn-notice-menu{right:49px}
 @media(max-width:375px){
  .gxn-top[data-docked="true"]{
