@@ -423,6 +423,42 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
 @media(max-width:315px){.gxs-trigger{gap:8px}.gxs-name{font-size:12.5px}.gxs-header h2{font-size:16px}}
 @media(prefers-reduced-motion:reduce){.gxs-card,.gxs-icon,.gxs-reveal,.gxs-reveal-inner,.gxs-body{animation:none!important;transition:none!important;transform:none!important}}
 
+
+/* Historial de movimientos: hechos registrados, no otro panel de estados. */
+.gxm-history{margin:27px 2px 0;min-width:0}
+.gxm-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 4px 12px}
+.gxm-head h2{min-width:0;margin:0;color:#f5f9ff;font-size:17px;font-weight:700;letter-spacing:-.03em;line-height:1.25}
+.gxm-filter-toggle{min-height:44px;min-width:73px;display:flex;align-items:center;justify-content:flex-end;gap:5px;padding:8px 1px 8px 10px;color:#b6cad7;background:transparent;border:0;font:inherit;font-size:11px;font-weight:600;cursor:pointer}
+.gxm-filter-toggle svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s}
+.gxm-filter-toggle[aria-expanded="true"] svg{transform:rotate(180deg)}
+.gxm-filters[hidden],.gxm-more[hidden],.gxm-detail[hidden],.gxm-empty[hidden]{display:none!important}
+.gxm-filters{display:flex;gap:7px;margin:0 4px 11px;flex-wrap:wrap}
+.gxm-filters button{min-height:39px;border:1px solid rgba(219,236,253,.075);border-radius:999px;padding:8px 12px;background:rgba(255,255,255,.035);color:#b6c8d8;font:inherit;font-size:10.5px;font-weight:600;cursor:pointer}
+.gxm-filters button[aria-pressed="true"]{background:rgba(110,209,213,.13);border-color:rgba(110,209,213,.19);color:#96edf0}
+.gxm-list{overflow:hidden;border-radius:22px;min-height:72px}
+.gxm-entry+.gxm-entry{border-top:1px solid rgba(225,239,250,.07)}
+.gxm-entry-button{display:grid;grid-template-columns:35px minmax(0,1fr) auto 16px;align-items:center;gap:10px;width:100%;min-height:76px;padding:13px 14px;border:0;background:transparent;text-align:left;color:#f4f8ff;font:inherit;cursor:pointer}
+.gxm-icon{display:grid;place-items:center;width:34px;height:34px;flex:0 0 34px;border-radius:12px;background:rgba(226,238,249,.045);color:#a8d4dd}
+.gxm-entry[data-kind="payment"] .gxm-icon{color:#8cdec1}
+.gxm-entry[data-kind="renewal"] .gxm-icon{color:#b9b0ed}
+.gxm-entry[data-kind="cancellation"] .gxm-icon{color:#e8b38f}
+.gxm-icon svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.gxm-entry-copy{display:grid;gap:5px;min-width:0}
+.gxm-entry-copy strong{font-size:12px;font-weight:650;line-height:1.35;color:#f1f7ff;overflow-wrap:anywhere}
+.gxm-entry-copy small{font-size:10.5px;font-weight:500;line-height:1.35;color:#9eb2c3;overflow-wrap:anywhere}
+.gxm-entry-value{font-size:12px;font-weight:700;line-height:1.3;color:#e5f1fc;white-space:nowrap;font-variant-numeric:tabular-nums}
+.gxm-arrow{display:grid;place-items:center;color:#889faf}
+.gxm-arrow svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;transition:transform .25s}
+.gxm-entry.is-open .gxm-arrow svg{transform:rotate(180deg)}
+.gxm-detail{margin:-3px 17px 14px 59px;color:#b8cbd9;font-size:10.5px;line-height:1.6}
+.gxm-more{display:block;margin:5px auto 0;padding:9px 17px;min-height:44px;border:0;background:transparent;color:#8de0e7;font:inherit;font-size:11px;font-weight:600;cursor:pointer}
+.gxm-empty{padding:20px 15px;font-size:11px;line-height:1.5;color:#b9cbd8}
+.gxm-footnote{font-size:9.5px;line-height:1.45;color:#89a0b0;margin:5px 5px 0}
+.gxm-filter-toggle:focus-visible,.gxm-filters button:focus-visible,.gxm-entry-button:focus-visible,.gxm-more:focus-visible{outline:2px solid #79e6fc;outline-offset:-3px;border-radius:9px}
+@media(max-width:380px){.gxm-head h2{font-size:16px}.gxm-entry-button{grid-template-columns:32px minmax(0,1fr) auto 14px;gap:8px;padding:11px 12px;min-height:72px}.gxm-icon{width:32px;height:32px}.gxm-entry-value{font-size:11.5px}.gxm-detail{margin-left:52px}}
+@media(max-width:315px){.gxm-head h2{font-size:15px}.gxm-entry-button{gap:6px;padding:10px}.gxm-entry-copy strong{font-size:11.5px}.gxm-entry-value{font-size:11px}}
+@media(prefers-reduced-motion:reduce){.gxm-filter-toggle svg,.gxm-arrow svg{transition:none!important}}
+
 .gxc-mini-rail{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:9px}
 .gxc-mini{position:relative;display:grid;grid-template-columns:35px minmax(0,1fr) 16px;gap:9px;align-items:center;padding:10px 9px;min-width:0;min-height:76px;border-radius:16px;text-align:left}
 .gxc-mini-icon{width:34px;height:34px;display:grid;place-items:center;border-radius:10px;background:rgba(255,255,255,.035);font-size:17px}
@@ -535,6 +571,21 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
   </select>
   <small id="gxs-lab-outcome" aria-live="polite">Datos de muestra, sin cambios reales.</small>
  </div>
+</section>
+
+<section class="gxm-history" id="gxm-history" aria-labelledby="gxm-title">
+ <header class="gxm-head">
+  <h2 id="gxm-title">Historial de movimientos</h2>
+  <button class="gxm-filter-toggle" id="gxm-filter-toggle" type="button" aria-expanded="false" aria-controls="gxm-filters"><span id="gxm-filter-label">Todos</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+ </header>
+ <div class="gxm-filters" id="gxm-filters" role="group" aria-label="Filtrar movimientos de ejemplo" hidden>
+  <button type="button" data-gxm-filter="all" aria-pressed="true">Todos</button>
+  <button type="button" data-gxm-filter="payment" aria-pressed="false">Pagos</button>
+  <button type="button" data-gxm-filter="service" aria-pressed="false">Servicios</button>
+ </div>
+ <div class="gxm-list gxc-surface" id="gxm-list" aria-label="Historial ilustrativo"></div>
+ <button type="button" class="gxm-more" id="gxm-more" hidden>Ver todos los movimientos</button>
+ <p class="gxm-footnote">Ejemplo visual · Movimientos ficticios.</p>
 </section>
 
 <section class="gxc-section" aria-label="Tarjetas compactas de catálogo">
@@ -1534,6 +1585,79 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
 })();
 </script>
 
+
+<script>
+/* Historial de movimientos DEMOSTRATIVO, sin credenciales ni conexión a backend.
+   Registros definitivos: pago ≠ renovación; cancelación solicitada ≠ baja efectiva. */
+(function(){
+ 'use strict';
+ const root=document.getElementById('gxm-history');
+ const list=document.getElementById('gxm-list');
+ const filterToggle=document.getElementById('gxm-filter-toggle');
+ const filterPanel=document.getElementById('gxm-filters');
+ const filterLabel=document.getElementById('gxm-filter-label');
+ const more=document.getElementById('gxm-more');
+ if(!root||!list||!filterToggle||!filterPanel||!filterLabel||!more)return;
+ const records=[
+  {id:'p-nov',kind:'payment',date:'2026-11-15',title:'Pago acreditado',subject:'Noviembre',amount:'$289',detail:'Pago en tiempo · Sumó a tu lealtad.'},
+  {id:'a-ms',kind:'acquisition',date:'2026-11-12',title:'Microsoft 365 agregado',subject:'Alta confirmada',detail:'Nuevo servicio incorporado a tu cuenta.'},
+  {id:'r-crunch',kind:'renewal',date:'2026-11-01',title:'Renovación confirmada',subject:'Crunchyroll',detail:'Nuevo periodo de cobertura confirmado.'},
+  {id:'c-one',kind:'cancellation',date:'2026-10-28',title:'Baja efectiva',subject:'Google One',detail:'Servicio finalizado; se conserva su registro.'},
+  {id:'c-request',kind:'cancellation',date:'2026-10-25',title:'Cancelación solicitada',subject:'Google One',detail:'Solicitud registrada antes de su baja efectiva.'},
+  {id:'p-oct',kind:'payment',date:'2026-10-15',title:'Pago acreditado',subject:'Octubre',amount:'$249',detail:'Pago en tiempo · Sumó a tu lealtad.'},
+  {id:'a-netflix',kind:'acquisition',date:'2026-10-10',title:'Netflix agregado',subject:'Alta confirmada',detail:'Servicio incorporado a tu cuenta.'}
+ ];
+ const glyph={
+  payment:'<path d="M5 12.5 10 17l9-10"/>',
+  acquisition:'<path d="M12 5v14M5 12h14"/>',
+  renewal:'<path d="M20 11a8 8 0 1 0-2.3 5.7M20 5v6h-6"/>',
+  cancellation:'<path d="M5 12h14"/>'
+ };
+ let activeFilter='all',allVisible=false,openId=null;
+ const formatDate=value=>new Date(value+'T12:00:00').toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric'});
+ function iconFor(kind){
+  const el=document.createElement('span');el.className='gxm-icon';el.setAttribute('aria-hidden','true');
+  el.innerHTML='<svg viewBox="0 0 24 24">'+(glyph[kind]||glyph.acquisition)+'</svg>';
+  return el;
+ }
+ function visibleRecords(){return activeFilter==='all'?records:records.filter(x=>activeFilter==='payment'?x.kind==='payment':x.kind!=='payment')}
+ function draw(){
+  const entries=visibleRecords();
+  const shown=allVisible?entries:entries.slice(0,3);
+  const frag=document.createDocumentFragment();
+  for(const entry of shown){
+   const item=document.createElement('div');item.className='gxm-entry';item.dataset.kind=entry.kind;
+   const button=document.createElement('button');button.type='button';button.className='gxm-entry-button';button.setAttribute('aria-expanded',String(openId===entry.id));button.setAttribute('aria-controls','gxm-detail-'+entry.id);
+   button.append(iconFor(entry.kind));
+   const copy=document.createElement('span');copy.className='gxm-entry-copy';
+   const title=document.createElement('strong');title.textContent=entry.title;
+   const sub=document.createElement('small');sub.textContent=formatDate(entry.date)+' · '+entry.subject;
+   copy.append(title,sub);button.append(copy);
+   if(entry.amount){const value=document.createElement('strong');value.className='gxm-entry-value';value.textContent=entry.amount;button.append(value)}
+   const arrow=document.createElement('span');arrow.className='gxm-arrow';arrow.setAttribute('aria-hidden','true');
+   arrow.innerHTML='<svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>';button.append(arrow);
+   const detail=document.createElement('p');detail.id='gxm-detail-'+entry.id;detail.className='gxm-detail';
+   detail.textContent=entry.detail;detail.hidden=openId!==entry.id;item.classList.toggle('is-open',!detail.hidden);
+   button.addEventListener('click',()=>{openId=openId===entry.id?null:entry.id;draw()});
+   item.append(button,detail);frag.append(item);
+  }
+  list.replaceChildren(frag);
+  if(!entries.length){const empty=document.createElement('p');empty.className='gxm-empty';empty.textContent='No hay movimientos de este tipo en la muestra.';list.append(empty)}
+  more.hidden=entries.length<=3;
+  more.textContent=allVisible?'Mostrar menos':'Ver todos los movimientos';
+ }
+ filterToggle.addEventListener('click',()=>{filterPanel.hidden=!filterPanel.hidden;filterToggle.setAttribute('aria-expanded',String(!filterPanel.hidden))});
+ filterPanel.addEventListener('click',event=>{
+  const control=event.target.closest('[data-gxm-filter]');if(!control||!filterPanel.contains(control))return;
+  activeFilter=control.dataset.gxmFilter;allVisible=false;openId=null;
+  filterLabel.textContent=activeFilter==='payment'?'Pagos':activeFilter==='service'?'Servicios':'Todos';
+  filterPanel.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b===control)));
+  filterPanel.hidden=true;filterToggle.setAttribute('aria-expanded','false');filterToggle.focus({preventScroll:true});draw();
+ });
+ more.addEventListener('click',()=>{allVisible=!allVisible;openId=null;draw()});
+ draw();
+})();
+</script>
 
 <script id="goxion-wave-background" src="../../assets/js/ayuda/06-wave-background.js"></script>
 </body>
