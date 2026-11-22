@@ -1,6 +1,6 @@
 # GOXION — Auditoría visual del feed: Lealtad, Referidos y Misiones
 **Fecha:** 22/nov/2026  
-**Estado:** diagnóstico y propuesta, NO diseño aprobado y NO implementación.  
+**Estado:** diagnóstico aplicado a una **nueva propuesta de laboratorio**, pendiente de evaluación visual y aprobación; NO integrado a producción.  
 **Origen:** captura real del laboratorio en iPhone aportada por el usuario en la conversación, comparada con la página oficial y referencias externas.
 
 ## Alcance e invariantes
@@ -83,3 +83,24 @@
 - **Conservar:** idea de las 3 unidades en fila, iconos vivos a color, barras de progreso, celebración por recompensa y material coherente con GOXION.
 - **Rehacer:** arquitectura del panel, transición real al expandir/colapsar, copy e información del panel, contraste local, altura y cierre táctil, y demo UI superpuesta.
 - **No hacer:** seguir sumando sombras, gradientes y keyframes al componente actual; no introducir nuevas dependencias en producción; no tocar ni la tarjeta principal aprobada ni `ayuda.html` hasta validar la nueva dirección.
+
+## Iteración experimental aplicada — 22/nov/2026
+
+**Commit de laboratorio:** `1a65bd4c918735a6b22410c4b2fa09296c045875`  
+**Archivo:** `preview/experiencia-mi-espacio-inteligente/morph-v2.html`  
+**URL de la vista:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=1a65bd4
+
+Se implementó una propuesta para comparar, **aún no aprobada**:
+
+- Fila triple con etiquetas más legibles, menos bordes/brillos permanentes, emoji compacto a color completo y barras breves.
+- Al abrir **se reemplaza** la fila por un solo panel, no se agrega el mismo contenido en otra tarjeta debajo.
+- Superficie y emoji comparten un movimiento geométrico de aprox. 455ms; cierre inverso. Las coordenadas del emoji se capturan antes de ocultar su origen para evitar pérdida de medidas; el contenido aparece después del movimiento.
+- Emoji ampliado en la esquina inferior derecha, dentro del panel; zona inferior reservada para no interferir con botones y texto.
+- Se redujo el texto visible y se trasladaron condiciones largas a un botón secundario que realmente las despliega. El botón de cierre mide 44x44px.
+- El panel visual de prueba `Probar estados · Laboratorio` se movió al pie del documento, fuera del viewport del feed, y se volvió desplazable en móvil. Incluye simulación de Referidos sin invitado / activo / listo / reclamado y Misiones listas.
+- No hay consulta a servicios ni acciones financieras; la copia de invitación genera únicamente texto explícitamente de demostración.
+- La tarjeta `Compacta centrada` aprobada, su cristal, saludo, textos y animaciones se conservaron; **no se modificó** `ayuda.html`.
+
+**Validaciones hechas:** sintaxis de JavaScript, balance de llaves CSS, presencia de los 12 escenarios de la tarjeta, conservación literal de selectores y funciones fundamentales del hero/saludo, y publicación GitHub Pages exitosa para el commit. **No afirmar validación real en Safari/iPhone ni aprobación de diseño hasta recibir feedback del usuario.**
+
+La versión debe evaluarse particularmente en iPhone: apertura de cada módulo, cierre inverso, emoji compartido, scroll/posibles saltos al reflujo, estado listo y legibilidad. Si visualmente no supera a la oficial, NO integrar.
