@@ -183,3 +183,16 @@ Abrir Lealtad, Referidos y Misiones; alternar varias veces el icono ⓘ (y «Mis
 - **Invariantes protegidos:** no modificar CSS/HTML del hero aprobado, beneficios Lealtad/Referidos/Misiones, X cian, botones CTA, medidores ni anchura exterior de ahorro, laboratorio de escenarios, motor financiero o las páginas oficiales.
 
 **QA:** ambos estilos CSS compactos y media queries revisados; sintaxis de los 3 scripts intacta; simulación DOM de palabras (nombre destacado, textos y animaciones) y prueba de maquetación aislada en Chromium a 280, 315, 375, 390, 430 y 580px con saludo corto y frase larga: hueco visual hasta el hero ~14–17px, salto a dos líneas sin desbordamiento horizontal. **No equivale a validar toda la página en Safari físico**. El usuario debe evaluar la versión; todavía no aprobada para producción.
+
+## Microajuste aprobado para probar · saludo intermedio + texto del ahorro desplazado (22/nov/2026)
+
+**Petición precisa del usuario:** tras la iteración de saludo anclado abajo, prefiere que quede **centrado/intermedio** verticalmente en su reserva de hasta dos líneas (sin demasiado espacio arriba). En la tarjeta de ahorro la composición todavía se percibe hacia la izquierda; **NO cambiar los logos ni su ubicación**, únicamente desplazar el grupo de texto del importe un poco a la derecha.
+
+**Rama:** `preview/saludo-centrado-ahorro-texto-20261122`. **Commit HTML:** `6ae5b46c34db38d0a38d8d272d0650a7de1f4304`.
+
+Dos ediciones CSS exactas en `preview/experiencia-mi-espacio-inteligente/morph-v2.html`:
+
+1. `.greeting h1`: `align-items:flex-end` → `align-items:center`. Conserva `height:2.32em`, el contenedor `.greeting` y `.greeting-line`, tamaño de la letra, todas las frases, rotación 13s y entrada por palabras. El texto queda equidistante de las líneas superior e inferior en vez de pegado abajo. La reserva permanece fija para evitar saltos de layout.
+2. `.gxv-value`: se añade únicamente `transform:translateX(clamp(7px,2.8vw,12px))` para desplazar la **columna de texto** entre 7–12px de forma adaptable. No cambiar `.gxv-logos`, los tamaños/posiciones/profundidad de logos, el grid externo, padding, fondo, CTA, contador numérico ni las barras de beneficios.
+
+**QA:** comparación exacta del HTML previo y posterior confirma que **solo** se editaron esas dos declaraciones; CSS balanceado, los tres scripts válidos, hero y textos dinámicos sin cambios. Pendiente revisión óptica por el usuario en Safari físico. Laboratorio exclusivamente; `ayuda.html` oficial sin cambios.
