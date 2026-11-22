@@ -80,7 +80,25 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
  .focus[data-layout="balanced"] .focus-copy{gap:8px}
  .focus[data-layout="balanced"] .focus-meta{font-size:9px}
 }
-.layout-compare{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:14px 0 9px}
+.layout-compare{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:14px 0 9px}
+/* Compacta: menos altura, acción centrada abajo. La altura puede crecer
+   en estados con más texto, sin forzar recortes ni tocar las animaciones. */
+.focus[data-layout="compact"]{min-height:242px;padding:24px 23px 19px 27px;grid-template-rows:minmax(127px,1fr) auto}
+.focus[data-layout="compact"] .focus-copy{display:flex;flex-direction:column;justify-content:center;align-self:center;gap:9px;min-height:0}
+.focus[data-layout="compact"] .focus-meta{display:block;flex:none;max-width:100%;font-size:11px;line-height:1.45;color:#b5c5d2;font-weight:500}
+.focus[data-layout="compact"] .focus-bottom{align-self:end;justify-content:center;margin-top:10px}
+.focus[data-layout="compact"] .focus-action{margin-inline:0}
+.glass-stage[data-layout="compact"] + .glass-test-label{display:none}
+.glass-stage[data-layout="compact"] ~ .secondary{margin-top:12px}
+@media(max-width:380px){
+ .focus[data-layout="compact"]{min-height:236px;padding:22px 18px 17px 20px;grid-template-rows:minmax(120px,1fr) auto}
+ .focus[data-layout="compact"] .focus-copy{gap:8px}
+ .focus[data-layout="compact"] .focus-meta{font-size:10px}
+}
+@media(max-width:315px){
+ .focus[data-layout="compact"]{min-height:234px;padding:20px 14px 16px 17px}
+ .focus[data-layout="compact"] .focus-meta{font-size:9px}
+}
 .layout-compare button{min-height:43px;border:1px solid rgba(174,202,224,.11);border-radius:13px;background:rgba(255,255,255,.035);color:#aebfd0;font-weight:600;font-size:11px}
 .layout-compare button[aria-pressed="true"]{background:rgba(92,196,198,.12);border-color:rgba(113,215,223,.30);color:#eafafa}
 .layout-compare-caption{display:block;color:#9cacc0;font-size:10px;line-height:1.4;margin:0 0 15px}
@@ -245,7 +263,7 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
   <span class="glass-orb"></span>
   <span class="glass-glyph">GOXION</span>
 </div>
-<button class="focus" id="focus" type="button" data-tone="calm" data-glass="on" data-layout="balanced" aria-describedby="focus-meta">
+<button class="focus" id="focus" type="button" data-tone="calm" data-glass="on" data-layout="compact" aria-describedby="focus-meta">
  <div class="focus-copy"><div class="focus-title" id="focus-title" aria-live="polite">Todo al corriente</div><span class="focus-meta" id="focus-meta">Próximo corte · 15 dic</span></div>
  <span class="focus-icon" id="focus-icon" aria-hidden="true">
   <svg viewBox="0 0 24 24" focusable="false"><path id="state-path" d="M20 6 9 17l-5-5"/></svg>
@@ -313,10 +331,11 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 </select>
 <span class="testcase" id="priority-note">La tarjeta muestra solo la acción de mayor prioridad.</span>
 <div class="layout-compare" role="group" aria-label="Comparar distribución de tarjeta">
- <button type="button" data-layout-preset="balanced" aria-pressed="true">Nueva distribución</button>
- <button type="button" data-layout-preset="original" aria-pressed="false">Distribución original</button>
+ <button type="button" data-layout-preset="compact" aria-pressed="true">Compacta centrada</button>
+ <button type="button" data-layout-preset="balanced" aria-pressed="false">Equilibrada</button>
+ <button type="button" data-layout-preset="original" aria-pressed="false">Original</button>
 </div>
-<span class="layout-compare-caption" id="layout-caption">Título y fecha juntos; acción abajo. Sin cambiar altura ni añadir contenido.</span>
+<span class="layout-compare-caption" id="layout-caption">Tarjeta menos alta; acción centrada en la base y lealtad debajo, por separado.</span>
 <div class="glass-material-selector" role="group" aria-label="Comparar materiales de cristal">
   <button type="button" data-material-preset="official" aria-pressed="false">GOXION oficial</button>
   <button type="button" data-material-preset="lab" aria-pressed="false">Laboratorio</button>
@@ -495,15 +514,19 @@ $('demo-toggle').addEventListener('click',()=>{
 });
 $('scenario').addEventListener('change',e=>render(e.target.value,false));
 function setLayout(mode){
- if(mode!=='balanced' && mode!=='original')return;
+ if(mode!=='compact' && mode!=='balanced' && mode!=='original')return;
  const card=$('focus'),meta=$('focus-meta'),copy=card.querySelector('.focus-copy'),bottom=card.querySelector('.focus-bottom');
- if(mode==='balanced')copy.appendChild(meta);
- else bottom.insertBefore(meta,bottom.querySelector('.focus-action'));
+ if(mode==='original')bottom.insertBefore(meta,bottom.querySelector('.focus-action'));
+ else copy.appendChild(meta);
  card.dataset.layout=mode;
+ $('glass-stage').dataset.layout=mode;
  document.querySelectorAll('[data-layout-preset]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.layoutPreset===mode)));
- $('layout-caption').textContent=mode==='balanced'
-  ?'Título y fecha juntos; acción abajo. Sin cambiar altura ni añadir contenido.'
-  :'Composición anterior: fecha y acción en la misma fila inferior.';
+ const captions={
+  compact:'Tarjeta menos alta; acción centrada en la base y lealtad debajo, por separado.',
+  balanced:'Título y fecha juntos; acción a la derecha, con la altura anterior.',
+  original:'Composición original: fecha y acción en la misma fila inferior.'
+ };
+ $('layout-caption').textContent=captions[mode];
 }
 document.querySelectorAll('[data-layout-preset]').forEach(b=>b.addEventListener('click',()=>setLayout(b.dataset.layoutPreset)));
 document.querySelectorAll('.local-only,#session,#bell').forEach(n=>n.addEventListener('click',()=>{
@@ -576,7 +599,7 @@ $('underlay-switch').addEventListener('click',()=>{
 updateGlass(15);
 updatePillAlpha(8);
 setGlassMaterial('neutral');
-setLayout('balanced');
+setLayout('compact');
 window.GOXION_MORPH_V2=Object.freeze({isolated:true,noBackend:true,scenarios:Object.keys(snapshots),classify,render,material:setGlassMaterial});
 render('clear',true);
 // Morphicons: librería real, cargada solo en este prototipo. SVG nativo queda disponible sin red.
