@@ -120,6 +120,13 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
  .secondary p{font-size:10.5px}
  .progress{width:58px}
 }
+@media(max-width:380px){
+ .focus[data-state="clear"]{grid-template-columns:minmax(0,1fr) minmax(74px,42%)}
+ .focus[data-state="new"]{grid-template-columns:minmax(0,1fr) minmax(68px,34%)}
+ .focus[data-state="multi"]{grid-template-columns:minmax(0,1fr) minmax(60px,26%)}
+ .focus[data-state="review"],.focus[data-state="extension"],.focus[data-state="cancellation"]{grid-template-columns:minmax(0,1fr) minmax(68px,31%)}
+ .focus-title{overflow-wrap:break-word}
+}
 @media(max-width:315px){
  .nav{gap:2px;padding:5px}
  .nav button{font-size:9px}
