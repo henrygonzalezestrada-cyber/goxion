@@ -4,10 +4,24 @@
 **Estado:** laboratorio interactivo actualizado, pendiente de validación visual final en iPhone/Safari y de aprobación del usuario. **NO integrado en producción.**  
 **Repositorio:** `henrygonzalezestrada-cyber/goxion`.
 
+## Decisión vigente · Historial de movimientos, no otra tarjeta de estado
+
+**El usuario aceptó evolucionar el último bloque a «Historial de movimientos»** (22/nov/2026), que debe incluir **pagos, altas de servicio, renovaciones confirmadas y cancelaciones**. Esta decisión **supersede** la recomendación anterior de limitarlo al «Historial de pagos» y la idea descartada de «Próximos movimientos». El objetivo es el registro cronológico de hechos pasados, no presentar otra vez estados o pendientes actuales.
+
+**Laboratorio implementado visualmente** en `main` commits `ab9a8e9fbf3ccac0fab5d5a9288192483f9cba69` y `73624b2f59fc86b62f6f18d908a22a0937164ae8`. Sección `#gxm-history`, **después de Servicios** y antes del Catálogo demostrativo. Una superficie neutra única con filas compactas, 3 por defecto, expansión total, filtro Todos/Pagos/Servicios, detalle por evento con foco preservado. Ejemplos de dos pagos, dos altas, una renovación y dos fases de cancelación, todos ficticios e identificados como tales.
+
+**Límite crucial:** `historial_pagos` ya existe con fuente real; la capa del cliente no muestra fecha de alta en cada servicio ni un evento confirmado de renovación y **no garantiza una bitácora completa de bajas efectivas de servicios retirados**. El nuevo título fue aprobado como alcance visual, **no implica que los cuatro tipos de eventos estén conectados**. No inventar movimientos ni inferir renovación a partir de pago/cobertura, ni baja efectiva por mera aprobación. Requiere contrato histórico real por evento antes de implementar en producción.
+
+**Documento canónico:** `docs/GOXION_HISTORIAL_MOVIMIENTOS_DISENO_Y_FUENTES_2026-11-22.md`. La UI del historial queda pendiente de validación visual en iPhone/Safari. Hero, Lealtad, Referidos, Misiones, Ahorro, Servicios y Catálogo **no se modificaron** en esa iteración. `ayuda.html` oficial sigue con Historial de pagos.
+
+**Vista actual:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=73624b2
+
+---
+
 ## Abrir primero al continuar en otro chat
 
-- **Laboratorio en GitHub Pages:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=2b2576c
-- **Fuente de la última iteración:** `preview/experiencia-mi-espacio-inteligente/morph-v2.html` en commit **`22cf678200c163baf28d11d5b94434b58a6eceb2`**. Jerarquía de título y ubicación de X: `d04c58818d883bee63615584a302f0dd76699886`. Los cambios de botón SVG y microsuperficie provienen de `5b034547f69f0f00cf67046b97ea72c1a07afb98`.
+- **Laboratorio en GitHub Pages:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=73624b2
+- **Fuente de la última iteración:** `preview/experiencia-mi-espacio-inteligente/morph-v2.html` en commit **`73624b2f59fc86b62f6f18d908a22a0937164ae8`**: propuesta del último módulo «Historial de movimientos» con 7 eventos ilustrativos, filtro y detalles progresivos. Los commits previos de X, hero, beneficios, ahorro y servicios permanecen como contratos históricos en este documento.
 - **Documentación de la tarjeta principal congelada:** `docs/GOXION_MI_ESPACIO_HERO_APROBADA_2026-11-22.md`.
 - **Auditoría visual previa y principios aprendidos:** `docs/GOXION_AUDITORIA_BENEFICIOS_FEED_2026-11-22.md`.
 - **Rama que preserva la tarjeta principal aprobada:** `approved/mi-espacio-hero-compacta-centrada-20261122`, apuntando a `f33e8572c07377f4811080a87c7cb1b483983b34`. Se elimina únicamente el rótulo flotante «GOXION» rechazado, según la documentación del hero.
@@ -324,6 +338,8 @@ Esta auditoría es de contrato, selectores y código actual: **no fusiona PR #23
 
 
 ## Auditoría de utilidad «Próximos movimientos» — recomendación de DESCARTE (22/nov/2026)
+
+> **NOTA HISTÓRICA:** se conserva esta auditoría como justificación para no añadir el bloque redundante. La recomendación de limitar la sección final a pagos **fue revisada y reemplazada** por la nueva decisión del usuario: Historial de movimientos con fuentes reales verificadas, tal como se indica al principio de este documento.
 
 **Estado:** análisis realizado por solicitud del usuario, **recomendación pendiente de su decisión**; no se ha añadido el bloque al laboratorio ni a producción. Reemplaza como recomendación práctica la idea prospectiva anterior que sigue más abajo solo por trazabilidad histórica.
 
