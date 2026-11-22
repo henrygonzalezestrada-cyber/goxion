@@ -25,7 +25,7 @@ for(const name of sources){
 }
 assert.ok(html.includes("mascota.css?v=official-f17"));
 assert.ok(html.includes("goxion-release-v2.css?v=oficial-v1"));
-assert.ok(html.includes("20-release-announcement.js?v=oficial-v1"));
+assert.ok(html.includes("20-release-announcement.js?v=oficial-v2-todos"));
 assert.ok(html.includes("21-legal-v2-documents.js?v=cola-v1"));
 assert.ok(!html.includes("avisos-apilados-beta"));
 assert.ok(!html.includes('iframe id="gxai-app"'));
@@ -43,7 +43,8 @@ assert.ok(news.includes('scroll.querySelectorAll("[data-gx-release-clone]").forE
 assert.ok(legal.includes('new CustomEvent("goxion:legal-opened"'));
 assert.ok(legal.includes('new CustomEvent("goxion:legal-dismissed"'));
 assert.ok(legal.includes("if(serverState?.estado===\"pendiente\"&&token())postpone();"));
-assert.ok(news.includes('const VERSION="nov2026-novedades-apiladas-v1"'));
+assert.ok(news.includes('const VERSION="nov2026-novedades-apiladas-v2-todos"'));
+assert.ok(news.includes('typeof globalClientesData!=="undefined"'),"Debe leer estado global lexical real");
 
 // Prueba de flujo con DOM reducido: toda la sesión es informativa.
 // Nunca se registra una decisión legal desde el módulo de novedades.
@@ -93,10 +94,10 @@ const document={
  addEventListener(){}
 };
 const handlers={};
+const globalClientesData={a:{},casone:{}};
 const window={
  GOXION_CORE:{STORAGE:{CLIENT_TOKEN:"clientToken"}},
  GOXION_LEGAL_V2:{getQueueStatus:()=>state},
- globalClientesData:{a:{},b:{}},
  getCurrentClientKey:()=>current,scrollY:scrollValue,
  scrollTo:(_x,y)=>{scrollValue=y;window.scrollY=y},
  matchMedia:()=>({matches:false}),
@@ -108,8 +109,8 @@ const requestAnimationFrame=fn=>{const id=++uid;frames.set(id,fn);return id};
 const cancelAnimationFrame=id=>frames.delete(id);
 new Function(
  "window","document","localStorage","setTimeout","clearTimeout",
- "requestAnimationFrame","cancelAnimationFrame",news
-)(window,document,localStorage,setTimeout,clearTimeout,requestAnimationFrame,cancelAnimationFrame);
+ "requestAnimationFrame","cancelAnimationFrame","globalClientesData",news
+)(window,document,localStorage,setTimeout,clearTimeout,requestAnimationFrame,cancelAnimationFrame,globalClientesData);
 const emit=event=>(handlers[event]||[]).forEach(fn=>fn({detail:{estado:state.estado}}));
 function flush(n=4){
  for(let i=0;i<n&&timeouts.size;i++){
@@ -130,11 +131,13 @@ assert.ok(overlay.hidden,"Botón de cierre cierra novedades");
 assert.ok([...local].some(([k,v])=>k.endsWith(":a")&&v==="1"),"Solo noticias quedan leídas");
 emit("goxion:client-ready");flush(2);
 assert.ok(overlay.hidden,"No repetir las novedades a A");
-current="b";emit("goxion:client-ready");flush(2);
-assert.ok(!overlay.hidden,"Cuenta B recibe su aviso independiente");
+// Casone ya había visto la versión anterior; v2 debe aparecer de todos modos.
+local.set("gx-release-seen:nov2026-novedades-apiladas-v1:casone","1");
+current="casone";emit("goxion:client-ready");flush(2);
+assert.ok(!overlay.hidden,"Casone recibe novedades aunque ya vio la versión anterior");
 emit("goxion:client-logout");flush(1);
 assert.ok(overlay.hidden,"Cerrar sesión cierra el aviso");
-assert.ok(![...local.keys()].some(k=>k.endsWith(":b")),"Logout no marca visto");
+assert.ok(![...local.keys()].some(([k,v])=>k.endsWith(":casone")&&k.includes("v2")&&v==="1"),"Logout no marca vista la versión nueva");
 state={estado:"pendiente",deferido:false,modalAbierto:false};
 emit("goxion:client-ready");flush(2);
 assert.ok(overlay.hidden,"Términos obligatorios se priorizan");
@@ -142,6 +145,6 @@ state={estado:"pendiente",deferido:true,modalAbierto:false};
 emit("goxion:legal-dismissed");flush(2);
 assert.ok(!overlay.hidden,"Al posponer términos aparece novedades");
 window.GOXION_RELEASE_202610.close();
-assert.ok([...local.keys()].some(k=>k.endsWith(":b")));
+assert.ok([...local.keys()].some(k=>k.endsWith(":casone")&&k.includes("v2-todos")));
 assert.equal(scrollValue,35,"Restaurar posición del documento");
 console.log("GOXION Goxy F17 + avisos oficiales apilados: PASS");
