@@ -91,9 +91,13 @@
  .gxn-tab-label{font-size:11px}
  .gxn-top[data-docked="true"]{grid-template-columns:minmax(0,1fr) 93px;grid-template-areas:"nav actions";gap:2px}
  .gxn-top[data-docked="true"] .gxn-brand{display:none}
+ .gxn-top[data-docked="true"][data-size="expanded"] .gxn-tab[aria-current="page"]{flex:1.7 1 0}
+ .gxn-top[data-docked="true"] .gxn-tab-label{font-size:9px}
+ .gxn-notice-menu{right:38px}
+}
+@media(max-width:305px){
  .gxn-top[data-docked="true"][data-size="expanded"] .gxn-tab[aria-current="page"]{flex:1 1 0}
  .gxn-top[data-docked="true"] .gxn-tab-label{max-width:0!important;opacity:0!important}
- .gxn-notice-menu{right:38px}
 }
 @media(prefers-reduced-motion:reduce){
  .gxn-top,.gxn-tab,.gxn-emoji,.gxn-tab-label,.gxn-avatar,.gxn-goxy-real,.gxn-goxy-fallback,.gxn-profile-trigger,.gxn-bell{transition:none!important;animation:none!important}
