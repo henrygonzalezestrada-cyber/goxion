@@ -46,7 +46,7 @@ En esta rama se aplicó `#view-dashboard .gx-service-divider{display:none!import
 
 **Bloqueo de aprobación visual de Servicios únicamente:** antes de fusionar el PR, confirmar logo, nombre, estado y cierre en compacta; avisos breves no redundantes y contenidos legales/sensibles accesibles cuando corresponda. No agregar elementos ornamentales gratuitos **en este módulo**. Las microanimaciones funcionales de beneficios, ahorro y catálogo permanecen fuera del alcance.
 
-**Contrato superior vigente:** [GOXION_FEED_CONTRATO_VISUAL_POR_COMPONENTE_2026-11-22.md](GOXION_FEED_CONTRATO_VISUAL_POR_COMPONENTE_2026-11-22.md). Esta rama NO puede redefinir las reglas de Lealtad, Referidos, Misiones, Ahorro, Hero, Catálogo ni otras experiencias.
+**Contrato superior vigente:** [GOXION_FEED_CONTRATO_VISUAL_POR_COMPONENTE_2026-11-22.md](https://github.com/henrygonzalezestrada-cyber/goxion/blob/main/docs/GOXION_FEED_CONTRATO_VISUAL_POR_COMPONENTE_2026-11-22.md). Esta rama NO puede redefinir las reglas de Lealtad, Referidos, Misiones, Ahorro, Hero, Catálogo ni otras experiencias.
 
 ## Escenarios mínimos antes de fusionar
 
