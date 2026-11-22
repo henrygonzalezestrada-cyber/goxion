@@ -666,6 +666,20 @@
                         ? `<span class="gx-service-update-badge gx-update-${escape(updateType)}" title="${escape(updateNotice.resumen || updateNotice.titulo || '')}">${updateLabel}</span>`
                         : '';
 
+                    // Mostrar novedades secundarias sin duplicar la contraseña
+                    // que ya tiene su propio flujo protegido de consulta única.
+                    const secondaryNotices = combinedNotices.slice(1).filter(n =>
+                        !(delivery && String(n?.tipo || '').toLowerCase() === 'password')
+                    );
+                    const secondaryNoticesHTML = secondaryNotices.length
+                        ? `<details class="gx-service-other-notices">
+                            <summary>Otras novedades (${secondaryNotices.length})</summary>
+                            <ul>${secondaryNotices.map(n =>
+                                `<li><strong>${escape(n?.titulo || 'Novedad de servicio')}</strong>${n?.resumen ? `<span>${escape(n.resumen)}</span>` : ''}</li>`
+                            ).join('')}</ul>
+                           </details>`
+                        : '';
+
                     const credentialNoticeHTML = delivery ? `
                         <button type="button" class="gx-credential-notice" id="gx-credential-notice-${idx}" onclick="gxServiceView(${idx},'credential',event)">
                             <span class="gx-credential-notice-icon" aria-hidden="true">
@@ -860,6 +874,7 @@
 
                                 <div id="gx-service-home-${idx}" class="gx-service-home">
                                     ${credentialNoticeHTML}
+                                    ${secondaryNoticesHTML}
                                     <div class="gx-access-heading">Tus accesos</div>
                                     ${credsHTML}
                                     <div class="gx-service-toolbar">
