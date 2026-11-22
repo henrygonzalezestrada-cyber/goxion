@@ -52,6 +52,18 @@ Se descartó la tarjeta separada «Próximos movimientos» porque repetiría lo 
 
 - **Ajuste de conteo en la segunda revisión**: commit `3e48c16a3a107e080891f70caabb77403d00f4ee` conserva «Ver 1 movimiento más» en singular y «Ver N movimientos más» en plural. Validado junto con el resto de los casos de fuente ficticia.
 
+## Consistencia de filtros y controles con Servicios — 22/nov/2026
+
+**Solicitud y decisión:** acercar los filtros al título «Historial de movimientos» para eliminar el aire visual excesivo; asegurar que las flechas de expansión se convierten en la misma X cian de Servicios; convertir las cápsulas de filtro al material translúcido aprobado, sin añadir ornamentos. Se conservan las líneas divisorias funcionales entre movimientos.
+
+**Aplicado en el laboratorio** `preview/experiencia-mi-espacio-inteligente/morph-v2.html`, commit `5f78c8ed479c8ca7b926238c3853e0daa934ef78`:
+
+- El encabezado `gxm-head` es una retícula: título a la izquierda; botón de filtro a la derecha; opciones `Todos / Pagos / Servicios` **dentro del mismo encabezado** y ancladas a su margen izquierdo en iPhone. La fila de opciones está a solo 2px del eje vertical de cabecera; `gxm-head` reduce su margen inferior a 8px. En anchuras desde 680px los tres filtros pueden compartir línea con el título, sin forzar ese acomodo en un iPhone.
+- **Mismo control que Servicios (no un parecido aproximado):** se reutilizan las clases `.gxs-icon`, `.gxs-chevron`, `.gxs-x` de `gxs-services` para la flecha y X de filas y para el control que expande las opciones. En abierto, disco cian `#79e6fc` de **35px**, glifo oscuro de **16px**, área de interacción **44px**; en cerrado, una flecha discreta sin círculo cian. `aria-expanded` permanece en el botón del filtro y en cada fila, no se duplican acciones ni botones para abrir/cerrar.
+- Los botones de categoría comparten `background:rgba(255,255,255,.08)`, radio de cápsula y texto sobrio con los CTA de GOXION. El seleccionado usa un tinte cian de alfa `.145`, sin bordes brillantes, sombras nuevas ni superficies anidadas. El tamaño táctil es 44px y se conserva el foco visible.
+- Se preservaron cuatro scripts inline sin errores de sintaxis, balance de encabezados y secciones, filtro por categoría, textos, siete fixtures y detalles desplegables. Comparación del contenido fuera del bloque `gxm-*` con commit anterior `3e48c16a3a107e080891f70caabb77403d00f4ee`: **sin modificaciones a Hero, Lealtad, Referidos, Misiones, Ahorro, Servicios o Catálogo.**
+- **Pendiente:** inspección visual del resultado exacto en Safari/iPhone, especialmente a 280–315px y al combinar un importe largo con el objetivo táctil de 44px. No se modificó `ayuda.html`, no hay datos reales en la simulación ni fusión de PR #231.
+
 ## Calidad, migración y guardas
 
 1. Validar con el usuario el concepto visual en Safari real antes de considerar aprobación.
