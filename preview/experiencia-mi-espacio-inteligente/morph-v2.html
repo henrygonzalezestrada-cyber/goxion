@@ -481,7 +481,7 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
 <main class="shell">
 <!-- Adaptive Top Capsule LAB · one DOM navigation, no official handlers duplicated -->
 <div class="gxn-stage" id="gxn-stage">
- <div class="gxn-top" id="gxn-top" data-docked="false" data-size="expanded">
+ <div class="gxn-top" id="gxn-top">
   <div class="gxn-header">
    <span class="gxn-brand" aria-label="GOXION">
     <img class="gxn-wordmark" src="../../logo2.PNG" alt="GOXION">
@@ -509,7 +509,9 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
     </button>
    </div>
   </div>
-  <nav class="gxn-nav" id="gxn-nav" aria-label="Navegación principal · laboratorio">
+  <div class="gxn-nav-slot" id="gxn-nav-slot" aria-hidden="true"></div>
+  <span class="gxn-nav-target" id="gxn-nav-target" aria-hidden="true"></span>
+  <nav class="gxn-nav" id="gxn-nav" data-nav-label="on" aria-label="Navegación principal · laboratorio">
    <button type="button" class="gxn-tab" data-gxn-target="space" aria-label="Mi Espacio" aria-current="page"><span class="gxn-emoji" aria-hidden="true">👤</span><span class="gxn-tab-label">Mi Espacio</span></button>
    <button type="button" class="gxn-tab" data-gxn-target="catalog" aria-label="Catálogo"><span class="gxn-emoji" aria-hidden="true">🛒</span><span class="gxn-tab-label">Catálogo</span></button>
    <button type="button" class="gxn-tab" data-gxn-target="support" aria-label="Soporte"><span class="gxn-emoji" aria-hidden="true">🛠️</span><span class="gxn-tab-label">Soporte</span></button>
