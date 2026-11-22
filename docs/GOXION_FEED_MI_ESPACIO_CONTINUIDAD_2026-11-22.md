@@ -6,8 +6,8 @@
 
 ## Abrir primero al continuar en otro chat
 
-- **Laboratorio en GitHub Pages:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=233d606
-- **Fuente de la última iteración:** `preview/experiencia-mi-espacio-inteligente/morph-v2.html` en commit **`233d6068760de69bc259808431452772537f3e90`**. Jerarquía de título y ubicación de X: `d04c58818d883bee63615584a302f0dd76699886`. Los cambios de botón SVG y microsuperficie provienen de `5b034547f69f0f00cf67046b97ea72c1a07afb98`.
+- **Laboratorio en GitHub Pages:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=ffb9313
+- **Fuente de la última iteración:** `preview/experiencia-mi-espacio-inteligente/morph-v2.html` en commit **`ffb9313eff8650ba50b57ff81c53352587441a22`**. Jerarquía de título y ubicación de X: `d04c58818d883bee63615584a302f0dd76699886`. Los cambios de botón SVG y microsuperficie provienen de `5b034547f69f0f00cf67046b97ea72c1a07afb98`.
 - **Documentación de la tarjeta principal congelada:** `docs/GOXION_MI_ESPACIO_HERO_APROBADA_2026-11-22.md`.
 - **Auditoría visual previa y principios aprendidos:** `docs/GOXION_AUDITORIA_BENEFICIOS_FEED_2026-11-22.md`.
 - **Rama que preserva la tarjeta principal aprobada:** `approved/mi-espacio-hero-compacta-centrada-20261122`, apuntando a `f33e8572c07377f4811080a87c7cb1b483983b34`. Se elimina únicamente el rótulo flotante «GOXION» rechazado, según la documentación del hero.
@@ -228,3 +228,17 @@ El usuario observó en video que la X de Servicios era más grande que la de Mis
 ### Reajuste de equilibrio visual de la X · 22/nov/2026
 
 El usuario revisó la versión de 26px / glifo 12px en iPhone y la encontró demasiado pequeña. **Nuevo punto intermedio solicitado y aplicado al laboratorio:** círculo cian **28px** y SVG X **13px** mediante el único par de variables `--gx-close-disc` y `--gx-close-x`. Afecta simultáneamente `.gxb-dismiss` (Lealtad, Referidos, Misiones), `.gxs-icon` (Servicios) y `.demo-panel-close` (panel de pruebas); el área de toque invisible permanece en **44×44px**, y los controles conservan su posición/color. Commit: `233d6068760de69bc259808431452772537f3e90`. No se integró a `ayuda.html` ni se modificó el hero/saludo aprobado. Enlace cache-busted: https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=233d606. Pendiente aprobación visual del usuario.
+
+### Regulador visual de la X en el laboratorio · 22/nov/2026
+
+El usuario pidió no seguir atinando entre medidas de 26/28/30px, sino **poder elegir el tamaño exacto él mismo desde una barra en la vista de prueba**. Implementado en `preview/experiencia-mi-espacio-inteligente/morph-v2.html`, commit `ffb9313eff8650ba50b57ff81c53352587441a22`.
+
+- Control discreto y plegable `#gx-close-tuner` fijo abajo en la vista de laboratorio: **barra deslizante de 22 a 36px con pasos de 1px**, valor en tiempo real y botón «Copiar medida». Al ocultarlo, queda un encabezado compacto para volver a mostrarlo. No forma parte de la interfaz productiva.
+- El regulador actualiza `--gx-close-disc` y `--gx-close-x` en el `:root`; círculo por defecto **28px**, X por defecto **13px**; la X escala proporcionalmente (`Math.round(size*13/28)`). Por herencia, todas las X abiertas de Lealtad, Referidos, Misiones, Servicios (incluidas tarjetas generadas dinámicamente) y el panel de laboratorio se ajustan **simultáneamente**, sin alterar el área táctil invisible de **44×44px** ni la posición.
+- La medida se conserva en el navegador mediante `localStorage` (con `try/catch` para Safari privado) para que el usuario no pierda su selección al recargar. El botón «Copiar medida» genera el texto «GOXION · X: círculo NN px, símbolo MM px»; si Safari no permite escribir al portapapeles, muestra la medida en pantalla.
+- El área de pruebas no altera hero, saludo, servicios reales, `ayuda.html`, Admin, Index ni motor. Se añadió espacio inferior en la vista de ejemplo para que el control fijo no impida llegar al contenido final.
+- Verificaciones estáticas: sintaxis válida de los **4 scripts inline**, selectores de los tres cierres compartiendo variables globales, un único deslizador, dimensiones 44px táctiles, etiquetas accesibles y equilibrio de etiquetas HTML. **Pendiente:** prueba visual táctil en Safari iPhone y confirmar que GitHub Pages sirva el commit más reciente. No se ha publicado a `ayuda.html`.
+
+**Enlace de la versión:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=ffb9313
+
+**Próximo paso:** pedir al usuario solamente el valor del círculo en px que marca la barra (o que pulse «Copiar medida» y lo pegue aquí). Una vez elegido, **fijar ese número como valor final**, quitar el regulador experimental cuando ya no haga falta y aplicar el mismo control en las demás tarjetas del feed. No dar por validado ningún tamaño sin esa elección.
