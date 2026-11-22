@@ -185,14 +185,21 @@
   if(loadingGoxy||!$('gxn-goxy-slot'))return;
   loadingGoxy=true;
   const mount=()=>{
+   const host=$('gxn-goxy-slot');
+   if(!host||!window.GOXY_ROBOT?.mount)return;
+   let observer;
    try{
-    window.GOXY_ROBOT?.mount?.($('gxn-goxy-slot'));
-    if(window.GOXY_ROBOT?.mount){
-     requestAnimationFrame(()=>requestAnimationFrame(()=>{
-      if($('gxn-goxy-slot')?.childElementCount)avatar.classList.add('gxn-robot-ready');
-     }));
-    }
-   }catch(_){/* keep lightweight fallback */}
+    // React may paint asynchronously; only reveal the real face after its DOM exists.
+    observer=new MutationObserver(()=>{
+     if(!host.childElementCount)return;
+     avatar.classList.add('gxn-robot-ready');
+     observer.disconnect();
+    });
+    observer.observe(host,{childList:true,subtree:true});
+    window.GOXY_ROBOT.mount(host);
+    if(host.childElementCount){avatar.classList.add('gxn-robot-ready');observer.disconnect()}
+    setTimeout(()=>observer?.disconnect(),5000);
+   }catch(_){observer?.disconnect();/* keep lightweight fallback */}
   };
   if(window.GOXY_ROBOT?.mount){mount();return;}
   const script=document.createElement('script');
