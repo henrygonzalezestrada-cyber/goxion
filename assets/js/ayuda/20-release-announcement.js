@@ -4,7 +4,7 @@
 (()=>{
  "use strict";
  if(window.GOXION_RELEASE_202610)return;
- const VERSION="nov2026-novedades-apiladas-v1";
+ const VERSION="nov2026-novedades-apiladas-v2-todos";
  const PREFIX="gx-release-seen:";
  const core=window.GOXION_CORE,tokenKey=core?.STORAGE?.CLIENT_TOKEN;
  const news=[
@@ -25,8 +25,12 @@
    let k="";
    try{k=String(window.getCurrentClientKey?.()||"");}catch(_){}
    if(!k||!tokenKey||!localStorage.getItem(tokenKey))return "";
-   // No mostrar a invitados ni antes de tener el cliente restaurado.
-   if(!window.globalClientesData?.[k])return "";
+   // La sesión es válida y el perfil fue cargado. En Mi Espacio, el
+   // estado compartido es una variable lexical global (let), NO window.*.
+   // Consultar ambas formas sin bloquear a clientes reales como Casone.
+   const clientes=typeof globalClientesData!=="undefined"&&globalClientesData
+     ?globalClientesData:window.globalClientesData;
+   if(!clientes?.[k])return "";
    return k;
  };
  const seenKey=k=>PREFIX+VERSION+":"+k;
