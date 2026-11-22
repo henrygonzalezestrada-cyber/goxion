@@ -209,6 +209,9 @@
   script.onerror=()=>{loadingGoxy=false};
   document.head.appendChild(script);
  }
- if('requestIdleCallback' in window)window.requestIdleCallback(loadGoxy,{timeout:1700});
- else setTimeout(loadGoxy,900);
+ // Motion-sensitive users keep the static Goxy face; no animated robot is loaded.
+ if(!motionReduced()){
+  if('requestIdleCallback' in window)window.requestIdleCallback(loadGoxy,{timeout:1700});
+  else setTimeout(loadGoxy,900);
+ }
 })();
