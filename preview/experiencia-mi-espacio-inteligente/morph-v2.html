@@ -196,17 +196,19 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 .gxb-wrap{margin:14px 2px 0;position:relative}
 .gxb-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
 .gxc-surface{background:rgba(8,8,12,.371);-webkit-backdrop-filter:blur(11.75px) saturate(1);backdrop-filter:blur(11.75px) saturate(1);border:1px solid rgba(255,255,255,.035);box-shadow:0 15px 36px rgba(0,0,0,.23),inset 0 1px rgba(255,255,255,.05);color:#f4f7ff}
-.gxb-tile{position:relative;isolation:isolate;overflow:hidden;min-width:0;min-height:110px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:3px;text-align:left;padding:12px 11px 11px;border-radius:21px;transition:background .22s,transform .17s,border-color .22s;box-shadow:0 10px 26px rgba(0,0,0,.11);border-color:rgba(255,255,255,.045)}
+.gxb-tile{position:relative;isolation:isolate;overflow:hidden;min-width:0;min-height:121px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:3px;text-align:left;padding:12px 11px 11px;border-radius:21px;transition:background .22s,transform .17s,border-color .22s;box-shadow:0 10px 26px rgba(0,0,0,.11);border-color:rgba(255,255,255,.045)}
 .gxb-tile:active{transform:scale(.976)}
 .gxb-tile[data-ready="true"]{border-color:rgba(75,223,202,.24);background:rgba(8,8,12,.371)}
 .gxb-metric-row{position:relative;display:flex;align-items:center;width:100%;min-height:34px;min-width:0}
 .gxb-emoji{position:absolute;z-index:1;top:50%;right:-3px;display:block;font-size:30px;line-height:1;opacity:1;pointer-events:none;user-select:none;transform:translateY(-50%) rotate(-8deg);transform-origin:center}
 .gxb-tile[data-ready="true"] .gxb-emoji{animation:gxbCelebrate 2.2s cubic-bezier(.2,.8,.2,1) 2}
 @keyframes gxbCelebrate{0%,100%{transform:translateY(-50%) rotate(-8deg) scale(1)}50%{transform:translateY(-50%) rotate(1deg) scale(1.13)}}
-.gxb-label{position:relative;z-index:2;font-size:11px;font-weight:600;color:#ced8e2;line-height:1.25;max-width:100%;overflow:visible;white-space:normal;margin-top:0}
+.gxb-label{position:relative;z-index:2;font-size:11.5px;font-weight:600;color:#e0e9f4;line-height:1.25;max-width:100%;overflow:visible;white-space:normal;margin-top:0}
 .gxb-number{position:relative;z-index:2;font-weight:700;font-size:clamp(21px,5.9vw,26px);line-height:1.17;letter-spacing:-.045em;font-variant-numeric:tabular-nums;color:#f7fbff;white-space:nowrap}
-.gxb-unit{position:relative;z-index:2;font-size:10px;line-height:1.35;color:#afbccc;white-space:nowrap;overflow:hidden;max-width:100%;text-overflow:ellipsis}
+.gxb-unit{position:relative;z-index:2;font-size:10.5px;line-height:1.36;color:#c5d3e1;white-space:normal;overflow:visible;max-width:100%;min-height:2.72em}
+.gxb-tile[data-phase="none"] .gxb-number{font-size:clamp(15px,4.5vw,18px)}
 .gxb-mini-progress{display:block;width:100%;height:4px;min-height:4px;flex:0 0 4px;overflow:hidden;border-radius:99px;background:rgba(237,246,255,.10);margin-top:7px}
+.gxb-mini-progress[hidden]{display:none!important}
 .gxb-mini-progress > span{display:block;position:relative;overflow:hidden;height:100%;width:var(--gxb-pct,0%);background:linear-gradient(90deg,#8163ef,#17d8e3);border-radius:inherit;transform-origin:left;transform:scaleX(0);will-change:transform}
 .gxb-wrap.is-visible .gxb-mini-progress > span{transform:scaleX(1);transition:transform .92s cubic-bezier(.16,1,.3,1),width .62s cubic-bezier(.16,1,.3,1)}
 .gxb-mini-progress > span::after,.gxb-meter > span::after{content:"";position:absolute;inset:0;width:46%;opacity:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.64),transparent);transform:translateX(-135%);pointer-events:none}
@@ -234,8 +236,11 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 .gxb-metric-head strong{font-size:13px;font-weight:700;color:#eff9ff;font-variant-numeric:tabular-nums}
 .gxb-meter{height:6px;width:100%;border-radius:99px;background:rgba(231,246,255,.105);overflow:hidden}
 .gxb-meter > span{display:block;position:relative;height:100%;background:linear-gradient(90deg,#8461ee,#04dee8);border-radius:inherit;transform-origin:left;overflow:hidden}
-/* A restrained continuous sweep keeps expanded progress visibly alive. */
-.gxb-panel:not([hidden]) .gxb-meter>span::after{animation:gxbSweep 3.1s .65s ease-in-out infinite}
+/* Short restrained sweep, then rest. Progress does not imply endless loading. */
+.gxb-meter>span::after{width:33%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.28),transparent)}
+.gxb-panel:not([hidden]) .gxb-meter>span::after{animation:gxbCalmSweep 7.2s 1.1s ease-in-out infinite}
+.gxb-wrap[data-motion-paused="true"] .gxb-meter>span::after{animation-play-state:paused}
+@keyframes gxbCalmSweep{0%,14%{opacity:0;transform:translateX(-135%)}23%{opacity:.37}43%{opacity:.23}55%{opacity:0;transform:translateX(315%)}100%{opacity:0;transform:translateX(315%)}}
 .gxb-note{font-size:11px;line-height:1.55;color:#a5b7c6;margin:12px 0 0}
 .gxb-tasks{list-style:none;margin:12px 0 0;padding:0}
 .gxb-tasks li{min-height:40px;display:flex;align-items:center;justify-content:space-between;gap:9px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.045);font-size:11.5px;color:#d8e2ed}
@@ -243,17 +248,17 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 .gxb-task-main{display:flex;align-items:center;gap:10px;min-width:0}
 .gxb-task-check{display:grid;place-items:center;flex:0 0 23px;width:23px;height:23px;border-radius:8px;border:1px solid rgba(99,232,213,.27);background:rgba(74,218,193,.11)}
 .gxb-task-check svg{width:17px;height:17px;fill:none;stroke:#79efdb;stroke-width:2.7;stroke-linecap:round;stroke-linejoin:round;overflow:visible}
-.gxb-task-check path{stroke-dasharray:27;stroke-dashoffset:0}
-.gxb-tasks li[data-status="pending"] .gxb-task-check{border-color:rgba(198,211,236,.19);background:rgba(169,186,215,.055)}
-.gxb-tasks li[data-status="pending"] .gxb-task-check path{opacity:0}
+.gxb-tasks li[data-status="done"] .gxb-task-check path{stroke-dasharray:27;stroke-dashoffset:0}
+.gxb-tasks li[data-status="pending"] .gxb-task-check{border-radius:50%;border-color:rgba(182,200,226,.21);background:rgba(146,167,207,.10)}
+.gxb-tasks li[data-status="pending"] .gxb-task-check svg{stroke:#b6c6dd;stroke-width:1.8}
 .gxb-panel.gxb-task-checks-active li[data-status="done"] .gxb-task-check{animation:gxbCheckPop .56s cubic-bezier(.2,1.35,.32,1) both}
 .gxb-panel.gxb-task-checks-active li[data-status="done"] .gxb-task-check path{animation:gxbCheckDraw .52s cubic-bezier(.2,.8,.25,1) both}
 .gxb-panel.gxb-task-checks-active li:nth-child(2) .gxb-task-check,
 .gxb-panel.gxb-task-checks-active li:nth-child(2) .gxb-task-check path{animation-delay:.17s}
 @keyframes gxbCheckPop{0%{transform:scale(.65);opacity:.45}60%{transform:scale(1.09);opacity:1}100%{transform:scale(1);opacity:1}}
 @keyframes gxbCheckDraw{from{stroke-dashoffset:27}to{stroke-dashoffset:0}}
-.gxb-tasks small{font-size:10px;white-space:nowrap;color:#7ddacb}
-.gxb-tasks li[data-status="pending"] small{color:#cfbfdb}
+.gxb-tasks small{font-size:10.5px;white-space:nowrap;color:#86e8d8;font-weight:500}
+.gxb-tasks li[data-status="pending"] small{color:#c6cce4}
 .gxb-foot{position:relative;z-index:2;display:flex;align-items:center;gap:12px;min-height:62px;margin-top:22px;padding-right:0}
 .gxb-action{display:inline-flex;align-items:center;justify-content:center;width:max-content;max-width:100%;min-height:38px;padding:8px 15px;border-radius:999px;border:0;background:rgba(255,255,255,.08);box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;color:var(--benefit-accent,#69e1d5);font-size:11px;line-height:1.15;font-weight:600;white-space:normal;text-align:center;transition:background-color .25s ease,color .3s ease,transform .25s cubic-bezier(.2,.85,.2,1)}
 .gxb-action:active{transform:scale(.985)}
@@ -279,22 +284,22 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 .gxb-morph-emoji{display:block;line-height:1;text-align:center;white-space:nowrap;transform-origin:center}
 @media(max-width:380px){
  .gxb-row{gap:7px}
- .gxb-tile{min-height:108px;padding:11px 9px 10px;border-radius:19px}
+ .gxb-tile{min-height:121px;padding:11px 9px 10px;border-radius:19px}
  .gxb-emoji{font-size:28px;right:-3px;top:50%}
- .gxb-label{font-size:10.5px}
+ .gxb-label{font-size:11px}
  .gxb-number{font-size:23px}
- .gxb-unit{font-size:9.5px}
+ .gxb-unit{font-size:10.5px}
  .gxb-panel{padding:20px 18px 20px}
  .gxb-dismiss{top:13px;right:13px}
  .gxb-foot{padding-right:0;gap:9px}
 }
 @media(max-width:315px){
  .gxb-row{gap:5px}
- .gxb-tile{min-height:105px;padding:10px 7px 9px}
+ .gxb-tile{min-height:121px;padding:10px 7px 9px}
  .gxb-emoji{font-size:25px;right:-4px}
- .gxb-label{font-size:10px}
+ .gxb-label{font-size:10.5px}
  .gxb-number{font-size:21px}
- .gxb-unit{font-size:9px}
+ .gxb-unit{font-size:10.5px}
  .gxb-panel-emoji{font-size:118px;bottom:4px;right:0}
  .gxb-foot{padding-right:0}
 }
@@ -720,6 +725,18 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
  let current=null,busy=false,missionReady=false,refStage='active';
  const sourceFor=key=>tiles.find(tile=>tile.dataset.gxb===key);
  const text=id=>document.getElementById(id);
+
+ const missionLabels=['Explorar el catálogo','Compartir tu opinión','Compartir GOXION'];
+ const missionCheckIcon='<svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg>';
+ const missionPendingIcon='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>';
+ // Datos y etiquetas estáticos del laboratorio. Son indicadores, no checkboxes editables.
+ function missionDetail(completed){
+  const tasks=missionLabels.map((label,i)=>{
+   const done=i<completed;
+   return '<li data-status="'+(done?'done':'pending')+'"><span class="gxb-task-main"><span class="gxb-task-check" aria-hidden="true">'+(done?missionCheckIcon:missionPendingIcon)+'</span><span>'+label+'</span></span><small>'+(done?'Completada':'Pendiente')+'</small></li>';
+  }).join('');
+  return '<div class="gxb-metric-head"><span>Misiones completadas</span><strong>'+completed+' de 3'+(completed===3?' · Listo':'')+'</strong></div><div class="gxb-meter" role="progressbar" aria-label="Misiones completadas" aria-valuemin="0" aria-valuemax="3" aria-valuenow="'+completed+'"><span style="width:'+((completed/3)*100).toFixed(2)+'%"></span></div><ul class="gxb-tasks">'+tasks+'</ul>';
+ }
  const entries={
   loyalty:{
    kicker:'LEALTAD',title:'Tu constancia crece',highlight:'crece',copy:'Un pago más y desbloqueas tu primer beneficio.',
@@ -733,7 +750,7 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
   },
   referralNone:{
    kicker:'REFERIDOS',title:'Invita y gana',highlight:'gana',copy:'Comparte GOXION para comenzar a obtener beneficios.',
-   detail:'<p class="gxb-note">Cuando tu invitado tenga servicios activos, aquí aparecerá su progreso. No hay meses validados todavía.</p>',
+   detail:'<p class="gxb-note">Comparte tu invitación para empezar. El progreso aparecerá cuando haya un referido confirmado y meses válidos; antes no se muestra ninguna barra.</p>',
    action:'Copiar invitación',terms:'La invitación debe estar vinculada a un cliente confirmado. El laboratorio no crea referencias ni inscripciones reales.',emoji:'🫂'
   },
   referralReady:{
@@ -743,17 +760,17 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
   },
   referralClaimed:{
    kicker:'REFERIDOS',title:'Beneficio aplicado',highlight:'aplicado',copy:'Tu recompensa ya fue registrada en este ejemplo.',
-   detail:'<p class="gxb-note">Cuando una recompensa está reclamada, el estado se mantiene visible para evitar confusiones.</p>',
+   detail:'<p class="gxb-note">El mes gratuito está aplicado en este ejemplo y pasa al historial. Ya no se presenta como progreso pendiente.</p>',
    action:'Ver historial',terms:'La confirmación de aplicación y el historial se consultan en los datos reales del cliente.',emoji:'💝'
   },
   mission:{
-   kicker:'MISIONES',title:'Una misión pendiente',highlight:'pendiente',copy:'Has completado 2 de las 3 actividades.',
-   detail:'<div class="gxb-metric-head"><span>Misiones completadas</span><strong>2 de 3</strong></div><div class="gxb-meter" role="progressbar" aria-label="Misiones completadas" aria-valuemin="0" aria-valuemax="3" aria-valuenow="2"><span style="width:66.67%"></span></div><ul class="gxb-tasks"><li data-status="done"><span class="gxb-task-main"><span class="gxb-task-check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg></span><span>Explorar el catálogo</span></span><small>Hecha</small></li><li data-status="done"><span class="gxb-task-main"><span class="gxb-task-check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg></span><span>Compartir tu opinión</span></span><small>Hecha</small></li><li data-status="pending"><span class="gxb-task-main"><span class="gxb-task-check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg></span><span>Compartir GOXION</span></span><small>Pendiente</small></li></ul>',
-   action:'Ver última misión',terms:'Las tareas oficiales pueden implicar visitas, comentarios o acciones verificables. Aquí únicamente se representan visualmente.',emoji:'🎯'
+   kicker:'MISIONES',title:'Una misión pendiente',highlight:'pendiente',copy:'Has completado 2 de las 3 actividades. Queda una por hacer.',
+   detail:missionDetail(2),
+   action:'Ver última misión',terms:'Las misiones se completan cuando la actividad se valida; los indicadores no se pueden marcar manualmente. Esta versión no guarda cambios.',emoji:'🎯'
   },
   missionReady:{
-   kicker:'MISIONES',title:'¡Recompensa disponible!',highlight:'disponible!',copy:'Completaste todas las actividades de esta ronda.',
-   detail:'<div class="gxb-metric-head"><span>Misiones completadas</span><strong>3 de 3 · Listo</strong></div><div class="gxb-meter" role="progressbar" aria-label="Misiones completas" aria-valuemin="0" aria-valuemax="3" aria-valuenow="3"><span style="width:100%"></span></div><p class="gxb-note">Tu siguiente paso es revisar el beneficio ganado.</p>',
+   kicker:'MISIONES',title:'¡Recompensa disponible!',highlight:'disponible!',copy:'Completaste las 3 actividades. La recompensa está lista para revisar.',
+   detail:missionDetail(3),
    action:'Ver recompensa',terms:'Este escenario no reclama ni aplica cupones reales. La recompensa se valida con las funciones oficiales.',emoji:'🏆'
   }
  };
@@ -775,6 +792,7 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
    titleNode.replaceChildren(document.createTextNode(d.title.slice(0,at)),accent,document.createTextNode(d.title.slice(at+emphasized.length)));
   }
   panel.dataset.benefit=key;
+  panel.dataset.phase=key==='referral'?refStage:key==='mission'?(missionReady?'ready':'active'):'active';
   text('gxb-copy').textContent=d.copy;
   panel.classList.remove('gxb-task-checks-active');
   text('gxb-content').innerHTML=d.detail; // Plantillas estáticas del laboratorio, sin valores externos.
@@ -953,23 +971,25 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
   const r=sourceFor('referral');
   m.querySelector('.gxb-emoji').textContent=missionReady?'🏆':'🎯';
   m.querySelector('.gxb-number').textContent=missionReady?'3/3':'2/3';
-  m.querySelector('.gxb-unit').textContent=missionReady?'lista':'completadas';
+  m.querySelector('.gxb-unit').textContent=missionReady?'premio listo':'completadas';
   m.querySelector('.gxb-mini-progress>span').style.setProperty('--gxb-pct',missionReady?'100%':'66.67%');
   m.dataset.ready=String(missionReady);
-  m.setAttribute('aria-label',missionReady?'Misiones, recompensa lista para reclamar, abrir detalle':'Misiones, 2 de 3 completadas, abrir detalle');
+  m.dataset.phase=missionReady?'ready':'active';
+  m.setAttribute('aria-label',missionReady?'Misiones, 3 de 3 completadas, recompensa disponible, abrir detalle':'Misiones, 2 de 3 completadas y una pendiente, abrir detalle');
   const referralDetails={
-   none:['🫂','Invita','empieza aquí','0%',false],
-   active:['🎁','1/3','meses válidos','33.33%',false],
-   ready:['🎁','3/3','premio listo','100%',true],
-   claimed:['💝','✓','reclamado','100%',false]
+   none:{emoji:'🫂',metric:'Invita',unit:'sin referidos',progress:'0%',showProgress:false,ready:false,label:'Referidos, sin invitados, abrir opciones para invitar'},
+   active:{emoji:'🎁',metric:'1/3',unit:'meses válidos',progress:'33.33%',showProgress:true,ready:false,label:'Referidos, 1 de 3 meses validados, abrir detalle'},
+   ready:{emoji:'🎁',metric:'3/3',unit:'premio listo',progress:'100%',showProgress:true,ready:true,label:'Referidos, recompensa disponible tras 3 meses validados, abrir detalle'},
+   claimed:{emoji:'💝',metric:'✓',unit:'mes aplicado',progress:'100%',showProgress:false,ready:false,label:'Referidos, beneficio aplicado, abrir historial'}
   }[refStage];
-  r.querySelector('.gxb-emoji').textContent=referralDetails[0];
-  r.querySelector('.gxb-number').textContent=referralDetails[1];
-  r.querySelector('.gxb-unit').textContent=referralDetails[2];
-  r.querySelector('.gxb-mini-progress>span').style.setProperty('--gxb-pct',referralDetails[3]);
-  r.querySelector('.gxb-mini-progress').style.opacity=refStage==='none'?'.22':'';
-  r.dataset.ready=String(referralDetails[4]);
-  r.setAttribute('aria-label','Referidos, '+referralDetails[2]+', abrir detalle');
+  r.querySelector('.gxb-emoji').textContent=referralDetails.emoji;
+  r.querySelector('.gxb-number').textContent=referralDetails.metric;
+  r.querySelector('.gxb-unit').textContent=referralDetails.unit;
+  r.querySelector('.gxb-mini-progress>span').style.setProperty('--gxb-pct',referralDetails.progress);
+  r.querySelector('.gxb-mini-progress').hidden=!referralDetails.showProgress;
+  r.dataset.phase=refStage;
+  r.dataset.ready=String(referralDetails.ready);
+  r.setAttribute('aria-label',referralDetails.label);
   if(current&&!busy){updatePanel(current);animateContent()}
  }
  readyToggle.addEventListener('click',()=>{
@@ -977,6 +997,9 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
  });
  refSelect.addEventListener('change',()=>{refStage=refSelect.value;syncState()});
  syncState();
+ const syncMotionVisibility=()=>{root.dataset.motionPaused=String(document.hidden)};
+ document.addEventListener('visibilitychange',syncMotionVisibility);
+ syncMotionVisibility();
  if(!prefersReduced()&&'IntersectionObserver' in window){
   const observer=new IntersectionObserver(entries=>{
    if(!entries.some(entry=>entry.isIntersecting))return;

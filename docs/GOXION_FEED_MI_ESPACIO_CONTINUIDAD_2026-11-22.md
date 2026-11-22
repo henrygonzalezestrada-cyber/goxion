@@ -121,3 +121,17 @@ Abrir Lealtad, Referidos y Misiones; alternar varias veces el icono ⓘ (y «Mis
 - En `prefers-reduced-motion: reduce` se desactivan todas las animaciones nuevas y los iconos quedan legibles. Se preservan título, X cian con símbolo oscuro, altura mínima 300px, emoji anclado al abrir información, morph de entrada/salida, hero compacto y saludo aprobados.
 - **Validación automatizada de estructura:** 3 compactas, barras en las 3 ampliadas normales, 3 iconos de misión, 2 scripts JS con sintaxis válida, estilos de cierre y altura preservados. **Falta prueba visual en Safari físico**, no afirmar aprobación final.
 - **Aún no integrado en `ayuda.html` oficial.** El usuario debe revisar las animaciones en iPhone y decidir si gusta la intensidad/ritmo antes de planificar integración.
+
+## Refinamiento autorizado · legibilidad, ritmo y estados (22/nov/2026)
+
+**Instrucción expresa:** aplicar los puntos 1, 2, 3 y 5 de la evaluación final del usuario; **NO aplicar el punto 4** (no aumentar ni el área ni el tamaño visual del CTA de 38px). El usuario manifestó que le gustó la iteración anterior.
+
+**Commit del laboratorio:** `f343aafdd9d4d3dd67b7d8802ec1cddff3a41b58`. **Archivo único de UI:** `preview/experiencia-mi-espacio-inteligente/morph-v2.html`.
+
+- **Compactas / legibilidad:** fila triple intacta. Títulos un poco mayores y más contrastados; leyendas secundarias de 10.5px, sin ellipsis forzada y con reserva vertical consistente para envolver palabras en móviles de 280–380px. Altura mínima 121px para alojar las dos líneas sin solapamientos. `Invita` usa tipografía adaptativa por su longitud, preservando el emoji a color.
+- **Ritmo de las barras expandidas:** brillo reducido y barrido cada 7.2 segundos con una fase prolongada en reposo; se conserva la animación inicial de los medidores y las animaciones individuales de las compactas. Se pausa el ciclo si la pestaña está oculta y se respeta `prefers-reduced-motion`. Los porcentajes y dimensiones de las barras no cambian.
+- **Misiones:** estado completado conserva el checkbox SVG animado no interactivo, con etiqueta «Completada»; estado pendiente ahora tiene icono de reloj no interactivo + «Pendiente», distinguible sin depender solo del color. El detalle del laboratorio genera de manera consistente las 3 misiones tanto en 2/3 como 3/3, indicando progreso/recompensa.
+- **Referidos:** `none` representa la acción «Invita» y oculta barra compacta; `active` muestra 1/3; `ready` muestra 3/3 y recompensa; `claimed` muestra ✓, «mes aplicado» y oculta la barra, pues ya no hay progreso pendiente. Los `aria-label` describen el estado real del escenario. Ningún dato de prueba se confunde con información oficial.
+- **Invariantes:** `#gxb-action` permanece EXACTAMENTE igual (38px, película al 8%, tamaño original). Tampoco se alteraron el hero aprobado, saludo, morph, botón de información, microsuperficie, X cian oscura, emoji anclado o panel mínimo de 300px. Sin acceso a backend ni `ayuda.html`.
+
+**QA alcanzado:** sintaxis válida de ambos scripts, llaves CSS balanceadas, verificación automática de estados 2/3 y 3/3, no progreso ficticio y guardas de CSS/hero/CTA. **Pendiente:** revisar rendering responsive y animaciones en Safari físico; no declarar aprobación ni integración oficial.
