@@ -482,11 +482,25 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
 <span class="layout-compare-caption" id="layout-caption">Tarjeta menos alta; acción centrada en la base y lealtad debajo, por separado.</span>
 <div class="gxb-lab-toggle"><button type="button" id="gxb-ready-toggle" aria-pressed="false">Simular recompensa lista · Misiones</button><span>Cambia el estado de la misión sin operar una cuenta real.</span></div><label class="hint" for="gxb-ref-stage">Estado de Referidos</label><select id="gxb-ref-stage" aria-label="Estado de referidos de demostración"><option value="active">Invitado activo · 1/3</option><option value="none">Sin referido · Invitar</option><option value="ready">Beneficio disponible · 3/3</option><option value="claimed">Beneficio reclamado</option></select>
 <label class="hint" for="gxv-demo-case">Plataformas en el resumen de ahorro</label>
-<select id="gxv-demo-case" aria-label="Variar servicios de demostración">
- <option value="four">4 plataformas · ejemplo principal</option>
- <option value="one">1 plataforma</option>
- <option value="many">7 plataformas</option>
- <option value="none">Sin servicios · ocultar resumen</option>
+<select id="gxv-demo-case" aria-label="Elegir cuántas plataformas mostrar">
+ <option value="0">0 · Sin servicios</option>
+ <option value="1">1 plataforma</option>
+ <option value="2">2 plataformas</option>
+ <option value="3">3 plataformas</option>
+ <option value="4" selected>4 plataformas</option>
+ <option value="5">5 plataformas</option>
+ <option value="6">6 plataformas</option>
+ <option value="7">7 plataformas</option>
+</select>
+<label class="hint" for="gxv-demo-brand">Plataforma protagonista</label>
+<select id="gxv-demo-brand" aria-label="Cambiar la plataforma protagonista">
+ <option value="0">Netflix</option>
+ <option value="1">Disney+</option>
+ <option value="2">Max</option>
+ <option value="3">YouTube Premium</option>
+ <option value="4">Prime Video</option>
+ <option value="5">Crunchyroll</option>
+ <option value="6">Microsoft 365</option>
 </select>
 <div class="glass-material-selector" role="group" aria-label="Comparar materiales de cristal">
   <button type="button" data-material-preset="official" aria-pressed="false">GOXION oficial</button>
@@ -1083,43 +1097,89 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
 </script>
 
 <script>
-/* Las cifras son ilustrativas. No usar como ahorro real sin obtener
-   precios individuales verificables y costo contratado para el mismo periodo. */
+/* Laboratorio exclusivamente visual: los importes no son precios ni ahorros reales.
+   El cálculo productivo deberá usar contrato real y precios públicos comparables. */
 (function(){
  'use strict';
  const card=document.getElementById('gxv-savings'),logos=document.getElementById('gxv-logos');
  const amount=document.getElementById('gxv-amount'),caption=document.getElementById('gxv-context');
- const select=document.getElementById('gxv-demo-case');if(!card||!logos||!amount||!caption||!select)return;
+ const countSelect=document.getElementById('gxv-demo-case'),brandSelect=document.getElementById('gxv-demo-brand');
+ if(!card||!logos||!amount||!caption||!countSelect||!brandSelect)return;
  const brands=[
   ['Netflix','../../logos/netflix.PNG'],['Disney+','../../logos/disney.PNG'],
   ['Max','../../logos/hbo-max.PNG'],['YouTube Premium','../../logos/youtube.PNG'],
   ['Prime Video','../../logos/prime-video.PNG'],['Crunchyroll','../../logos/crunchyroll.PNG'],
   ['Microsoft 365','../../logos/microsoft.PNG']
  ];
- const examples={one:{count:1,saving:69},four:{count:4,saving:248},many:{count:7,saving:412},none:{count:0,saving:null}};
+ const examples=[0,69,131,187,248,312,367,412];
  const pesos=new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN',maximumFractionDigits:0,minimumFractionDigits:0});
- function render(key){
-  const data=examples[key]||examples.four;card.hidden=!data.count;
-  logos.replaceChildren();if(!data.count)return;
-  const selected=brands.slice(0,Math.min(data.count,4));logos.dataset.count=String(selected.length);
-  selected.forEach(([name,src])=>{
+ const reduced=()=>window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+ let currentValue=0,targetValue=0,frame=0,seen=false,hasCards=false;
+ function show(value){amount.textContent=pesos.format(value)}
+ function stop(){if(frame){cancelAnimationFrame(frame);frame=0}}
+ function animateTo(next,fromZero){
+  stop();
+  const start=fromZero?0:currentValue;
+  if(reduced()||document.hidden||typeof requestAnimationFrame!=='function'||Math.abs(next-start)<1){
+   currentValue=next;show(next);return;
+  }
+  const startTime=performance.now(),duration=fromZero?1050:760,change=next-start;
+  function step(now){
+   const p=Math.min(1,Math.max(0,(now-startTime)/duration));
+   const eased=p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2;
+   currentValue=Math.round(start+change*eased);
+   show(currentValue);
+   if(p<1)frame=requestAnimationFrame(step);
+   else {frame=0;currentValue=next;show(next)}
+  }
+  currentValue=start;show(start);
+  frame=requestAnimationFrame(step);
+ }
+ function render(){
+  const n=Math.max(0,Math.min(7,Number(countSelect.value)||0));
+  const idx=Math.max(0,Math.min(6,Number(brandSelect.value)||0));
+  card.hidden=n===0;
+  logos.replaceChildren();
+  hasCards=n>0;
+  if(!n){stop();currentValue=targetValue=0;return}
+  const order=[brands[idx],...brands.filter((_,i)=>i!==idx)];
+  const shown=order.slice(0,Math.min(n,4));
+  logos.dataset.count=String(shown.length);
+  shown.forEach(([name,src])=>{
    const slot=document.createElement('span');slot.className='gxv-slot';
    const img=document.createElement('img');img.src=src;img.alt=name;img.loading='lazy';img.decoding='async';
    slot.appendChild(img);logos.appendChild(slot);
   });
-  const rest=data.count-selected.length;
-  if(rest){const more=document.createElement('span');more.className='gxv-more';more.textContent='+'+rest;more.setAttribute('aria-label','y '+rest+' plataformas más');logos.appendChild(more)}
-  amount.textContent=pesos.format(data.saving);
-  caption.textContent='Ejemplo · '+data.count+' '+(data.count===1?'plataforma':'plataformas');
-  card.setAttribute('aria-label','Demostración: '+pesos.format(data.saving)+' de ahorro al mes frente a contratarlas por separado. No es un ahorro real.');
+  const rest=n-shown.length;
+  if(rest){
+   const more=document.createElement('span');more.className='gxv-more';more.textContent='+'+rest;
+   more.setAttribute('aria-label','y '+rest+' plataformas más');logos.appendChild(more);
+  }
+  targetValue=examples[n];
+  amount.dataset.long=String(targetValue>=1000);
+  caption.textContent='Ejemplo · '+n+' '+(n===1?'plataforma':'plataformas');
+  card.setAttribute('aria-label','Ahorro ilustrativo de '+pesos.format(targetValue)+' al mes, '+n+' '+(n===1?'plataforma':'plataformas')+'. No es un cálculo real.');
+  if(card.classList.contains('is-visible')){
+   animateTo(targetValue,!seen);seen=true;
+  }else {stop();currentValue=targetValue;show(targetValue)}
  }
- select.addEventListener('change',()=>render(select.value));render(select.value);
- const sync=()=>card.dataset.motionPaused=String(document.hidden);
- document.addEventListener('visibilitychange',sync);sync();
- if('IntersectionObserver' in window){new IntersectionObserver(entries=>{
-   card.classList.toggle('is-visible',entries.some(entry=>entry.isIntersecting));
-  },{threshold:.12}).observe(card);
- }else card.classList.add('is-visible');
+ countSelect.addEventListener('change',render);
+ brandSelect.addEventListener('change',render);
+ render();
+ function handleVisibility(){
+  card.dataset.motionPaused=String(document.hidden);
+  if(document.hidden){stop();currentValue=targetValue;show(targetValue)}
+ }
+ document.addEventListener('visibilitychange',handleVisibility);
+ handleVisibility();
+ if('IntersectionObserver' in window){
+  new IntersectionObserver(entries=>{
+   const visible=entries.some(entry=>entry.isIntersecting);
+   card.classList.toggle('is-visible',visible);
+   if(visible&&!seen&&hasCards){seen=true;animateTo(targetValue,true)}
+   if(!visible){stop();currentValue=targetValue;show(targetValue)}
+  },{threshold:.14}).observe(card);
+ }else {card.classList.add('is-visible');seen=true;animateTo(targetValue,true)}
 })();
 </script>
 <script id="goxion-wave-background" src="../../assets/js/ayuda/06-wave-background.js"></script>
