@@ -323,7 +323,7 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
 .gxv-slot img{display:block;width:100%;height:100%;object-fit:cover;border-radius:clamp(10px,2.7vw,15px);background:rgba(14,16,28,.34);box-shadow:0 var(--shadow-y,8px) var(--shadow-blur,16px) rgba(0,0,0,.37);filter:brightness(var(--brightness,1))}
 .gxv-logos[data-count="1"] .gxv-slot:nth-child(1){left:50%;top:50%;--size:clamp(68px,18vw,82px);--layer:5;--float:-3px;--duration:8.6s;--brightness:1;--shadow-y:14px;--shadow-blur:23px}
 .gxv-logos[data-count="2"] .gxv-slot:nth-child(1){left:3%;top:14%;--size:clamp(50px,13.2vw,62px);--layer:5;--float:3px;--duration:7.2s;--brightness:1;--shadow-y:14px;--shadow-blur:23px}
-.gxv-logos[data-count="2"] .gxv-slot:nth-child(2){left:48%;top:51%;--size:clamp(46px,12.3vw,56px);--layer:2;--float:-3px;--duration:8.7s;--brightness:.96;--shadow-y:6px;--shadow-blur:13px}
+.gxv-logos[data-count="2"] .gxv-slot:nth-child(2){left:48%;top:45%;--size:clamp(46px,12.3vw,56px);--layer:2;--float:-3px;--duration:8.7s;--brightness:.96;--shadow-y:6px;--shadow-blur:13px}
 .gxv-logos[data-count="3"] .gxv-slot:nth-child(1){left:5%;top:8%;--size:clamp(49px,12.9vw,61px);--layer:5;--float:3px;--duration:7.1s;--brightness:1;--shadow-y:14px;--shadow-blur:23px}
 .gxv-logos[data-count="3"] .gxv-slot:nth-child(2){left:51%;top:34%;--size:clamp(45px,11.8vw,55px);--layer:2;--float:-4px;--duration:8.3s;--brightness:.96;--shadow-y:6px;--shadow-blur:13px}
 .gxv-logos[data-count="3"] .gxv-slot:nth-child(3){left:14%;top:67%;--size:clamp(42px,10.8vw,51px);--layer:3;--float:3px;--duration:9.4s;--brightness:1;--shadow-y:6px;--shadow-blur:13px}
@@ -681,7 +681,10 @@ function setDemoOpen(open){
  document.documentElement.classList.toggle('gx-demo-open',open);
  $('demo-toggle').setAttribute('aria-expanded',String(open));
  if(open){panel.scrollTop=0;panel.focus({preventScroll:true})}
- else if(previousDemoFocus && typeof previousDemoFocus.focus==='function'){previousDemoFocus.focus({preventScroll:true})}
+ else{
+  window.dispatchEvent(new CustomEvent('goxion:lab-panel-closed'));
+  if(previousDemoFocus && typeof previousDemoFocus.focus==='function')previousDemoFocus.focus({preventScroll:true});
+ }
 }
 $('demo-toggle').addEventListener('click',()=>setDemoOpen($('demo-panel').hidden));
 $('demo-panel-close').addEventListener('click',()=>setDemoOpen(false));
@@ -1114,7 +1117,7 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
  const examples=[0,69,131,187,248,312,367,412];
  const pesos=new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN',maximumFractionDigits:0,minimumFractionDigits:0});
  const reduced=()=>window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;
- let currentValue=0,targetValue=0,frame=0,seen=false,hasCards=false;
+ let currentValue=0,targetValue=0,frame=0,seen=false,hasCards=false,pendingFrom=null;
  function show(value){amount.textContent=pesos.format(value)}
  function stop(){if(frame){cancelAnimationFrame(frame);frame=0}}
  function animateTo(next,fromZero){
@@ -1141,7 +1144,7 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
   card.hidden=n===0;
   logos.replaceChildren();
   hasCards=n>0;
-  if(!n){stop();currentValue=targetValue=0;return}
+  if(!n){stop();currentValue=targetValue=0;pendingFrom=null;return}
   const order=[brands[idx],...brands.filter((_,i)=>i!==idx)];
   const shown=order.slice(0,Math.min(n,4));
   logos.dataset.count=String(shown.length);
@@ -1155,16 +1158,25 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
    const more=document.createElement('span');more.className='gxv-more';more.textContent='+'+rest;
    more.setAttribute('aria-label','y '+rest+' plataformas más');logos.appendChild(more);
   }
+  // Preserve the pre-edit value until the panel closes, so the user can see
+  // the upward or downward transition rather than animating behind the modal.
+  if(document.documentElement.classList.contains('gx-demo-open')&&pendingFrom===null)pendingFrom=currentValue;
   targetValue=examples[n];
   amount.dataset.long=String(targetValue>=1000);
   caption.textContent='Ejemplo · '+n+' '+(n===1?'plataforma':'plataformas');
   card.setAttribute('aria-label','Ahorro ilustrativo de '+pesos.format(targetValue)+' al mes, '+n+' '+(n===1?'plataforma':'plataformas')+'. No es un cálculo real.');
-  if(card.classList.contains('is-visible')){
+  if(card.classList.contains('is-visible')&&!document.documentElement.classList.contains('gx-demo-open')){
    animateTo(targetValue,!seen);seen=true;
   }else {stop();currentValue=targetValue;show(targetValue)}
  }
  countSelect.addEventListener('change',render);
  brandSelect.addEventListener('change',render);
+ window.addEventListener('goxion:lab-panel-closed',()=>{
+  if(card.hidden||pendingFrom===null)return;
+  if(card.classList.contains('is-visible')){
+   currentValue=pendingFrom;animateTo(targetValue,false);seen=true;pendingFrom=null;
+  }
+ });
  render();
  function handleVisibility(){
   card.dataset.motionPaused=String(document.hidden);
@@ -1176,7 +1188,10 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
   new IntersectionObserver(entries=>{
    const visible=entries.some(entry=>entry.isIntersecting);
    card.classList.toggle('is-visible',visible);
-   if(visible&&!seen&&hasCards){seen=true;animateTo(targetValue,true)}
+   if(visible&&!document.documentElement.classList.contains('gx-demo-open')){
+    if(pendingFrom!==null){currentValue=pendingFrom;animateTo(targetValue,false);pendingFrom=null;seen=true}
+    else if(!seen&&hasCards){seen=true;animateTo(targetValue,true)}
+   }
    if(!visible){stop();currentValue=targetValue;show(targetValue)}
   },{threshold:.14}).observe(card);
  }else {card.classList.add('is-visible');seen=true;animateTo(targetValue,true)}
