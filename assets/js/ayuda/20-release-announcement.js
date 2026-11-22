@@ -1,138 +1,252 @@
-/* GOXION · Lanzamiento octubre 2026. Aviso una sola vez por cliente y versión,
- * en este navegador, después de validar su sesión de Mi Espacio.
- * No usa datos privados ni hace consultas a Supabase, Groq o WhatsApp. */
+/* GOXION · Avisos oficiales 2.0: términos reales primero, novedades independientes después.
+ * Novedades informativas una sola vez por cuenta/version/navegador.
+ * No escribe consentimiento, fechas ni operaciones comerciales. */
 (()=>{
-  "use strict";
-  if(window.GOXION_RELEASE_202610) return;
-  const VERSION="oct2026-goxy-f17-v1";
-  const PREFIX="gx-release-seen:";
-  const SESSION_KEY=window.GOXION_CORE?.STORAGE?.CLIENT_TOKEN;
-  let activeClient="",timer=0,tries=0,dialog=null,lastFocus=null,scrollY=0,bodyPrev=null;
-  const readyClient=()=>{
-    let key="";
-    try{key=String(window.getCurrentClientKey?.()||"");}catch(_){}
-    if(!key||!SESSION_KEY||!localStorage.getItem(SESSION_KEY))return "";
-    if(!window.globalClientesData?.[key]&&!globalClientesData?.[key])return "";
-    return key;
-  };
-  const storageKey=key=>PREFIX+VERSION+":"+key;
-  const acknowledged=key=>{
-    try{return localStorage.getItem(storageKey(key))==="1";}catch(_){return false;}
-  };
-  const remember=key=>{
-    try{localStorage.setItem(storageKey(key),"1");}catch(_){}
-  };
-  // La beta visual de tarjetas apiladas reemplaza el aviso antiguo SOLO en Cliente Prueba.
-  // No se modifica la marca de lectura ni las decisiones reales.
-  const isStackBeta=()=>new URLSearchParams(location.search).get("avisosBeta")==="1"&&readyClient()==="cliente-prueba";
-  const blocked=()=>{
-    if(isStackBeta())return true;
-    if(document.hidden || document.body.classList.contains("no-scroll"))return true;
-    const splash=document.getElementById("splash-screen");
-    if(splash && splash.style.visibility!=="hidden")return true;
-    return Boolean(document.querySelector(
-      ".modal.show,.gxai-chat-layer.gxai-visible,.gx-welcome-modal.show,"+
-      ".gx-client-notif-overlay.show,.gx-auth-sheet.show,.auth-overlay.show"));
-  };
-  const markup=()=>[
-    '<section class="gx-release-sheet" role="dialog" aria-modal="true" aria-labelledby="gx-release-title" aria-describedby="gx-release-intro">',
-    '<header class="gx-release-head">',
-      '<button class="gx-release-close" type="button" aria-label="Cerrar novedades">×</button>',
-      '<div class="gx-release-kicker"><span class="gx-release-signal" aria-hidden="true"></span> UNA NUEVA ETAPA EN GOXION</div>',
-      '<h2 class="gx-release-title" id="gx-release-title">Tu Espacio, <em>más inteligente.</em></h2>',
-      '<p class="gx-release-intro" id="gx-release-intro">Hicimos mejoras para que tengas más claridad, control y ayuda cuando la necesites. Esto es lo nuevo:</p>',
-    '</header>',
-    '<div class="gx-release-content">',
-      '<article class="gx-release-item"><span class="gx-release-item-mark" aria-hidden="true">✦</span><div><strong>Conoce a Goxy, tu asistente</strong><p>Ahora puedes conversar con Goxy desde Soporte para resolver dudas, consultar fechas de pago y recibir ayuda con tus servicios. Si necesitas atención humana, prepara tu solicitud contigo.</p></div></article>',
-      '<article class="gx-release-item"><span class="gx-release-item-mark" aria-hidden="true">◉</span><div><strong>Notificaciones en Mi Espacio</strong><p>Un centro más claro para revisar avisos importantes, recordatorios, novedades y comunicaciones de tu cuenta, sin depender únicamente de mensajes externos.</p></div></article>',
-      '<article class="gx-release-item"><span class="gx-release-item-mark" aria-hidden="true">%</span><div><strong>Promociones y catálogo renovados</strong><p>Explora ofertas, combos y descuentos destacados; revisa disponibilidad y condiciones antes de solicitar tus servicios.</p></div></article>',
-      '<article class="gx-release-item"><span class="gx-release-item-mark" aria-hidden="true">◷</span><div><strong>Pagos más claros, incluso con distintas fechas</strong><p>Si tus plataformas vencen en días diferentes, ahora puedes consultar cada cobro por separado o revisar el importe conjunto en tu estado de cuenta.</p></div></article>',
-      '<article class="gx-release-item"><span class="gx-release-item-mark" aria-hidden="true">◇</span><div><strong>Prórrogas y beneficios más transparentes</strong><p>Cuando tu cuenta sea elegible, puedes solicitar una prórroga desde Mi Espacio y conocer sus condiciones. También ves tu avance de lealtad y el efecto de los pagos puntuales.</p></div></article>',
-      '<article class="gx-release-item"><span class="gx-release-item-mark" aria-hidden="true">★</span><div><strong>Misiones, cupones y opiniones</strong><p>Seguimiento más intuitivo de tus misiones y recompensas, además de una mejor experiencia para dejar comentarios y ayudarnos a mejorar.</p></div></article>',
-    '</div>',
-    '<footer class="gx-release-foot"><button class="gx-release-primary" type="button">¡Entendido! Explorar Mi Espacio</button>',
-      '<small>Las funciones y promociones se muestran según tu cuenta y su disponibilidad.</small></footer>',
-    '</section>'
-  ].join("");
-  function unfreeze(){
-    if(!bodyPrev)return;
-    const body=document.body;
-    body.classList.remove("gx-release-body-lock");
-    body.style.position=bodyPrev.position;
-    body.style.top=bodyPrev.top;
-    body.style.width=bodyPrev.width;
-    window.scrollTo?.(0,scrollY);
-    bodyPrev=null;
-  }
-  function close(mark=true){
-    if(!dialog)return;
-    const key=activeClient;
-    dialog.hidden=true;
-    dialog.setAttribute("aria-hidden","true");
-    unfreeze();
-    if(mark && key)remember(key);
-    const prev=lastFocus;
-    lastFocus=null;activeClient="";
-    if(prev?.isConnected)prev.focus?.();
-  }
-  function mount(){
-    if(dialog)return dialog;
-    const overlay=document.createElement("div");
-    overlay.id="gx-release-overlay";
-    overlay.className="gx-release-overlay";
-    overlay.hidden=true;
-    overlay.setAttribute("aria-hidden","true");
-    overlay.innerHTML=markup();
-    document.body.appendChild(overlay);
-    const closeBtn=overlay.querySelector(".gx-release-close");
-    const primary=overlay.querySelector(".gx-release-primary");
-    closeBtn.addEventListener("click",()=>close());
-    primary.addEventListener("click",()=>close());
-    overlay.addEventListener("click",event=>{if(event.target===overlay)close();});
-    overlay.addEventListener("keydown",event=>{
-      if(event.key==="Escape"){event.preventDefault();close();return;}
-      if(event.key!=="Tab")return;
-      const elements=[closeBtn,primary],atFirst=document.activeElement===closeBtn,
-        atLast=document.activeElement===primary;
-      if(event.shiftKey&&atFirst){event.preventDefault();primary.focus();}
-      else if(!event.shiftKey&&atLast){event.preventDefault();closeBtn.focus();}
-    });
-    dialog=overlay;
-    return overlay;
-  }
-  function present(key){
-    if(!key||readyClient()!==key||acknowledged(key)||blocked()||!document.body)return false;
-    const overlay=mount();
-    if(!overlay.hidden)return false;
-    activeClient=key;lastFocus=document.activeElement;
-    scrollY=Number(window.scrollY)||0;
-    const body=document.body;
-    bodyPrev={position:body.style.position,top:body.style.top,width:body.style.width};
-    body.classList.add("gx-release-body-lock");
-    body.style.position="fixed";
-    body.style.top="-"+scrollY+"px";
-    body.style.width="100%";
-    overlay.hidden=false;
-    overlay.setAttribute("aria-hidden","false");
-    overlay.querySelector(".gx-release-close")?.focus();
-    return true;
-  }
-  function schedule(){
-    clearTimeout(timer);tries=0;
-    const key=readyClient();
-    if(isStackBeta()||!key||acknowledged(key))return;
-    function next(){
-      if(readyClient()!==key)return;
-      if(present(key))return;
-      if(++tries<16)timer=setTimeout(next,1200);
-    }
-    timer=setTimeout(next,1000);
-  }
-  window.addEventListener("goxion:client-ready",schedule);
-  window.addEventListener("goxion:client-logout",()=>{clearTimeout(timer);close(false);});
-  window.addEventListener("storage",event=>{
-    if(event.key===SESSION_KEY && !event.newValue){clearTimeout(timer);close(false);}
-  });
-  document.addEventListener("visibilitychange",()=>{if(!document.hidden)schedule();});
-  window.GOXION_RELEASE_202610=Object.freeze({version:VERSION,close:()=>close()});
+ "use strict";
+ if(window.GOXION_RELEASE_202610)return;
+ const VERSION="nov2026-novedades-apiladas-v1";
+ const PREFIX="gx-release-seen:";
+ const core=window.GOXION_CORE,tokenKey=core?.STORAGE?.CLIENT_TOKEN;
+ const news=[
+  {symbol:"✦",title:"Conoce a Goxy, tu asistente",copy:"Ahora puedes conversar con Goxy desde Soporte para resolver dudas, consultar fechas de pago y recibir ayuda con tus servicios. Si necesitas atención humana, prepara tu solicitud contigo."},
+  {symbol:"◉",title:"Notificaciones en Mi Espacio",copy:"Un centro más claro para revisar avisos importantes, recordatorios, novedades y comunicaciones de tu cuenta, sin depender únicamente de mensajes externos."},
+  {symbol:"%",title:"Promociones y catálogo renovados",copy:"Explora ofertas, combos y descuentos destacados; revisa disponibilidad y condiciones antes de solicitar tus servicios."},
+  {symbol:"◷",title:"Pagos más claros, incluso con distintas fechas",copy:"Si tus plataformas vencen en días diferentes, ahora puedes consultar cada cobro por separado o revisar el importe conjunto en tu estado de cuenta."},
+  {symbol:"◇",title:"Prórrogas y beneficios más transparentes",copy:"Cuando tu cuenta sea elegible, puedes solicitar una prórroga desde Mi Espacio y conocer sus condiciones. También ves tu avance de lealtad y el efecto de los pagos puntuales."},
+  {symbol:"★",title:"Misiones, cupones y opiniones",copy:"Seguimiento más intuitivo de tus misiones y recompensas, además de una mejor experiencia para dejar comentarios y ayudarnos a mejorar."}
+ ];
+ const $=(selector,root=document)=>root.querySelector(selector);
+ const create=(tag,cls,text)=>{
+   const e=document.createElement(tag);if(cls)e.className=cls;
+   if(text!==undefined)e.textContent=text;return e;
+ };
+ const closeSvg='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"></path></svg>';
+ const key=()=>{
+   let k="";
+   try{k=String(window.getCurrentClientKey?.()||"");}catch(_){}
+   if(!k||!tokenKey||!localStorage.getItem(tokenKey))return "";
+   // No mostrar a invitados ni antes de tener el cliente restaurado.
+   if(!window.globalClientesData?.[k])return "";
+   return k;
+ };
+ const seenKey=k=>PREFIX+VERSION+":"+k;
+ const seen=k=>{try{return localStorage.getItem(seenKey(k))==="1";}catch(_){return false;}};
+ const mark=k=>{try{localStorage.setItem(seenKey(k),"1");}catch(_){}};
+ const reducedMotion=()=>Boolean(window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches);
+ const queue=()=>window.GOXION_LEGAL_V2?.getQueueStatus?.()||{
+   estado:"sin_activar",deferido:false,modalAbierto:false
+ };
+ let overlay=null,scroll=null,activeKey="",timer=0,attempts=0,open=false,focusSource=null,keyboard=false;
+ let frame=0,lastTick=0,autoDelay=0,autoPosition=0,loopHeight=0,manual=false,scrollY=0;
+ function modalBusy(){
+   if(document.hidden||document.body.classList.contains("no-scroll"))return true;
+   const splash=$("#splash-screen");
+   if(splash&&splash.style.visibility!=="hidden")return true;
+   return Boolean(document.querySelector(
+     "#gx-legal-consent[open],.modal.show,.gxai-chat-layer.gxai-visible,"+
+     ".gx-welcome-modal.show,.gx-client-notif-overlay.show,"+
+     ".gx-auth-sheet.show,.auth-overlay.show,.gx-legal-locked"
+   ));
+ }
+ function removePeek(){
+   const d=$("#gx-legal-consent");
+   d?.classList.remove("gx-release-peek-active");
+   d?.querySelector(".gx-release-stack-peek")?.remove();
+ }
+ function syncPeek(){
+   const d=$("#gx-legal-consent"),k=key(),state=queue();
+   if(!d?.open||!k||seen(k)||state.estado!=="pendiente"){
+     removePeek();return;
+   }
+   if(!d.querySelector(".gx-release-stack-peek")){
+     const p=create("div","gx-release-stack-peek","Tu Espacio, más inteligente.");
+     p.setAttribute("aria-hidden","true");
+     d.append(p);
+   }
+   d.classList.add("gx-release-peek-active");
+ }
+ function stopAuto(removeClones=true){
+   cancelAnimationFrame(frame);frame=0;lastTick=0;
+   clearTimeout(autoDelay);autoDelay=0;
+   if(removeClones&&scroll){
+     const pos=loopHeight>0?autoPosition%loopHeight:scroll.scrollTop;
+     scroll.querySelectorAll("[data-gx-release-clone]").forEach(node=>node.remove());
+     scroll.scrollTop=Math.min(Math.floor(pos),Math.max(0,scroll.scrollHeight-scroll.clientHeight));
+     autoPosition=scroll.scrollTop;loopHeight=0;
+   }
+ }
+ function takeControl(){
+   if(manual||!open)return;
+   manual=true;stopAuto(true);
+ }
+ function tick(time){
+   if(!open||manual||document.hidden||reducedMotion()){frame=0;lastTick=0;return;}
+   if(!scroll||loopHeight<=0){frame=0;return;}
+   if(lastTick){
+     // Safari iPhone redondea subpíxeles: acumulación en enteros evita congelación.
+     const elapsed=Math.max(0,Math.min(time-lastTick,80));
+     autoPosition=(autoPosition+elapsed*0.030)%loopHeight;
+     scroll.scrollTop=Math.floor(autoPosition);
+   }
+   lastTick=time;frame=requestAnimationFrame(tick);
+ }
+ function startAuto(){
+   if(!open||manual||document.hidden||reducedMotion()||!scroll)return;
+   if(!loopHeight){
+     const originals=[...scroll.querySelectorAll(".gx-release-v2-item:not([data-gx-release-clone])")];
+     if(originals.length!==news.length||scroll.scrollHeight<=scroll.clientHeight)return;
+     loopHeight=originals.reduce((sum,item)=>sum+item.offsetHeight,0);
+     if(!loopHeight)return;
+     autoPosition=scroll.scrollTop;
+     for(let round=0;round<2;round++){
+       for(const item of originals){
+         const copy=item.cloneNode(true);
+         copy.setAttribute("aria-hidden","true");
+         copy.dataset.gxReleaseClone="true";
+         scroll.append(copy);
+       }
+     }
+   }
+   if(!frame){lastTick=0;autoPosition=scroll.scrollTop;frame=requestAnimationFrame(tick);}
+ }
+ function scheduleAuto(){
+   if(!open||manual||reducedMotion())return;
+   clearTimeout(autoDelay);
+   autoDelay=setTimeout(()=>{autoDelay=0;startAuto();},850);
+ }
+ function dismiss(markSeen=true){
+   if(!overlay||!open)return;
+   const closingKey=activeKey;
+   stopAuto(true);open=false;overlay.hidden=true;
+   overlay.setAttribute("aria-hidden","true");
+   document.body.classList.remove("gx-release-v2-body-lock");
+   activeKey="";
+   if(markSeen&&closingKey)mark(closingKey);
+   if(keyboard&&focusSource?.isConnected&&!focusSource.closest("#gx-release-overlay"))
+     focusSource.focus({preventScroll:true});
+   focusSource=null;
+   window.scrollTo?.(0,scrollY);
+ }
+ function mount(){
+   if(overlay)return overlay;
+   overlay=create("div","gx-release-v2");overlay.id="gx-release-overlay";
+   overlay.hidden=true;overlay.tabIndex=-1;
+   overlay.setAttribute("aria-hidden","true");
+   overlay.innerHTML=[
+     '<section class="gx-release-v2-card" role="dialog" aria-modal="true" aria-labelledby="gx-release-v2-title">',
+       '<header class="gx-release-v2-header">',
+         '<button type="button" class="gx-release-v2-close" data-gx-release-dismiss aria-label="Cerrar novedades">'+closeSvg+'</button>',
+         '<h2 id="gx-release-v2-title">Tu Espacio, <span>más inteligente.</span></h2>',
+       '</header>',
+       '<div class="gx-release-v2-scroll" tabindex="0" role="region" aria-label="Todas las novedades de GOXION">',
+         news.map((item,i)=>
+           '<article class="gx-release-v2-item" data-gx-release-item="'+i+'">'+
+             '<span class="gx-release-v2-mark" aria-hidden="true">'+item.symbol+'</span>'+
+             '<div><h3>'+item.title+'</h3><p>'+item.copy+'</p></div>'+
+           '</article>'
+         ).join(""),
+       '</div>',
+       '<footer class="gx-release-v2-footer">',
+         '<button type="button" class="gx-release-v2-primary" data-gx-release-dismiss>¡Entendido! Explorar Mi Espacio</button>',
+       '</footer>',
+     '</section>'
+   ].join("");
+   document.body.append(overlay);
+   scroll=$(".gx-release-v2-scroll",overlay);
+   overlay.dataset.input="pointer";
+   overlay.addEventListener("pointerdown",()=>{keyboard=false;overlay.dataset.input="pointer";},{passive:true});
+   overlay.addEventListener("touchstart",()=>{keyboard=false;overlay.dataset.input="pointer";},{passive:true});
+   overlay.addEventListener("click",e=>{
+     if(e.target.closest?.("[data-gx-release-dismiss]")||e.target===overlay)dismiss(true);
+   });
+   overlay.addEventListener("keydown",e=>{
+     keyboard=true;overlay.dataset.input="keyboard";
+     if(e.key==="Escape"){e.preventDefault();dismiss(true);return;}
+     if(e.key!=="Tab")return;
+     const buttons=[...overlay.querySelectorAll("button:not([disabled])")];
+     if(!buttons.length)return;
+     if(e.shiftKey&&document.activeElement===buttons[0]){
+       e.preventDefault();buttons[buttons.length-1].focus();
+     }else if(!e.shiftKey&&document.activeElement===buttons[buttons.length-1]){
+       e.preventDefault();buttons[0].focus();
+     }
+   });
+   const claim=()=>takeControl();
+   scroll.addEventListener("touchstart",claim,{passive:true});
+   scroll.addEventListener("pointerdown",claim,{passive:true});
+   scroll.addEventListener("wheel",claim,{passive:true});
+   scroll.addEventListener("keydown",e=>{
+     if(["ArrowDown","ArrowUp","PageDown","PageUp","Home","End"," "].includes(e.key))
+       takeControl();
+   });
+   return overlay;
+ }
+ function present(){
+   const k=key(),state=queue();
+   if(!k||seen(k)||open||modalBusy()||state.estado==="sin_activar"||
+      state.estado==="rechazado"||state.modalAbierto||
+      (state.estado==="pendiente"&&!state.deferido))return false;
+   mount();
+   if(open)return false;
+   activeKey=k;focusSource=document.activeElement;
+   scrollY=Number(window.scrollY)||0;
+   manual=false;stopAuto(true);scroll.scrollTop=0;
+   open=true;overlay.hidden=false;overlay.setAttribute("aria-hidden","false");
+   document.body.classList.add("gx-release-v2-body-lock");
+   overlay.focus({preventScroll:true});
+   scheduleAuto();
+   return true;
+ }
+ function schedule(delay=450){
+   clearTimeout(timer);timer=0;
+   const k=key();
+   if(!k||seen(k))return;
+   attempts=0;
+   const attempt=()=>{
+     if(!key()||key()!==k||seen(k)||open)return;
+     if(present())return;
+     // No competir con otros modales; reintentar sin bloquear la navegación.
+     if(++attempts<85)timer=setTimeout(attempt,800);
+   };
+   timer=setTimeout(attempt,delay);
+ }
+ function logout(){
+   clearTimeout(timer);timer=0;attempts=0;
+   dismiss(false);removePeek();
+ }
+ window.addEventListener("goxion:legal-opened",()=>{
+   clearTimeout(timer);timer=0;
+   if(open)dismiss(false);
+   syncPeek();
+ });
+ window.addEventListener("goxion:legal-dismissed",()=>{
+   removePeek();
+   // X y "Ahora no" afectan solo los términos. Novedades van después.
+   schedule(210);
+ });
+ window.addEventListener("goxion:legal-state",e=>{
+   if(e.detail?.acceso?.restringido||e.detail?.estado==="rechazado"){
+     dismiss(false);removePeek();clearTimeout(timer);return;
+   }
+   syncPeek();
+   if(!$("#gx-legal-consent")?.open)schedule(800);
+ });
+ window.addEventListener("goxion:client-ready",()=>schedule(1300));
+ window.addEventListener("goxion:client-logout",logout);
+ window.addEventListener("storage",e=>{
+   if(e.key===tokenKey){logout();if(e.newValue)schedule(1000);}
+ });
+ window.addEventListener("focus",()=>{
+   if(!document.hidden&&!open)schedule(700);
+ });
+ document.addEventListener("visibilitychange",()=>{
+   if(document.hidden){cancelAnimationFrame(frame);frame=0;lastTick=0;return;}
+   if(open&&!manual)scheduleAuto();
+   else schedule(700);
+ });
+ window.GOXION_RELEASE_202610=Object.freeze({
+   version:VERSION,close:()=>dismiss(true),refresh:()=>schedule(250)
+ });
+ if(document.readyState!=="loading")schedule(1200);
+ else document.addEventListener("DOMContentLoaded",()=>schedule(1200),{once:true});
 })();
