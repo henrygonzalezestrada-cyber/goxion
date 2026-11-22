@@ -32,6 +32,23 @@ Se descartó la tarjeta separada «Próximos movimientos» porque repetiría lo 
 - **7 operaciones ficticias** de pago, alta, renovación, solicitud de baja y baja efectiva, claramente marcadas «Ejemplo visual · Movimientos ficticios». No hay conexión a cuentas reales ni mutaciones de estado.
 - Interacción accesible: botones nativos, atributo `aria-expanded`, `aria-controls`, foco preservado al expandir filas, altura táctil superior a 44px. Movimiento decorativo mínimo; respetar `prefers-reduced-motion`.
 
+## Revisión visual contra la captura real del usuario (22/nov/2026)
+
+**Imagen de referencia:** captura de iPhone tomada en Safari desde GitHub Pages y compartida por el usuario. El usuario valoró la idea y los controles, pero pidió comparar jerarquía, densidad, márgenes y separadores con el feed aprobado; no corregir por inercia ni aplicar reglas de Servicios de modo global.
+
+**Veredicto:** la solución base está lograda, **no rediseñarla**. Una sola superficie de cristal para movimientos, iconografía por categoría, fecha secundaria, tres filas por defecto y detalles bajo demanda; la diferencia de carácter respecto a beneficios y ahorro es funcional. La tarjeta está visualmente sobria y cabe en el ADN del feed.
+
+**Criterio sobre separadores:** **conservarlos**, porque en esta lista distinguen eventos repetidos y facilitan escanear cada fila. A diferencia de la línea artificial bajo el logo de Servicios, aquí son estructurales. Guías de referencia: Apple [Lists and tables](https://developer.apple.com/design/human-interface-guidelines/lists-and-tables); Material [Dividers](https://m1.material.io/components/dividers.html) (uso justificado y moderado); NN/g [Progressive Disclosure](https://www.nngroup.com/articles/progressive-disclosure/) (opciones secundarias bajo demanda). No adoptar una prohibición de rayas universal.
+
+**Ajustes limitados aplicados al laboratorio, commit `3d9eca2a83108364b858c10fb43f4840b405b611`:**
+
+- Servicios → Historial: margen superior local **27px → 19px**, sin cambiar márgenes de Hero, Lealtad, Referidos, Misiones, Ahorro, Servicios o Catálogo.
+- Las líneas entre filas se conservan **neutras, de 1px, alfa .07**, ahora con **inset alineado al inicio de la columna de texto** en lugar de atravesar la franja de iconos. Adaptación exacta para <=380 y <=315px. Son separadores funcionales dentro de la lista, no líneas decorativas ni un borde extra por fila.
+- El control de filtro superior usa **«Filtrar»** en estado «Todos» colapsado; al expandirse dice **«Cerrar»** y solo entonces aparecen las opciones **Todos / Pagos / Servicios**. Cuando hay un filtro activo y cerrado, muestra **«Pagos» o «Servicios»**. Así no hay «Todos» repetido a la vez; `aria-expanded` y `aria-label` comunican el filtro real.
+- El texto «Alta confirmada» debajo de «Microsoft 365 agregado»/«Netflix agregado» era redundante; se elimina y queda solo la fecha como dato secundario. Los otros tipos siguen incluyendo contexto útil (mes o plataforma).
+- Acción de expansión: **«Ver N movimientos más»**, conteo derivado del filtro activo, en lugar de repetir el encabezado con «Ver todos los movimientos». Al expandir: «Mostrar menos». Ninguna fila perdió fecha, icono, resumen o monto.
+
+**Invariantes revisados:** cristal neutro, iconos, contraste, tres entradas, datos ficticios, lista responsive, filtro opcional, foco y contenido accesible, X común 35/16 de las otras tarjetas. No se afectaron las acciones ni el backend ni se fusionó la rama oficial de Servicios. **Validación de sintaxis no sustituye QA visual física en Safari**.
 ## Calidad, migración y guardas
 
 1. Validar con el usuario el concepto visual en Safari real antes de considerar aprobación.
