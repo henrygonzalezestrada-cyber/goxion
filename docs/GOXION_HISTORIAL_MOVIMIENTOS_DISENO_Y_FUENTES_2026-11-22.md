@@ -49,6 +49,9 @@ Se descartó la tarjeta separada «Próximos movimientos» porque repetiría lo 
 - Acción de expansión: **«Ver N movimientos más»**, conteo derivado del filtro activo, en lugar de repetir el encabezado con «Ver todos los movimientos». Al expandir: «Mostrar menos». Ninguna fila perdió fecha, icono, resumen o monto.
 
 **Invariantes revisados:** cristal neutro, iconos, contraste, tres entradas, datos ficticios, lista responsive, filtro opcional, foco y contenido accesible, X común 35/16 de las otras tarjetas. No se afectaron las acciones ni el backend ni se fusionó la rama oficial de Servicios. **Validación de sintaxis no sustituye QA visual física en Safari**.
+
+- **Ajuste de conteo en la segunda revisión**: commit `3e48c16a3a107e080891f70caabb77403d00f4ee` conserva «Ver 1 movimiento más» en singular y «Ver N movimientos más» en plural. Validado junto con el resto de los casos de fuente ficticia.
+
 ## Calidad, migración y guardas
 
 1. Validar con el usuario el concepto visual en Safari real antes de considerar aprobación.
