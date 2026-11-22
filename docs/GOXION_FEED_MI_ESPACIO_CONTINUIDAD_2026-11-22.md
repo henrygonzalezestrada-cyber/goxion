@@ -6,8 +6,8 @@
 
 ## Abrir primero al continuar en otro chat
 
-- **Laboratorio en GitHub Pages:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=8b85d9f
-- **Fuente de la última iteración:** `preview/experiencia-mi-espacio-inteligente/morph-v2.html` en commit **`8b85d9ff9ea81cf5aaea0d81cb6962b78311878c`**. Jerarquía de título y ubicación de X: `d04c58818d883bee63615584a302f0dd76699886`. Los cambios de botón SVG y microsuperficie provienen de `5b034547f69f0f00cf67046b97ea72c1a07afb98`.
+- **Laboratorio en GitHub Pages:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=24c0eca
+- **Fuente de la última iteración:** `preview/experiencia-mi-espacio-inteligente/morph-v2.html` en commit **`24c0eca8971e733270a06d35fa0cffa27163401e`**. Jerarquía de título y ubicación de X: `d04c58818d883bee63615584a302f0dd76699886`. Los cambios de botón SVG y microsuperficie provienen de `5b034547f69f0f00cf67046b97ea72c1a07afb98`.
 - **Documentación de la tarjeta principal congelada:** `docs/GOXION_MI_ESPACIO_HERO_APROBADA_2026-11-22.md`.
 - **Auditoría visual previa y principios aprendidos:** `docs/GOXION_AUDITORIA_BENEFICIOS_FEED_2026-11-22.md`.
 - **Rama que preserva la tarjeta principal aprobada:** `approved/mi-espacio-hero-compacta-centrada-20261122`, apuntando a `f33e8572c07377f4811080a87c7cb1b483983b34`. Se elimina únicamente el rótulo flotante «GOXION» rechazado, según la documentación del hero.
@@ -271,3 +271,17 @@ El usuario indicó que le gustó la UI contextual de Servicios pero no encontrab
 - QA: sintaxis JS correcta; 12 escenarios evaluados en prueba aislada del generador de datos, incluyendo aprobada visible, baja efectiva ausente y nuevo PIN en muestra; comprobación de selectores y controles únicos, estilos/scripts balanceados. Pendiente prueba táctil y visual Safari físico y validación de publicación Pages.
 
 **Cómo probar:** desplázate hasta Tus servicios → pulsa «Probar situaciones» debajo de la lista → elige «Cancelación solicitada», «aprobada», «no autorizada», «Baja efectiva», «PIN de perfil actualizado» o «Nueva contraseña». Comprueba cómo cambia Netflix (o YouTube para la invitación). Todos los datos son de muestra.
+
+## Colores semánticos de Servicios y adaptación conectada en rama · 22/nov/2026
+
+El usuario expresó conformidad con la jerarquía visual del área de Servicios y pidió consolidar estados semánticos (verde correcto, amarillo/ámbar pendiente, naranja precaución, rojo alerta), prioridad de avisos y conservación de **todas las conexiones de la versión oficial** antes de avanzar a otros módulos.
+
+- **Aplicado al laboratorio en `main`:** commit `24c0eca8971e733270a06d35fa0cffa27163401e` en `preview/experiencia-mi-espacio-inteligente/morph-v2.html`. Estados normal verde, actualización de acceso/PIN/cancelación en revisión ámbar, cancelación aprobada pendiente de efectividad y servicio temporalmente inactivo naranja, cancelación no autorizada rojo. Color limitado a punto/contexto y microsuperficie interna. No tintar tarjeta completa. Cierre de X 35px/16px intacto.
+- Se agregó escenario de laboratorio `multi-notice`: cancelación en revisión como asunto principal, contraseña disponible como información secundaria **dentro del panel**, sin generar dos tarjetas ni acciones de backend. Selector accesible desde «Probar situaciones» bajo Servicios y desde pruebas generales.
+- **Adaptación conectada propuesta, NO publicada:** PR borrador [#231](https://github.com/henrygonzalezestrada-cyber/goxion/pull/231), rama `feature/mi-espacio-servicios-conectados-20261122`. Modifica exclusivamente `assets/js/ayuda/01e-client-dashboard.js` y `assets/css/ayuda.css`, más su documento contractual. No toca `ayuda.html`, hero, saludo, finanzas, Admin, Index.
+- En dicha rama, `data-gx-priority-tone` procede de `novedades`, `cancelacion`, `credencial_pendiente` y alertas que la versión oficial ya usa. Se preservaron los 9 handlers y todas las llamadas reales de cancelación, credencial, PIN, soporte, copia, novedades e invitaciones. Se respetó orden `combinedNotices` existente; el tono es presentación, no una regla de negocio nueva.
+- QA estático: 3 scripts inline del laboratorio y JS del dashboard oficial sintácticamente válidos; handlers y endpoints oficiales sin nuevos duplicados. Escenarios de semántica comprobados por tabla de casos. **No es una prueba autenticada ni Safari real**. PR #231 queda en borrador: **no fusionar ni anunciar producción completada sin QA funcional con cuentas reales/de prueba y aprobación de la vista final**.
+
+**Laboratorio para revisar:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=24c0eca
+
+**Próximo paso:** validar cromática/jerarquía con el usuario en iPhone; resolver y probar en la rama conectada controles de contraseñas de una sola vista, PIN protegido, notificaciones simultáneas, cancelaciones solicitadas/aprobadas/rechazadas y baja efectiva antes de publicar. Una vez resuelto, continuar con el siguiente módulo del feed sin alterar hero y saludo aprobados.
