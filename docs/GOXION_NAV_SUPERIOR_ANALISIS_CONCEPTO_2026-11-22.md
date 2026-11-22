@@ -1,6 +1,6 @@
-# GOXION · Navegación superior adaptable + perfil — análisis previo al laboratorio
+# GOXION · Navegación superior adaptable + perfil — investigación y laboratorio V1
 
-**Fecha:** 22/nov/2026. **Estado:** propuesta ANALIZADA, **NO aprobada ni implementada**. Sin cambios en `ayuda.html`, CSS/JS oficial, Edge o la interfaz del laboratorio. El usuario solicitó contrastar arquitectura, investigación visual y UX **antes** de prototipar.
+**Fecha:** 22/nov/2026. **Estado actual:** **IMPLEMENTADA EN LABORATORIO para evaluación visual**, **NO aprobada todavía ni publicada en `ayuda.html`**. El análisis de las secciones 1–7 fue previo al prototipo; la implementación exacta y lo que sigue pendiente se describen en la sección 8. Sin cambios en código CSS/JS oficial, Edge o datos de clientes.
 
 ## 1. Brief del usuario (no convertir en instrucciones contradictorias)
 
@@ -65,7 +65,7 @@ Reubicar toda la cápsula expandida justo **sobre** el texto en el encabezado, d
 5. No alterar ni rehacer hero/saludo congelados o tarjetas de beneficios, ahorro, servicios e historial; nav/encabezado son un trabajo local con su propio contrato.
 6. Mantener safe areas Safari, rebote, cambio de orientación, teclado, overlays de login/notificaciones, uso con lector de pantalla, targets 44px; no bloquear scroll ni disparar cambios de tamaño sobre un modal abierto.
 
-## 7. Plan de prototipo y validación antes de integrar
+## 7. Plan original de prototipo y validación (histórico, previo a V1)
 
 **Todavía no autorizado como implementación; requiere evaluación visual en laboratorio.**
 
@@ -77,3 +77,36 @@ Reubicar toda la cápsula expandida justo **sobre** el texto en el encabezado, d
 6. Documentar lo que apruebe el usuario en este expediente y en [el documento maestro de integración](GOXION_MI_ESPACIO_INTEGRACION_MAESTRA_2026-11-22.md); el estado de esta propuesta sigue **NO APROBADA**.
 
 **Dictamen:** conceptualmente **sí es compatible** con el nuevo feed, pero **no realizar un simple shrink proporcional de todo el header** ni superponer otra barra. La diferencia de GOXION debe estar en la cápsula que cambia de geometría sin perder los tres destinos, la identidad cromática controlada y la conexión intacta, no en acumular capas de vidrio.
+
+## 8. Implementación real en el laboratorio · V1 (22/nov/2026)
+
+**Autorización de alcance:** el usuario pidió expresamente **implementar la idea en el laboratorio** para probar sus interacciones, sin autorizar la integración oficial. La cápsula sigue siendo diseño pendiente de aprobación en Safari físico.
+
+**Archivo principal:** `preview/experiencia-mi-espacio-inteligente/morph-v2.html`, commit `cdfb36d2b62416b5e4e01741b19de962f11f26ec` (enlaces versionados). **Archivos nuevos y funcionales, no basura temporal:**
+
+- `preview/experiencia-mi-espacio-inteligente/adaptive-top-nav.css`: `775acbb98567e5733e7258625740d6f57547eef5`
+- `preview/experiencia-mi-espacio-inteligente/adaptive-top-nav.js`: `a72fa20ab9cdb5738bcc98cb0f103a048b68e2bd`
+- `preview/experiencia-mi-espacio-inteligente/check-adaptive-nav.mjs`: prueba de navegador Chromium/WebKit **agregada, aún NO ejecutada con navegadores reales en esta sesión** (requiere repo local con Playwright y navegadores instalados).
+
+**URL para revisión:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=cdfb36d
+
+### Comportamiento observado por código
+
+1. **Navegación única real en el DOM** `#gxn-nav`: tres botones con emojis 👤 / 🛒 / 🛠️. El destino activo crece con morph CSS (aprox. 440ms) y revela su etiqueta cuando la anchura lo permite. Otros destinos permanecen accesibles.
+2. **Encabezado inicial:** wordmark completo a la izquierda, campana de prueba y avatar circular de Goxy a la derecha. Cristal neutro derivado de la base del feed (`rgba(8,8,12,.371)`, blur 11.75px). No se redibujó el Hero ni las tarjetas previas.
+3. **Scroll por dirección con histéresis:** listener pasivo, `requestAnimationFrame`, entrada a dock cuando `scrollY>=185`, retorno al inicio `scrollY<85`, cambio de tamaño tras ~29px de desplazamiento acumulado. En dock compacto: barra superior de una fila de ~50px; al regresar por el contenido reaparece la etiqueta activa y el dock crece sin volver al principio. Un solo nodo visual, no dos navegaciones solapadas.
+4. **Marca adaptable:** `logo2.PNG` completo al inicio y recurso oficial `Logo individual.png` para el estado compacto cuando cabe. A <=355px se oculta la marca dentro del dock para mantener targets de >=44px; nunca se sustituye por un logo inventado.
+5. **Avatar Goxy:** estado inicial es un rostro robótico simplificado inspirado en la carcasa/pantalla oficiales; tras el primer pintado, se intenta montar **el motor original local `../goxion-ai/goxy-heads.bundle.js`** (~227 KB) en inactividad del navegador. Solo se muestra cuando React terminó de renderizar, mediante `MutationObserver`, evitando parpadeo. Con `prefers-reduced-motion` se conserva la representación estática.
+6. **Menú:** «Mi perfil», subopciones «Elegir foto / Volver a Goxy» y «Salir». En laboratorio, la foto se lee localmente solo en JPG/PNG/WebP hasta 2 MB, con URL local temporal revocable; **no se sube ni persiste**. «Salir» muestra diálogo explicativo, **no modifica sesión ni llama a backend**.
+7. **Campana de muestra:** abre popover no conectado; la campana real de la página oficial y su badge no se sustituyeron. Catálogo desplaza a la sección ilustrativa; Soporte abre diálogo explicativo y vuelve al destino anterior; Mi Espacio regresa al inicio. **Estos handlers son de laboratorio, no equivalentes a los de producción**.
+8. **Sin navegación inferior, sin hamburguesa y sin barra extra**. El dock superior fijo usa el mismo DOM y deja un espacio estable en el flujo mediante `#gxn-stage`, evitando saltos de contenido. El nuevo código está aislado en clases `gxn-*`; los módulos del Hero, Beneficios, Ahorro, Servicios, Historial y Catálogo conservan exactamente sus subárboles previos.
+
+### Validaciones realizadas / pendientes
+
+- Se comprobó que existen los recursos `Logo individual.png`, `logo2.PNG`, `goxy-heads.bundle.js` en GitHub; HTML con **1 `<nav>` / 3 destinos** y sin IDs duplicados; balance de secciones y encabezados; **4 scripts inline válidos** y nuevo JS válido; X compartida de Servicios **35/16** intacta.
+- **16 transiciones simuladas satisfactorias**: inicio, umbrales, dock compacto, expansión al volver, compactación posterior, retorno a estado inicial, avatar, perfil, campana, categorías, soporte y salida ilustrativa. Las pruebas simularon DOM y scroll; **NO son evidencia de rendimiento real en Safari**.
+- Se añadió smoke real de Chromium/WebKit para seis anchos (280,320,360,390,430,768) y flujo de menús, pero **no se ejecutó todavía**. No afirmar que su suite pasó.
+- **Obligatorio para aprobación:** vídeo Safari de iPhone con scroll de arriba abajo, rebote al inicio, cambio de pestaña, giro de pantalla, perfil, teclado/foco, `prefers-reduced-motion`; verificar que el dock no tape acciones ni pestañas del navegador, que Goxy no ocasione tirones, y que la marca individual se vea bien al pasar a compacto.
+- **La implementación productiva sigue bloqueada** hasta conectar la campana existente, `switchTab`, login morph, `cerrarSesion`, foto persistente segura y retirar/coordinar `#sticky-client-bar`. Prohibido copiar los handlers ficticios de laboratorio a producción.
+
+**Estado final de V1:** prototipo listo para feedback, sin aprobación visual final. El trabajo futuro debe iterar **solo `gxn-*`** salvo instrucción del usuario; no sacrificar las tarjetas ya aprobadas.
