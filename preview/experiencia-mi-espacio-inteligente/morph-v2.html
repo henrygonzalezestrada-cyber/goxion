@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap">
 <style>
-:root{color-scheme:dark;--bg:#030305;--text:#f5f8ff;--muted:#a8b5c9;--cyan:#36dbe8;--purple:#8067f5}
+:root{color-scheme:dark;--bg:#030305;--text:#f5f8ff;--muted:#a8b5c9;--cyan:#36dbe8;--purple:#8067f5;--gx-close-disc:28px;--gx-close-x:13px}
 *{box-sizing:border-box}
 html{min-width:280px;background:var(--bg);scroll-behavior:smooth}
 body{margin:0;min-height:100dvh;font-family:Poppins,system-ui,-apple-system,sans-serif;color:var(--text);background:var(--bg);overflow-x:clip;-webkit-font-smoothing:antialiased}
@@ -21,7 +21,7 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 .ambient .gx-wave-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:.96;filter:saturate(1.08);transform:translateZ(0)}
 .ambient:after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,rgba(3,3,5,.08),rgba(3,3,5,.22) 46%,rgba(3,3,5,.42)),radial-gradient(circle at center,transparent 20%,rgba(3,3,5,.18) 82%,rgba(3,3,5,.42) 100%);pointer-events:none}
 .ambient.gx-wave-fallback:before{content:"";position:absolute;inset:-20%;background:linear-gradient(147deg,transparent 41%,rgba(71,79,239,.2) 49%,rgba(24,216,232,.43) 50%,transparent 56%);filter:blur(14px)}
-.shell{position:relative;z-index:1;width:min(100%,580px);margin:0 auto;padding:calc(22px + env(safe-area-inset-top,0px)) 18px calc(110px + env(safe-area-inset-bottom,0px))}
+.shell{position:relative;z-index:1;width:min(100%,580px);margin:0 auto;padding:calc(22px + env(safe-area-inset-top,0px)) 18px calc(212px + env(safe-area-inset-bottom,0px))}
 .header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 8px 24px}
 .logo{width:132px;max-width:38%;height:36px;object-fit:contain;object-position:left center}
 .head-actions{display:flex;align-items:center;gap:10px}
@@ -234,7 +234,6 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
 .gxb-panel[data-benefit="loyalty"]{--gxb-title-accent:#bfaaff}
 .gxb-panel[data-benefit="referral"]{--gxb-title-accent:#82e1df}
 .gxb-panel[data-benefit="mission"]{--gxb-title-accent:#9dc3ff}
-.gxb-dismiss,.gxs-icon,.demo-panel-close{--gx-close-disc:28px;--gx-close-x:13px}
 .gxb-dismiss{position:absolute;top:15px;right:16px;z-index:5;min-width:44px;width:44px;height:44px;display:grid;place-items:center;border:0;border-radius:50%;background:transparent;box-shadow:none;color:#071c29;line-height:1;cursor:pointer}
 .gxb-dismiss::before{content:"";position:absolute;inset:calc((44px - var(--gx-close-disc))/2);border-radius:50%;background:#79e6fc;pointer-events:none;transition:background-color .2s ease}
 .gxb-dismiss svg{position:relative;width:var(--gx-close-x);height:var(--gx-close-x);fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;pointer-events:none}
@@ -429,6 +428,26 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
 .gxc-mini-icon{width:25px;height:25px;font-size:13px}
 .gxc-mini-copy strong{font-size:9px}
 }
+
+/* Laboratorio únicamente: regulador visible y plegable del control compartido de cierre. */
+.gx-close-tuner{position:fixed;z-index:15;bottom:calc(12px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);width:min(358px,calc(100vw - 24px));padding:12px 15px 11px;border:1px solid rgba(163,211,230,.18);border-radius:20px;background:rgba(12,18,30,.95);box-shadow:0 15px 40px rgba(0,0,0,.36);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);color:#effbff}
+.gx-close-tuner-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.gx-close-tuner-label{display:flex;align-items:baseline;flex-wrap:wrap;gap:9px;min-width:0}
+.gx-close-tuner-label strong{font-size:12px;letter-spacing:-.01em;font-weight:700}
+.gx-close-tuner-label span{font-size:12px;color:#79e6fc;font-variant-numeric:tabular-nums;font-weight:700}
+.gx-close-tuner button{min-height:40px;border:0;border-radius:13px;background:rgba(255,255,255,.075);color:#d8f4fb;padding:0 11px;font-size:11px;font-weight:600}
+.gx-close-tuner button:focus-visible,.gx-close-tuner input:focus-visible{outline:2px solid #79e6fc;outline-offset:2px}
+.gx-close-tuner-body{margin-top:8px}
+.gx-close-tuner-body label{display:block;font-size:10px;line-height:1.4;color:#b1c3d1}
+.gx-close-tuner input[type=range]{display:block;width:100%;height:40px;margin:1px 0 0;cursor:pointer;accent-color:#79e6fc;touch-action:pan-x}
+.gx-close-tuner-foot{display:flex;align-items:center;justify-content:space-between;gap:7px}
+.gx-close-tuner-foot small{font-size:10px;line-height:1.3;color:#9cbbca}
+.gx-close-tuner-foot button{white-space:nowrap}
+.gx-close-tuner-feedback{font-size:10px;color:#79e6fc;min-height:0}
+.gx-close-tuner.is-collapsed{width:max-content;max-width:calc(100vw - 24px);padding:6px 8px 6px 14px;border-radius:16px}
+.gx-close-tuner.is-collapsed .gx-close-tuner-label strong{font-size:11px}
+@media(max-width:320px){.gx-close-tuner{padding-inline:12px}.gx-close-tuner-foot small{max-width:120px}}
+@media(prefers-reduced-motion:reduce){.gx-close-tuner,.gx-close-tuner *{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
@@ -525,6 +544,19 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
 <button class="demo-toggle" id="demo-toggle" type="button" aria-expanded="false" aria-controls="demo-panel">Probar estados · Laboratorio</button>
 <p class="gxb-preview-label" style="text-align:center">Vista conceptual · Los beneficios utilizan datos de muestra.</p>
 </main>
+
+<aside class="gx-close-tuner" id="gx-close-tuner" aria-label="Ajustar tamaño de las X en el laboratorio">
+ <div class="gx-close-tuner-head">
+  <div class="gx-close-tuner-label"><strong>Ajustar X</strong><span id="gx-close-tuner-headval">28 px</span></div>
+  <button id="gx-close-tuner-toggle" type="button" aria-expanded="true" aria-controls="gx-close-tuner-body">Ocultar</button>
+ </div>
+ <div id="gx-close-tuner-body" class="gx-close-tuner-body">
+  <label for="gx-close-tuner-range">Diámetro del círculo</label>
+  <input id="gx-close-tuner-range" type="range" min="22" max="36" step="1" value="28" aria-describedby="gx-close-tuner-guide">
+  <div class="gx-close-tuner-foot"><small id="gx-close-tuner-guide">Se ajusta en todas las tarjetas al instante.</small><button id="gx-close-tuner-copy" type="button">Copiar medida</button></div>
+  <div class="gx-close-tuner-feedback" id="gx-close-tuner-feedback" role="status" aria-live="polite"></div>
+ </div>
+</aside>
 <section class="demo-panel" id="demo-panel" aria-label="Simulador de estados" role="dialog" aria-modal="true" tabindex="-1" hidden>
 <div class="demo-panel-head"><h2>Tarjeta dinámica</h2><button id="demo-panel-close" type="button" class="demo-panel-close" aria-label="Cerrar laboratorio"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div><p>Escenarios ficticios. No se conecta con cuentas, pagos ni notificaciones reales.</p>
 <label for="scenario" class="hint">Situación de prueba</label>
@@ -1428,6 +1460,60 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
  });
  select.addEventListener('change',render);
  render();
+})();
+</script>
+
+<script id="gx-close-tuner-js">
+/* Laboratorio: una sola medida gobierna todos los botones X, incluso los servicios creados después. */
+(()=>{
+ 'use strict';
+ const root=document.documentElement;
+ const tuner=document.getElementById('gx-close-tuner');
+ const range=document.getElementById('gx-close-tuner-range');
+ const value=document.getElementById('gx-close-tuner-headval');
+ const toggle=document.getElementById('gx-close-tuner-toggle');
+ const body=document.getElementById('gx-close-tuner-body');
+ const copy=document.getElementById('gx-close-tuner-copy');
+ const feedback=document.getElementById('gx-close-tuner-feedback');
+ if(!tuner||!range||!value||!toggle||!body||!copy||!feedback)return;
+ const storageKey='goxion-lab-close-disc-v1';
+ const getSize=raw=>{
+  const n=Number(raw);
+  return Number.isFinite(n)?Math.max(22,Math.min(36,Math.round(n))):28;
+ };
+ const setSize=raw=>{
+  const size=getSize(raw);
+  const glyph=Math.round(size*13/28);
+  range.value=String(size);
+  value.textContent=size+' px';
+  range.setAttribute('aria-valuetext',size+' píxeles');
+  root.style.setProperty('--gx-close-disc',size+'px');
+  root.style.setProperty('--gx-close-x',glyph+'px');
+  feedback.textContent='';
+  try{window.localStorage.setItem(storageKey,String(size));}catch(_){}
+ };
+ let saved=28;
+ try{const candidate=window.localStorage.getItem(storageKey);if(candidate!==null)saved=candidate;}catch(_){}
+ setSize(saved);
+ range.addEventListener('input',()=>setSize(range.value));
+ toggle.addEventListener('click',()=>{
+  const isCollapsed=!body.hidden;
+  body.hidden=isCollapsed;
+  tuner.classList.toggle('is-collapsed',isCollapsed);
+  toggle.textContent=isCollapsed?'Mostrar':'Ocultar';
+  toggle.setAttribute('aria-expanded',String(!isCollapsed));
+ });
+ copy.addEventListener('click',()=>{
+  const size=getSize(range.value),glyph=Math.round(size*13/28);
+  const measure='GOXION · X: círculo '+size+' px, símbolo '+glyph+' px';
+  if(!navigator.clipboard||!navigator.clipboard.writeText){
+   feedback.textContent='Tamaño elegido: '+size+' px';
+   return;
+  }
+  navigator.clipboard.writeText(measure).then(()=>{
+   feedback.textContent='Medida copiada: '+size+' px';
+  }).catch(()=>{feedback.textContent='Tamaño elegido: '+size+' px';});
+ });
 })();
 </script>
 <script id="goxion-wave-background" src="../../assets/js/ayuda/06-wave-background.js"></script>
