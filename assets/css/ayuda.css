@@ -14485,4 +14485,40 @@ body.gx-promo-morph-open{overflow:hidden!important}
 @media(prefers-reduced-motion:reduce){
   #view-dashboard .gx-service-manage-card .gx-service-expand-icon::before{transition:none!important;animation:none!important}
 }
+
+/* Novedades secundarias de la fuente oficial, detrás de disclosure nativo. */
+#view-dashboard .gx-service-other-notices{
+  margin:6px 0 13px;
+  border-top:1px solid rgba(221,236,252,.07);
+  border-bottom:1px solid rgba(221,236,252,.07);
+  color:#c8d8e5;
+}
+#view-dashboard .gx-service-other-notices summary{
+  display:list-item;
+  min-height:44px;
+  padding:13px 3px 9px;
+  color:#93dbe4;
+  font-size:11px;
+  font-weight:650;
+  cursor:pointer;
+}
+#view-dashboard .gx-service-other-notices ul{
+  list-style:none;
+  margin:0;padding:0 4px 11px;
+}
+#view-dashboard .gx-service-other-notices li{
+  display:grid;gap:3px;padding:8px 0;
+}
+#view-dashboard .gx-service-other-notices li+li{
+  border-top:1px solid rgba(221,236,252,.07);
+}
+#view-dashboard .gx-service-other-notices strong{
+  font-size:11px;font-weight:650;color:#ddecf4;
+}
+#view-dashboard .gx-service-other-notices span{
+  font-size:10.5px;line-height:1.5;color:#b1c4d3;
+}
+#view-dashboard .gx-service-other-notices summary:focus-visible{
+  outline:2px solid #79e6fc;outline-offset:2px;border-radius:8px;
+}
 /* /GOXION · SERVICIOS CONECTADOS · JERARQUÍA SEMÁNTICA V1 */
