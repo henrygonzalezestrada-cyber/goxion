@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="es-MX" data-gx-experiment="morph-v2">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#030305">
+<meta name="robots" content="noindex,nofollow">
+<title>GOXION · Mi Espacio · Movimiento contextual</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap">
+<style>
+:root{color-scheme:dark;--bg:#030305;--text:#f5f8ff;--muted:#a8b5c9;--cyan:#36dbe8;--purple:#8067f5}
+*{box-sizing:border-box}
+html{min-width:280px;background:var(--bg);scroll-behavior:smooth}
+body{margin:0;min-height:100dvh;font-family:Poppins,system-ui,-apple-system,sans-serif;color:var(--text);background:var(--bg);overflow-x:clip;-webkit-font-smoothing:antialiased}
+button,select{font:inherit}
+button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offset:4px}
+[hidden]{display:none!important}
+.ambient{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;background:radial-gradient(ellipse at 15% -12%,rgba(108,83,227,.11),transparent 52%),radial-gradient(ellipse at 100% 82%,rgba(3,157,213,.08),transparent 55%),#030305}
+.ambient:after{content:"";position:absolute;width:140vw;height:2px;left:-35vw;top:69%;transform:rotate(-49deg);opacity:.45;background:linear-gradient(90deg,transparent,#325cff,#68daf4,transparent);filter:blur(2px);box-shadow:0 0 28px 3px rgba(63,93,255,.36)}
+.shell{width:min(100%,580px);margin:0 auto;padding:calc(22px + env(safe-area-inset-top,0px)) 18px calc(110px + env(safe-area-inset-bottom,0px))}
+.header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 8px 24px}
+.logo{width:132px;max-width:38%;height:36px;object-fit:contain;object-position:left center}
+.head-actions{display:flex;align-items:center;gap:10px}
+.bell,.session{height:43px;border:1px solid rgba(59,206,230,.28);background:rgba(11,30,37,.7);color:#d8f9ff;backdrop-filter:blur(13px);-webkit-backdrop-filter:blur(13px)}
+.bell{width:45px;border-radius:50%;display:grid;place-items:center}
+.bell svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.session{border-radius:25px;padding:0 16px;font-weight:700;font-size:12px}
+.nav{min-height:75px;border-radius:28px;border:1px solid rgba(197,206,255,.1);background:rgba(12,14,26,.64);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);display:grid;grid-template-columns:2.1fr .75fr .75fr;gap:6px;align-items:center;padding:9px;margin-bottom:40px}
+.nav button{height:53px;min-width:0;border-radius:23px;border:1px solid transparent;background:transparent;color:#a9b5c7;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:9px;white-space:nowrap}
+.nav button.active{border-color:rgba(48,225,237,.68);color:#fff;background:linear-gradient(115deg,rgba(14,33,43,.88),rgba(17,19,34,.82))}
+.nav svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.nav .active svg{color:#53dce8}
+.nav .nav-only{display:none}
+.greeting{min-height:87px;display:flex;align-items:flex-end;padding:0 9px 19px;overflow:hidden}
+.greeting h1{margin:0;font-weight:700;font-size:clamp(26px,6vw,34px);letter-spacing:-.045em;line-height:1.17;max-width:100%;text-wrap:balance}
+.greeting .word{display:inline-block;will-change:transform,filter,opacity;white-space:pre}
+.greeting .name{color:#42e4e8}
+.focus{position:relative;isolation:isolate;display:grid;grid-template-columns:minmax(0,1fr) minmax(84px,30%);grid-template-rows:minmax(145px,1fr) auto;align-items:center;width:100%;min-height:277px;text-align:left;padding:29px 23px 23px 28px;overflow:hidden;border:1px solid rgba(167,190,226,.18);border-radius:32px;background:linear-gradient(142deg,rgba(25,29,48,.79),rgba(7,13,24,.89) 60%,rgba(12,23,37,.82));box-shadow:0 20px 52px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.045);color:var(--text);-webkit-backdrop-filter:blur(26px) saturate(1.2);backdrop-filter:blur(26px) saturate(1.2);transform:translateZ(0);transition:border-color .65s ease,box-shadow .65s ease,background .6s ease}
+.focus:before{content:"";position:absolute;inset:-65px -55px auto auto;width:250px;height:240px;border-radius:50%;background:var(--glow,rgba(65,219,232,.22));filter:blur(59px);opacity:.6;transition:background .5s,opacity .6s;z-index:-1;pointer-events:none}
+.focus:after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(115deg,rgba(255,255,255,.045),transparent 31%,transparent 73%,rgba(96,164,220,.035));pointer-events:none}
+.focus[data-tone="attention"]{--glow:rgba(242,94,119,.26);border-color:rgba(244,128,153,.21)}
+.focus[data-tone="review"]{--glow:rgba(63,183,249,.26)}
+.focus[data-tone="agreement"]{--glow:rgba(142,111,239,.28)}
+.focus[data-tone="calm"]{--glow:rgba(37,215,202,.24)}
+.focus[data-tone="due"]{--glow:rgba(38,200,225,.26)}
+.focus[data-tone="muted"]{--glow:rgba(143,153,186,.18)}
+.focus:active{transform:scale(.991)}
+.focus-copy{min-width:0;position:relative;align-self:center;grid-column:1;grid-row:1;z-index:2}
+.focus-title{position:relative;font-size:clamp(23px,5.6vw,33px);font-weight:700;letter-spacing:-.048em;line-height:1.16;text-wrap:balance;overflow-wrap:normal;hyphens:auto;margin:0;color:#f7f8fe;max-width:100%}
+.focus-title.shadow-out{position:absolute;inset:0;pointer-events:none}
+.focus-icon{position:relative;grid-column:2;grid-row:1;place-self:center;z-index:1;display:grid;place-items:center;width:100%;max-width:130px;aspect-ratio:1;color:var(--accent,#42e0e5);transition:color .5s ease}
+.focus-icon:before{content:"";position:absolute;inset:6%;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.04),transparent 70%);filter:blur(7px);pointer-events:none}
+.focus-icon svg{display:block;max-width:86%;width:100%;height:100%;overflow:visible;fill:none;stroke:currentColor;stroke-width:1.35;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 14px currentColor)}
+.focus-bottom{position:relative;z-index:1;grid-row:2;grid-column:1/-1;display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-top:14px}
+.focus-meta{font-size:11px;line-height:1.4;color:#b4c4d1;letter-spacing:-.01em;max-width:63%}
+.focus-action{display:inline-flex;align-items:center;gap:7px;color:var(--accent,#53e5ec);font-size:11.5px;line-height:1.4;font-weight:700;white-space:nowrap;margin-left:auto}
+.focus-action svg{width:17px;height:17px;stroke:currentColor;stroke-width:1.9;fill:none;stroke-linecap:round;stroke-linejoin:round;transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.focus:hover .focus-action svg{transform:translate(2px,-2px)}
+.focus[data-tone="attention"]{--accent:#f6a4b8}
+.focus[data-tone="review"]{--accent:#7bccff}
+.focus[data-tone="agreement"]{--accent:#c1b5ff}
+.focus[data-tone="calm"]{--accent:#69e1d5}
+.focus[data-tone="due"]{--accent:#5cdaeb}
+.focus[data-tone="muted"]{--accent:#bfc9dc}
+.secondary{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:26px 6px 0;padding:0;min-height:32px}
+.secondary p{font-size:12px;color:#d5dfeb;margin:0;line-height:1.4}
+.secondary .right{display:flex;align-items:center;gap:10px;white-space:nowrap;color:#a0b5c8;font-size:11px}
+.progress{width:73px;height:3px;border-radius:4px;background:rgba(165,180,210,.16);overflow:hidden}
+.progress span{display:block;width:75%;height:100%;border-radius:4px;background:linear-gradient(90deg,#31dce7,#8b69eb)}
+.after{margin:54px 6px 0}
+.after h2{font-size:14px;font-weight:700;letter-spacing:-.01em;margin:0 0 6px}
+.after p{font-size:11px;color:#8c9caf;margin:0}
+.demo-toggle{position:fixed;z-index:10;bottom:calc(16px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);border:1px solid rgba(107,209,222,.24);background:rgba(8,18,29,.93);color:#e3f9ff;border-radius:25px;min-height:44px;padding:0 19px;white-space:nowrap;box-shadow:0 10px 30px rgba(0,0,0,.45);font-size:11px;font-weight:600;backdrop-filter:blur(18px)}
+.demo-panel{position:fixed;z-index:10;left:50%;bottom:calc(72px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(370px,calc(100vw - 24px));padding:19px;border:1px solid rgba(147,175,210,.2);border-radius:23px;background:rgba(12,17,32,.97);box-shadow:0 26px 70px rgba(0,0,0,.5);backdrop-filter:blur(23px)}
+.demo-panel h2{font-size:15px;margin:0 0 5px;letter-spacing:-.02em}
+.demo-panel p{font-size:10px;line-height:1.55;color:#aab7c9;margin:0 0 15px}
+.demo-panel select{width:100%;min-height:45px;border:1px solid rgba(129,161,204,.26);border-radius:13px;background:#151e2f;color:#f4f6ff;padding:0 12px;font-weight:600;font-size:12px}
+.demo-panel .testcase{display:block;font-size:10px;color:#8ce8f0;margin-top:11px;line-height:1.6}
+.detail{width:min(420px,calc(100vw - 35px));max-height:80dvh;background:linear-gradient(135deg,#141b2c,#090e19);color:#fff;border:1px solid rgba(144,173,215,.2);border-radius:25px;padding:26px 24px;box-shadow:0 25px 100px #0009}
+.detail::backdrop{background:rgba(1,3,9,.67);backdrop-filter:blur(6px)}
+.detail h2{font-size:23px;line-height:1.22;letter-spacing:-.04em;margin:13px 0 10px}
+.detail p{font-size:13px;color:#b7c5d6;line-height:1.65;margin:0 0 22px}
+.detail .close{min-height:44px;width:100%;border-radius:15px;border:1px solid rgba(130,190,220,.3);background:rgba(44,71,87,.4);color:#ddfaff}
+.detail .hint{color:#80dbe7;font-size:10px;font-weight:700}
+@media (max-width:380px){
+ .shell{padding-inline:13px}
+ .header{padding-inline:5px}
+ .nav{grid-template-columns:2fr .7fr .7fr}
+ .focus{padding:25px 18px 22px 20px;grid-template-columns:minmax(0,1fr) minmax(75px,29%);min-height:263px}
+ .focus-title{font-size:clamp(21px,6.3vw,26px)}
+ .focus-bottom{gap:7px}
+ .focus-meta,.focus-action{font-size:10px}
+ .secondary p{font-size:10.5px}
+ .progress{width:58px}
+}
+@media(max-width:315px){
+ .nav{gap:2px;padding:5px}
+ .nav button{font-size:9px}
+ .nav svg{width:16px}
+ .session{padding:0 11px}
+ .focus{grid-template-columns:minmax(0,1fr) 77px;padding:23px 14px 19px 17px}
+ .focus-title{font-size:21px}
+ .focus-action{gap:3px;font-size:9px}
+ .focus-meta{font-size:9px}
+}
+@media(prefers-reduced-motion:reduce){
+ *,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
+ .greeting .word{will-change:auto}
+}
+</style>
+</head>
+<body>
+<div class="ambient" aria-hidden="true"></div>
+<main class="shell">
+<header class="header">
+<img class="logo" src="../../logo2.PNG" alt="GOXION">
+<div class="head-actions">
+<button class="bell" id="bell" type="button" aria-label="Notificaciones de ejemplo">
+<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>
+</button>
+<button type="button" class="session" id="session">Mi Espacio</button>
+</div>
+</header>
+<nav class="nav" aria-label="Navegación de ejemplo">
+<button type="button" class="active" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3-7 8-7s8 3 8 7"/></svg>Mi Espacio</button>
+<button type="button" class="local-only" aria-label="Catálogo de ejemplo"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="20" r="1"/><circle cx="19" cy="20" r="1"/><path d="M2 3h2l2.8 12h13l2-9H5"/></svg></button>
+<button type="button" class="local-only" aria-label="Soporte de ejemplo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 5a5 5 0 0 0-6 6L2 17l5 5 6-6a5 5 0 0 0 6-6l-4 3-3-3z"/></svg></button>
+</nav>
+<section aria-label="Resumen contextual de cliente">
+<div class="greeting"><h1 id="greeting" aria-label="Hola, Mario">Hola, <span class="name">Mario</span></h1></div>
+<button class="focus" id="focus" type="button" data-tone="calm" aria-describedby="focus-meta">
+ <div class="focus-copy"><div class="focus-title" id="focus-title" aria-live="polite">Todo al corriente</div></div>
+ <span class="focus-icon" id="focus-icon" aria-hidden="true">
+  <svg viewBox="0 0 24 24" focusable="false"><path id="state-path" d="M20 6 9 17l-5-5"/></svg>
+ </span>
+ <div class="focus-bottom">
+  <span class="focus-meta" id="focus-meta">Próximo corte · 15 dic</span>
+  <span class="focus-action"><span id="focus-action">Ver mi cuenta</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 18 19 5M8 5h11v11"/></svg></span>
+ </div>
+</button>
+<div class="secondary" aria-label="Progreso de lealtad de ejemplo">
+ <p>Tu lealtad</p>
+ <div class="right"><span>3/4 pagos</span><span class="progress" aria-hidden="true"><span></span></span></div>
+</div>
+<div class="after"><h2>Tus servicios</h2><p>Consulta tus accesos, beneficios y solicitudes.</p></div>
+</section>
+</main>
+<button class="demo-toggle" id="demo-toggle" type="button" aria-expanded="false" aria-controls="demo-panel">Probar estados</button>
+<section class="demo-panel" id="demo-panel" aria-label="Simulador de estados" hidden>
+<h2>Tarjeta dinámica</h2><p>Escenarios ficticios. No se conecta con cuentas, pagos ni notificaciones reales.</p>
+<label for="scenario" class="hint">Situación de prueba</label>
+<select id="scenario">
+<option value="clear">Todo al corriente</option>
+<option value="correction">Comprobante rechazado</option>
+<option value="incomplete">Pago incompleto</option>
+<option value="review">Comprobante en revisión</option>
+<option value="overdue">Pago vencido</option>
+<option value="suspended">Servicio suspendido</option>
+<option value="extension">Prórroga aprobada</option>
+<option value="cancellation">Cancelación pendiente</option>
+<option value="multi">Dos fechas independientes</option>
+<option value="soon">Pago próximo</option>
+<option value="new">Cliente sin servicios</option>
+<option value="combined">Rechazo + aviso secundario</option>
+</select>
+<span class="testcase" id="priority-note">La tarjeta muestra solo la acción de mayor prioridad.</span>
+</section>
+<dialog class="detail" id="detail">
+ <span class="hint">VISTA DE DEMOSTRACIÓN</span>
+ <h2 id="detail-title"></h2>
+ <p id="detail-text"></p>
+ <button class="close" id="detail-close" type="button">Volver a Mi Espacio</button>
+</dialog>
+<script>
+(function(){
+'use strict';
+const $ = id=>document.getElementById(id);
+const reduced=()=>window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const snapshots={
+ clear:{paid:true,next:'15 dic'},
+ correction:{receipt:'rejected',next:'15 dic'},
+ incomplete:{receipt:'incomplete',next:'15 dic'},
+ review:{receipt:'pending',next:'15 dic'},
+ overdue:{overdue:true,next:'15 dic'},
+ suspended:{suspended:true,next:'15 dic'},
+ extension:{extension:'20 dic',next:'20 dic'},
+ cancellation:{cancel:'pending',next:'15 dic'},
+ multi:{multi:true,next:'15 dic'},
+ soon:{soon:true,next:'15 dic'},
+ new:{services:0},
+ combined:{receipt:'rejected',notification:'Promoción nueva',next:'15 dic'}
+};
+const states={
+ correction:{title:'Tu comprobante necesita atención',meta:'Revisa la observación',action:'Ver observación',tone:'attention',icon:'alert',detail:'El comprobante fue rechazado. Consulta el motivo confirmado y corrige el documento antes de volver a enviarlo.'},
+ incomplete:{title:'Hay un pago incompleto',meta:'Revisa el importe faltante',action:'Ver detalle',tone:'attention',icon:'alert',detail:'El importe faltante debe obtenerse del estado financiero confirmado, nunca de esta tarjeta.'},
+ suspended:{title:'Tu servicio está suspendido',meta:'Consulta cómo regularizarlo',action:'Ver situación',tone:'attention',icon:'alert',detail:'La causa y la acción permitida dependen del estado oficial del servicio.'},
+ overdue:{title:'Tienes un pago vencido',meta:'Consulta tu estado de cuenta',action:'Ver pago',tone:'attention',icon:'clock',detail:'La fecha y cualquier recargo deben proceder del cálculo oficial antes de mostrarse.'},
+ review:{title:'Estamos revisando tu comprobante',meta:'Ya lo recibimos',action:'Ver seguimiento',tone:'review',icon:'clock',detail:'No necesitas enviar otro comprobante del mismo servicio mientras la revisión siga pendiente.'},
+ extension:{title:'Tu nueva fecha está registrada',meta:'Acuerdo · 20 dic',action:'Ver acuerdo',tone:'agreement',icon:'calendar',detail:'La prórroga debe mostrarse solo después de que haya sido confirmada oficialmente.'},
+ cancellation:{title:'Tu cancelación está en proceso',meta:'Solicitud recibida',action:'Ver seguimiento',tone:'review',icon:'layers',detail:'Muestra la etapa confirmada de la solicitud, sin afirmar que el servicio ya se canceló.'},
+ multi:{title:'Tu próximo pago es el 15 de diciembre',meta:'Tienes dos fechas activas',action:'Ver fechas',tone:'due',icon:'calendar',detail:'Las dos obligaciones se consultan en el estado de cuenta oficial; este ejemplo no calcula importes.'},
+ soon:{title:'Tu próximo corte se acerca',meta:'15 de diciembre',action:'Ver cuenta',tone:'due',icon:'calendar',detail:'El próximo vencimiento se deriva de la fecha confirmada por GOXION.'},
+ clear:{title:'Todo al corriente',meta:'Próximo corte · 15 dic',action:'Ver mi cuenta',tone:'calm',icon:'check',detail:'No hay acciones urgentes pendientes en este escenario ficticio.'},
+ new:{title:'Tu espacio está listo',meta:'Explora tu primer servicio',action:'Ir al catálogo',tone:'calm',icon:'spark',detail:'Este caso representa una cuenta nueva sin servicios y sin pagos.'}
+};
+const paths={
+ alert:'M12 2 22 20H2L12 2zM12 8v5M12 16v1',
+ clock:'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18M12 7v5l3 2',
+ check:'M4 12l5 5L20 6',
+ calendar:'M5 3v4M19 3v4M3 9h18M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2',
+ layers:'M12 3 21 8 12 13 3 8 12 3zM3 12l9 5 9-5M3 16l9 5 9-5',
+ spark:'M12 2v20M2 12h20M5 5l14 14M19 5 5 19'
+};
+let iconHandle=null,active='clear',greetTimer=null;
+function classify(s){
+ if(s.services===0)return 'new';
+ if(s.receipt==='rejected')return 'correction';
+ if(s.receipt==='incomplete')return 'incomplete';
+ if(s.suspended)return 'suspended';
+ if(s.overdue)return 'overdue';
+ if(s.receipt==='pending')return 'review';
+ if(s.extension)return 'extension';
+ if(s.cancel==='pending')return 'cancellation';
+ if(s.multi)return 'multi';
+ if(s.soon)return 'soon';
+ return 'clear';
+}
+function words(text,name){
+ const element=$('greeting');
+ element.replaceChildren();
+ const tokens=text.split(/(\s+)/);
+ tokens.forEach(part=>{
+  if(!part)return;
+  const s=document.createElement('span');
+  s.className='word';
+  s.textContent=part;
+  if(name && part.indexOf('Mario')>=0)s.classList.add('name');
+  element.append(s);
+  if(!reduced() && part.trim() && s.animate){
+   const order=element.querySelectorAll('.word').length;
+   s.animate([{transform:'translateY(70%)',filter:'blur(9px)',opacity:0},{transform:'translateY(0)',filter:'blur(0)',opacity:1}],
+    {duration:640,delay:Math.min(order*50,310),easing:'cubic-bezier(.16,1,.3,1)',fill:'both'});
+  }
+ });
+ element.setAttribute('aria-label',text);
+}
+function updateGreeting(code){
+ clearInterval(greetTimer);
+ const urgent=['correction','incomplete','suspended','overdue','review'].includes(code);
+ if(urgent){words('Hola, Mario',true);return;}
+ const phrases=['Hola, Mario','Qué gusto verte, Mario','Bienvenido a tu espacio'];
+ let index=0;
+ words(phrases[0],true);
+ if(reduced())return;
+ greetTimer=setInterval(()=>{
+  if(document.hidden || active!==code)return;
+  index=(index+1)%phrases.length;
+  words(phrases[index],true);
+ },13000);
+}
+function transitionText(next){
+ const title=$('focus-title');
+ const old=title.textContent;
+ if(old===next)return;
+ if(!reduced() && title.animate){
+  const ghost=title.cloneNode(true);
+  ghost.classList.add('shadow-out');
+  ghost.setAttribute('aria-hidden','true');
+  ghost.removeAttribute('id');
+  title.parentNode.append(ghost);
+  const a=ghost.animate([{opacity:1,filter:'blur(0)',transform:'translateY(0)'},{opacity:0,filter:'blur(10px)',transform:'translateY(-17px)'}],{duration:370,easing:'ease-in',fill:'forwards'});
+  a.finished.then(()=>ghost.remove(),()=>ghost.remove());
+  window.setTimeout(()=>ghost.remove(),450);
+ }
+ title.textContent=next;
+ if(!reduced() && title.animate){
+  title.animate([{opacity:0,filter:'blur(12px)',transform:'translateY(24px)',clipPath:'inset(75% 0 0 0)'},{opacity:1,filter:'blur(0)',transform:'translateY(0)',clipPath:'inset(0 0 0 0)'}],
+  {duration:570,easing:'cubic-bezier(.18,.85,.2,1)'});
+ }
+}
+function setIcon(next){
+ const path=$('state-path');
+ const shape=paths[next]||paths.check;
+ if(iconHandle){try{iconHandle.morphTo(shape,'smooth');return;}catch(_){}}
+ path.setAttribute('d',shape);
+ const svg=path.ownerSVGElement;
+ if(svg && svg.animate && !reduced())svg.animate([{opacity:.2,transform:'scale(.79) rotate(-9deg)'},{opacity:1,transform:'scale(1) rotate(0)'}],
+  {duration:480,easing:'cubic-bezier(.2,.8,.2,1)'});
+}
+function render(scenario,first){
+ const code=classify(snapshots[scenario]||snapshots.clear);
+ const data=states[code];
+ const card=$('focus');
+ active=code;
+ card.dataset.tone=data.tone;
+ card.dataset.state=code;
+ card.setAttribute('aria-label',data.title+'. '+data.meta+'. '+data.action);
+ $('focus-meta').textContent=data.meta;
+ $('focus-action').textContent=data.action;
+ transitionText(data.title);
+ setIcon(data.icon);
+ if(!first && !reduced() && card.animate){
+   card.animate([{transform:'scale(.984)',filter:'brightness(.87)'},{transform:'scale(1)',filter:'brightness(1)'}],
+    {duration:540,easing:'cubic-bezier(.2,.84,.2,1)'});
+ }
+ updateGreeting(code);
+ $('priority-note').textContent=scenario==='combined'?
+  'Prioridad correcta: el rechazo permanece arriba de una notificación secundaria.':
+  'Solo un estado principal; el resto queda disponible al entrar.';
+}
+function openDetail(){
+ const data=states[active];
+ $('detail-title').textContent=data.title;
+ $('detail-text').textContent=data.detail+' Es una demostración visual: ninguna operación real está disponible aquí.';
+ const dialog=$('detail');
+ if(typeof dialog.showModal==='function')dialog.showModal();
+ else dialog.setAttribute('open','');
+}
+function closeDetail(){const d=$('detail');if(typeof d.close==='function')d.close();else d.removeAttribute('open');}
+$('focus').addEventListener('click',openDetail);
+$('detail-close').addEventListener('click',closeDetail);
+$('demo-toggle').addEventListener('click',()=>{
+ const panel=$('demo-panel');
+ panel.hidden=!panel.hidden;
+ $('demo-toggle').setAttribute('aria-expanded',String(!panel.hidden));
+ if(!panel.hidden)$('scenario').focus({preventScroll:true});
+});
+$('scenario').addEventListener('change',e=>render(e.target.value,false));
+document.querySelectorAll('.local-only,#session,#bell').forEach(n=>n.addEventListener('click',()=>{
+ $('demo-panel').hidden=false;
+ $('demo-toggle').setAttribute('aria-expanded','true');
+ $('priority-note').textContent='La navegación real permanece intacta; esta vista solo demuestra la tarjeta.';
+}));
+window.GOXION_MORPH_V2=Object.freeze({isolated:true,noBackend:true,scenarios:Object.keys(snapshots),classify,render});
+render('clear',true);
+// Morphicons: librería real, cargada solo en este prototipo. SVG nativo queda disponible sin red.
+import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
+ if(typeof mod.createMorph!=='function')return;
+ const path=$('state-path');
+ const shape=paths[states[active].icon];
+ iconHandle=mod.createMorph(path,shape,{reducedMotion:'user'});
+}).catch(()=>{ /* fallback SVG accesible sin la dependencia externa */ });
+})();
+</script>
+</body>
+</html>
