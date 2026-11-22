@@ -138,7 +138,12 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 .after h2{font-size:14px;font-weight:700;letter-spacing:-.01em;margin:0 0 6px}
 .after p{font-size:11px;color:#8c9caf;margin:0}
 .demo-toggle{position:relative;display:block;margin:35px auto 8px;border:1px solid rgba(107,209,222,.18);background:rgba(8,18,29,.78);color:#d5eaf3;border-radius:25px;min-height:44px;padding:0 20px;white-space:nowrap;font-size:11px;font-weight:600;backdrop-filter:blur(12px)}
-.demo-panel{position:fixed;z-index:20;left:50%;top:50%;transform:translate(-50%,-50%);width:min(370px,calc(100vw - 24px));max-height:80dvh;overflow-y:auto;overscroll-behavior:contain;padding:19px;border:1px solid rgba(147,175,210,.2);border-radius:23px;background:rgba(12,17,32,.98);box-shadow:0 26px 70px rgba(0,0,0,.5);backdrop-filter:blur(23px)}
+.demo-panel{position:fixed;z-index:20;left:50%;top:calc(12px + env(safe-area-inset-top,0px));bottom:calc(12px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(370px,calc(100vw - 24px));max-height:none;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;touch-action:pan-y;padding:19px 19px 28px;border:1px solid rgba(147,175,210,.2);border-radius:23px;background:rgba(12,17,32,.98);box-shadow:0 26px 70px rgba(0,0,0,.5);backdrop-filter:blur(23px);-webkit-backdrop-filter:blur(23px)}
+html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
+.demo-panel-head{position:sticky;top:-19px;z-index:3;display:flex;align-items:center;justify-content:space-between;gap:12px;margin:-19px -19px 8px;padding:15px 13px 9px 19px;background:rgba(12,17,32,.985);border-radius:22px 22px 0 0}
+.demo-panel-head h2{margin:0}
+.demo-panel-close{flex:0 0 37px;width:37px;height:37px;border:0;border-radius:50%;background:#79e6fc;color:#071c29;font-size:23px;font-weight:500;line-height:1;display:grid;place-items:center}
+.demo-panel-close:active{background:#5bd4ed}
 .demo-panel h2{font-size:15px;margin:0 0 5px;letter-spacing:-.02em}
 .demo-panel p{font-size:10px;line-height:1.55;color:#aab7c9;margin:0 0 15px}
 .demo-panel select{width:100%;min-height:45px;border:1px solid rgba(129,161,204,.26);border-radius:13px;background:#151e2f;color:#f4f6ff;padding:0 12px;font-weight:600;font-size:12px}
@@ -310,32 +315,39 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
  .gxb-mini-progress>span{transform:none!important;will-change:auto}
 }
 
-/* GOXION · Ahorro ilustrativo: un dato dominante, logos sin cápsulas extra. */
-.gxv-savings{position:relative;isolation:isolate;display:grid;grid-template-columns:minmax(92px,42%) minmax(0,1fr);align-items:center;gap:clamp(7px,2.3vw,16px);min-height:170px;margin:23px 2px 0;padding:15px 21px 15px 15px;border-radius:25px;overflow:hidden}
-.gxv-savings::before{content:"";position:absolute;z-index:-1;inset:0;pointer-events:none;background:radial-gradient(ellipse at 17% 48%,rgba(91,114,192,.115),transparent 58%)}
-.gxv-logos{position:relative;height:139px;min-width:0;width:100%;user-select:none}
-.gxv-slot{position:absolute;display:block;width:clamp(37px,9vw,48px);height:clamp(37px,9vw,48px);--float:4px}
-.gxv-slot img{display:block;width:100%;height:100%;object-fit:cover;border-radius:11px;filter:drop-shadow(0 7px 11px rgba(0,0,0,.38));background:rgba(14,16,28,.34)}
-.gxv-slot:nth-child(1){top:8%;left:9%;--float:4px;animation-delay:-1.2s}
-.gxv-slot:nth-child(2){top:22%;left:53%;--float:-3px;animation-delay:-4.4s}
-.gxv-slot:nth-child(3){top:63%;left:20%;--float:3px;animation-delay:-2.9s}
-.gxv-slot:nth-child(4){top:65%;left:57%;--float:-4px;animation-delay:-6.1s}
-.gxv-logos[data-count="1"] .gxv-slot:first-child{width:clamp(54px,14vw,70px);height:clamp(54px,14vw,70px);left:calc(50% - clamp(27px,7vw,35px));top:calc(50% - clamp(27px,7vw,35px))}
-.gxv-logos[data-count="2"] .gxv-slot:first-child{left:6%;top:33%}
-.gxv-logos[data-count="2"] .gxv-slot:nth-child(2){left:54%;top:38%}
-.gxv-logos[data-count="3"] .gxv-slot:first-child{left:7%;top:18%}
-.gxv-logos[data-count="3"] .gxv-slot:nth-child(2){left:54%;top:31%}
-.gxv-logos[data-count="3"] .gxv-slot:nth-child(3){left:25%;top:68%}
-.gxv-more{position:absolute;z-index:2;right:0;bottom:0;min-width:29px;height:25px;padding:3px 6px;border-radius:9px;background:rgba(31,39,61,.92);color:#e0eaf3;display:grid;place-items:center;font-size:11px;font-weight:600}
+/* GOXION · Ahorro: jerarquía en la cifra, logos espaciales y mismo ritmo vertical. */
+.gxv-savings{position:relative;isolation:isolate;display:grid;grid-template-columns:minmax(92px,42%) minmax(0,1fr);align-items:center;gap:clamp(7px,2.3vw,16px);min-height:170px;margin:14px 2px 0;padding:15px 19px 15px 13px;border-radius:25px;overflow:hidden}
+.gxv-savings::before{content:"";position:absolute;z-index:-1;inset:0;pointer-events:none;background:radial-gradient(ellipse at 17% 48%,rgba(91,114,192,.09),transparent 58%)}
+.gxv-logos{position:relative;height:140px;min-width:0;width:100%;pointer-events:none;user-select:none;perspective:300px}
+.gxv-slot{position:absolute;display:block;width:var(--size,48px);height:var(--size,48px);z-index:var(--layer,1);transform-origin:center;--float:3px;--duration:7.5s}
+.gxv-slot img{display:block;width:100%;height:100%;object-fit:cover;border-radius:clamp(10px,2.7vw,15px);background:rgba(14,16,28,.34);box-shadow:0 var(--shadow-y,8px) var(--shadow-blur,16px) rgba(0,0,0,.37);filter:brightness(var(--brightness,1))}
+.gxv-logos[data-count="1"] .gxv-slot:nth-child(1){left:50%;top:50%;--size:clamp(68px,18vw,82px);--layer:5;--float:-3px;--duration:8.6s;--brightness:1;--shadow-y:14px;--shadow-blur:23px}
+.gxv-logos[data-count="2"] .gxv-slot:nth-child(1){left:3%;top:14%;--size:clamp(50px,13.2vw,62px);--layer:5;--float:3px;--duration:7.2s;--brightness:1;--shadow-y:14px;--shadow-blur:23px}
+.gxv-logos[data-count="2"] .gxv-slot:nth-child(2){left:48%;top:45%;--size:clamp(46px,12.3vw,56px);--layer:2;--float:-3px;--duration:8.7s;--brightness:.96;--shadow-y:6px;--shadow-blur:13px}
+.gxv-logos[data-count="3"] .gxv-slot:nth-child(1){left:5%;top:8%;--size:clamp(49px,12.9vw,61px);--layer:5;--float:3px;--duration:7.1s;--brightness:1;--shadow-y:14px;--shadow-blur:23px}
+.gxv-logos[data-count="3"] .gxv-slot:nth-child(2){left:51%;top:34%;--size:clamp(45px,11.8vw,55px);--layer:2;--float:-4px;--duration:8.3s;--brightness:.96;--shadow-y:6px;--shadow-blur:13px}
+.gxv-logos[data-count="3"] .gxv-slot:nth-child(3){left:14%;top:67%;--size:clamp(42px,10.8vw,51px);--layer:3;--float:3px;--duration:9.4s;--brightness:1;--shadow-y:6px;--shadow-blur:13px}
+.gxv-logos[data-count="4"] .gxv-slot:nth-child(1){left:7%;top:5%;--size:clamp(48px,12.7vw,61px);--layer:5;--float:4px;--duration:7.1s;--brightness:1;--shadow-y:14px;--shadow-blur:23px}
+.gxv-logos[data-count="4"] .gxv-slot:nth-child(2){left:49%;top:26%;--size:clamp(45px,11.9vw,56px);--layer:2;--float:-3px;--duration:8.4s;--brightness:.96;--shadow-y:6px;--shadow-blur:13px}
+.gxv-logos[data-count="4"] .gxv-slot:nth-child(3){left:13%;top:63%;--size:clamp(43px,11.3vw,53px);--layer:4;--float:3px;--duration:9.1s;--brightness:1;--shadow-y:11px;--shadow-blur:19px}
+.gxv-logos[data-count="4"] .gxv-slot:nth-child(4){left:54%;top:68%;--size:clamp(40px,10.6vw,49px);--layer:1;--float:-2px;--duration:10s;--brightness:.91;--shadow-y:6px;--shadow-blur:13px}
+
+.gxv-logos[data-count="1"] .gxv-slot:first-child{translate:-50% -50%}
+.gxv-more{position:absolute;z-index:6;right:0;top:4px;min-width:29px;height:25px;padding:3px 6px;border-radius:9px;background:rgba(31,39,61,.94);color:#e0eaf3;display:grid;place-items:center;font-size:11px;font-weight:600}
 .gxv-value{position:relative;z-index:1;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;min-width:0}
-.gxv-amount{display:block;margin:0;font-size:clamp(31px,8.1vw,46px);line-height:1.1;letter-spacing:-.052em;font-weight:700;color:#f9fcff;font-variant-numeric:tabular-nums;white-space:nowrap}
+.gxv-amount{display:block;margin:0;font-size:clamp(34px,9vw,51px);line-height:1.1;letter-spacing:-.052em;font-weight:700;color:#f9fcff;font-variant-numeric:tabular-nums;white-space:nowrap}
+.gxv-amount[data-long="true"]{font-size:clamp(27px,7.3vw,42px)}
 .gxv-meaning{display:block;margin-top:4px;font-size:clamp(11.5px,2.8vw,13px);font-weight:600;line-height:1.4;color:#d4e4ed}
 .gxv-context{display:block;max-width:100%;margin-top:10px;font-size:10.5px;line-height:1.44;color:#b2c6d3}
-.gxv-savings:not([hidden]) + .after{margin-top:32px}
-@keyframes gxvHover{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(0,var(--float),0)}}
-.gxv-savings.is-visible:not([data-motion-paused="true"]) .gxv-slot{animation-name:gxvHover;animation-duration:7.6s;animation-timing-function:ease-in-out;animation-iteration-count:infinite}
-@media(max-width:380px){.gxv-savings{min-height:164px;padding:13px 14px 13px 10px;border-radius:23px}.gxv-logos{height:134px}.gxv-slot{width:38px;height:38px}.gxv-context{font-size:10.5px}}
-@media(max-width:315px){.gxv-savings{grid-template-columns:minmax(90px,41%) minmax(0,1fr);gap:7px;padding:12px 11px 12px 9px}.gxv-slot{width:35px;height:35px}.gxv-amount{font-size:30px}.gxv-context{font-size:10px}}
+.gxv-savings + .after{margin-top:18px}
+@keyframes gxvHover{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(0,var(--float),0) scale(1.012)}}
+.gxv-savings.is-visible:not([data-motion-paused="true"]) .gxv-slot{animation:gxvHover var(--duration) ease-in-out infinite;animation-delay:var(--delay,0s)}
+.gxv-slot:nth-child(1){--delay:-1.2s}
+.gxv-slot:nth-child(2){--delay:-3.4s}
+.gxv-slot:nth-child(3){--delay:-4.9s}
+.gxv-slot:nth-child(4){--delay:-2.6s}
+@media(max-width:380px){.gxv-savings{min-height:164px;padding:13px 12px 13px 10px;border-radius:23px}.gxv-logos{height:137px}.gxv-context{font-size:10.5px}}
+@media(max-width:315px){.gxv-savings{grid-template-columns:minmax(90px,41%) minmax(0,1fr);gap:7px;padding:12px 9px 12px 8px}.gxv-amount{font-size:34px}.gxv-amount[data-long="true"]{font-size:27px}.gxv-context{font-size:10px}}
 @media(prefers-reduced-motion:reduce){.gxv-slot{animation:none!important;transform:none!important}}
 
 .gxc-mini-rail{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:9px}
@@ -444,8 +456,8 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 <button class="demo-toggle" id="demo-toggle" type="button" aria-expanded="false" aria-controls="demo-panel">Probar estados · Laboratorio</button>
 <p class="gxb-preview-label" style="text-align:center">Vista conceptual · Los beneficios utilizan datos de muestra.</p>
 </main>
-<section class="demo-panel" id="demo-panel" aria-label="Simulador de estados" hidden>
-<h2>Tarjeta dinámica</h2><p>Escenarios ficticios. No se conecta con cuentas, pagos ni notificaciones reales.</p>
+<section class="demo-panel" id="demo-panel" aria-label="Simulador de estados" role="dialog" aria-modal="true" tabindex="-1" hidden>
+<div class="demo-panel-head"><h2>Tarjeta dinámica</h2><button id="demo-panel-close" type="button" class="demo-panel-close" aria-label="Cerrar laboratorio">×</button></div><p>Escenarios ficticios. No se conecta con cuentas, pagos ni notificaciones reales.</p>
 <label for="scenario" class="hint">Situación de prueba</label>
 <select id="scenario">
 <option value="clear">Todo al corriente</option>
@@ -470,11 +482,25 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 <span class="layout-compare-caption" id="layout-caption">Tarjeta menos alta; acción centrada en la base y lealtad debajo, por separado.</span>
 <div class="gxb-lab-toggle"><button type="button" id="gxb-ready-toggle" aria-pressed="false">Simular recompensa lista · Misiones</button><span>Cambia el estado de la misión sin operar una cuenta real.</span></div><label class="hint" for="gxb-ref-stage">Estado de Referidos</label><select id="gxb-ref-stage" aria-label="Estado de referidos de demostración"><option value="active">Invitado activo · 1/3</option><option value="none">Sin referido · Invitar</option><option value="ready">Beneficio disponible · 3/3</option><option value="claimed">Beneficio reclamado</option></select>
 <label class="hint" for="gxv-demo-case">Plataformas en el resumen de ahorro</label>
-<select id="gxv-demo-case" aria-label="Variar servicios de demostración">
- <option value="four">4 plataformas · ejemplo principal</option>
- <option value="one">1 plataforma</option>
- <option value="many">7 plataformas</option>
- <option value="none">Sin servicios · ocultar resumen</option>
+<select id="gxv-demo-case" aria-label="Elegir cuántas plataformas mostrar">
+ <option value="0">0 · Sin servicios</option>
+ <option value="1">1 plataforma</option>
+ <option value="2">2 plataformas</option>
+ <option value="3">3 plataformas</option>
+ <option value="4" selected>4 plataformas</option>
+ <option value="5">5 plataformas</option>
+ <option value="6">6 plataformas</option>
+ <option value="7">7 plataformas</option>
+</select>
+<label class="hint" for="gxv-demo-brand">Plataforma protagonista</label>
+<select id="gxv-demo-brand" aria-label="Cambiar la plataforma protagonista">
+ <option value="0">Netflix</option>
+ <option value="1">Disney+</option>
+ <option value="2">Max</option>
+ <option value="3">YouTube Premium</option>
+ <option value="4">Prime Video</option>
+ <option value="5">Crunchyroll</option>
+ <option value="6">Microsoft 365</option>
 </select>
 <div class="glass-material-selector" role="group" aria-label="Comparar materiales de cristal">
   <button type="button" data-material-preset="official" aria-pressed="false">GOXION oficial</button>
@@ -646,11 +672,24 @@ function openDetail(){
 function closeDetail(){const d=$('detail');if(typeof d.close==='function')d.close();else d.removeAttribute('open');}
 $('focus').addEventListener('click',openDetail);
 $('detail-close').addEventListener('click',closeDetail);
-$('demo-toggle').addEventListener('click',()=>{
+let previousDemoFocus=null;
+function setDemoOpen(open){
  const panel=$('demo-panel');
- panel.hidden=!panel.hidden;
- $('demo-toggle').setAttribute('aria-expanded',String(!panel.hidden));
- if(!panel.hidden)$('scenario').focus({preventScroll:true});
+ if(open===!panel.hidden)return;
+ if(open)previousDemoFocus=document.activeElement;
+ panel.hidden=!open;
+ document.documentElement.classList.toggle('gx-demo-open',open);
+ $('demo-toggle').setAttribute('aria-expanded',String(open));
+ if(open){panel.scrollTop=0;panel.focus({preventScroll:true})}
+ else{
+  window.dispatchEvent(new CustomEvent('goxion:lab-panel-closed'));
+  if(previousDemoFocus && typeof previousDemoFocus.focus==='function')previousDemoFocus.focus({preventScroll:true});
+ }
+}
+$('demo-toggle').addEventListener('click',()=>setDemoOpen($('demo-panel').hidden));
+$('demo-panel-close').addEventListener('click',()=>setDemoOpen(false));
+$('demo-panel').addEventListener('keydown',event=>{
+ if(event.key==='Escape'){event.stopPropagation();setDemoOpen(false)}
 });
 $('scenario').addEventListener('change',e=>render(e.target.value,false));
 function setLayout(mode){
@@ -670,8 +709,7 @@ function setLayout(mode){
 }
 document.querySelectorAll('[data-layout-preset]').forEach(b=>b.addEventListener('click',()=>setLayout(b.dataset.layoutPreset)));
 document.querySelectorAll('.local-only,#session,#bell').forEach(n=>n.addEventListener('click',()=>{
- $('demo-panel').hidden=false;
- $('demo-toggle').setAttribute('aria-expanded','true');
+ setDemoOpen(true);
  $('priority-note').textContent='La navegación real permanece intacta; esta vista solo demuestra la tarjeta.';
 }));
 function updateGlass(percent){
@@ -1062,43 +1100,101 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
 </script>
 
 <script>
-/* Las cifras son ilustrativas. No usar como ahorro real sin obtener
-   precios individuales verificables y costo contratado para el mismo periodo. */
+/* Laboratorio exclusivamente visual: los importes no son precios ni ahorros reales.
+   El cálculo productivo deberá usar contrato real y precios públicos comparables. */
 (function(){
  'use strict';
  const card=document.getElementById('gxv-savings'),logos=document.getElementById('gxv-logos');
  const amount=document.getElementById('gxv-amount'),caption=document.getElementById('gxv-context');
- const select=document.getElementById('gxv-demo-case');if(!card||!logos||!amount||!caption||!select)return;
+ const countSelect=document.getElementById('gxv-demo-case'),brandSelect=document.getElementById('gxv-demo-brand');
+ if(!card||!logos||!amount||!caption||!countSelect||!brandSelect)return;
  const brands=[
   ['Netflix','../../logos/netflix.PNG'],['Disney+','../../logos/disney.PNG'],
   ['Max','../../logos/hbo-max.PNG'],['YouTube Premium','../../logos/youtube.PNG'],
   ['Prime Video','../../logos/prime-video.PNG'],['Crunchyroll','../../logos/crunchyroll.PNG'],
   ['Microsoft 365','../../logos/microsoft.PNG']
  ];
- const examples={one:{count:1,saving:69},four:{count:4,saving:248},many:{count:7,saving:412},none:{count:0,saving:null}};
+ const examples=[0,69,131,187,248,312,367,412];
  const pesos=new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN',maximumFractionDigits:0,minimumFractionDigits:0});
- function render(key){
-  const data=examples[key]||examples.four;card.hidden=!data.count;
-  logos.replaceChildren();if(!data.count)return;
-  const selected=brands.slice(0,Math.min(data.count,4));logos.dataset.count=String(selected.length);
-  selected.forEach(([name,src])=>{
+ const reduced=()=>window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+ let currentValue=0,targetValue=0,frame=0,seen=false,hasCards=false,pendingFrom=null;
+ function show(value){amount.textContent=pesos.format(value)}
+ function stop(){if(frame){cancelAnimationFrame(frame);frame=0}}
+ function animateTo(next,fromZero){
+  stop();
+  const start=fromZero?0:currentValue;
+  if(reduced()||document.hidden||typeof requestAnimationFrame!=='function'||Math.abs(next-start)<1){
+   currentValue=next;show(next);return;
+  }
+  const startTime=performance.now(),duration=fromZero?1050:760,change=next-start;
+  function step(now){
+   const p=Math.min(1,Math.max(0,(now-startTime)/duration));
+   const eased=p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2;
+   currentValue=Math.round(start+change*eased);
+   show(currentValue);
+   if(p<1)frame=requestAnimationFrame(step);
+   else {frame=0;currentValue=next;show(next)}
+  }
+  currentValue=start;show(start);
+  frame=requestAnimationFrame(step);
+ }
+ function render(){
+  const n=Math.max(0,Math.min(7,Number(countSelect.value)||0));
+  const idx=Math.max(0,Math.min(6,Number(brandSelect.value)||0));
+  card.hidden=n===0;
+  logos.replaceChildren();
+  hasCards=n>0;
+  if(!n){stop();currentValue=targetValue=0;pendingFrom=null;return}
+  const order=[brands[idx],...brands.filter((_,i)=>i!==idx)];
+  const shown=order.slice(0,Math.min(n,4));
+  logos.dataset.count=String(shown.length);
+  shown.forEach(([name,src])=>{
    const slot=document.createElement('span');slot.className='gxv-slot';
    const img=document.createElement('img');img.src=src;img.alt=name;img.loading='lazy';img.decoding='async';
    slot.appendChild(img);logos.appendChild(slot);
   });
-  const rest=data.count-selected.length;
-  if(rest){const more=document.createElement('span');more.className='gxv-more';more.textContent='+'+rest;more.setAttribute('aria-label','y '+rest+' plataformas más');logos.appendChild(more)}
-  amount.textContent=pesos.format(data.saving);
-  caption.textContent='Ejemplo · '+data.count+' '+(data.count===1?'plataforma':'plataformas');
-  card.setAttribute('aria-label','Demostración: '+pesos.format(data.saving)+' de ahorro al mes frente a contratarlas por separado. No es un ahorro real.');
+  const rest=n-shown.length;
+  if(rest){
+   const more=document.createElement('span');more.className='gxv-more';more.textContent='+'+rest;
+   more.setAttribute('aria-label','y '+rest+' plataformas más');logos.appendChild(more);
+  }
+  // Preserve the pre-edit value until the panel closes, so the user can see
+  // the upward or downward transition rather than animating behind the modal.
+  if(document.documentElement.classList.contains('gx-demo-open')&&pendingFrom===null)pendingFrom=currentValue;
+  targetValue=examples[n];
+  amount.dataset.long=String(targetValue>=1000);
+  caption.textContent='Ejemplo · '+n+' '+(n===1?'plataforma':'plataformas');
+  card.setAttribute('aria-label','Ahorro ilustrativo de '+pesos.format(targetValue)+' al mes, '+n+' '+(n===1?'plataforma':'plataformas')+'. No es un cálculo real.');
+  if(card.classList.contains('is-visible')&&!document.documentElement.classList.contains('gx-demo-open')){
+   animateTo(targetValue,!seen);seen=true;
+  }else {stop();currentValue=targetValue;show(targetValue)}
  }
- select.addEventListener('change',()=>render(select.value));render(select.value);
- const sync=()=>card.dataset.motionPaused=String(document.hidden);
- document.addEventListener('visibilitychange',sync);sync();
- if('IntersectionObserver' in window){new IntersectionObserver(entries=>{
-   card.classList.toggle('is-visible',entries.some(entry=>entry.isIntersecting));
-  },{threshold:.12}).observe(card);
- }else card.classList.add('is-visible');
+ countSelect.addEventListener('change',render);
+ brandSelect.addEventListener('change',render);
+ window.addEventListener('goxion:lab-panel-closed',()=>{
+  if(card.hidden||pendingFrom===null)return;
+  if(card.classList.contains('is-visible')){
+   currentValue=pendingFrom;animateTo(targetValue,false);seen=true;pendingFrom=null;
+  }
+ });
+ render();
+ function handleVisibility(){
+  card.dataset.motionPaused=String(document.hidden);
+  if(document.hidden){stop();currentValue=targetValue;show(targetValue)}
+ }
+ document.addEventListener('visibilitychange',handleVisibility);
+ handleVisibility();
+ if('IntersectionObserver' in window){
+  new IntersectionObserver(entries=>{
+   const visible=entries.some(entry=>entry.isIntersecting);
+   card.classList.toggle('is-visible',visible);
+   if(visible&&!document.documentElement.classList.contains('gx-demo-open')){
+    if(pendingFrom!==null){currentValue=pendingFrom;animateTo(targetValue,false);pendingFrom=null;seen=true}
+    else if(!seen&&hasCards){seen=true;animateTo(targetValue,true)}
+   }
+   if(!visible){stop();currentValue=targetValue;show(targetValue)}
+  },{threshold:.14}).observe(card);
+ }else {card.classList.add('is-visible');seen=true;animateTo(targetValue,true)}
 })();
 </script>
 <script id="goxion-wave-background" src="../../assets/js/ayuda/06-wave-background.js"></script>
