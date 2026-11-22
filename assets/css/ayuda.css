@@ -14332,7 +14332,8 @@ body.gx-promo-morph-open{overflow:hidden!important}
 #view-dashboard #gamif-grid .gx-gamif-card,
 #view-dashboard #gamif-grid .gx-gamif-card.pulse-referral,
 #view-dashboard #gamif-grid .gx-gamif-card.gx-referral-ready,
-#view-dashboard #gamif-grid .gx-gamif-card.pulse-mission {
+#view-dashboard #gamif-grid .gx-gamif-card.pulse-mission,
+.gx-gamif-morph-ghost.gx-gamif-card {
     background: rgba(8, 8, 12, .371) !important;
     -webkit-backdrop-filter: blur(11.75px) saturate(1) !important;
     backdrop-filter: blur(11.75px) saturate(1) !important;
