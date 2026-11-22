@@ -56,7 +56,7 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 .focus:active{transform:scale(.991)}
 .focus-copy{min-width:0;position:relative;align-self:center;grid-column:1;grid-row:1;z-index:2}
 .focus-title{position:relative;font-size:clamp(23px,5.6vw,33px);font-weight:700;letter-spacing:-.048em;line-height:1.16;text-wrap:balance;overflow-wrap:normal;hyphens:auto;margin:0;color:#f7f8fe;max-width:100%}
-.focus-title.shadow-out{position:absolute;inset:0;pointer-events:none}
+.focus-title.shadow-out{position:absolute;top:0;left:0;right:0;bottom:auto;pointer-events:none}
 .focus-icon{position:relative;grid-column:2;grid-row:1;place-self:center;z-index:1;display:grid;place-items:center;width:100%;max-width:130px;aspect-ratio:1;color:var(--accent,#42e0e5);transition:color .5s ease}
 .focus-icon svg{display:block;max-width:86%;width:100%;height:100%;overflow:visible;fill:none;stroke:currentColor;stroke-width:1.35;stroke-linecap:round;stroke-linejoin:round}
 .focus-bottom{position:relative;z-index:1;grid-row:2;grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:14px}
@@ -66,6 +66,24 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
    La tarjeta exterior sigue siendo el único botón interactivo. */
 .focus-action{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;width:max-content;max-width:100%;min-height:38px;padding:8px 15px;border-radius:999px;border:0;background:rgba(255,255,255,var(--pill-alpha,.08));box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;color:var(--accent,#69e1d5);font-size:11px;line-height:1.15;font-weight:600;white-space:nowrap;margin-left:auto;transition:background-color .25s ease,color .5s ease,transform .35s cubic-bezier(.2,.85,.2,1)}
 .focus:active .focus-action{transform:scale(.985)}
+/* Agrupar la información sin reducir el tamaño: comparación reversible. */
+.focus[data-layout="balanced"] .focus-copy{display:flex;flex-direction:column;justify-content:center;gap:12px;align-self:center;min-height:0}
+.focus[data-layout="balanced"] .focus-meta{display:block;flex:none;max-width:100%;font-size:11px;line-height:1.45;color:#b5c5d2;font-weight:500}
+.focus[data-layout="balanced"] .focus-bottom{justify-content:flex-end;align-self:end;margin-top:10px}
+.focus[data-layout="balanced"] .focus-action{margin-left:0}
+@media(max-width:380px){
+ .focus[data-layout="balanced"] .focus-copy{gap:10px}
+ .focus[data-layout="balanced"] .focus-meta{font-size:10px}
+ .focus[data-layout="balanced"] .focus-bottom{margin-top:8px}
+}
+@media(max-width:315px){
+ .focus[data-layout="balanced"] .focus-copy{gap:8px}
+ .focus[data-layout="balanced"] .focus-meta{font-size:9px}
+}
+.layout-compare{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:14px 0 9px}
+.layout-compare button{min-height:43px;border:1px solid rgba(174,202,224,.11);border-radius:13px;background:rgba(255,255,255,.035);color:#aebfd0;font-weight:600;font-size:11px}
+.layout-compare button[aria-pressed="true"]{background:rgba(92,196,198,.12);border-color:rgba(113,215,223,.30);color:#eafafa}
+.layout-compare-caption{display:block;color:#9cacc0;font-size:10px;line-height:1.4;margin:0 0 15px}
 .focus[data-tone="attention"]{--accent:#f6a4b8}
 .focus[data-tone="review"]{--accent:#7bccff}
 .focus[data-tone="agreement"]{--accent:#c1b5ff}
@@ -227,13 +245,12 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
   <span class="glass-orb"></span>
   <span class="glass-glyph">GOXION</span>
 </div>
-<button class="focus" id="focus" type="button" data-tone="calm" data-glass="on" aria-describedby="focus-meta">
- <div class="focus-copy"><div class="focus-title" id="focus-title" aria-live="polite">Todo al corriente</div></div>
+<button class="focus" id="focus" type="button" data-tone="calm" data-glass="on" data-layout="balanced" aria-describedby="focus-meta">
+ <div class="focus-copy"><div class="focus-title" id="focus-title" aria-live="polite">Todo al corriente</div><span class="focus-meta" id="focus-meta">Próximo corte · 15 dic</span></div>
  <span class="focus-icon" id="focus-icon" aria-hidden="true">
   <svg viewBox="0 0 24 24" focusable="false"><path id="state-path" d="M20 6 9 17l-5-5"/></svg>
  </span>
  <div class="focus-bottom">
-  <span class="focus-meta" id="focus-meta">Próximo corte · 15 dic</span>
   <span class="focus-action"><span id="focus-action">Ver mi cuenta</span></span>
  </div>
 </button>
@@ -295,6 +312,11 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 <option value="combined">Rechazo + aviso secundario</option>
 </select>
 <span class="testcase" id="priority-note">La tarjeta muestra solo la acción de mayor prioridad.</span>
+<div class="layout-compare" role="group" aria-label="Comparar distribución de tarjeta">
+ <button type="button" data-layout-preset="balanced" aria-pressed="true">Nueva distribución</button>
+ <button type="button" data-layout-preset="original" aria-pressed="false">Distribución original</button>
+</div>
+<span class="layout-compare-caption" id="layout-caption">Título y fecha juntos; acción abajo. Sin cambiar altura ni añadir contenido.</span>
 <div class="glass-material-selector" role="group" aria-label="Comparar materiales de cristal">
   <button type="button" data-material-preset="official" aria-pressed="false">GOXION oficial</button>
   <button type="button" data-material-preset="lab" aria-pressed="false">Laboratorio</button>
@@ -472,6 +494,18 @@ $('demo-toggle').addEventListener('click',()=>{
  if(!panel.hidden)$('scenario').focus({preventScroll:true});
 });
 $('scenario').addEventListener('change',e=>render(e.target.value,false));
+function setLayout(mode){
+ if(mode!=='balanced' && mode!=='original')return;
+ const card=$('focus'),meta=$('focus-meta'),copy=card.querySelector('.focus-copy'),bottom=card.querySelector('.focus-bottom');
+ if(mode==='balanced')copy.appendChild(meta);
+ else bottom.insertBefore(meta,bottom.querySelector('.focus-action'));
+ card.dataset.layout=mode;
+ document.querySelectorAll('[data-layout-preset]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.layoutPreset===mode)));
+ $('layout-caption').textContent=mode==='balanced'
+  ?'Título y fecha juntos; acción abajo. Sin cambiar altura ni añadir contenido.'
+  :'Composición anterior: fecha y acción en la misma fila inferior.';
+}
+document.querySelectorAll('[data-layout-preset]').forEach(b=>b.addEventListener('click',()=>setLayout(b.dataset.layoutPreset)));
 document.querySelectorAll('.local-only,#session,#bell').forEach(n=>n.addEventListener('click',()=>{
  $('demo-panel').hidden=false;
  $('demo-toggle').setAttribute('aria-expanded','true');
@@ -542,6 +576,7 @@ $('underlay-switch').addEventListener('click',()=>{
 updateGlass(15);
 updatePillAlpha(8);
 setGlassMaterial('neutral');
+setLayout('balanced');
 window.GOXION_MORPH_V2=Object.freeze({isolated:true,noBackend:true,scenarios:Object.keys(snapshots),classify,render,material:setGlassMaterial});
 render('clear',true);
 // Morphicons: librería real, cargada solo en este prototipo. SVG nativo queda disponible sin red.
