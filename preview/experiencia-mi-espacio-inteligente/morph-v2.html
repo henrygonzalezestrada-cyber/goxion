@@ -88,6 +88,16 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 .demo-panel input[type="range"]{width:100%;height:32px;accent-color:#62dfe7;cursor:pointer}
 .demo-panel .glass-compare{margin:9px 0 0;width:100%;height:43px;border:1px solid rgba(112,204,225,.28);border-radius:13px;background:rgba(54,128,144,.1);color:#d8f4f7;font-size:11px;font-weight:700}
 .demo-panel .glass-note{display:block;font-size:9.5px;line-height:1.55;color:#9fadc2;margin-top:7px}
+.glass-material-selector{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:14px}
+.glass-material-selector button{min-height:43px;padding:7px 5px;border:1px solid rgba(191,213,237,.12);border-radius:13px;background:rgba(130,159,187,.065);color:#bbcad8;font-size:10px;font-weight:600;line-height:1.3;white-space:normal}
+.glass-material-selector button[aria-pressed="true"]{border-color:rgba(155,222,229,.43);background:rgba(98,190,199,.13);color:#e6f7f8;box-shadow:inset 0 1px rgba(255,255,255,.07)}
+.demo-panel .material-caption{min-height:32px;margin:8px 0 2px!important;color:#a5b3c7;font-size:10px;line-height:1.45}
+.demo-panel input[type="range"]:disabled{opacity:.35;cursor:not-allowed}
+.focus[data-material="official"]:not([data-glass="off"]){background:rgba(0,0,0,.30)!important;border:1px solid rgba(255,255,255,.08);box-shadow:0 10px 30px rgba(0,0,0,.40);-webkit-backdrop-filter:blur(10px)!important;backdrop-filter:blur(10px)!important}
+.focus[data-material="official"]::before,.focus[data-material="official"]::after{opacity:0!important}
+.focus[data-material="neutral"]:not([data-glass="off"]){background:rgba(8,8,12,var(--neutral-alpha,.34))!important;border:1px solid rgba(255,255,255,.035);box-shadow:0 15px 36px rgba(0,0,0,.23),inset 0 1px rgba(255,255,255,.05);-webkit-backdrop-filter:blur(var(--neutral-blur,10.3px)) saturate(1)!important;backdrop-filter:blur(var(--neutral-blur,10.3px)) saturate(1)!important}
+.focus[data-material="neutral"]::before{opacity:.06}
+.focus[data-material="neutral"]::after{opacity:.35}
 .secondary{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:26px 6px 0;padding:0;min-height:32px}
 .secondary p{font-size:12px;color:#d5dfeb;margin:0;line-height:1.4}
 .secondary .right{display:flex;align-items:center;gap:10px;white-space:nowrap;color:#a0b5c8;font-size:11px}
@@ -210,8 +220,14 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 <option value="combined">Rechazo + aviso secundario</option>
 </select>
 <span class="testcase" id="priority-note">La tarjeta muestra solo la acción de mayor prioridad.</span>
-<label class="glass-control" for="glass-depth"><span>Profundidad del cristal</span><output id="glass-depth-value">9%</output></label>
-<input id="glass-depth" type="range" min="0" max="100" value="9" aria-label="Profundidad del cristal">
+<div class="glass-material-selector" role="group" aria-label="Comparar materiales de cristal">
+  <button type="button" data-material-preset="official" aria-pressed="true">GOXION oficial</button>
+  <button type="button" data-material-preset="lab" aria-pressed="false">Laboratorio</button>
+  <button type="button" data-material-preset="neutral" aria-pressed="false">Neutro</button>
+</div>
+<p class="material-caption" id="material-caption" aria-live="polite">Negro al 30%, blur 10 px. Material de la tarjeta oficial.</p>
+<label class="glass-control" for="glass-depth"><span id="glass-depth-caption">Profundidad experimental</span><output id="glass-depth-value">9%</output></label>
+<input id="glass-depth" type="range" min="0" max="100" value="9" aria-label="Profundidad experimental del cristal" disabled>
 <label class="glass-control" for="beam-position"><span>Mover luz detrás</span><output id="beam-position-value">Auto</output></label>
 <input id="beam-position" type="range" min="0" max="100" value="50" aria-label="Mover la luz por debajo de la tarjeta">
 <button class="glass-compare" type="button" id="glass-compare" aria-pressed="false">Comparar sin cristal</button>
@@ -392,9 +408,31 @@ function updateGlass(percent){
  card.style.setProperty('--glass-middle','rgba(7,13,24,'+mid+')');
  card.style.setProperty('--glass-bottom','rgba(12,23,37,'+bottom+')');
  card.style.setProperty('--glass-blur',(8+25*n/100).toFixed(1)+'px');
+ card.style.setProperty('--neutral-alpha',alpha.toFixed(3));
+ card.style.setProperty('--neutral-blur',(8+25*n/100).toFixed(1)+'px');
  $('glass-depth-value').textContent=n+'%';
 }
+function setGlassMaterial(mode){
+ const modes={
+   official:'Negro al 30%, blur 10 px. Material de la tarjeta oficial.',
+   lab:'Tres tonos azulados, saturación 135% y brillo contextual.',
+   neutral:'Base oscura neutra, blur experimental y reflejo mínimo.'
+ };
+ if(!Object.prototype.hasOwnProperty.call(modes,mode))return;
+ $('focus').dataset.material=mode;
+ document.querySelectorAll('[data-material-preset]').forEach(button=>{
+   button.setAttribute('aria-pressed',String(button.dataset.materialPreset===mode));
+ });
+ $('material-caption').textContent=modes[mode];
+ const official=mode==='official';
+ $('glass-depth').disabled=official;
+ $('glass-depth-caption').textContent=official?'Parámetros oficiales fijos':'Profundidad experimental';
+ $('glass-depth-value').textContent=official?'10 px':$('glass-depth').value+'%';
+}
 $('glass-depth').addEventListener('input',event=>updateGlass(event.target.value));
+document.querySelectorAll('[data-material-preset]').forEach(button=>{
+ button.addEventListener('click',()=>setGlassMaterial(button.dataset.materialPreset));
+});
 $('beam-position').addEventListener('input',event=>{
  const n=Number(event.target.value);
  $('glass-underlay').classList.add('manual');
@@ -408,7 +446,8 @@ $('glass-compare').addEventListener('click',()=>{
  $('glass-compare').textContent=off?'Restaurar cristal':'Comparar sin cristal';
 });
 updateGlass(9);
-window.GOXION_MORPH_V2=Object.freeze({isolated:true,noBackend:true,scenarios:Object.keys(snapshots),classify,render});
+setGlassMaterial('official');
+window.GOXION_MORPH_V2=Object.freeze({isolated:true,noBackend:true,scenarios:Object.keys(snapshots),classify,render,material:setGlassMaterial});
 render('clear',true);
 // Morphicons: librería real, cargada solo en este prototipo. SVG nativo queda disponible sin red.
 import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
