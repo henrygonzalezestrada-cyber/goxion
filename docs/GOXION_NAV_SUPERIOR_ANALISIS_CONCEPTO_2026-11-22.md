@@ -1,6 +1,6 @@
-# GOXION · Navegación superior adaptable + perfil — investigación y laboratorio V2
+# GOXION · Navegación superior adaptable + perfil — investigación y laboratorio V3
 
-**Fecha:** 22/nov/2026. **Estado actual:** **IMPLEMENTADA EN LABORATORIO para evaluación visual**, **NO aprobada todavía ni publicada en `ayuda.html`**. El análisis de las secciones 1–7 fue previo al prototipo; la implementación exacta y lo que sigue pendiente se describen en la sección 8. Sin cambios en código CSS/JS oficial, Edge o datos de clientes.
+**Fecha:** 22/nov/2026. **Estado actual:** **V3 IMPLEMENTADA EN LABORATORIO para revisión**, aún **NO aprobada ni publicada en `ayuda.html`**. Las secciones 1–9 contienen el análisis y las V1–V2 históricas; **la sección 10 recoge el comportamiento vigente V3 y prevalece cuando exista contradicción**. Sin cambios en CSS/JS oficial, Edge ni datos de clientes.
 
 ## 1. Brief del usuario (no convertir en instrucciones contradictorias)
 
@@ -77,6 +77,36 @@ Reubicar toda la cápsula expandida justo **sobre** el texto en el encabezado, d
 6. Documentar lo que apruebe el usuario en este expediente y en [el documento maestro de integración](GOXION_MI_ESPACIO_INTEGRACION_MAESTRA_2026-11-22.md); el estado de esta propuesta sigue **NO APROBADA**.
 
 **Dictamen:** conceptualmente **sí es compatible** con el nuevo feed, pero **no realizar un simple shrink proporcional de todo el header** ni superponer otra barra. La diferencia de GOXION debe estar en la cápsula que cambia de geometría sin perder los tres destinos, la identidad cromática controlada y la conexión intacta, no en acumular capas de vidrio.
+
+## 10. Rediseño V3 tras video iPhone · UNA cápsula y un solo movimiento (22/nov/2026)
+
+**El usuario rechazó V2**, porque la cápsula desaparecía del flujo y otra presentación aparecía desde arriba. El video `ScreenRecording_11-22-2026 17-04-33_1.mp4` (~18.9 s) muestra exactamente esa discontinuidad, y cuando la animación quedaba a medias no terminaba asentándose. La indicación actual: la **misma cápsula** debe desplazarse de su ubicación debajo del encabezado hacia la **esquina superior izquierda donde estaba el logo**, encogerse allí, permanecer navegable con tres destinos, ampliarse cuando la persona desplaza de vuelta y terminar el ciclo cuando el dedo se detenga. No sacrificar márgenes ni dejar el saludo demasiado separado de la navegación.
+
+### Fuente real del patrón (Index oficial, no suposición)
+
+- Se inspeccionó `assets/js/index/05-index-header-morph.js` en `main`, no solo referencias de Dribbble. Allí el valor de morph `value` sigue a `goal` con amortiguación temporal `1-exp(-dt/tau)`, `TAU=64`, `SETTLE_TAU=26`, y la geometría se mueve con transform; al quedar a medias el código usa asentamiento y tiene guardas para los resize de Safari. El Index tiene además snap del **scroll** dentro del hero financiero; **esa parte no se copia** en Mi Espacio porque movería inesperadamente la lectura del feed.
+- Principio complementario: FLIP y uso de rectángulos de layout, transformaciones y `requestAnimationFrame`; guías externas [Josh Comeau, FLIP](https://www.joshwcomeau.com/react/animating-the-unanimatable/) y [MDN, Web Animations API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Animations_API/Using_the_Web_Animations_API). V3 utiliza una trayectoria continua calculada y una interpolación amortiguada, no el patrón de ocultar un control y revelar otro.
+
+### Implementación V3 en `main` — solo laboratorio
+
+- **HTML** `preview/experiencia-mi-espacio-inteligente/morph-v2.html`, commit **`ab31bd8e3e16cbb17756114e4f9dabe95431018c`**. Se añadió `#gxn-nav-slot` para reservar el hueco original y `#gxn-nav-target` como referencia fija para la esquina. El elemento interactivo **continúa siendo exactamente el mismo** `#gxn-nav` con las mismas tres opciones. Se quitaron los atributos del dock V2, que ya no existen en el modelo nuevo.
+- **CSS** `adaptive-top-nav.css`, commit **`26eb0039433d60bcd920cd4892037d175e97bcab`**. El nav se presenta con `position:fixed` desde el principio pero en las coordenadas originales medidas del slot; JavaScript transforma posición/anchura/altura de forma continua. No hay cambios `position:absolute → position:fixed`, dos barras, opacidades de intercambio, ni marco oscuro alrededor de la cabecera. Se preservan círculo exacto 56px en inicial (54px estrecho), 46px compacto (44px en <=320px), aspecto 1:1 y cápsula con cristal `rgba(8,8,12,.371)` / blur 11.75px. La tarjeta de navegación se reduce a **174px** habituales, **164px** en anchos <=375px y **158px** en <=320px; al desplazarse hacia abajo el dock se amplía hasta **246px** cuando cabe y reaparece el texto del elemento activo.
+- **JS** `adaptive-top-nav.js`, commit **`800e8f2136a74fba88d13ec132a69745040ccad6`**. Motor de UN progreso `dock` que combina origen y destino en cada frame; un segundo valor `spread` **modula la amplitud del mismo elemento**, nunca crea una segunda navegación. Listener `scroll` pasivo + rAF y geometría medida solo al montar/resize; `RANGE=158px`, `TAU=62ms`, `SETTLE_TAU=29ms`, `SNAP_IDLE_MS=175ms`. Tras el idle se fuerza el objetivo del componente a 0 o 1 para completar el recorrido. `prefers-reduced-motion` elimina el asentamiento animado, pero mantiene ambos destinos accesibles.
+- **Logo y espaciado:** al acercarse la cápsula al lado izquierdo, el logo se atenúa con el mismo progreso y deja esa zona a la navegación. La campana y el avatar de Goxy siguen en la cabecera normal, sin un segundo encabezado fijo. El margen después de `#gxn-stage` pasó de **39px a 15px**, para no generar un hueco visual innecesario antes del saludo (sin alterar el diseño interno del Hero).
+- **Prueba de navegador** `check-adaptive-nav.mjs`, commit `437ca744bf8aa34edf60b4e326fb17b1d9fe9629`, actualizada para validar a 280/320/360/390/430/768px que: misma cápsula, mismo slot inicial, idle snap sin mover scroll, regreso exacto, círculo 1:1, transparencia, ausencia de duplicado y accesibilidad de Goxy/menús. **Suite Chromium/WebKit incorporada, NO ejecutada en navegador real en esta sesión**.
+
+### Validación realmente realizada
+
+- Inspección directa del video y del archivo de Index oficial. Código JS sintácticamente válido, CSS balanceado, HTML con 1 nav y tres destinos, sin IDs duplicados.
+- **12 comprobaciones dinámicas con DOM/scroll simulado pasaron**: slot inicial, anchura inicial, scroll a mitad con asentamiento a compacto, logo coordinado, página sin desplazamiento forzado, reversa con expansión de dock, misma instancia DOM, restauración exacta, geometría a 280px, cápsula de 158px e ítems de 44px.
+- Se conservaron Goxy, menú de perfil, campana ilustrativa, vista de Catálogo/Soporte y componentes del feed. No se tocó `ayuda.html`, auth, B2, backend ni APIs.
+- **QA PENDIENTE:** ejecución de Playwright real en Chromium/WebKit y evaluación visual/gestual de esta V3 exacta en iPhone Safari, incluidas interrupciones rápidas, barra del navegador dinámica, orientación y zoom. Las comprobaciones simuladas no prueban 60 FPS ni eliminan todos los riesgos de trabones.
+
+**Enlace V3 anticaché:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=ab31bd8
+
+**Estado de aprobación:** V3 disponible para revisión, no aprobada todavía. **No regresar al patrón de header opaco + nav separada ni a las animaciones de dos etapas.**
+
+---
 
 ## 9. Corrección V2 tras video Safari — cápsula flotante independiente (22/nov/2026)
 
