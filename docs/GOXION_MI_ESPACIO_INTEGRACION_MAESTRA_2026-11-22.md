@@ -7,6 +7,16 @@
 
 > **Leer esto primero en otra sesión.** En caso de contradicción entre textos antiguos de continuidad y este corte, este expediente es el **índice de estado e integración más reciente**. Para medidas y microcomportamientos, consultar los **contratos específicos enlazados abajo**; no reemplazarlos con resúmenes. Cada edición futura debe actualizar este expediente junto con su contrato de componente. No suponer que una captura de laboratorio prueba una conexión real.
 
+## Corrección V2 de navegación flotante — última referencia, pendiente de Safari
+
+Tras video real de iPhone el usuario **rechazó el contenedor superior que unificaba logo, navegación, campana y Goxy**: se veía oscuro, opaco, ancho y con círculos deformados. **V2 en laboratorio** lo sustituye por **tres grupos independientes** sobre el contenido: logo individual, **mini cápsula central translúcida** y controles de campana/Goxy, sin un fondo envolvente. Mantener el morph del destino activo heredado de la navegación oficial y radios circulares estrictos para las opciones inactivas. Valores: cristal `rgba(8,8,12,.371)` + `blur(11.75px)`; mini cápsula aprox. 182×60px, ítems de 48px (44–46px en pantallas estrechas); cápsula inicial usa 56px (54px en móvil estrecho). Pinned assets en `morph-v2.html` commit **`d2237f1cc726460ab5114d8ff2c8704a69eafb30`**, CSS `9597943f956fda0c719c0a5a6fd292dd9057747b`, JS `8b25d104ae1453176c931b205363357db4b0d6a6`.
+
+**Detalles técnicos:** el dock no se fusiona en `#sticky-client-bar` oficial ni se publica todavía. No usar `top.offsetHeight` ni forzar layout sincrónico durante desplazamiento. El smoke V2 prueba círculos, material y solapes a 280–768px pero **no ha sido ejecutado en un browser real aún**. Goxy mantiene avatar original; **personalizar su color** es una idea de backlog posterior, no una función implementada. Documento canónico actualizado: [`GOXION_NAV_SUPERIOR_ANALISIS_CONCEPTO_2026-11-22.md`](GOXION_NAV_SUPERIOR_ANALISIS_CONCEPTO_2026-11-22.md) sección 9.
+
+**Enlace V2:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=d2237f1
+
+---
+
 ## Nueva línea en laboratorio V1 — encabezado y cápsula adaptable (pendiente de aprobación)
 
 **Solicitud del 22/nov/2026:** el usuario pidió **implementar en el laboratorio**, manteniendo la expansión del ítem activo de la navegación oficial y sumando: cápsula superior compacta al avanzar en scroll, expansión al volver por el contenido, logo contextual, emojis, campana y avatar predeterminado con el rostro original de Goxy, menú «Mi perfil / Salir» y foto de prueba local.
@@ -21,7 +31,7 @@
 
 | Recurso | Fuente |
 | --- | --- |
-| Laboratorio **vigente** del feed | [Abrir GOXION Mi Espacio, versión de prueba](https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=cdfb36d) |
+| Laboratorio **vigente** del feed | [Abrir GOXION Mi Espacio, versión de prueba](https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=d2237f1) |
 | Archivo editable del laboratorio | `preview/experiencia-mi-espacio-inteligente/morph-v2.html` en `main`; última iteración visual conocida: **`cdfb36d2b62416b5e4e01741b19de962f11f26ec`** (nav adaptativa en laboratorio, no publicada); **los componentes originales previos** estaban fijados en `37388f559cad5f7c78d2a753ec515fd141ae0c93` |
 | Contrato visual compartido por componente | [`GOXION_FEED_CONTRATO_VISUAL_POR_COMPONENTE_2026-11-22.md`](GOXION_FEED_CONTRATO_VISUAL_POR_COMPONENTE_2026-11-22.md) |
 | Hero/saludo exacto aprobado e inmutable | [`GOXION_MI_ESPACIO_HERO_APROBADA_2026-11-22.md`](GOXION_MI_ESPACIO_HERO_APROBADA_2026-11-22.md), commit **`f33e8572c07377f4811080a87c7cb1b483983b34`**, rama de respaldo `approved/mi-espacio-hero-compacta-centrada-20261122` |
