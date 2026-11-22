@@ -7,11 +7,13 @@
 
 > **Leer esto primero en otra sesión.** En caso de contradicción entre textos antiguos de continuidad y este corte, este expediente es el **índice de estado e integración más reciente**. Para medidas y microcomportamientos, consultar los **contratos específicos enlazados abajo**; no reemplazarlos con resúmenes. Cada edición futura debe actualizar este expediente junto con su contrato de componente. No suponer que una captura de laboratorio prueba una conexión real.
 
-## Nueva línea conceptual — encabezado y cápsula adaptable (aún sin prototipo)
+## Nueva línea en laboratorio V1 — encabezado y cápsula adaptable (pendiente de aprobación)
 
-**Última solicitud registrada el 22/nov/2026:** revisar y analizar, **sin alterar todavía el laboratorio**, la cápsula de navegación superior y la cabecera: navegación que se compacta hacia la parte superior al avanzar en el feed y se reexpande al gesto contrario; logo completo o símbolo según estado; campana oficial preservada; avatar circular personalizable que abre «Mi perfil / Salir»; conservar color y personalidad sin convertirla en tab bar inferior genérica.
+**Solicitud del 22/nov/2026:** el usuario pidió **implementar en el laboratorio**, manteniendo la expansión del ítem activo de la navegación oficial y sumando: cápsula superior compacta al avanzar en scroll, expansión al volver por el contenido, logo contextual, emojis, campana y avatar predeterminado con el rostro original de Goxy, menú «Mi perfil / Salir» y foto de prueba local.
 
-**Análisis técnico y referencias externas:** [`GOXION_NAV_SUPERIOR_ANALISIS_CONCEPTO_2026-11-22.md`](GOXION_NAV_SUPERIOR_ANALISIS_CONCEPTO_2026-11-22.md). Veredicto provisional: **una sola cápsula, dos estados**, manteniendo los tres destinos y el morph activo, con emojis actuales como primera candidata para conservar identidad, cristal neutro y transición con histéresis. No apilar dock, cabecera y `#sticky-client-bar`. En el código oficial la campana se inyecta vía `04-client-notifications-realtime.js`, el login de `07-production-interactions-js.js` se transforma y el logout lo gestiona `cerrarSesion()`. **No existe fuente confirmada para guardar foto de avatar**; requiere API/bucket privado seguro antes de producción. Esta propuesta **no está aprobada, implementada ni conectada**. No modificar Hero, beneficios, ahorro, servicios o historial.
+**Ahora existe en `main` únicamente como prototipo**, no conectado a cuentas. Referencia de implementación y análisis: [`GOXION_NAV_SUPERIOR_ANALISIS_CONCEPTO_2026-11-22.md`](GOXION_NAV_SUPERIOR_ANALISIS_CONCEPTO_2026-11-22.md), sección 8. Archivo `morph-v2.html` commit **`cdfb36d2b62416b5e4e01741b19de962f11f26ec`**, CSS `adaptive-top-nav.css` commit `775acbb98567e5733e7258625740d6f57547eef5`, JS `adaptive-top-nav.js` commit `a72fa20ab9cdb5738bcc98cb0f103a048b68e2bd`. Smoke browser `check-adaptive-nav.mjs` añadido, pero no ejecutado físicamente. **No está aprobado en Safari real**.
+
+**Contrato funcional futuro:** una sola nav / tres destinos; conservar `switchTab`, `#gx-client-notif-launch` real, login morph, `cerrarSesion()` y coordinar `#sticky-client-bar`. **No hay API de fotos confirmada:** el laboratorio permite seleccionar una imagen local sin persistir; producción requiere almacenamiento autenticado seguro. No copiar los diálogos demo como funciones reales. No alterar Hero, Beneficios, Ahorro, Servicios, Historial y Catálogo.
 
 ---
 
@@ -19,8 +21,8 @@
 
 | Recurso | Fuente |
 | --- | --- |
-| Laboratorio **vigente** del feed | [Abrir GOXION Mi Espacio, versión de prueba](https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=37388f5) |
-| Archivo editable del laboratorio | `preview/experiencia-mi-espacio-inteligente/morph-v2.html` en `main`; última iteración visual conocida: **`37388f559cad5f7c78d2a753ec515fd141ae0c93`**; blob comprobado: `bcbffb2edd6698d51920da8b52ba3d3ef52c62c5` |
+| Laboratorio **vigente** del feed | [Abrir GOXION Mi Espacio, versión de prueba](https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=cdfb36d) |
+| Archivo editable del laboratorio | `preview/experiencia-mi-espacio-inteligente/morph-v2.html` en `main`; última iteración visual conocida: **`cdfb36d2b62416b5e4e01741b19de962f11f26ec`** (nav adaptativa en laboratorio, no publicada); **los componentes originales previos** estaban fijados en `37388f559cad5f7c78d2a753ec515fd141ae0c93` |
 | Contrato visual compartido por componente | [`GOXION_FEED_CONTRATO_VISUAL_POR_COMPONENTE_2026-11-22.md`](GOXION_FEED_CONTRATO_VISUAL_POR_COMPONENTE_2026-11-22.md) |
 | Hero/saludo exacto aprobado e inmutable | [`GOXION_MI_ESPACIO_HERO_APROBADA_2026-11-22.md`](GOXION_MI_ESPACIO_HERO_APROBADA_2026-11-22.md), commit **`f33e8572c07377f4811080a87c7cb1b483983b34`**, rama de respaldo `approved/mi-espacio-hero-compacta-centrada-20261122` |
 | Lealtad/Referidos/Misiones | [`GOXION_AUDITORIA_BENEFICIOS_FEED_2026-11-22.md`](GOXION_AUDITORIA_BENEFICIOS_FEED_2026-11-22.md) + [continuidad exhaustiva](GOXION_FEED_MI_ESPACIO_CONTINUIDAD_2026-11-22.md) |
