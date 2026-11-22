@@ -37,7 +37,7 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 .greeting h1{margin:0;font-weight:700;font-size:clamp(26px,6vw,34px);letter-spacing:-.045em;line-height:1.17;max-width:100%;text-wrap:balance}
 .greeting .word{display:inline-block;will-change:transform,filter,opacity;white-space:pre}
 .greeting .name{color:#42e4e8}
-.focus{position:relative;isolation:isolate;display:grid;grid-template-columns:minmax(0,1fr) minmax(84px,30%);grid-template-rows:minmax(145px,1fr) auto;align-items:center;width:100%;min-height:277px;text-align:left;padding:29px 23px 23px 28px;overflow:hidden;border:1px solid rgba(167,190,226,.18);border-radius:32px;background:linear-gradient(142deg,rgba(25,29,48,.79),rgba(7,13,24,.89) 60%,rgba(12,23,37,.82));box-shadow:0 20px 52px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.045);color:var(--text);-webkit-backdrop-filter:blur(26px) saturate(1.2);backdrop-filter:blur(26px) saturate(1.2);transform:translateZ(0);transition:border-radius .75s cubic-bezier(.2,.85,.2,1),border-color .65s ease,box-shadow .65s ease,background .6s ease}
+.focus{position:relative;isolation:isolate;display:grid;grid-template-columns:minmax(0,1fr) minmax(84px,30%);grid-template-rows:minmax(145px,1fr) auto;align-items:center;width:100%;min-height:277px;text-align:left;padding:29px 23px 23px 28px;overflow:hidden;border:1px solid rgba(167,190,226,.18);border-radius:32px;background:linear-gradient(142deg,rgba(25,29,48,.79),rgba(7,13,24,.89) 60%,rgba(12,23,37,.82));box-shadow:0 20px 52px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.045);color:var(--text);-webkit-backdrop-filter:blur(26px) saturate(1.2);backdrop-filter:blur(26px) saturate(1.2);transform:translateZ(0);transition:grid-template-columns .72s cubic-bezier(.2,.85,.2,1),border-radius .75s cubic-bezier(.2,.85,.2,1),border-color .65s ease,box-shadow .65s ease,background .6s ease}
 .focus:before{content:"";position:absolute;inset:-65px -55px auto auto;width:250px;height:240px;border-radius:50%;background:var(--glow,rgba(65,219,232,.22));filter:blur(59px);opacity:.6;transition:background .5s,opacity .6s;z-index:-1;pointer-events:none}
 .focus:after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(115deg,rgba(255,255,255,.045),transparent 31%,transparent 73%,rgba(96,164,220,.035));pointer-events:none}
 .focus[data-tone="attention"]{--glow:rgba(242,94,119,.26);border-color:rgba(244,128,153,.21);border-radius:35px 26px 31px 30px}
@@ -46,6 +46,10 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 .focus[data-tone="calm"]{--glow:rgba(37,215,202,.24);border-radius:32px}
 .focus[data-tone="due"]{--glow:rgba(38,200,225,.26);border-radius:31px 38px 28px 33px}
 .focus[data-tone="muted"]{--glow:rgba(143,153,186,.18)}
+.focus[data-state="clear"]{grid-template-columns:minmax(0,50%) minmax(84px,50%)}
+.focus[data-state="new"]{grid-template-columns:minmax(0,65%) minmax(84px,35%)}
+.focus[data-state="multi"]{grid-template-columns:minmax(0,75%) minmax(72px,25%)}
+.focus[data-state="review"],.focus[data-state="extension"],.focus[data-state="cancellation"]{grid-template-columns:minmax(0,68%) minmax(84px,32%)}
 .focus:active{transform:scale(.991)}
 .focus-copy{min-width:0;position:relative;align-self:center;grid-column:1;grid-row:1;z-index:2}
 .focus-title{position:relative;font-size:clamp(23px,5.6vw,33px);font-weight:700;letter-spacing:-.048em;line-height:1.16;text-wrap:balance;overflow-wrap:normal;hyphens:auto;margin:0;color:#f7f8fe;max-width:100%}
