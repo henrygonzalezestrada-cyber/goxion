@@ -7,13 +7,27 @@
 
 > **Leer esto primero en otra sesión.** En caso de contradicción entre textos antiguos de continuidad y este corte, este expediente es el **índice de estado e integración más reciente**. Para medidas y microcomportamientos, consultar los **contratos específicos enlazados abajo**; no reemplazarlos con resúmenes. Cada edición futura debe actualizar este expediente junto con su contrato de componente. No suponer que una captura de laboratorio prueba una conexión real.
 
-## Corrección V2 de navegación flotante — última referencia, pendiente de Safari
+## ÚLTIMO ESTADO de navegación · V3 (22/nov/2026)
+
+El usuario rechazó la V2 porque la cápsula se ocultaba y aparecía un dock diferente por encima. El nuevo requisito implementado en laboratorio es **un único elemento `#gxn-nav` que se desplaza y transforma en una sola interacción**, desde su posición debajo del encabezado hacia el hueco izquierdo del logo, desapareciendo este durante el mismo recorrido. Si el scroll se detiene a medias, **termina su ciclo sin mover `scrollY`**; al regresar hacia abajo se amplía en la esquina y vuelve a su posición original al llegar arriba. No volver a una animación de desaparición/reaparición.
+
+**Investigación específica y origen técnico:** se revisó `assets/js/index/05-index-header-morph.js` **oficial**, que combina seguimiento amortiguado de un progreso y asentamiento a extremos; para Mi Espacio se toman esos principios pero NO el salto de scroll financiero. Contrato canónico y registro de prueba: [`GOXION_NAV_SUPERIOR_ANALISIS_CONCEPTO_2026-11-22.md`, sección 10](GOXION_NAV_SUPERIOR_ANALISIS_CONCEPTO_2026-11-22.md).
+
+**V3 publicada SOLO en laboratorio:** `morph-v2.html` commit `ab31bd8e3e16cbb17756114e4f9dabe95431018c`; `adaptive-top-nav.css` commit `26eb0039433d60bcd920cd4892037d175e97bcab`; `adaptive-top-nav.js` commit `800e8f2136a74fba88d13ec132a69745040ccad6`. Mide un slot de origen y un punto destino fijo, reubica la misma cápsula con `translate3d` y cambia anchura, altura y círculos de manera coherente. El dock queda a la izquierda (158–174px cerrado, hasta 246px ampliado). **Cristal neutro**, 44–46px círculos en compacto, morph del activo preservado. Margen con saludo reducido de 39px a 15px.
+
+**Pruebas:** 12 estados simulados de scroll y layout pasaron, 4 scripts inline válidos, CSS sin reglas del dock anterior; browser smoke Chromium/WebKit actualizado pero todavía **NO ejecutado en navegador real**. Goxy y menús siguen siendo demostrativos. `ayuda.html` y handlers oficiales intactos. **No declarar QA visual o fluidez iPhone aprobados hasta revisar la V3 real.**
+
+**Vista de revisión:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=ab31bd8
+
+---
+
+## Navegación anterior V2 · referencia histórica reemplazada por V3
 
 Tras video real de iPhone el usuario **rechazó el contenedor superior que unificaba logo, navegación, campana y Goxy**: se veía oscuro, opaco, ancho y con círculos deformados. **V2 en laboratorio** lo sustituye por **tres grupos independientes** sobre el contenido: logo individual, **mini cápsula central translúcida** y controles de campana/Goxy, sin un fondo envolvente. Mantener el morph del destino activo heredado de la navegación oficial y radios circulares estrictos para las opciones inactivas. Valores: cristal `rgba(8,8,12,.371)` + `blur(11.75px)`; mini cápsula aprox. 182×60px, ítems de 48px (44–46px en pantallas estrechas); cápsula inicial usa 56px (54px en móvil estrecho). Pinned assets en `morph-v2.html` commit **`d2237f1cc726460ab5114d8ff2c8704a69eafb30`**, CSS `9597943f956fda0c719c0a5a6fd292dd9057747b`, JS `8b25d104ae1453176c931b205363357db4b0d6a6`.
 
 **Detalles técnicos:** el dock no se fusiona en `#sticky-client-bar` oficial ni se publica todavía. No usar `top.offsetHeight` ni forzar layout sincrónico durante desplazamiento. El smoke V2 prueba círculos, material y solapes a 280–768px pero **no ha sido ejecutado en un browser real aún**. Goxy mantiene avatar original; **personalizar su color** es una idea de backlog posterior, no una función implementada. Documento canónico actualizado: [`GOXION_NAV_SUPERIOR_ANALISIS_CONCEPTO_2026-11-22.md`](GOXION_NAV_SUPERIOR_ANALISIS_CONCEPTO_2026-11-22.md) sección 9.
 
-**Enlace V2:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=d2237f1
+**Enlace V2:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=ab31bd8
 
 ---
 
