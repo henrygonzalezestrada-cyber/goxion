@@ -217,3 +217,7 @@ Dos ediciones CSS exactas en `preview/experiencia-mi-espacio-inteligente/morph-v
 - Toda nueva implementación se limita al **feed desde el saludo hacia abajo**; la barra de «Mi Espacio/Catálogo/Soporte» que se ve arriba en el laboratorio es apoyo visual y **NO se publicará ni cambiará**. `ayuda.html`/Index/Admin y la base de datos siguen intactos.
 
 **QA de esta iteración:** comparados contra `main`, cabecera/navegación de prueba, saludo/hero, beneficios y bloque de ahorro **idénticos en HTML y CSS** (excepto reemplazo del antiguo placeholder de Tus servicios); 4 scripts válidos, CSS balanceado; simulación DOM de los 8 escenarios y apertura/cierre de acordeón con cambio entre tarjetas, opciones expandibles. **No se ha realizado prueba física en Safari ni el usuario ha validado visualmente esta nueva sección.**
+
+## Jerarquía unificada de cierres · 22/nov/2026
+
+El usuario observó en video que la X de Servicios era más grande que la de Misiones, Lealtad y Referidos. **Regla visual para todos los módulos actuales y futuros:** círculo cian de **30px de diámetro visual**, glifo X de **14px**, área táctil accesible invisible de **44×44px**. Fondo `#79e6fc`, trazo `#071c29`. Se aplicó a `.gxb-dismiss::before` (inset 7px en área de 44px) y a `.gxs-icon::before` (mismo inset) cuando las tarjetas están abiertas. No reducir el área táctil ni cambiar la posición de las X. Mantenerlo idéntico en futuras tarjetas del feed; la jerarquía es de color y tamaño, no de posición.
