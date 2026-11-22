@@ -1655,7 +1655,8 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
   list.replaceChildren(frag);
   if(!entries.length){const empty=document.createElement('p');empty.className='gxm-empty';empty.textContent='No hay movimientos de este tipo en la muestra.';list.append(empty)}
   more.hidden=entries.length<=3;
-  more.textContent=allVisible?'Mostrar menos':'Ver '+Math.max(0,entries.length-3)+' movimientos más';
+  const unseen=Math.max(0,entries.length-3);
+  more.textContent=allVisible?'Mostrar menos':'Ver '+unseen+' '+(unseen===1?'movimiento':'movimientos')+' más';
  }
  function syncFilterControl(){
   const opened=!filterPanel.hidden;
