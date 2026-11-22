@@ -4,6 +4,20 @@
 **Estado:** laboratorio interactivo actualizado, pendiente de validación visual final en iPhone/Safari y de aprobación del usuario. **NO integrado en producción.**  
 **Repositorio:** `henrygonzalezestrada-cyber/goxion`.
 
+## Revisión definitiva del filtro de Historial — 22/nov/2026
+
+El usuario adjuntó video Safari y pidió **eliminar la flecha y transformación a X del botón Filtrar** para no repetir el gesto de apertura de todas las tarjetas. El mismo botón debe abrir/cerrar filtros y cambiar de nombre a Pagos/Servicios cuando se escoge una categoría. También pidió revisar dimensiones de flechas del Historial vs Servicios.
+
+**Implementado en laboratorio `main`**, commit `37388f559cad5f7c78d2a753ec515fd141ae0c93`: control Filtrar se reemplaza por **píldora propia de cristal translúcido 8%, icono de filtro estático (14px), sin flecha y sin X**. Al aplicar pagos/servicios conserva la etiqueta dinámica, con tinte cian sutil. `aria-expanded` y `aria-label` siguen describiendo apertura/cierre. En pruebas simulares, 8/8 interacciones correctas.
+
+**Estandarización real:** el video mostró diferencia de diseño del trazo SVG: Servicios usa `m5 9 7 7 7-7` y las filas de Historial usaban `m6 9 6 6 6-6`. Ahora las filas tienen el **mismo path de flecha y X** de Servicios, medidas existentes de 14px/16px, disco 35px y área táctil 44px. El filtro NO tiene flecha porque su función es elegir categoría, no expandir un registro.
+
+**Alcance:** solo CSS/HTML/JS de Historial (`gxm-*`); se comprobó por comparación que el resto del laboratorio quedó idéntico. Cuatro scripts válidos, documentación `docs/GOXION_HISTORIAL_MOVIMIENTOS_DISENO_Y_FUENTES_2026-11-22.md` actualizada, sin cambios en `ayuda.html` ni PR #231. Falta QA visual de esta revisión exacta en iPhone.
+
+**Link anticaché:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=37388f5
+
+---
+
 ## Último ajuste de encabezado y controles — 22/nov/2026
 
 El usuario pidió acercar «Todos / Pagos / Servicios» al título «Historial de movimientos» y armonizar flechas, X y material de filtros con Servicios. **Aplicado al laboratorio, no a `ayuda.html`**, commit `5f78c8ed479c8ca7b926238c3853e0daa934ef78`.
@@ -15,7 +29,7 @@ El usuario pidió acercar «Todos / Pagos / Servicios» al título «Historial d
 
 Documentación canónica: `docs/GOXION_HISTORIAL_MOVIMIENTOS_DISENO_Y_FUENTES_2026-11-22.md`.
 
-**Laboratorio actualizado:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=5f78c8e
+**Laboratorio actualizado:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=37388f5
 
 ---
 
@@ -50,7 +64,7 @@ Laboratorio actualizado en `3d9eca2a83108364b858c10fb43f4840b405b611` y `3e48c16
 ## Abrir primero al continuar en otro chat
 
 - **Laboratorio en GitHub Pages:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=73624b2
-- **Fuente de la última iteración:** `preview/experiencia-mi-espacio-inteligente/morph-v2.html` en commit **`5f78c8ed479c8ca7b926238c3853e0daa934ef78`**: filtros en el encabezado y control flecha→X cian idéntico a Servicios, conservando los módulos aprobados. La auditoría previa del historial fue `3e48c16a3a107e080891f70caabb77403d00f4ee`; prototipo base `73624b2f59fc86b62f6f18d908a22a0937164ae8`.
+- **Fuente de la última iteración:** `preview/experiencia-mi-espacio-inteligente/morph-v2.html` en commit **`37388f559cad5f7c78d2a753ec515fd141ae0c93`**: filtro como una sola píldora de cristal sin chevron/X, con icono estático y texto dinámico; chevrons de filas igualados exactamente a Servicios. Laboratorio anterior `5f78c8ed479c8ca7b926238c3853e0daa934ef78`; prototipo base `73624b2f59fc86b62f6f18d908a22a0937164ae8`.
 - **Documentación de la tarjeta principal congelada:** `docs/GOXION_MI_ESPACIO_HERO_APROBADA_2026-11-22.md`.
 - **Auditoría visual previa y principios aprendidos:** `docs/GOXION_AUDITORIA_BENEFICIOS_FEED_2026-11-22.md`.
 - **Rama que preserva la tarjeta principal aprobada:** `approved/mi-espacio-hero-compacta-centrada-20261122`, apuntando a `f33e8572c07377f4811080a87c7cb1b483983b34`. Se elimina únicamente el rótulo flotante «GOXION» rechazado, según la documentación del hero.
