@@ -168,3 +168,18 @@ Abrir Lealtad, Referidos y Misiones; alternar varias veces el icono ⓘ (y «Mis
 - **Limitación intencional del cálculo:** sin importes contractuales GOXION ni referencia oficial homogénea por servicio/perfil, NO calculamos ni publicamos ahorro real. La comparación futura debe tomar referencias de precio verificables y por el mismo periodo, contratos activos reales y la tarifa que paga cada perfil; los planes completos y los perfiles compartidos no son necesariamente equivalentes. No se altera Index, beneficios, motor financiero, `ayuda.html` ni bases de datos.
 
 **Comprobaciones:** JS de los 3 scripts valido; CSS balanceado; 8 escenas 0–7 simuladas con DOM + animador hasta el monto exacto, selección de Microsoft como logo principal validada; hero completo, CSS/HTML de los tres beneficios y ambos CTA aprobados inalterados. **Aún pendiente:** verificar desplazamiento con gestos y composición en Safari físico (ancho 280–430px). La tarjeta de ahorro continúa como laboratorio y **no está aprobada para producción**.
+
+## Ajuste óptico de ahorro + saludo compacto sin saltos (22/nov/2026)
+
+**Solicitud del usuario:** tras ver el laboratorio en iPhone, el módulo de ahorro se siente cargado hacia la izquierda porque deja más aire a la derecha; el saludo «Hola, Mario» queda demasiado lejos del hero. Solicita corregirlo en el laboratorio y conservar compatibilidad de hasta dos líneas sin desplazar el feed.
+
+**Rama:** `preview/mi-espacio-balance-saludo-20261122`.  
+**Commits del HTML:** `0c13203c88cc2a052704bc537e6c5c615449155b`, `aa4eeed525ee302caaada4086c883e4e9a12ab85`.  
+**Archivo:** `preview/experiencia-mi-espacio-inteligente/morph-v2.html`.
+
+- **Ahorro — balance óptico interno, no rediseño:** misma superficie y ancho exterior, logos flotantes, profundidad y contador intactos. Padding interior de ahorro de `15px 19px 15px 13px` a `15px 15px 15px 18px` (derecha/izquierda menos desequilibradas), desplazando discretamente el conjunto hacia la derecha. Ajustes móviles congruentes: `13px 12px 13px 14px` hasta 380px y `12px 9px 12px 11px` hasta 315px. No añadir más cristal, bordes, glows, títulos ni efectos.
+- **Saludo — vínculo más cercano al hero:** altura anterior `clamp(106px,26vw,122px)` a `clamp(88px,23vw,102px)`, con 90px hasta 380 y 86px hasta 315. Fuente ligeramente mayor: base `clamp(28px,7vw,35px)`, 26–29px hasta 380 y 25px hasta 315. Se mantienen peso, color del nombre, microanimación por palabra, contexto urgente y rotación de las tres frases cada 13s.
+- **Dos líneas sin reflow:** `h1` conserva altura fija de `2.32em`; se agrega `.greeting-line` alineado al fondo. Una frase corta queda cerca de la tarjeta sin espacio blanco inferior; una larga puede ocupar dos líneas **sin mover la tarjeta principal ni el resto del feed**. La animación coloca spans solamente para palabras y nodos de texto auténticos para espacios; esta corrección evita que las palabras se peguen y recupera saltos de línea naturales. `aria-label` del saludo sigue actualizado.
+- **Invariantes protegidos:** no modificar CSS/HTML del hero aprobado, beneficios Lealtad/Referidos/Misiones, X cian, botones CTA, medidores ni anchura exterior de ahorro, laboratorio de escenarios, motor financiero o las páginas oficiales.
+
+**QA:** ambos estilos CSS compactos y media queries revisados; sintaxis de los 3 scripts intacta; simulación DOM de palabras (nombre destacado, textos y animaciones) y prueba de maquetación aislada en Chromium a 280, 315, 375, 390, 430 y 580px con saludo corto y frase larga: hueco visual hasta el hero ~14–17px, salto a dos líneas sin desbordamiento horizontal. **No equivale a validar toda la página en Safari físico**. El usuario debe evaluar la versión; todavía no aprobada para producción.
