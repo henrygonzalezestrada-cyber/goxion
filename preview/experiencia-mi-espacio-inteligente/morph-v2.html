@@ -40,7 +40,7 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 .greeting .word{display:inline-block;will-change:transform,filter,opacity;white-space:pre}
 .greeting .name{color:#42e4e8}
 .focus{position:relative;z-index:1;isolation:isolate;display:grid;grid-template-columns:minmax(0,1fr) minmax(84px,30%);grid-template-rows:minmax(145px,1fr) auto;align-items:center;width:100%;min-height:277px;text-align:left;padding:29px 23px 23px 28px;overflow:hidden;border:1px solid rgba(220,237,255,.035);border-radius:32px;background:linear-gradient(142deg,var(--glass-top,rgba(25,29,48,.54)),var(--glass-middle,rgba(7,13,24,.63)) 60%,var(--glass-bottom,rgba(12,23,37,.55)));box-shadow:0 20px 52px rgba(0,0,0,.19),inset 0 1px rgba(255,255,255,.055);color:var(--text);-webkit-backdrop-filter:blur(var(--glass-blur,19px)) saturate(1.35);backdrop-filter:blur(var(--glass-blur,19px)) saturate(1.35);transform:translateZ(0);transition:grid-template-columns .72s cubic-bezier(.2,.85,.2,1),border-radius .75s cubic-bezier(.2,.85,.2,1),border-color .65s ease,box-shadow .65s ease,background .6s ease}
-.focus:before{content:"";position:absolute;inset:-65px -55px auto auto;width:250px;height:240px;border-radius:50%;background:var(--glow,rgba(65,219,232,.22));filter:blur(59px);opacity:.6;transition:background .5s,opacity .6s;z-index:-1;pointer-events:none}
+.focus:before{content:"";position:absolute;inset:-65px -55px auto auto;width:250px;height:240px;border-radius:50%;background:radial-gradient(ellipse at center,var(--glow,rgba(65,219,232,.22)) 0%,transparent 73%);opacity:.65;transition:background .5s,opacity .6s;z-index:-1;pointer-events:none}
 .focus:after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(127deg,rgba(255,255,255,.07) 0%,rgba(255,255,255,.015) 18%,transparent 40%,transparent 77%,rgba(96,164,220,.023));pointer-events:none}
 .focus[data-tone="attention"]{--glow:rgba(242,94,119,.26);border-radius:35px 26px 31px 30px}
 .focus[data-tone="review"]{--glow:rgba(63,183,249,.26);border-radius:28px 36px 29px 33px}
@@ -58,7 +58,7 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 .focus-title{position:relative;font-size:clamp(23px,5.6vw,33px);font-weight:700;letter-spacing:-.048em;line-height:1.16;text-wrap:balance;overflow-wrap:normal;hyphens:auto;margin:0;color:#f7f8fe;max-width:100%}
 .focus-title.shadow-out{position:absolute;inset:0;pointer-events:none}
 .focus-icon{position:relative;grid-column:2;grid-row:1;place-self:center;z-index:1;display:grid;place-items:center;width:100%;max-width:130px;aspect-ratio:1;color:var(--accent,#42e0e5);transition:color .5s ease}
-.focus-icon:before{content:"";position:absolute;inset:6%;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.04),transparent 70%);filter:blur(7px);pointer-events:none}
+.focus-icon:before{content:"";position:absolute;inset:6%;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.035),transparent 72%);pointer-events:none}
 .focus-icon svg{display:block;max-width:86%;width:100%;height:100%;overflow:visible;fill:none;stroke:currentColor;stroke-width:1.35;stroke-linecap:round;stroke-linejoin:round}
 .focus-icon .icon-glow{stroke:currentColor;stroke-width:3.4;opacity:.15;fill:none;pointer-events:none}
 .focus-bottom{position:relative;z-index:1;grid-row:2;grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:14px}
