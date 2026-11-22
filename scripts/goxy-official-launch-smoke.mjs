@@ -3,12 +3,14 @@ import {readFileSync} from "node:fs";
 import {join,dirname} from "node:path";
 import {fileURLToPath} from "node:url";
 const root=join(dirname(fileURLToPath(import.meta.url)),"..");
-const html=readFileSync(join(root,"ayuda.html"),"utf8");
-const launch=readFileSync(join(root,"assets/js/ayuda/20-release-announcement.js"),"utf8");
-const css=readFileSync(join(root,"assets/css/goxion-release-oct2026.css"),"utf8");
-const login=readFileSync(join(root,"assets/js/ayuda/02-client-supabase-layer.js"),"utf8");
-const goxy=readFileSync(join(root,"preview/goxion-ai/mascota.js"),"utf8");
-const preview=readFileSync(join(root,"preview/goxion-ai/index.html"),"utf8");
+const read=path=>readFileSync(join(root,path),"utf8");
+const html=read("ayuda.html");
+const news=read("assets/js/ayuda/20-release-announcement.js");
+const legal=read("assets/js/ayuda/21-legal-v2-documents.js");
+const css=read("assets/css/goxion-release-v2.css");
+const login=read("assets/js/ayuda/02-client-supabase-layer.js");
+const goxy=read("preview/goxion-ai/mascota.js");
+const preview=read("preview/goxion-ai/index.html");
 const sources=[
  "goxy-heads.bundle.js","goxy-support-knowledge.js","goxy-client-context.js",
  "goxy-access-routing.js","goxy-whatsapp-handoff.js","goxy-ai-client.js",
@@ -16,99 +18,129 @@ const sources=[
 ];
 let last=-1;
 for(const name of sources){
- const src="./preview/goxion-ai/"+name+"?v=official-f17";
- const pos=html.indexOf(src);
- assert.ok(pos>last,"Orden de dependencias oficiales incorrecto: "+name);
+ const location="./preview/goxion-ai/"+name+"?v=official-f17";
+ const pos=html.indexOf(location);
+ assert.ok(pos>last,"Orden de GOXY incorrecto: "+name);
  last=pos;
 }
 assert.ok(html.includes("mascota.css?v=official-f17"));
-assert.ok(html.includes("20-release-announcement.js?v=launch1"));
-assert.ok(!html.includes('iframe id="gxai-app"'),"El Soporte oficial no usa iframe");
-assert.ok(goxy.includes("if (!section || !card || card.classList.contains('gxai-card')) return;"),
- "Goxy debe ser idempotente por documento");
-assert.ok(preview.includes("if (win.GOXION_AI_BETA && doc.querySelector('#view-soporte .gxai-card'))"),
- "El enlace beta evita un segundo asistente");
-assert.equal(login.match(/goxion:client-ready/g)?.length,2,
- "Sesión restaurada y login validado disparan anuncio");
+assert.ok(html.includes("goxion-release-v2.css?v=oficial-v1"));
+assert.ok(html.includes("20-release-announcement.js?v=oficial-v1"));
+assert.ok(html.includes("21-legal-v2-documents.js?v=cola-v1"));
+assert.ok(!html.includes("avisos-apilados-beta"));
+assert.ok(!html.includes('iframe id="gxai-app"'));
+assert.ok(goxy.includes("if (!section || !card || card.classList.contains('gxai-card')) return;"));
+assert.ok(preview.includes("if (win.GOXION_AI_BETA && doc.querySelector('#view-soporte .gxai-card'))"));
+assert.equal(login.match(/goxion:client-ready/g)?.length,2);
 assert.ok(login.includes("goxion:client-logout"));
-assert.ok(css.includes(".gx-release-sheet")&&css.includes("overscroll-behavior:contain"));
-assert.ok(launch.includes("Goxy, tu asistente")&&
- launch.includes("distintas fechas")&&launch.includes("Notificaciones")&&
- launch.includes("Promociones")&&launch.includes("Prórrogas")&&
- launch.includes("Misiones"));
+assert.ok(css.includes(".gx-release-v2-card")&&css.includes("overscroll-behavior:contain"));
+assert.ok(css.includes("mask-image:linear-gradient")&&css.includes(".gx-release-stack-peek"));
+assert.equal((news.match(/title:"/g)||[]).length,6,"Deben mostrarse las seis novedades");
+assert.ok(news.includes("autoPosition=(autoPosition+elapsed*0.030)%loopHeight"));
+assert.ok(news.includes("scroll.scrollTop=Math.floor(autoPosition)"));
+assert.ok(news.includes('scroll.addEventListener("touchstart",claim'));
+assert.ok(news.includes('scroll.querySelectorAll("[data-gx-release-clone]").forEach(node=>node.remove())'));
+assert.ok(legal.includes('new CustomEvent("goxion:legal-opened"'));
+assert.ok(legal.includes('new CustomEvent("goxion:legal-dismissed"'));
+assert.ok(legal.includes("if(serverState?.estado===\"pendiente\"&&token())postpone();"));
+assert.ok(news.includes('const VERSION="nov2026-novedades-apiladas-v1"'));
 
-class FakeEl{
+// Prueba de flujo con DOM reducido: toda la sesión es informativa.
+// Nunca se registra una decisión legal desde el módulo de novedades.
+class FakeElement{
  constructor(tag="div"){
-  this.tag=tag;this.listeners={};this.attrs={};this.style={position:"",top:"",width:""};
-  this.hidden=true;this.isConnected=true;this.children=[];
-  this.classes=new Set();this.classList={add:(n)=>this.classes.add(n),
-   remove:(n)=>this.classes.delete(n),contains:(n)=>this.classes.has(n)};
+  this.tag=tag;this.hidden=true;this.isConnected=true;this.style={};
+  this.attrs={};this.listeners={};this.children=[];this.offsetHeight=130;
+  this.clientHeight=320;this.scrollHeight=1500;this.scrollTop=0;this.dataset={};
+  const set=new Set();
+  this.classList={add:n=>set.add(n),remove:n=>set.delete(n),contains:n=>set.has(n)};
  }
  addEventListener(type,fn){(this.listeners[type]??=[]).push(fn)}
- click(){this.listeners.click?.forEach(fn=>fn({target:this}))}
- focus(){document.activeElement=this}
  setAttribute(k,v){this.attrs[k]=v}
- appendChild(el){this.children.push(el)}
- querySelector(sel){return this.controls?.[sel]||null}
+ focus(){document.activeElement=this}
+ append(e){this.children.push(e)}
+ cloneNode(){return new FakeElement(this.tag)}
+ querySelector(selector){return this.controls?.[selector]||null}
+ querySelectorAll(selector){
+  if(selector.includes("gx-release-v2-item:not"))return this.originalItems??[];
+  if(selector==="[data-gx-release-clone]")return this.children.filter(x=>x.dataset.gxReleaseClone);
+  return [];
+ }
  get innerHTML(){return this.html||""}
- set innerHTML(html){this.html=html;this.controls={
-  ".gx-release-close":new FakeEl("button"),
-  ".gx-release-primary":new FakeEl("button")
- }}
+ set innerHTML(value){
+  this.html=value;
+  if(this.tag==="div"&&value.includes("gx-release-v2-card")){
+   const scroller=new FakeElement("div");
+   scroller.originalItems=Array.from({length:6},()=>new FakeElement("article"));
+   const close=new FakeElement("button"),cta=new FakeElement("button");
+   this.controls={".gx-release-v2-scroll":scroller};
+   this.actions={close,cta};
+  }
+ }
 }
-let current="",signedIn=false,scrollValue=42,created=0;
-const local=new Map(),tasks=new Map();let counter=0;
+let current="",signedIn=false,state={estado:"aceptado",deferido:false,modalAbierto:false};
+const local=new Map(),timeouts=new Map(),frames=new Map();
+let uid=0,scrollValue=35;
 const localStorage={
- getItem:k=>k==="clientToken"?(signedIn?"signed-token":null):local.get(k)||null,
- setItem:(k,v)=>local.set(k,String(v))
+ getItem:key=>key==="clientToken"?(signedIn?"session-token":null):local.get(key)||null,
+ setItem:(key,value)=>local.set(key,String(value))
 };
 const document={
- hidden:false,activeElement:null,
- body:new FakeEl("body"),
- getElementById:id=>id==="splash-screen"?{style:{visibility:"hidden"}}:null,
+ hidden:false,readyState:"complete",activeElement:null,body:new FakeElement("body"),
  querySelector:()=>null,
- createElement:(tag)=>{created++;return new FakeEl(tag)},
- addEventListener(type,cb){(this.listeners??={})[type]=cb}
+ createElement:tag=>new FakeElement(tag),
+ addEventListener(){}
 };
 const handlers={};
 const window={
  GOXION_CORE:{STORAGE:{CLIENT_TOKEN:"clientToken"}},
+ GOXION_LEGAL_V2:{getQueueStatus:()=>state},
+ globalClientesData:{a:{},b:{}},
  getCurrentClientKey:()=>current,scrollY:scrollValue,
  scrollTo:(_x,y)=>{scrollValue=y;window.scrollY=y},
- addEventListener:(type,fn)=>{(handlers[type]??=[]).push(fn)}
+ matchMedia:()=>({matches:false}),
+ addEventListener:(event,fn)=>{(handlers[event]??=[]).push(fn)}
 };
-const users={a:{},b:{}};
-const schedule=(fn)=>{const id=++counter;tasks.set(id,fn);return id};
-const clear=(id)=>tasks.delete(id);
-new Function("window","document","localStorage","globalClientesData","setTimeout","clearTimeout",launch)(
- window,document,localStorage,users,schedule,clear);
-const emit=type=>(handlers[type]||[]).forEach(fn=>fn({}));
-const flush=(max=20)=>{
- let n=0;while(tasks.size&&n++<max){const [id,fn]=tasks.entries().next().value;tasks.delete(id);fn();}
- assert.ok(n<max,"Loop de UI indefinido");
-};
+const setTimeout=fn=>{const id=++uid;timeouts.set(id,fn);return id};
+const clearTimeout=id=>timeouts.delete(id);
+const requestAnimationFrame=fn=>{const id=++uid;frames.set(id,fn);return id};
+const cancelAnimationFrame=id=>frames.delete(id);
+new Function(
+ "window","document","localStorage","setTimeout","clearTimeout",
+ "requestAnimationFrame","cancelAnimationFrame",news
+)(window,document,localStorage,setTimeout,clearTimeout,requestAnimationFrame,cancelAnimationFrame);
+const emit=event=>(handlers[event]||[]).forEach(fn=>fn({detail:{estado:state.estado}}));
+function flush(n=4){
+ for(let i=0;i<n&&timeouts.size;i++){
+   const [id,fn]=timeouts.entries().next().value;timeouts.delete(id);fn();
+ }
+}
 emit("goxion:client-ready");flush();
-assert.equal(created,0,"No popup para invitados");
+assert.equal(document.body.children.length,0,"Invitados sin avisos");
 current="a";signedIn=true;
-emit("goxion:client-ready");flush();
+emit("goxion:client-ready");flush(2);
 const overlay=document.body.children[0];
-assert.ok(overlay&&!overlay.hidden,"El primer cliente recibe popup");
-assert.equal(document.body.style.position,"fixed","Fondo fijo en Safari");
-assert.ok(overlay.innerHTML.includes("Prórrogas y beneficios más transparentes"));
-overlay.querySelector(".gx-release-primary").click();
-assert.ok(overlay.hidden,"CTA cierra");
-assert.equal(document.body.style.position,"","Restaura fondo");
-assert.equal(scrollValue,42,"Restaura posición");
-assert.ok([...local].some(([k,v])=>k.includes(":a")&&v==="1"),"Marca leído por cliente");
-emit("goxion:client-ready");flush();
-assert.equal(overlay.hidden,true,"No reaparece en cada ingreso del mismo cliente");
-current="b";emit("goxion:client-ready");flush();
-assert.equal(overlay.hidden,false,"Segundo cliente del mismo navegador también lo ve");
-emit("goxion:client-logout");flush();
-assert.equal(overlay.hidden,true,"Logout cancela popup");
-assert.ok(![...local].some(([k])=>k.includes(":b")),"Logout no confirma vista");
-current="b";signedIn=true;emit("goxion:client-ready");flush();
-assert.equal(overlay.hidden,false,"Se puede reintentar si cerró sesión antes de aceptar");
-overlay.querySelector(".gx-release-close").click();
-assert.ok([...local].some(([k])=>k.includes(":b")),"Cerrar marca versión como vista");
-console.log("GOXION Goxy F17 oficial + anuncio por cliente: PASS");
+assert.ok(overlay&&!overlay.hidden,"Cuenta A recibe novedades");
+assert.ok(overlay.innerHTML.includes("Goxy, tu asistente"));
+assert.ok(overlay.innerHTML.includes("Misiones, cupones y opiniones"));
+assert.ok(document.body.classList.contains("gx-release-v2-body-lock"));
+window.GOXION_RELEASE_202610.close();
+assert.ok(overlay.hidden,"Botón de cierre cierra novedades");
+assert.ok([...local].some(([k,v])=>k.endsWith(":a")&&v==="1"),"Solo noticias quedan leídas");
+emit("goxion:client-ready");flush(2);
+assert.ok(overlay.hidden,"No repetir las novedades a A");
+current="b";emit("goxion:client-ready");flush(2);
+assert.ok(!overlay.hidden,"Cuenta B recibe su aviso independiente");
+emit("goxion:client-logout");flush(1);
+assert.ok(overlay.hidden,"Cerrar sesión cierra el aviso");
+assert.ok(![...local.keys()].some(k=>k.endsWith(":b")),"Logout no marca visto");
+state={estado:"pendiente",deferido:false,modalAbierto:false};
+emit("goxion:client-ready");flush(2);
+assert.ok(overlay.hidden,"Términos obligatorios se priorizan");
+state={estado:"pendiente",deferido:true,modalAbierto:false};
+emit("goxion:legal-dismissed");flush(2);
+assert.ok(!overlay.hidden,"Al posponer términos aparece novedades");
+window.GOXION_RELEASE_202610.close();
+assert.ok([...local.keys()].some(k=>k.endsWith(":b")));
+assert.equal(scrollValue,35,"Restaurar posición del documento");
+console.log("GOXION Goxy F17 + avisos oficiales apilados: PASS");
