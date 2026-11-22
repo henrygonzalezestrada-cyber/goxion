@@ -56,6 +56,32 @@ async function exercise(name,engine){
    await page.waitForFunction(()=>document.getElementById('gxn-top').dataset.docked==='true');
    assert.equal(await bar.getAttribute('data-size'),'compact');
    assert.equal(await page.locator('[data-gxn-target]').count(),3);
+   const mini=await page.evaluate(()=>{
+    const root=document.getElementById('gxn-top'),pill=document.getElementById('gxn-nav');
+    const logo=root.querySelector('.gxn-brand'), bell=document.getElementById('gxn-bell'), goxy=document.getElementById('gxn-profile-trigger');
+    const tabs=[...pill.querySelectorAll('.gxn-tab')];
+    const navRect=pill.getBoundingClientRect(),bellRect=bell.getBoundingClientRect(),goxyRect=goxy.getBoundingClientRect();
+    const css=getComputedStyle(pill);
+    return {
+     rootBg:getComputedStyle(root).backgroundColor,
+     pillWidth:navRect.width, pillHeight:navRect.height, glass:css.backgroundColor,
+     capsuleRadius:parseFloat(css.borderTopLeftRadius),
+     navRight:navRect.right,bellLeft:bellRect.left,
+     bellRatio:bellRect.width/bellRect.height,
+     goxyRatio:goxyRect.width/goxyRect.height,
+     logoVisible:getComputedStyle(logo).display!=='none',
+     circles:tabs.map(el=>{const b=el.getBoundingClientRect();return {width:b.width,height:b.height,radius:parseFloat(getComputedStyle(el).borderTopLeftRadius)}})
+    };
+   });
+   assert.match(mini.rootBg,/rgba\(0, 0, 0, 0\)|transparent/,'Dock wrapper must have no background');
+   assert(mini.pillWidth<=230,'Capsule should remain much narrower than page at '+width);
+   assert(mini.pillHeight<=62,'Capsule must remain small');
+   assert(mini.capsuleRadius>=mini.pillHeight/2,'Mini capsule geometry must be pill shaped');
+   assert(Math.abs(mini.bellRatio-1)<.02&&Math.abs(mini.goxyRatio-1)<.02,'Header actions should be real circles');
+   assert(mini.circles.every(x=>Math.abs(x.width-x.height)<1.1&&x.radius>=x.height/2-1),
+    'All three collapsed icons must remain perfect circles');
+   assert(mini.navRight+1<mini.bellLeft,'Detached capsule must not overlap bell/Goxy');
+   assert.match(mini.glass,/rgba\(/,'Mini capsule must keep true translucent glass material');
    await page.evaluate(()=>window.scrollTo(0,620));
    await page.waitForFunction(()=>document.getElementById('gxn-top').dataset.size==='expanded');
    assert.equal(await stage.evaluate(el=>el.getBoundingClientRect().height),stageHeight,
