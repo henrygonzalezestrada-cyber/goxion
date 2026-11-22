@@ -17,7 +17,9 @@ assert.match(html,/id="gxn-profile-trigger"/);
 assert.match(html,/data-gxn-target="space"/);
 assert.match(html,/data-gxn-target="catalog"/);
 assert.match(html,/data-gxn-target="support"/);
-assert.match(js,/requestAnimationFrame\(updateScroll\)/);
+assert.match(js,/frame=requestAnimationFrame\(tick\)/);
+assert.match(js,/const RANGE=158, SNAP_IDLE_MS=175/);
+assert(!/setDocked\(|dataset\.docked|\.cloneNode\(/.test(js),'The same nav must morph without a dock swap');
 assert.match(js,/addEventListener\('scroll',scheduleScroll,\{passive:true\}\)/);
 assert.match(css,/prefers-reduced-motion:reduce/);
 assert(!/localStorage|sessionStorage|fetch\(/.test(js),'No client data or backend in the lab');
@@ -46,46 +48,53 @@ async function exercise(name,engine){
    await page.route('**/fonts.googleapis.com/**',r=>r.abort());
    await page.route('**/fonts.gstatic.com/**',r=>r.abort());
    await page.goto(base,{waitUntil:'domcontentloaded'});
-   const bar=page.locator('#gxn-top');
-   const stage=page.locator('#gxn-stage');
-   const stageHeight=await stage.evaluate(el=>el.getBoundingClientRect().height);
+   const nav=page.locator('#gxn-nav'),slot=page.locator('#gxn-nav-slot');
+   const original=await nav.boundingBox(),slotRect=await slot.boundingBox();
+   assert(original&&slotRect,'The real nav and its original slot must be measurable');
+   assert(Math.abs(original.x-slotRect.x)<2&&Math.abs(original.y-slotRect.y)<2,
+    'At origin the SAME capsule must align with its flow slot');
    assert.equal(await page.locator('nav').count(),1);
-   assert.equal(await bar.getAttribute('data-docked'),'false');
    assert.equal(await page.locator('[data-gxn-target]').count(),3);
-   await page.evaluate(()=>window.scrollTo(0,730));
-   await page.waitForFunction(()=>document.getElementById('gxn-top').dataset.docked==='true');
-   assert.equal(await bar.getAttribute('data-size'),'compact');
-   assert.equal(await page.locator('[data-gxn-target]').count(),3);
-   const mini=await page.evaluate(()=>{
-    const root=document.getElementById('gxn-top'),pill=document.getElementById('gxn-nav');
-    const logo=root.querySelector('.gxn-brand'), bell=document.getElementById('gxn-bell'), goxy=document.getElementById('gxn-profile-trigger');
-    const tabs=[...pill.querySelectorAll('.gxn-tab')];
-    const navRect=pill.getBoundingClientRect(),bellRect=bell.getBoundingClientRect(),goxyRect=goxy.getBoundingClientRect();
-    const css=getComputedStyle(pill);
+   const stageHeight=await page.locator('#gxn-stage').evaluate(el=>el.getBoundingClientRect().height);
+   await page.evaluate(()=>window.scrollTo(0,105));
+   await page.waitForTimeout(900);
+   assert.equal(await nav.getAttribute('data-nav-label'),'off');
+   assert(Math.abs(await page.evaluate(()=>window.scrollY)-105)<1,'Do not snap the page scroll');
+   const compact=await page.evaluate(()=>{
+    const pill=document.getElementById('gxn-nav'),brand=document.querySelector('.gxn-brand');
+    const b=pill.getBoundingClientRect(), css=getComputedStyle(pill);
     return {
-     rootBg:getComputedStyle(root).backgroundColor,
-     pillWidth:navRect.width, pillHeight:navRect.height, glass:css.backgroundColor,
-     capsuleRadius:parseFloat(css.borderTopLeftRadius),
-     navRight:navRect.right,bellLeft:bellRect.left,
-     bellRatio:bellRect.width/bellRect.height,
-     goxyRatio:goxyRect.width/goxyRect.height,
-     logoVisible:getComputedStyle(logo).display!=='none',
-     circles:tabs.map(el=>{const b=el.getBoundingClientRect();return {width:b.width,height:b.height,radius:parseFloat(getComputedStyle(el).borderTopLeftRadius)}})
+     width:b.width,height:b.height,left:b.left,top:b.top,
+     glass:css.backgroundColor,blur:css.backdropFilter||css.webkitBackdropFilter,
+     logoOpacity:parseFloat(getComputedStyle(brand).opacity),
+     circles:[...pill.querySelectorAll('.gxn-tab')].map(el=>{
+      const r=el.getBoundingClientRect(), c=getComputedStyle(el);
+      return {w:r.width,h:r.height,radius:parseFloat(c.borderTopLeftRadius)};
+     })
     };
    });
-   assert.match(mini.rootBg,/rgba\(0, 0, 0, 0\)|transparent/,'Dock wrapper must have no background');
-   assert(mini.pillWidth<=230,'Capsule should remain much narrower than page at '+width);
-   assert(mini.pillHeight<=62,'Capsule must remain small');
-   assert(mini.capsuleRadius>=mini.pillHeight/2,'Mini capsule geometry must be pill shaped');
-   assert(Math.abs(mini.bellRatio-1)<.02&&Math.abs(mini.goxyRatio-1)<.02,'Header actions should be real circles');
-   assert(mini.circles.every(x=>Math.abs(x.width-x.height)<1.1&&x.radius>=x.height/2-1),
-    'All three collapsed icons must remain perfect circles');
-   assert(mini.navRight+1<mini.bellLeft,'Detached capsule must not overlap bell/Goxy');
-   assert.match(mini.glass,/rgba\(/,'Mini capsule must keep true translucent glass material');
-   await page.evaluate(()=>window.scrollTo(0,620));
-   await page.waitForFunction(()=>document.getElementById('gxn-top').dataset.size==='expanded');
-   assert.equal(await stage.evaluate(el=>el.getBoundingClientRect().height),stageHeight,
-    'Do not shift the document when the dock changes state');
+   assert(compact.width<=185&&compact.width>=155,'Compact pill should be 155–185px');
+   assert(compact.height<=60,'No surrounding toolbar');
+   assert(compact.top>=0&&compact.top<=50,'Capsule settles in the top corner');
+   assert(Math.abs(compact.left-slotRect.x)<4,'Capsule aligns with content left edge');
+   assert(compact.logoOpacity<.05,'The logo yields to the SAME capsule');
+   assert(compact.circles.every(c=>Math.abs(c.w-c.h)<1.2&&c.radius>=c.h/2-1),
+    'All compact destinations must remain circles');
+   assert(/rgba/.test(compact.glass)&&!/0\.84/.test(compact.glass),'Approved translucent material');
+   assert(/blur/.test(compact.blur),'Glass blur must be visible');
+   await page.evaluate(()=>window.scrollTo(0,720));
+   await page.waitForTimeout(400);
+   await page.evaluate(()=>window.scrollTo(0,615));
+   await page.waitForTimeout(700);
+   const expanded=await nav.boundingBox();
+   assert(expanded.width>compact.width+30,'Reverse scroll expands the SAME navigation');
+   assert.equal(await page.locator('[data-gxn-target]').count(),3);
+   assert.equal(await page.locator('#gxn-stage').evaluate(el=>el.getBoundingClientRect().height),stageHeight);
+   await page.evaluate(()=>window.scrollTo(0,0));
+   await page.waitForTimeout(750);
+   const restored=await nav.boundingBox(),home=await slot.boundingBox();
+   assert(Math.abs(restored.x-home.x)<2&&Math.abs(restored.y-home.y)<2,
+    'Nav returns to its actual original position');
    await page.locator('#gxn-profile-trigger').click();
    assert.equal(await page.locator('#gxn-profile-menu').evaluate(el=>el.hidden),false);
    await page.locator('#gxn-profile-open').click();
@@ -101,7 +110,7 @@ async function exercise(name,engine){
    await page.locator('#gxn-support-dialog [data-gxn-close-dialog]').click();
    assert.equal(await page.locator('[data-gxn-target="catalog"]').getAttribute('aria-current'),'page');
    await page.locator('[data-gxn-target="space"]').click();
-   await page.waitForFunction(()=>document.getElementById('gxn-top').dataset.docked==='false');
+   await page.waitForTimeout(750);
    const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
    assert(overflow<=1,'Horizontal overflow '+overflow+'px at '+width);
    assert.deepEqual(errors,[],name+'/'+width+' page errors');
