@@ -51,6 +51,8 @@
 - **Cápsula CTA:** **8% de película translúcida blanca**, `background:rgba(255,255,255,.08)`, código `updatePillAlpha(8)`.
 - **En la cápsula:** SIN borde, SIN sombra, SIN degradado, SIN brillo/radial, SIN blur adicional; `border:0;box-shadow:none;backdrop-filter:none`. El texto se tiñe de `var(--accent)` según el estado de la cuenta.
 - El haz/reflejo y la onda ya aprobados **permanecen detrás de la superficie principal**; no copiar esos efectos a todas las tarjetas.
+- **Corrección de fidelidad visual (22/nov/2026):** el laboratorio del feed tuvo un error que borró reglas CSS del cristal, ya corregido en commit `dd20a2b4975cd616b6c1796628f3ceba6853f168`. La vista vigente **debe preservar exactamente las reglas de cristal, onda, haz y orb de la versión aprobada**. Se retiró **solo** el rótulo flotante `<span class="glass-glyph">GOXION</span>` y su animación, porque resultaba invasivo y el usuario lo rechazó. No volver a introducir ese texto encima/detrás de la tarjeta ni confundirlo con el logo del encabezado.
+- **Orden de prioridad para reconstrucción:** diseño, textos y animaciones de la tarjeta base siguen tomándose del commit aprobado `f33e8572...`, **con la excepción explícita de NO incluir el rótulo flotante GOXION**. El commit correctivo anterior muestra esa excepción en el laboratorio vigente.
 
 ## 4. Comportamiento que debe conservarse
 
