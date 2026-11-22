@@ -6,8 +6,8 @@
 
 ## Abrir primero al continuar en otro chat
 
-- **Laboratorio en GitHub Pages:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=a18173a
-- **Fuente de la última iteración:** `preview/experiencia-mi-espacio-inteligente/morph-v2.html` en commit **`a18173a41d28eefa3c5379b19fb6ca1240eb3542`**. Los cambios de botón SVG y microsuperficie provienen de `5b034547f69f0f00cf67046b97ea72c1a07afb98`.
+- **Laboratorio en GitHub Pages:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=d04c588
+- **Fuente de la última iteración:** `preview/experiencia-mi-espacio-inteligente/morph-v2.html` en commit **`d04c58818d883bee63615584a302f0dd76699886`**. Los cambios de botón SVG y microsuperficie provienen de `5b034547f69f0f00cf67046b97ea72c1a07afb98`.
 - **Documentación de la tarjeta principal congelada:** `docs/GOXION_MI_ESPACIO_HERO_APROBADA_2026-11-22.md`.
 - **Auditoría visual previa y principios aprendidos:** `docs/GOXION_AUDITORIA_BENEFICIOS_FEED_2026-11-22.md`.
 - **Rama que preserva la tarjeta principal aprobada:** `approved/mi-espacio-hero-compacta-centrada-20261122`, apuntando a `f33e8572c07377f4811080a87c7cb1b483983b34`. Se elimina únicamente el rótulo flotante «GOXION» rechazado, según la documentación del hero.
@@ -56,7 +56,7 @@ El usuario solicitó **dos cambios muy concretos** en el bloque ampliado de Leal
 
 ### Cómo abrir la continuidad en otro chat
 
-> Continuemos el laboratorio visual del feed GOXION. Lee `AGENTS.md`, `docs/GOXION_MI_ESPACIO_HERO_APROBADA_2026-11-22.md` y `docs/GOXION_FEED_MI_ESPACIO_CONTINUIDAD_2026-11-22.md`. La última versión está en `preview/experiencia-mi-espacio-inteligente/morph-v2.html`, commit `a18173a41d28eefa3c5379b19fb6ca1240eb3542`. Ya está aplicado el bloqueo visual de posición del emoji al abrir información, además del botón SVG de información a la derecha del CTA y la microsuperficie oscura debajo. Continúa desde aquí: no rehagas la tarjeta principal, saludo, fila triple ni morph; trabaja directamente en GitHub y proporciona el enlace del laboratorio tras cada cambio.
+> Continuemos el laboratorio visual del feed GOXION. Lee `AGENTS.md`, `docs/GOXION_MI_ESPACIO_HERO_APROBADA_2026-11-22.md` y `docs/GOXION_FEED_MI_ESPACIO_CONTINUIDAD_2026-11-22.md`. La última versión está en `preview/experiencia-mi-espacio-inteligente/morph-v2.html`, commit `d04c58818d883bee63615584a302f0dd76699886`. Además de la jerarquía de título y X, ya está aplicado el bloqueo visual de posición del emoji al abrir información, además del botón SVG de información a la derecha del CTA y la microsuperficie oscura debajo. Continúa desde aquí: no rehagas la tarjeta principal, saludo, fila triple ni morph; trabaja directamente en GitHub y proporciona el enlace del laboratorio tras cada cambio.
 
 ## Corrección del 22/nov/2026 · emoji fijo al tocar información
 
@@ -76,3 +76,20 @@ El usuario solicitó **dos cambios muy concretos** en el bloque ampliado de Leal
 ### Próxima revisión en el laboratorio
 
 Abrir Lealtad, Referidos y Misiones; alternar varias veces el icono ⓘ (y «Mis niveles» en Lealtad). Confirmar que ⭐/🎁/🎯/🏆 **permanecen a la misma altura y posición en pantalla** mientras aparecen las condiciones, sin perder legibilidad. Si falla en iPhone, ajustar exclusivamente la compensación del emoji; no rediseñar el hero, el saludo ni el panel.
+
+## Iteración de jerarquía en ampliadas · 22/nov/2026
+
+**Referencia visual:** captura adjunta de la interfaz oficial «Sube tu comprobante» con X en la esquina superior derecha. El usuario solicitó **adoptar la jerarquía y posición, NO su color cian**.
+
+**Código del laboratorio:** commit `d04c58818d883bee63615584a302f0dd76699886`.
+
+- Se retiró **del panel ampliado únicamente** el texto pequeño de categoría `LEALTAD`, `REFERIDOS`, `MISIONES` (selector anterior `.gxb-eyebrow`). En la **fila compacta** esos nombres se conservan: son necesarios para identificar cada beneficio.
+- El título real `#gxb-title` sube al inicio de la tarjeta (se eliminó el margen superior de 9px), fuente responsiva 20–25px con jerarquía clara. Sin eliminar ni cambiar textos, estados ni lógica.
+- Una sola palabra significativa dentro de cada título recibe acento mediante `span.gxb-title-accent`, creado con `document.createTextNode` y `textContent`, **sin innerHTML de títulos**. Lealtad: **morado/lila** (crece); Referidos: **cian** (avanza, gana, desbloqueado, aplicado); Misiones: **azul** (pendiente, disponible). Solo un acento a la vez; NO gradientes ni varias palabras de colores.
+- La X es ahora **un SVG real, neutral** (NO el cian de la captura), con botón táctil de 44×44 px y círculo visual translúcido, sin sombras ni borde llamativo. Se posiciona **absolutamente en la esquina superior derecha de toda `.gxb-panel`** (`top:15px;right:16px`, menor en móviles), como hijo directo del panel. No la alinea el título ni depende de que el título ocupe 1 o 2 líneas.
+- Se reservan 50px de ancho en el encabezado para evitar colisiones entre títulos largos y X. El control conserva foco, eventos y cierre del panel compartido.
+- **Protegido:** min-height 300px del panel, CTA e icono de info, microsuperficie oscura, emoji grande inferior con bloqueo de movimiento al abrir info, morph al abrir/cerrar, barra de progreso, hero principal compacto al 15% y saludo animado.
+- El usuario pidió revisar cómo queda. **Esta iteración aún NO cuenta con aprobación final de iPhone/Safari**. Se hicieron comprobaciones estáticas de HTML/CSS/JS, no prueba visual física ni conexión con datos reales.
+
+**Continuidad inmediata:** pedir inspección visual de Lealtad/Referidos/Misiones con 1 y 2 líneas y la X en la esquina. Si aprueba, marcar el conjunto listo para planificar integración; no tocar `ayuda.html` ni lógica real hasta autorización expresa.
+
