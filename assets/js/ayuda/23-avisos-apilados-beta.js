@@ -27,7 +27,7 @@
   let overlay=null,launcher=null,shown=false,open=false,stage="terms",savedFocus=null,scrollTop=0;
   let tries=0,retry=0;
   // Movimiento ambiental: no debe competir con la lectura del cliente.
-  let autoFrame=0,autoDelay=0,autoLast=0,loopHeight=0,manualScroll=false;
+  let autoFrame=0,autoDelay=0,autoLast=0,loopHeight=0,autoPosition=0,manualScroll=false;
   let keyboardInput=false;
   const reducedMotion=()=>Boolean(window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches);
   const $=(q,root=document)=>root.querySelector(q);
@@ -160,10 +160,10 @@
     const scroll=overlay&&$(".gx-stack-beta-scroll",overlay);
     if(removeDuplicates&&scroll){
       // Misma novedad y mismo desplazamiento visual al pasar al control manual.
-      const position=loopHeight>0?scroll.scrollTop%loopHeight:scroll.scrollTop;
+      const position=loopHeight>0?autoPosition%loopHeight:scroll.scrollTop;
       scroll.querySelectorAll("[data-beta-duplicate]").forEach(node=>node.remove());
-      scroll.scrollTop=Math.min(position,Math.max(0,scroll.scrollHeight-scroll.clientHeight));
-      loopHeight=0;
+      scroll.scrollTop=Math.min(Math.floor(position),Math.max(0,scroll.scrollHeight-scroll.clientHeight));
+      loopHeight=0;autoPosition=scroll.scrollTop;
     }
   }
   function takeControl(){
@@ -178,9 +178,11 @@
     const scroll=$(".gx-stack-beta-scroll",overlay);
     if(!scroll||loopHeight<=0){autoFrame=0;return;}
     if(autoLast){
-      const step=Math.min(time-autoLast,45)*0.016; // 16 px/s; pequeño y continuo.
-      if(Number.isFinite(step)&&step>0)scroll.scrollTop+=step;
-      if(scroll.scrollTop>=loopHeight)scroll.scrollTop-=loopHeight;
+      // Safari iPhone puede redondear scrollTop fraccionario a cero.
+      // Acumulamos la posición real y aplicamos enteros: no se pierde movimiento.
+      const elapsed=Math.max(0,Math.min(time-autoLast,80));
+      autoPosition=(autoPosition+elapsed*0.030)%loopHeight; // 30px/s.
+      scroll.scrollTop=Math.floor(autoPosition);
     }
     autoLast=time;
     autoFrame=requestAnimationFrame(tickAuto);
@@ -192,8 +194,10 @@
     if(!loopHeight){
       const originals=[...scroll.querySelectorAll(".gx-stack-beta-news-item:not([data-beta-duplicate])")];
       if(originals.length!==news.length||scroll.scrollHeight<=scroll.clientHeight)return;
-      loopHeight=originals.reduce((sum,item)=>sum+item.getBoundingClientRect().height,0);
+      // offsetHeight es estable también en Safari con la máscara de fade.
+      loopHeight=originals.reduce((sum,item)=>sum+item.offsetHeight,0);
       if(loopHeight<=0)return;
+      autoPosition=scroll.scrollTop;
       // Clones presentacionales: no duplican avisos leídos ni elementos accesibles.
       for(let round=0;round<2;round++){
         for(const item of originals){
@@ -205,12 +209,12 @@
         }
       }
     }
-    if(!autoFrame){autoLast=0;autoFrame=requestAnimationFrame(tickAuto);}
+    if(!autoFrame){autoLast=0;autoPosition=scroll.scrollTop;autoFrame=requestAnimationFrame(tickAuto);}
   }
   function scheduleAuto(){
     if(manualScroll||reducedMotion())return;
     clearTimeout(autoDelay);
-    autoDelay=setTimeout(()=>{autoDelay=0;startAuto();},1250);
+    autoDelay=setTimeout(()=>{autoDelay=0;startAuto();},850);
   }
 
   function reset(){
