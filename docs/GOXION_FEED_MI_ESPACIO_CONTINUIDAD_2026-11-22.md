@@ -6,8 +6,8 @@
 
 ## Abrir primero al continuar en otro chat
 
-- **Laboratorio en GitHub Pages:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=5b03454
-- **Fuente de la última iteración:** `preview/experiencia-mi-espacio-inteligente/morph-v2.html` en commit **`5b034547f69f0f00cf67046b97ea72c1a07afb98`**.
+- **Laboratorio en GitHub Pages:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=a18173a
+- **Fuente de la última iteración:** `preview/experiencia-mi-espacio-inteligente/morph-v2.html` en commit **`a18173a41d28eefa3c5379b19fb6ca1240eb3542`**. Los cambios de botón SVG y microsuperficie provienen de `5b034547f69f0f00cf67046b97ea72c1a07afb98`.
 - **Documentación de la tarjeta principal congelada:** `docs/GOXION_MI_ESPACIO_HERO_APROBADA_2026-11-22.md`.
 - **Auditoría visual previa y principios aprendidos:** `docs/GOXION_AUDITORIA_BENEFICIOS_FEED_2026-11-22.md`.
 - **Rama que preserva la tarjeta principal aprobada:** `approved/mi-espacio-hero-compacta-centrada-20261122`, apuntando a `f33e8572c07377f4811080a87c7cb1b483983b34`. Se elimina únicamente el rótulo flotante «GOXION» rechazado, según la documentación del hero.
@@ -56,4 +56,23 @@ El usuario solicitó **dos cambios muy concretos** en el bloque ampliado de Leal
 
 ### Cómo abrir la continuidad en otro chat
 
-> Continuemos el laboratorio visual del feed GOXION. Lee `AGENTS.md`, `docs/GOXION_MI_ESPACIO_HERO_APROBADA_2026-11-22.md` y `docs/GOXION_FEED_MI_ESPACIO_CONTINUIDAD_2026-11-22.md`. La última versión está en `preview/experiencia-mi-espacio-inteligente/morph-v2.html`, commit `5b034547f69f0f00cf67046b97ea72c1a07afb98`. Ya está aplicado el botón SVG de información a la derecha del CTA y la microsuperficie oscura debajo. Continúa desde aquí: no rehagas la tarjeta principal, saludo, fila triple ni morph; trabaja directamente en GitHub y proporciona el enlace del laboratorio tras cada cambio.
+> Continuemos el laboratorio visual del feed GOXION. Lee `AGENTS.md`, `docs/GOXION_MI_ESPACIO_HERO_APROBADA_2026-11-22.md` y `docs/GOXION_FEED_MI_ESPACIO_CONTINUIDAD_2026-11-22.md`. La última versión está en `preview/experiencia-mi-espacio-inteligente/morph-v2.html`, commit `a18173a41d28eefa3c5379b19fb6ca1240eb3542`. Ya está aplicado el bloqueo visual de posición del emoji al abrir información, además del botón SVG de información a la derecha del CTA y la microsuperficie oscura debajo. Continúa desde aquí: no rehagas la tarjeta principal, saludo, fila triple ni morph; trabaja directamente en GitHub y proporciona el enlace del laboratorio tras cada cambio.
+
+## Corrección del 22/nov/2026 · emoji fijo al tocar información
+
+**Referencia:** video de iPhone `ScreenRecording_11-22-2026 01-21-41_1.mp4`, aportado por el usuario en el chat. Muestra que al tocar ⓘ la microsuperficie se abre, **el panel crece y el emoji ampliado se desliza verticalmente** porque estaba anclado a `bottom:3px` de una tarjeta con altura variable.
+
+**Pedido explícito:** «el emoji no se debe mover al tocar el símbolo de info».
+
+**Aplicado al laboratorio:** commit `a18173a41d28eefa3c5379b19fb6ca1240eb3542`.
+
+- `.gxb-panel-emoji` conserva su esquina inferior, tamaño, opacidad y rotación. Solo suma `translateY(var(--gxb-info-lock,0px))`, un desplazamiento correctivo aplicado **únicamente** al abrir/cerrar el texto de información.
+- `setInfoOpen(open,feedbackMessage)`: mide la altura del panel **antes y después** de actualizar `hidden` y calcula `offsetAnterior + altoAnterior - altoNuevo`, compensando el crecimiento en el mismo evento de UI (sin una animación nueva). Al cerrar, el desplazamiento vuelve a cero.
+- El botón de información usa la función común. La acción «Mis niveles», que también muestra las condiciones, usa la misma ruta y toma en cuenta el mensaje adicional.
+- Cuando cambia el beneficio o se termina de cerrar el panel ampliado se retira la corrección de posición. **La animación compartida al abrir/cerrar la tarjeta completa sigue intacta**.
+- La microsuperficie local oscura `rgba(4,7,13,.88)`, el botón SVG ⓘ junto al CTA, el panel ampliado con mínimo de 300px y el cristal neutro 15% no cambian.
+- **Validado hasta ahora:** sintaxis JavaScript, balance CSS, estructura y condiciones de invariancia. **No** afirmar que esta revisión fue probada visualmente en Safari físico hasta recibir comprobación del usuario.
+
+### Próxima revisión en el laboratorio
+
+Abrir Lealtad, Referidos y Misiones; alternar varias veces el icono ⓘ (y «Mis niveles» en Lealtad). Confirmar que ⭐/🎁/🎯/🏆 **permanecen a la misma altura y posición en pantalla** mientras aparecen las condiciones, sin perder legibilidad. Si falla en iPhone, ajustar exclusivamente la compensación del emoji; no rediseñar el hero, el saludo ni el panel.
