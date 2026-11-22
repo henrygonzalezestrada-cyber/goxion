@@ -509,13 +509,6 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
     </button>
    </div>
   </div>
-  <div class="gxn-nav-slot" id="gxn-nav-slot" aria-hidden="true"></div>
-  <span class="gxn-nav-target" id="gxn-nav-target" aria-hidden="true"></span>
-  <nav class="gxn-nav" id="gxn-nav" data-nav-label="on" aria-label="Navegación principal · laboratorio">
-   <button type="button" class="gxn-tab" data-gxn-target="space" aria-label="Mi Espacio" aria-current="page"><span class="gxn-emoji" aria-hidden="true">👤</span><span class="gxn-tab-label">Mi Espacio</span></button>
-   <button type="button" class="gxn-tab" data-gxn-target="catalog" aria-label="Catálogo"><span class="gxn-emoji" aria-hidden="true">🛒</span><span class="gxn-tab-label">Catálogo</span></button>
-   <button type="button" class="gxn-tab" data-gxn-target="support" aria-label="Soporte"><span class="gxn-emoji" aria-hidden="true">🛠️</span><span class="gxn-tab-label">Soporte</span></button>
-  </nav>
   <div class="gxn-menu gxn-profile-menu" id="gxn-profile-menu" hidden>
    <div class="gxn-menu-head"><strong>Mario · Mi Espacio</strong><small>Perfil ilustrativo del laboratorio</small></div>
    <button type="button" id="gxn-profile-open"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-4 3-6.5 7-6.5s7 2.5 7 6.5"/></svg>Mi perfil</button>
@@ -534,6 +527,11 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
   </div>
  </div>
 </div>
+<nav class="gxn-nav" id="gxn-nav" data-mode="expanded" aria-label="Navegación principal · laboratorio">
+   <button type="button" class="gxn-tab" data-gxn-target="space" aria-label="Mi Espacio" aria-current="page"><span class="gxn-emoji" aria-hidden="true">👤</span><span class="gxn-tab-label">Mi Espacio</span></button>
+   <button type="button" class="gxn-tab" data-gxn-target="catalog" aria-label="Catálogo"><span class="gxn-emoji" aria-hidden="true">🛒</span><span class="gxn-tab-label">Catálogo</span></button>
+   <button type="button" class="gxn-tab" data-gxn-target="support" aria-label="Soporte"><span class="gxn-emoji" aria-hidden="true">🛠️</span><span class="gxn-tab-label">Soporte</span></button>
+  </nav>
 <input class="gxn-avatar-input" id="gxn-avatar-input" type="file" accept="image/png,image/jpeg,image/webp" aria-label="Elegir foto de perfil de prueba" hidden>
 <dialog class="gxn-dialog" id="gxn-support-dialog"><h2>Soporte</h2><p>En la versión oficial se abrirá la vista conectada de Soporte. Aquí solo puedes comprobar cómo cambia la cápsula entre destinos.</p><button type="button" class="gxn-dialog-close" data-gxn-close-dialog>Volver</button></dialog>
 <dialog class="gxn-dialog" id="gxn-logout-dialog"><h2>Salir de GOXION</h2><p>Este es un laboratorio sin sesión. En la integración oficial, «Salir» llamará a la función de cierre seguro existente.</p><button type="button" class="gxn-dialog-close" data-gxn-close-dialog>Entendido</button></dialog>
