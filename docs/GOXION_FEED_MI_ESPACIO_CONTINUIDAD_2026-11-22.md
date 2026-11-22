@@ -6,8 +6,8 @@
 
 ## Abrir primero al continuar en otro chat
 
-- **Laboratorio en GitHub Pages:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=d04c588
-- **Fuente de la última iteración:** `preview/experiencia-mi-espacio-inteligente/morph-v2.html` en commit **`d04c58818d883bee63615584a302f0dd76699886`**. Los cambios de botón SVG y microsuperficie provienen de `5b034547f69f0f00cf67046b97ea72c1a07afb98`.
+- **Laboratorio en GitHub Pages:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=14af689
+- **Fuente de la última iteración:** `preview/experiencia-mi-espacio-inteligente/morph-v2.html` en commit **`14af68964affeba212df7519bdb940d12a9eb048`**. Jerarquía de título y ubicación de X: `d04c58818d883bee63615584a302f0dd76699886`. Los cambios de botón SVG y microsuperficie provienen de `5b034547f69f0f00cf67046b97ea72c1a07afb98`.
 - **Documentación de la tarjeta principal congelada:** `docs/GOXION_MI_ESPACIO_HERO_APROBADA_2026-11-22.md`.
 - **Auditoría visual previa y principios aprendidos:** `docs/GOXION_AUDITORIA_BENEFICIOS_FEED_2026-11-22.md`.
 - **Rama que preserva la tarjeta principal aprobada:** `approved/mi-espacio-hero-compacta-centrada-20261122`, apuntando a `f33e8572c07377f4811080a87c7cb1b483983b34`. Se elimina únicamente el rótulo flotante «GOXION» rechazado, según la documentación del hero.
@@ -93,3 +93,19 @@ Abrir Lealtad, Referidos y Misiones; alternar varias veces el icono ⓘ (y «Mis
 
 **Continuidad inmediata:** pedir inspección visual de Lealtad/Referidos/Misiones con 1 y 2 líneas y la X en la esquina. Si aprueba, marcar el conjunto listo para planificar integración; no tocar `ayuda.html` ni lógica real hasta autorización expresa.
 
+
+## Corrección de interpretación · jerarquía COLOR de la X (22/nov/2026)
+
+**User feedback explícito:** «Pero si quería que fue tal cual como en la imagen la x para en todos lados sea la misma gerarquia, no de posición si no de color».
+
+**Referencia:** captura aportada del modal oficial «Sube tu comprobante». La idea de **misma jerarquía de la X** es **fondo circular cian destacado y símbolo X OSCURO**, no simplemente la ubicación en la esquina ni una X gris sobre círculo translucido. No se requiere copiar el color de la tarjeta/modal que la rodea.
+
+**Corregido en laboratorio:** commit `14af68964affeba212df7519bdb940d12a9eb048`.
+
+- `#gxb-dismiss` conserva la ubicación ya acordada (absoluta arriba a la derecha) y el objetivo táctil 44×44 px. El círculo visible es de ~38px.
+- Fondo del círculo sólido cian `#79e6fc` (aproximación visual basada en la captura original, no token de producto validado), símbolo SVG X color oscuro `#071c29`, estado pulsado `#5bd4ed`. Sin glow ni borde adicional.
+- Esta combinación **cian visible + X oscura** es la **referencia de jerarquía para controles de cierre equivalentes en GOXION**. No cambiar todos los botones de la web oficial sin aprobación de integración; la regla se adopta primero en los cierres equivalentes del laboratorio.
+- Se mantuvieron títulos con una sola palabra contrastante, sin etiqueta superior, tarjetas ampliadas min-height 300px, bloqueo del emoji al tocar info, microsuperficie oscura, morph, y hero/saludo aprobados.
+- **Pendiente:** verificación visual en iPhone y confirmación del usuario; fuente pública sujeta a proceso de publicación Pages. No declarar aprobación del feed ni integración oficial todavía.
+
+**Al retomar otro chat:** no confundir de nuevo el pedido: se refiere **al color de cierre** (círculo cian X negra/oscura) y no a mover su posición. No devolverlo a círculo gris/transparente.
