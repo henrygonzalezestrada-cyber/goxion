@@ -7,11 +7,25 @@
 
 > **Leer esto primero en otra sesión.** En caso de contradicción entre textos antiguos de continuidad y este corte, este expediente es el **índice de estado e integración más reciente**. Para medidas y microcomportamientos, consultar los **contratos específicos enlazados abajo**; no reemplazarlos con resúmenes. Cada edición futura debe actualizar este expediente junto con su contrato de componente. No suponer que una captura de laboratorio prueba una conexión real.
 
+## Navegación V4 en laboratorio — cápsula centrada y sticky (última decisión, 22/nov/2026)
+
+Tras recuperar y probar la V3 anterior a Muse, el usuario optó por **simplificar la navegación** para reducir riesgos. **La V4 sustituye el traslado de la cápsula a la esquina**: conserva una única nav y los tres destinos estilo oficial, pero utiliza **`position: sticky` y centrado nativo** dentro del feed, compactando solo su tamaño y restaurándolo al deslizar de regreso. El encabezado con logo, campana y Goxy no se transforma en una barra adicional ni viaja a la esquina: **desaparece de la vista con el scroll normal**.
+
+**Laboratorio:** HTML `morph-v2.html` commit `cb19d3ab3750e9e8835fb33000cfdaf2b80ee48d`; CSS `adaptive-top-nav.css` commit `2e5007c1d804e8ba989f39447394429a0dbdc668`; JS `adaptive-top-nav.js` commit `876946a90b7e06fc892148203d334364143ad402`. **El nuevo contrato prevalente está en la sección 11 de** [`GOXION_NAV_SUPERIOR_ANALISIS_CONCEPTO_2026-11-22.md`](GOXION_NAV_SUPERIOR_ANALISIS_CONCEPTO_2026-11-22.md). Medidas: nav compacta 172×60 px (160×60 en <=320 px), targets redondos 46px (44px en <=320), cristal `rgba(8,8,12,.371)` con blur 11.75px; botones oficiales conservan el morph con etiqueta activa en expandida. Umbrales con histéresis, transición CSS que siempre completa su ciclo. No se mueve `scrollY` ni se reubica el elemento lateralmente.
+
+**Regresión:** 15 comprobaciones estáticas y 18 simulaciones de comportamiento satisfactorias. Smoke WebKit/Chromium actualizado, **no ejecutado**; pendiente evaluación visual en Safari físico. Ningún cambio en los módulos de Hero, Beneficios, Ahorro, Servicios, Historial, Catálogo ni archivos oficiales. Goxy y menú siguen simulados; personalización de color y foto persistente pendientes.
+
+**Vista V4:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=cb19d3a
+
+**Advertencia histórica:** los párrafos que siguen sobre V3, o sobre «una sola cápsula que se mueve a la esquina», documentan la decisión anterior y **NO son el diseño vigente**. No restaurarlos ni copiar el código de la V3 por error; guardar como respaldo únicamente.
+
+---
+
 ## Restauración de laboratorio tras cambio de Muse (22/nov/2026)
 
 **Estado vigente:** recuperada la V3 anterior al cambio no aprobado `c8f3efa0782b5cfe403cec90cbff75e05ebb9191`. Se restauraron **solo los tres archivos que Muse modificó** (`morph-v2.html`, `adaptive-top-nav.css`, `adaptive-top-nav.js`) desde el punto de control `27ecb20ef481503eaec3bacd9555e8d8c90a81a4`. El HTML tiene únicamente un ajuste posterior de `?v=restore-...` para evitar archivos antiguos en caché. **No hay cambios oficiales.** Mantener la cápsula V3 independiente, con **un solo movimiento y expansión al deslizar de vuelta**, Goxy y el Hero/beneficios tal cual estaban. No usar la «franja única» que introdujo Muse como referencia de diseño. Registro completo y SHAs: [contrato de navegación](GOXION_NAV_SUPERIOR_ANALISIS_CONCEPTO_2026-11-22.md).
 
-**URL para retomar:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=4efbd59
+**URL para retomar:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=cb19d3a
 
 ---
 
