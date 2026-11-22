@@ -7,6 +7,14 @@
 
 > **Leer esto primero en otra sesión.** En caso de contradicción entre textos antiguos de continuidad y este corte, este expediente es el **índice de estado e integración más reciente**. Para medidas y microcomportamientos, consultar los **contratos específicos enlazados abajo**; no reemplazarlos con resúmenes. Cada edición futura debe actualizar este expediente junto con su contrato de componente. No suponer que una captura de laboratorio prueba una conexión real.
 
+## Restauración de laboratorio tras cambio de Muse (22/nov/2026)
+
+**Estado vigente:** recuperada la V3 anterior al cambio no aprobado `c8f3efa0782b5cfe403cec90cbff75e05ebb9191`. Se restauraron **solo los tres archivos que Muse modificó** (`morph-v2.html`, `adaptive-top-nav.css`, `adaptive-top-nav.js`) desde el punto de control `27ecb20ef481503eaec3bacd9555e8d8c90a81a4`. El HTML tiene únicamente un ajuste posterior de `?v=restore-...` para evitar archivos antiguos en caché. **No hay cambios oficiales.** Mantener la cápsula V3 independiente, con **un solo movimiento y expansión al deslizar de vuelta**, Goxy y el Hero/beneficios tal cual estaban. No usar la «franja única» que introdujo Muse como referencia de diseño. Registro completo y SHAs: [contrato de navegación](GOXION_NAV_SUPERIOR_ANALISIS_CONCEPTO_2026-11-22.md).
+
+**URL para retomar:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=4efbd59
+
+---
+
 ## ÚLTIMO ESTADO de navegación · V3 (22/nov/2026)
 
 El usuario rechazó la V2 porque la cápsula se ocultaba y aparecía un dock diferente por encima. El nuevo requisito implementado en laboratorio es **un único elemento `#gxn-nav` que se desplaza y transforma en una sola interacción**, desde su posición debajo del encabezado hacia el hueco izquierdo del logo, desapareciendo este durante el mismo recorrido. Si el scroll se detiene a medias, **termina su ciclo sin mover `scrollY`**; al regresar hacia abajo se amplía en la esquina y vuelve a su posición original al llegar arriba. No volver a una animación de desaparición/reaparición.
@@ -17,7 +25,7 @@ El usuario rechazó la V2 porque la cápsula se ocultaba y aparecía un dock dif
 
 **Pruebas:** 12 estados simulados de scroll y layout pasaron, 4 scripts inline válidos, CSS sin reglas del dock anterior; browser smoke Chromium/WebKit actualizado pero todavía **NO ejecutado en navegador real**. Goxy y menús siguen siendo demostrativos. `ayuda.html` y handlers oficiales intactos. **No declarar QA visual o fluidez iPhone aprobados hasta revisar la V3 real.**
 
-**Vista de revisión:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=ab31bd8
+**Vista de revisión:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=4efbd59
 
 ---
 
