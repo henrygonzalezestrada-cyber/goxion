@@ -6,8 +6,8 @@
 
 ## Abrir primero al continuar en otro chat
 
-- **Laboratorio en GitHub Pages:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=50d71ec
-- **Fuente de la última iteración:** `preview/experiencia-mi-espacio-inteligente/morph-v2.html` en commit **`50d71ec3f6d64cc41ca31f4b1739e6bedd631315`**. Jerarquía de título y ubicación de X: `d04c58818d883bee63615584a302f0dd76699886`. Los cambios de botón SVG y microsuperficie provienen de `5b034547f69f0f00cf67046b97ea72c1a07afb98`.
+- **Laboratorio en GitHub Pages:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=8b85d9f
+- **Fuente de la última iteración:** `preview/experiencia-mi-espacio-inteligente/morph-v2.html` en commit **`8b85d9ff9ea81cf5aaea0d81cb6962b78311878c`**. Jerarquía de título y ubicación de X: `d04c58818d883bee63615584a302f0dd76699886`. Los cambios de botón SVG y microsuperficie provienen de `5b034547f69f0f00cf67046b97ea72c1a07afb98`.
 - **Documentación de la tarjeta principal congelada:** `docs/GOXION_MI_ESPACIO_HERO_APROBADA_2026-11-22.md`.
 - **Auditoría visual previa y principios aprendidos:** `docs/GOXION_AUDITORIA_BENEFICIOS_FEED_2026-11-22.md`.
 - **Rama que preserva la tarjeta principal aprobada:** `approved/mi-espacio-hero-compacta-centrada-20261122`, apuntando a `f33e8572c07377f4811080a87c7cb1b483983b34`. Se elimina únicamente el rótulo flotante «GOXION» rechazado, según la documentación del hero.
@@ -257,3 +257,17 @@ El usuario utilizó la barra y entregó exactamente: **«GOXION · X: círculo 3
 **URL anticaché:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=50d71ec
 
 Preservar 35/16px para nuevas tarjetas del laboratorio hasta petición explícita de cambio.
+
+## Pruebas de situaciones reales en Servicios · 22/nov/2026
+
+El usuario indicó que le gustó la UI contextual de Servicios pero no encontraba cómo probar avisos de cancelación, novedades de acceso, PIN y contraseña actualizada. El selector previo existía pero solo dentro de «Probar estados · Laboratorio», al final del feed, lejos de las tarjetas. **Se conservó íntegro el diseño principal de Servicios y se acercaron los controles de simulación a la sección.**
+
+- Laboratorio: `preview/experiencia-mi-espacio-inteligente/morph-v2.html`, commit `8b85d9ff9ea81cf5aaea0d81cb6962b78311878c`; enlace anticaché: https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=8b85d9f.
+- **Nuevo enlace discreto «Probar situaciones»** justo debajo de las tarjetas de `Tus servicios`. Abre un selector local de estados sin añadir otra tarjeta permanente a la UI; al elegir un escenario se actualizan las tarjetas, se abre automáticamente el servicio pertinente y se desplaza a él. Se conserva sincronizado el selector completo del panel inferior «Probar estados · Laboratorio».
+- Estados de cancelación según la fuente oficial `assets/js/ayuda/01e-client-dashboard.js`: `solicitada` («En revisión»), `aprobada` (todavía visible y pendiente de baja), `rechazada` (servicio activo, opción de nueva solicitud) y ejemplo de **baja efectiva** (solo Netflix sale de la lista). No representar autorización como baja efectiva ni retirar servicios antes de tiempo.
+- También se puede probar «Nueva contraseña» (solo aviso; en oficial se revela con el PIN de GOXION una sola vez), «PIN de perfil actualizado» (dato **ficticio** `6951`, distinto del PIN de GOXION; se revela mediante «Mostrar»), invitación pendiente, incidencia temporal, 0/1/2/4 servicios. El botón «Mostrar PIN» de demostración usa el mismo control de los accesos y se vuelve a ocultar al cerrar el servicio.
+- El laboratorio **no se conecta** a pagos, contraseñas ni solicitudes reales. La notificación automática por PIN de perfil actualizado es una idea visual en prueba, **no una función oficial confirmada**; la implementación productiva deberá consumir solo cambios reales de `accesos`/`novedades` y evitar inventar un aviso si no existe una señal confiable del backend. La contraseña nueva sigue el contrato oficial `credencial_pendiente` con verificación de PIN de Mi Espacio y una sola consulta.
+- La X confirmada por usuario permanece intacta: disco **35px** y símbolo **16px** en todas las tarjetas. No se modificó `ayuda.html`, Admin, Index ni backend.
+- QA: sintaxis JS correcta; 12 escenarios evaluados en prueba aislada del generador de datos, incluyendo aprobada visible, baja efectiva ausente y nuevo PIN en muestra; comprobación de selectores y controles únicos, estilos/scripts balanceados. Pendiente prueba táctil y visual Safari físico y validación de publicación Pages.
+
+**Cómo probar:** desplázate hasta Tus servicios → pulsa «Probar situaciones» debajo de la lista → elige «Cancelación solicitada», «aprobada», «no autorizada», «Baja efectiva», «PIN de perfil actualizado» o «Nueva contraseña». Comprueba cómo cambia Netflix (o YouTube para la invitación). Todos los datos son de muestra.
