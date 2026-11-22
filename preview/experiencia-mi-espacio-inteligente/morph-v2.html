@@ -748,6 +748,10 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
  }
  function reducedOrUnsupported(){return prefersReduced()||!Element.prototype.animate}
  function coordinates(rect){return {left:rect.left+'px',top:rect.top+'px',width:rect.width+'px',height:rect.height+'px'}}
+ function snapshotEmoji(element){
+  const rect=element.getBoundingClientRect();
+  return {rect,text:element.textContent};
+ }
  function animationFinished(animation){return animation?animation.finished.catch(()=>{}):Promise.resolve()}
  async function transition(sourceRect,targetRect,startEmoji,endEmoji,opening){
   if(reducedOrUnsupported())return;
@@ -758,11 +762,12 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
    surface.className='gxb-morph-surface';
    Object.assign(surface.style,coordinates(sourceRect),{borderRadius:opening?'20px':'26px'});
    document.body.appendChild(surface);
-   const from=startEmoji.getBoundingClientRect(),to=endEmoji.getBoundingClientRect();
+   // Geometry captured before either original surface is hidden.
+   const from=startEmoji.rect,to=endEmoji.rect;
    const emojiSize=Math.max(from.width,to.width,35);
    floating=document.createElement('span');
    floating.className='gxb-morph-emoji';
-   floating.textContent=startEmoji.textContent;
+   floating.textContent=startEmoji.text;
    floating.style.fontSize=emojiSize+'px';
    floating.style.left=(from.left+from.width/2)+'px';
    floating.style.top=(from.top+from.height/2)+'px';
@@ -777,7 +782,14 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
      {left:(to.left+to.width/2)+'px',top:(to.top+to.height/2)+'px',opacity:opening?.34:1,transform:'translate(-50%,-50%) rotate('+(opening?-12:-8)+'deg) scale('+(to.width/emojiSize)+')'}
    ],{duration:455,easing:'cubic-bezier(.22,.72,.18,1)',fill:'forwards'});
    animations.push(eAnim);
+   // The real surface fades in underneath the moving surface, never popping in at the end.
+   const realSurface=opening?panel:row;
+   const reveal=realSurface.animate([{opacity:0},{opacity:1}],{
+    duration:190,delay:255,easing:'ease-out',fill:'forwards'
+   });
+   animations.push(reveal);
    await Promise.all(animations.map(animationFinished));
+   realSurface.style.opacity='1';
   }finally{
    animations.forEach(a=>{try{a.cancel()}catch(_){}});
    if(surface)surface.remove();
@@ -800,7 +812,7 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
   const tile=sourceFor(key);if(!tile)return;
   busy=true;current=key;
   const sourceRect=tile.getBoundingClientRect();
-  const sourceEmoji=tile.querySelector('.gxb-emoji');
+  const sourceEmoji=snapshotEmoji(tile.querySelector('.gxb-emoji'));
   try{
    updatePanel(key);
    tiles.forEach(button=>button.setAttribute('aria-expanded',String(button===tile)));
@@ -809,15 +821,15 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
    panel.style.visibility='hidden';
    panel.style.opacity='0';
    const targetRect=panel.getBoundingClientRect();
-   const targetEmoji=expandedEmoji;
+   const targetEmoji=snapshotEmoji(expandedEmoji);
    if(!reducedOrUnsupported()){
     panel.style.visibility='visible'; // La superficie no aparece hasta completar el movimiento.
-    targetEmoji.style.visibility='hidden';
+    expandedEmoji.style.visibility='hidden';
     await transition(sourceRect,targetRect,sourceEmoji,targetEmoji,true);
    }
    panel.style.visibility='';
    panel.style.opacity='';
-   targetEmoji.style.visibility='';
+   expandedEmoji.style.visibility='';
    animateContent();
    close.focus({preventScroll:true});
   }catch(e){
@@ -834,15 +846,18 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
   const key=current;
   const tile=sourceFor(key);
   const sourceRect=panel.getBoundingClientRect();
-  const sourceEmoji=expandedEmoji;
+  const sourceEmoji=snapshotEmoji(expandedEmoji);
   try{
    // Se mide la fila de destino en su flujo real sin mostrar una segunda tarjeta.
    panel.hidden=true;
    row.hidden=false;
    row.style.visibility='hidden';
    const targetRect=tile.getBoundingClientRect();
-   const targetEmoji=tile.querySelector('.gxb-emoji');
+   const targetEmoji=snapshotEmoji(tile.querySelector('.gxb-emoji'));
+   row.style.visibility='';
+   row.style.opacity='0';
    if(!reducedOrUnsupported())await transition(sourceRect,targetRect,sourceEmoji,targetEmoji,false);
+   row.style.opacity='';
    row.style.visibility='';
    tiles.forEach(button=>button.setAttribute('aria-expanded','false'));
    current=null;
@@ -851,7 +866,7 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
    row.style.visibility='';
    row.hidden=false;panel.hidden=true;current=null;
   }finally{
-   row.style.visibility='';busy=false;
+   row.style.visibility='';row.style.opacity='';busy=false;
   }
  }
  tiles.forEach(tile=>tile.addEventListener('click',()=>open(tile.dataset.gxb)));
