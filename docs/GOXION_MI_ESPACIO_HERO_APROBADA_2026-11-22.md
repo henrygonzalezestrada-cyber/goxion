@@ -57,7 +57,31 @@
 - **Un único botón real**: `<button class="focus" id="focus">…</button>`; la cápsula `.focus-action` es un `span` visual dentro del botón, NO anidar un segundo botón.
 - Estados contextuales, prioridad y sus textos e iconos, incluyendo comprobante rechazado, pago incompleto, suspensión, vencido, revisión, prórroga, cancelación en proceso, doble fecha, próximo corte, al corriente y cliente nuevo.
 - Transiciones de mensaje e iconos y variación de acento cromático; animación respetuosa con `prefers-reduced-motion`.
-- Saludo con altura estable para evitar saltos cuando cambia entre frases.
+- Saludo superior y todas sus animaciones: **parte del conjunto visual aprobado**, no de una sección editable del feed. Los textos de la tarjeta y sus transiciones también quedan fijados.
+
+### Saludo superior aprobado — posición, frases y animación
+
+**Fuente de código exacta:** mismo commit inmutable `f33e8572c07377f4811080a87c7cb1b483983b34`, función `words(text,name)` y `updateGreeting(code)`, selectores `.greeting`, `.greeting h1`, `.greeting .word` y `.greeting .name`. Estas reglas se preservan durante la futura integración.
+
+- **Lugar:** por encima de la tarjeta y dentro del mismo bloque principal, **NO dentro del cristal**. Tiene su propio ritmo y espacio visual; no introducir un recuadro ni elementos decorativos alrededor.
+- **Reserva de altura estable:** `.greeting{height:clamp(106px,26vw,122px);display:flex;align-items:flex-end;padding:0 9px 19px;overflow:hidden}`. El `h1` usa `height:2.34em`, `line-height:1.17` y `text-wrap:balance` para reservar hasta dos líneas sin saltos al cambiar de frase.
+- **Tipografía:** Poppins, grosor 700, tamaño `clamp(26px,6vw,34px)`, `letter-spacing:-.045em`. El nombre tiene acento **cian `#42e4e8`**, no sustituirlo por otra pastilla o adorno.
+- **Móviles de hasta 380px:** área de saludo `height:112px;padding-bottom:17px`; fuente `clamp(24px,6.45vw,28px)`. Respetar el área disponible y la legibilidad.
+- **Frases en estados no urgentes:** «Hola, Mario», «Qué gusto, Mario» y «Bienvenido, Mario», rotando en ese orden **cada 13 segundos**. **Mario es nombre ficticio del laboratorio**: al integrar, usar el nombre real confirmado, escapado como texto seguro y sin incrustar la cadena «Mario».
+- **Estados urgentes:** `correction`, `incomplete`, `suspended`, `overdue` y `review` muestran **solo «Hola, Mario»** en la demo, sin alternancia festiva; el contenido crítico de la tarjeta tiene prioridad. Al cambiar de estado se cancela el intervalo previo (`clearInterval(greetTimer)`).
+- **Animación de entrada de cada palabra:** fragmentación del texto en spans `.word` preservando espacios; `translateY(70%)`, desenfoque inicial `blur(9px)`, `opacity:0` → posición original, `blur(0)` y `opacity:1`; duración **640ms**, escalonado **50ms por palabra** con tope **310ms**, `cubic-bezier(.16,1,.3,1)`. No cambiarlo por efecto de máquina de escribir, un fade genérico ni transiciones que muevan la tarjeta.
+- **Visibilidad y movimiento reducido:** en pestaña oculta no se actualiza la frase. Con `prefers-reduced-motion:reduce`, no se programa la rotación, no se animan las palabras y se muestra el saludo legible sin retrasos.
+- **Accesibilidad:** actualizar `aria-label` del saludo con la frase completa. Conservar espaciado semántico, la legibilidad y las opciones de movimiento reducido.
+
+### Textos e iconografía de la tarjeta — comportamiento fijado
+
+- **Título contextual:** transición definida por `transitionText(next)`: el texto anterior sale con desplazamiento `translateY(-17px)`, blur hasta 10px y opacidad 0 durante **370ms**, con clon temporal inaccesible para lectura; el nuevo aparece desde `translateY(24px)`, blur 12px, `clipPath` y opacidad progresiva durante **570ms**, con curva `cubic-bezier(.18,.85,.2,1)`. La copia antigua se limpia; no crear títulos duplicados permanentes.
+- **Icono:** conservar `setIcon(next)`, cambios de silueta mediante Morphicons si está disponible; mantener fallback SVG y entrada suave (480ms) si no carga. El color responde al estado, no es siempre verde.
+- **Transición breve de la tarjeta al cambiar de escenario:** escala **.993 → 1** y opacidad **.96 → 1** en **540ms**; no volver a implementar un carrusel entre tarjetas.
+- **Texto real:** estado principal, fecha/subtítulo y CTA se actualizan juntos desde la prioridad correspondiente; **no inventar datos financieros ni textos optimistas durante una incidencia**. Con movimiento reducido, no forzar estas animaciones.
+- **No confundir:** el saludo que rota arriba y el título de estado dentro del cristal son **dos animaciones distintas**, ambas aprobadas, con funciones y jerarquías diferentes.
+
+**Regla de continuidad:** el saludo y el texto contextual son parte de la identidad final aprobada. Ningún pulido del feed puede cambiar su altura, frases/criterio de prioridad, cadencia, posición o estilo de entrada sin nueva indicación explícita. Para integrar en producción, adaptar solo el nombre y los datos reales, conservando el comportamiento visual aprobado.
 - Los **12 escenarios del selector de pruebas** siguen siendo una demostración con datos simulados; la tarjeta del laboratorio NO consulta Supabase y NO realiza pagos.
 - Aprobación visual NO equivale a lógica financiera lista: en producción los datos deben proceder de los módulos oficiales de Ayuda/Index y su backend; no duplicar cálculos ni inventar cifras.
 
