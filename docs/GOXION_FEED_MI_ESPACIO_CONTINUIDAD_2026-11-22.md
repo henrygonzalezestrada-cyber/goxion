@@ -6,8 +6,8 @@
 
 ## Abrir primero al continuar en otro chat
 
-- **Laboratorio en GitHub Pages:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=24c0eca
-- **Fuente de la última iteración:** `preview/experiencia-mi-espacio-inteligente/morph-v2.html` en commit **`24c0eca8971e733270a06d35fa0cffa27163401e`**. Jerarquía de título y ubicación de X: `d04c58818d883bee63615584a302f0dd76699886`. Los cambios de botón SVG y microsuperficie provienen de `5b034547f69f0f00cf67046b97ea72c1a07afb98`.
+- **Laboratorio en GitHub Pages:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=22cf678
+- **Fuente de la última iteración:** `preview/experiencia-mi-espacio-inteligente/morph-v2.html` en commit **`22cf678200c163baf28d11d5b94434b58a6eceb2`**. Jerarquía de título y ubicación de X: `d04c58818d883bee63615584a302f0dd76699886`. Los cambios de botón SVG y microsuperficie provienen de `5b034547f69f0f00cf67046b97ea72c1a07afb98`.
 - **Documentación de la tarjeta principal congelada:** `docs/GOXION_MI_ESPACIO_HERO_APROBADA_2026-11-22.md`.
 - **Auditoría visual previa y principios aprendidos:** `docs/GOXION_AUDITORIA_BENEFICIOS_FEED_2026-11-22.md`.
 - **Rama que preserva la tarjeta principal aprobada:** `approved/mi-espacio-hero-compacta-centrada-20261122`, apuntando a `f33e8572c07377f4811080a87c7cb1b483983b34`. Se elimina únicamente el rótulo flotante «GOXION» rechazado, según la documentación del hero.
@@ -285,3 +285,28 @@ El usuario expresó conformidad con la jerarquía visual del área de Servicios 
 **Laboratorio para revisar:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=24c0eca
 
 **Próximo paso:** validar cromática/jerarquía con el usuario en iPhone; resolver y probar en la rama conectada controles de contraseñas de una sola vista, PIN protegido, notificaciones simultáneas, cancelaciones solicitadas/aprobadas/rechazadas y baja efectiva antes de publicar. Una vez resuelto, continuar con el siguiente módulo del feed sin alterar hero y saludo aprobados.
+
+## Corrección obligatoria de densidad y decoración · 22/nov/2026
+
+**Queja y criterio del usuario:** tras añadir los colores semánticos apareció una línea de color bajo el logo al expandir las tarjetas de Servicios, además de mucho texto duplicado en los contextos. Esto **es una regresión**, no un detalle 'premium'. El usuario pide criterio profesional y continuidad de las investigaciones/skills, no justificaciones ni asentir automáticamente.
+
+### Regla aprobada y no negociable para Servicios del feed
+
+1. **Prohibido añadir separadores, rayas/gradientes de estado bajo el logo o el encabezado, líneas de adorno, halos, marcos extra o superficies anidadas**. Los estados deben ser legibles sin decoración adicional. La regla se aplica al laboratorio y a su adaptación oficial futura.
+2. **El color semántico tiene una sola función:** identificar de un vistazo el estado mediante un punto y texto corto: verde activo, ámbar pendiente/actualización, naranja precaución, rojo problema. No colorear toda la tarjeta ni agregar acento adicional en cada sección.
+3. **Primera mirada:** logo + plataforma + estado + control de expandir/cerrar. **Detalle abierto:** una microsuperficie neutra solo cuando el contexto aporta una instrucción o consecuencia real, idealmente una frase breve (30–65 caracteres en el laboratorio), nunca un encabezado que repita el estado y otro párrafo que explique lo mismo.
+4. **Información secundaria bajo demanda** (`details/summary`), no otra caja de estado visible por defecto. Mantener PIN y contraseñas en sus flujos protegidos, no duplicar la información entre los bloques.
+5. **Material ya aprobado:** conservar el ADN de cristal neutro, los controles translúcidos sin brillos artificiales, las proporciones/márgenes y los cierres del círculo cian **35px** con glifo **16px** y área de toque de **44px**. El hero y saludo congelados no se tocan. No agregar cambios cosméticos no solicitados.
+6. Toda futura incorporación de UI en Servicios debe pasar esta pregunta: **¿es información o una acción que el cliente necesita?** Si es solo decoración, se omite. Evaluar también la densidad de texto en iPhone antes de dar por finalizado.
+
+### Corrección técnica aplicada
+
+- Laboratorio `preview/experiencia-mi-espacio-inteligente/morph-v2.html` en commits `13b5cd4727449af5f063694bf713a5351f57bd1c` y `22cf678200c163baf28d11d5b94434b58a6eceb2`.
+- Se eliminó íntegramente `.gxs-line` (el elemento del DOM, su estilo base y el gradiente semántico), **no se dejó una variante gris sustituta**. Se limpiaron los tokens de tintado ya sin uso.
+- Los estados de cancelación, credenciales, invitación e incidencia siguen funcionando; sus avisos dentro de la tarjeta se redujeron a un solo texto útil, en microsuperficie **neutra al 4.5%**. Segunda novedad queda tras `<details>` con etiqueta «1 novedad más», sin otra caja visible por defecto.
+- La rama de preparación de integración oficial `feature/mi-espacio-servicios-conectados-20261122` / PR borrador `#231` recibió también corrección para ocultar la línea `.gx-service-divider` dentro de `#view-dashboard`, y dejar sin líneas los avisos secundarios. **No fusionar ese PR** hasta validar el laboratorio y funcionalidad real.
+- Comprobación estática: todos los 3 scripts inline válidos; 11 escenarios ejecutados con el generador ficticio, avisos de 37–57 caracteres y novedad secundaria de 46 caracteres; ausencia total de la clase `gxs-line`; X 35/16 intacta. **No se verificó Safari visual/táctil** ni se modificó la producción oficial en `main`.
+
+**Laboratorio vigente (anticaché):** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=22cf678
+
+**Seguimiento:** aplicar esta regla a próximas iteraciones sin reintroducir líneas por estilo, sin ampliar copy por defecto y sin alterar conexiones originales.
