@@ -63,9 +63,11 @@
    dockSize='compact';
    top.dataset.size='compact';
    top.dataset.docked='true';
-   // One style flush only at a state boundary; none during regular scroll.
-   void top.offsetHeight;
-   requestAnimationFrame(()=>{if(docked)top.classList.add('gxn-visible')});
+   // Two paint frames let the detached surfaces enter smoothly without
+   // forcing synchronous layout (which caused a potential Safari hitch).
+   requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    if(docked)top.classList.add('gxn-visible');
+   }));
   }else{
    top.classList.remove('gxn-visible');
    top.dataset.docked='false';
