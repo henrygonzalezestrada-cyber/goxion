@@ -327,6 +327,11 @@
      if(serverState?.estado==="pendiente"&&token())postpone();
      checkbox.checked=false;feedback.textContent="";introError.textContent="";confirmError.textContent="";
      const previous=lastFocus;lastFocus=null;previous?.focus?.({preventScroll:true});
+     // La cola informativa continúa solo DESPUÉS de cerrar esta tarjeta.
+     // Nunca convierte un "Ahora no" en aceptación ni modifica la decisión.
+     window.dispatchEvent(new CustomEvent("goxion:legal-dismissed",{
+       detail:{estado:serverState?.estado||"sin_activar"}
+     }));
    });
    dialog={
      element:d,scroll,checkbox,accept,feedback,introError,confirmError,
@@ -356,6 +361,9 @@
    dlg.saveFocus();dlg.reset();dlg.element.showModal();
    // Intro deliberadamente compacto; el documento se muestra solo si el cliente lo solicita.
    dlg.setMode("intro");
+   window.dispatchEvent(new CustomEvent("goxion:legal-opened",{
+     detail:{estado:serverState?.estado||"sin_activar"}
+   }));
  }
  async function decide(value){
    if(busy)return;
@@ -443,7 +451,12 @@
    openNotification,
    refresh:()=>checkSession({force:true}),
    getState:()=>serverState?.estado||"sin_activar",
-   getAccessState:()=>serverState?.acceso||null
+   getAccessState:()=>serverState?.acceso||null,
+   getQueueStatus:()=>({
+     estado:serverState?.estado||"sin_activar",
+     deferido:remindAfter()>Date.now(),
+     modalAbierto:Boolean(dialog?.element.open)
+   })
  });
  window.addEventListener("goxion:client-ready",()=>void checkSession({force:true}));
  window.addEventListener("focus",()=>{if(!document.hidden)void checkSession({force:true});});
