@@ -137,7 +137,7 @@ current="casone";emit("goxion:client-ready");flush(2);
 assert.ok(!overlay.hidden,"Casone recibe novedades aunque ya vio la versión anterior");
 emit("goxion:client-logout");flush(1);
 assert.ok(overlay.hidden,"Cerrar sesión cierra el aviso");
-assert.ok(![...local.keys()].some(([k,v])=>k.endsWith(":casone")&&k.includes("v2")&&v==="1"),"Logout no marca vista la versión nueva");
+assert.ok(![...local.keys()].some(k=>k.endsWith(":casone")&&k.includes("v2-todos")),"Logout no marca vista la versión nueva");
 state={estado:"pendiente",deferido:false,modalAbierto:false};
 emit("goxion:client-ready");flush(2);
 assert.ok(overlay.hidden,"Términos obligatorios se priorizan");
