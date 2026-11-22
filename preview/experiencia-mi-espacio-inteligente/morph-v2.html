@@ -354,7 +354,7 @@ function render(scenario,first){
  transitionText(data.title);
  setIcon(data.icon);
  if(!first && !reduced() && card.animate){
-   card.animate([{transform:'scale(.984)',filter:'brightness(.87)'},{transform:'scale(1)',filter:'brightness(1)'}],
+   card.animate([{transform:'scale(.993)',opacity:.96},{transform:'scale(1)',opacity:1}],
     {duration:540,easing:'cubic-bezier(.2,.84,.2,1)'});
  }
  updateGreeting(code);
