@@ -78,6 +78,20 @@ Reubicar toda la cápsula expandida justo **sobre** el texto en el encabezado, d
 
 **Dictamen:** conceptualmente **sí es compatible** con el nuevo feed, pero **no realizar un simple shrink proporcional de todo el header** ni superponer otra barra. La diferencia de GOXION debe estar en la cápsula que cambia de geometría sin perder los tres destinos, la identidad cromática controlada y la conexión intacta, no en acumular capas de vidrio.
 
+## Restauración de V3 después de intervención no aprobada de Muse — 22/nov/2026
+
+**Decisión del usuario:** deshacer el «cochinero» introducido después de nuestra V3 y **dejar el laboratorio como nos quedamos**. El commit no aprobado de Muse fue `c8f3efa0782b5cfe403cec90cbff75e05ebb9191` («transform-only + franja única...», además de alteraciones fuera de navegación en Hero/beneficios). Se recuperó **exactamente** el contenido anterior al commit de Muse, correspondiente a `27ecb20ef481503eaec3bacd9555e8d8c90a81a4`, en:
+
+- `adaptive-top-nav.css`: contenido de referencia `901e5682e470e7d865aa03c681f03202cda49714`, restaurado con commit `c2c52989bdc561be23c7685e82b219d03bb1be74`.
+- `adaptive-top-nav.js`: contenido de referencia `582a993bdacc818e9fda40ab383f7a388cbcafc5`, restaurado con commit `9537d2f1e837484453c550f7826e606e310ee4bd`.
+- `morph-v2.html`: DOM, estilos de Hero/beneficios y guion del feed anteriores al commit de Muse; fuente `1035da02645e466f937774177fec225a2e9ef5b3`, restaurada con commit `ddd0f43a3520beb8f11e29f257d52946829d150d`. **Única diferencia intencional posterior:** parámetros de caché de nav CSS/JS renovados en commit `4efbd595470b8884a4f92c2ccda78e847486c5f8` para evitar servir la versión rota previamente cacheada.
+
+**Qué se prohibe repetir:** no introducir una `gxn-strip` que englobe la campana/Goxy, no cancelar la expansión del nav al deslizar de regreso, no quitar las cuadrículas adaptadas del Hero ni los materiales/animaciones de Beneficios. La V3 documentada a continuación es el estado válido para continuar. **No se ha modificado la página oficial** `ayuda.html` ni se considera aprobada aún la V3 mediante QA físico en iPhone.
+
+**Laboratorio restaurado:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=4efbd59
+
+---
+
 ## 10. Rediseño V3 tras video iPhone · UNA cápsula y un solo movimiento (22/nov/2026)
 
 **El usuario rechazó V2**, porque la cápsula desaparecía del flujo y otra presentación aparecía desde arriba. El video `ScreenRecording_11-22-2026 17-04-33_1.mp4` (~18.9 s) muestra exactamente esa discontinuidad, y cuando la animación quedaba a medias no terminaba asentándose. La indicación actual: la **misma cápsula** debe desplazarse de su ubicación debajo del encabezado hacia la **esquina superior izquierda donde estaba el logo**, encogerse allí, permanecer navegable con tres destinos, ampliarse cuando la persona desplaza de vuelta y terminar el ciclo cuando el dedo se detenga. No sacrificar márgenes ni dejar el saludo demasiado separado de la navegación.
