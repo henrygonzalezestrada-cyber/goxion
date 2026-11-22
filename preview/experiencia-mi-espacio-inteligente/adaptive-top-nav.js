@@ -119,10 +119,14 @@
   frame=0;
   const dt=lastTick?clamp(now-lastTick,0,100):16.7;
   lastTick=now;
-  const tau=now-lastScroll>SNAP_IDLE_MS?SETTLE_TAU:TAU;
-  const k=1-Math.exp(-dt/tau);
-  dock+= (dockGoal-dock)*k;
-  spread+=(spreadGoal-spread)*k;
+  if(motionReduced()){
+   dock=dockGoal;spread=spreadGoal;
+  }else{
+   const tau=now-lastScroll>SNAP_IDLE_MS?SETTLE_TAU:TAU;
+   const k=1-Math.exp(-dt/tau);
+   dock+= (dockGoal-dock)*k;
+   spread+=(spreadGoal-spread)*k;
+  }
   if(Math.abs(dockGoal-dock)<.002)dock=dockGoal;
   if(Math.abs(spreadGoal-spread)<.002)spread=spreadGoal;
   paint();
