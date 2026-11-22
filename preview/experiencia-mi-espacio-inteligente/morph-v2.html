@@ -1633,12 +1633,22 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
    const title=document.createElement('strong');title.textContent=entry.title;
    const sub=document.createElement('small');sub.textContent=formatDate(entry.date)+' · '+entry.subject;
    copy.append(title,sub);button.append(copy);
-   if(entry.amount){const value=document.createElement('strong');value.className='gxm-entry-value';value.textContent=entry.amount;button.append(value)}
+   const value=document.createElement('span');value.className='gxm-entry-value';value.textContent=entry.amount||'';
+   if(!entry.amount)value.setAttribute('aria-hidden','true');
+   button.append(value);
    const arrow=document.createElement('span');arrow.className='gxm-arrow';arrow.setAttribute('aria-hidden','true');
    arrow.innerHTML='<svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>';button.append(arrow);
    const detail=document.createElement('p');detail.id='gxm-detail-'+entry.id;detail.className='gxm-detail';
    detail.textContent=entry.detail;detail.hidden=openId!==entry.id;item.classList.toggle('is-open',!detail.hidden);
-   button.addEventListener('click',()=>{openId=openId===entry.id?null:entry.id;draw()});
+   button.addEventListener('click',()=>{
+    openId=openId===entry.id?null:entry.id;
+    list.querySelectorAll('.gxm-entry').forEach(node=>{
+     const open=node===item && openId===entry.id;
+     node.classList.toggle('is-open',open);
+     node.querySelector('.gxm-entry-button').setAttribute('aria-expanded',String(open));
+     node.querySelector('.gxm-detail').hidden=!open;
+    });
+   });
    item.append(button,detail);frag.append(item);
   }
   list.replaceChildren(frag);
