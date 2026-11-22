@@ -409,6 +409,12 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
 .gxs-empty strong{font-size:14px;font-weight:700}
 .gxs-empty span{font-size:11px;color:#b6c6d7;line-height:1.5}
 .gxs-lab-caption{font-size:10px;line-height:1.5;color:#8ba4b5;margin:11px 5px 0}
+.gxs-lab-trigger{border:0;background:transparent;padding:7px 2px;color:#83e0e9;font-size:10.5px;font-weight:650;text-decoration:underline;text-decoration-color:rgba(131,224,233,.38);text-underline-offset:3px}
+.gxs-lab-controls{display:grid;gap:7px;margin:7px 5px 12px;padding:0 0 6px;max-width:100%}
+.gxs-lab-controls label{color:#bed6e3;font-size:10.5px;font-weight:600}
+.gxs-lab-controls select{width:100%;min-width:0;min-height:44px;border:1px solid rgba(144,192,222,.22);background:rgba(16,25,41,.88);color:#eefaff;border-radius:13px;padding:0 12px;font-size:11.5px;font-family:inherit}
+.gxs-lab-controls small{color:#95afbf;font-size:10px;line-height:1.5}
+.gxs-lab-trigger:focus-visible,.gxs-lab-controls select:focus-visible{outline:2px solid #74e7f5;outline-offset:3px}
 .gxs-trigger:focus-visible,.gxs-pill:focus-visible,.gxs-ghost:focus-visible,.gxs-rowbutton:focus-visible,.gxs-more button:focus-visible{outline:2px solid #74e7f5;outline-offset:-3px}
 @media(max-width:380px){.gxs-trigger{grid-template-columns:43px minmax(0,1fr) 44px;gap:10px;padding:11px;min-height:75px}.gxs-logo{width:43px;height:43px}.gxs-name{font-size:13.5px}.gxs-body{padding:0 13px 15px}}
 @media(max-width:315px){.gxs-trigger{gap:8px}.gxs-name{font-size:12.5px}.gxs-header h2{font-size:16px}}
@@ -506,7 +512,25 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
 <section class="gxs-services" id="gxs-services" aria-labelledby="gxs-title">
  <header class="gxs-header"><h2 id="gxs-title">Tus servicios</h2><small id="gxs-count">4 plataformas</small></header>
  <div class="gxs-list" id="gxs-list" aria-label="Plataformas del cliente, demostración"></div>
- <p class="gxs-lab-caption">Accesos y gestiones ilustrativos · Sin cambios reales.</p>
+ <p class="gxs-lab-caption">Accesos y gestiones ilustrativos · <button type="button" id="gxs-lab-toggle" class="gxs-lab-trigger" aria-expanded="false" aria-controls="gxs-lab-controls">Probar situaciones</button></p>
+ <div class="gxs-lab-controls" id="gxs-lab-controls" hidden>
+  <label for="gxs-quick-case">¿Qué quieres ver en las tarjetas?</label>
+  <select id="gxs-quick-case" aria-label="Simular situación de los servicios">
+   <option value="all">Todos activos · muestra normal</option>
+   <option value="update">Nueva contraseña · Netflix</option>
+   <option value="pin-update">PIN de perfil actualizado · Netflix</option>
+   <option value="cancel">Cancelación solicitada · Netflix</option>
+   <option value="cancel-approved">Cancelación aprobada · Netflix</option>
+   <option value="cancel-rejected">Cancelación no autorizada · Netflix</option>
+   <option value="cancel-effective">Baja efectiva · Netflix desaparece</option>
+   <option value="invitation">Invitación pendiente · YouTube</option>
+   <option value="paused">Servicio temporalmente inactivo</option>
+   <option value="empty">Sin servicios</option>
+   <option value="one">Un servicio</option>
+   <option value="two">Dos servicios</option>
+  </select>
+  <small id="gxs-lab-outcome" aria-live="polite">Datos de muestra, sin cambios reales.</small>
+ </div>
 </section>
 
 <section class="gxc-section" aria-label="Tarjetas compactas de catálogo">
@@ -569,8 +593,12 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
  <option value="one">1 servicio</option>
  <option value="two">2 servicios</option>
  <option value="update">Nueva contraseña · Netflix</option>
+ <option value="pin-update">PIN de perfil actualizado · Netflix</option>
  <option value="invitation">Invitación pendiente · YouTube</option>
- <option value="cancel">Cancelación en revisión · Netflix</option>
+ <option value="cancel">Cancelación solicitada · Netflix</option>
+ <option value="cancel-approved">Cancelación aprobada · Netflix</option>
+ <option value="cancel-rejected">Cancelación no autorizada · Netflix</option>
+ <option value="cancel-effective">Baja efectiva · Netflix desaparece</option>
  <option value="paused">Servicio temporalmente inactivo</option>
  <option value="empty">Sin servicios</option>
 </select>
