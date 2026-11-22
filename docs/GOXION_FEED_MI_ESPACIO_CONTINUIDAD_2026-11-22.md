@@ -4,6 +4,16 @@
 **Estado:** laboratorio interactivo actualizado, pendiente de validación visual final en iPhone/Safari y de aprobación del usuario. **NO integrado en producción.**  
 **Repositorio:** `henrygonzalezestrada-cyber/goxion`.
 
+## Último diseño del encabezado · Navegación V3 continua (22/nov/2026)
+
+El usuario revisó el video `ScreenRecording_11-22-2026 17-04-33_1.mp4` y rechazó la interacción en dos etapas de la cápsula V2. V3 **mueve el mismo nodo** `#gxn-nav` continuamente de su posición bajo la cabecera a la esquina del logo, lo encoge, y le permite volver a ensancharse al regresar en scroll. El logo se retira dentro del mismo progreso; **la animación termina de asentarse si se suelta el gesto a la mitad**, sin modificar el scroll real de la página. El origen técnico es `assets/js/index/05-index-header-morph.js` (morph y spring de Index oficial); no se copió su scroll snap financiero.
+
+Archivos del laboratorio: HTML `morph-v2.html` commit **`ab31bd8e3e16cbb17756114e4f9dabe95431018c`**, CSS `adaptive-top-nav.css` commit `26eb0039433d60bcd920cd4892037d175e97bcab`, JS `adaptive-top-nav.js` commit `800e8f2136a74fba88d13ec132a69745040ccad6`. Referencia canónica: [`GOXION_NAV_SUPERIOR_ANALISIS_CONCEPTO_2026-11-22.md`, sección 10](GOXION_NAV_SUPERIOR_ANALISIS_CONCEPTO_2026-11-22.md). El margen entre nav inicial/saludo se redujo de 39px a 15px; marca Goxy conservada, color personalizable futuro sigue sin implementar. **No tocar todavía `ayuda.html` ni replicar handlers demo**.
+
+QA realizado: 12 pruebas dinámicas con DOM simulado, JS válido, tres destinos/una navegación, CSS responsive revisado incluyendo 280px; **pendiente Playwright y Safari reales**, no anunciar ausencia demostrada de tirones. Nuevo laboratorio: https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=ab31bd8
+
+---
+
 ## PUNTO DE REANUDACIÓN OBLIGATORIO — integración completa del feed
 
 **Documento maestro más reciente:** [`GOXION_MI_ESPACIO_INTEGRACION_MAESTRA_2026-11-22.md`](GOXION_MI_ESPACIO_INTEGRACION_MAESTRA_2026-11-22.md). Antes de trasladar a `ayuda.html` oficial todo lo experimentado en el laboratorio, leerlo junto a `AGENTS.md` y los contratos específicos. Incluye inventario de versiones, decisiones aprobadas, diferencias con producción, rutas de datos/handlers, riesgos, fuente faltante del Historial, condición de PR #231, plan coordinado de migración, QA y rollback.
