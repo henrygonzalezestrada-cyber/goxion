@@ -104,3 +104,13 @@ Se implementó una propuesta para comparar, **aún no aprobada**:
 **Validaciones hechas:** sintaxis de JavaScript, balance de llaves CSS, presencia de los 12 escenarios de la tarjeta, conservación literal de selectores y funciones fundamentales del hero/saludo, y publicación GitHub Pages exitosa para el commit. **No afirmar validación real en Safari/iPhone ni aprobación de diseño hasta recibir feedback del usuario.**
 
 La versión debe evaluarse particularmente en iPhone: apertura de cada módulo, cierre inverso, emoji compartido, scroll/posibles saltos al reflujo, estado listo y legibilidad. Si visualmente no supera a la oficial, NO integrar.
+
+## Iteración visual — emojis alineados y cristal restituido (pendiente de aprobación)
+
+- **Commit de laboratorio:** `4814c267ea20172b8651017675c25046ea690fa5`.
+- Las compactas bajan de `min-height:128px` a `110px` (con mínimos adaptativos para pantallas estrechas).
+- ⭐, 🎁 y 🎯 ahora comparten **la misma fila horizontal de 3/4, 1/3 o 2/3**, en lugar de ocupar una franja superior propia. El dato y los textos se dibujan por encima del emoji cuando se aproximan en anchos estrechos, preservando legibilidad.
+- Se conserva el preset de profundidad **Neutro 15% del regulador**, equivalente al material real `rgba(8,8,12,.371)` con `blur(11.75px)`. El panel ampliado dejó de tener un degradado opaco `rgba(...,.89/.79)`, y la superficie durante el morph utiliza ahora el mismo cristal.
+- El emoji del panel crece a `clamp(136px,38vw,165px)`, opacidad `.68` y queda integrado en **esquina inferior derecha**, con contenido/CTA por encima para evitar pérdidas de lectura.
+- Se conservan la transformación compartida entre compacta/extendida, saludo, tarjeta principal aprobada, los escenarios y las acciones demostrativas.
+- **Importante:** cambios experimentales de presentación, NO integrados en `ayuda.html`; pendientes de prueba visual en Safari móvil antes de dar el diseño por aprobado.
