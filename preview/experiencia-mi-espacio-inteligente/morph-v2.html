@@ -425,7 +425,7 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
 
 
 /* Historial de movimientos: hechos registrados, no otro panel de estados. */
-.gxm-history{margin:27px 2px 0;min-width:0}
+.gxm-history{margin:19px 2px 0;min-width:0}
 .gxm-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 4px 12px}
 .gxm-head h2{min-width:0;margin:0;color:#f5f9ff;font-size:17px;font-weight:700;letter-spacing:-.03em;line-height:1.25}
 .gxm-filter-toggle{min-height:44px;min-width:73px;display:flex;align-items:center;justify-content:flex-end;gap:5px;padding:8px 1px 8px 10px;color:#b6cad7;background:transparent;border:0;font:inherit;font-size:11px;font-weight:600;cursor:pointer}
@@ -436,7 +436,8 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
 .gxm-filters button{min-height:39px;border:1px solid rgba(219,236,253,.075);border-radius:999px;padding:8px 12px;background:rgba(255,255,255,.035);color:#b6c8d8;font:inherit;font-size:10.5px;font-weight:600;cursor:pointer}
 .gxm-filters button[aria-pressed="true"]{background:rgba(110,209,213,.13);border-color:rgba(110,209,213,.19);color:#96edf0}
 .gxm-list{overflow:hidden;border-radius:22px;min-height:72px}
-.gxm-entry+.gxm-entry{border-top:1px solid rgba(225,239,250,.07)}
+.gxm-entry{position:relative}
+.gxm-entry+.gxm-entry::before{content:"";position:absolute;top:0;left:59px;right:14px;height:1px;background:rgba(225,239,250,.07);pointer-events:none}
 .gxm-entry-button{display:grid;grid-template-columns:35px minmax(0,1fr) auto 16px;align-items:center;gap:10px;width:100%;min-height:76px;padding:13px 14px;border:0;background:transparent;text-align:left;color:#f4f8ff;font:inherit;cursor:pointer}
 .gxm-icon{display:grid;place-items:center;width:34px;height:34px;flex:0 0 34px;border-radius:12px;background:rgba(226,238,249,.045);color:#a8d4dd}
 .gxm-entry[data-kind="payment"] .gxm-icon{color:#8cdec1}
@@ -455,8 +456,8 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
 .gxm-empty{padding:20px 15px;font-size:11px;line-height:1.5;color:#b9cbd8}
 .gxm-footnote{font-size:9.5px;line-height:1.45;color:#89a0b0;margin:5px 5px 0}
 .gxm-filter-toggle:focus-visible,.gxm-filters button:focus-visible,.gxm-entry-button:focus-visible,.gxm-more:focus-visible{outline:2px solid #79e6fc;outline-offset:-3px;border-radius:9px}
-@media(max-width:380px){.gxm-head h2{font-size:16px}.gxm-entry-button{grid-template-columns:32px minmax(0,1fr) auto 14px;gap:8px;padding:11px 12px;min-height:72px}.gxm-icon{width:32px;height:32px}.gxm-entry-value{font-size:11.5px}.gxm-detail{margin-left:52px}}
-@media(max-width:315px){.gxm-head h2{font-size:15px}.gxm-entry-button{gap:6px;padding:10px}.gxm-entry-copy strong{font-size:11.5px}.gxm-entry-value{font-size:11px}}
+@media(max-width:380px){.gxm-head h2{font-size:16px}.gxm-entry-button{grid-template-columns:32px minmax(0,1fr) auto 14px;gap:8px;padding:11px 12px;min-height:72px}.gxm-entry+.gxm-entry::before{left:52px;right:12px}.gxm-icon{width:32px;height:32px}.gxm-entry-value{font-size:11.5px}.gxm-detail{margin-left:52px}}
+@media(max-width:315px){.gxm-head h2{font-size:15px}.gxm-entry-button{gap:6px;padding:10px}.gxm-entry+.gxm-entry::before{left:48px;right:10px}.gxm-entry-copy strong{font-size:11.5px}.gxm-entry-value{font-size:11px}}
 @media(prefers-reduced-motion:reduce){.gxm-filter-toggle svg,.gxm-arrow svg{transition:none!important}}
 
 .gxc-mini-rail{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:9px}
@@ -576,7 +577,7 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
 <section class="gxm-history" id="gxm-history" aria-labelledby="gxm-title">
  <header class="gxm-head">
   <h2 id="gxm-title">Historial de movimientos</h2>
-  <button class="gxm-filter-toggle" id="gxm-filter-toggle" type="button" aria-expanded="false" aria-controls="gxm-filters"><span id="gxm-filter-label">Todos</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+  <button class="gxm-filter-toggle" id="gxm-filter-toggle" type="button" aria-expanded="false" aria-controls="gxm-filters"><span id="gxm-filter-label">Filtrar</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
  </header>
  <div class="gxm-filters" id="gxm-filters" role="group" aria-label="Filtrar movimientos de ejemplo" hidden>
   <button type="button" data-gxm-filter="all" aria-pressed="true">Todos</button>
@@ -1600,12 +1601,12 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
  if(!root||!list||!filterToggle||!filterPanel||!filterLabel||!more)return;
  const records=[
   {id:'p-nov',kind:'payment',date:'2026-11-15',title:'Pago acreditado',subject:'Noviembre',amount:'$289',detail:'Pago en tiempo · Sumó a tu lealtad.'},
-  {id:'a-ms',kind:'acquisition',date:'2026-11-12',title:'Microsoft 365 agregado',subject:'Alta confirmada',detail:'Nuevo servicio incorporado a tu cuenta.'},
+  {id:'a-ms',kind:'acquisition',date:'2026-11-12',title:'Microsoft 365 agregado',subject:'',detail:'Nuevo servicio incorporado a tu cuenta.'},
   {id:'r-crunch',kind:'renewal',date:'2026-11-01',title:'Renovación confirmada',subject:'Crunchyroll',detail:'Nuevo periodo de cobertura confirmado.'},
   {id:'c-one',kind:'cancellation',date:'2026-10-28',title:'Baja efectiva',subject:'Google One',detail:'Servicio finalizado; se conserva su registro.'},
   {id:'c-request',kind:'cancellation',date:'2026-10-25',title:'Cancelación solicitada',subject:'Google One',detail:'Solicitud registrada antes de su baja efectiva.'},
   {id:'p-oct',kind:'payment',date:'2026-10-15',title:'Pago acreditado',subject:'Octubre',amount:'$249',detail:'Pago en tiempo · Sumó a tu lealtad.'},
-  {id:'a-netflix',kind:'acquisition',date:'2026-10-10',title:'Netflix agregado',subject:'Alta confirmada',detail:'Servicio incorporado a tu cuenta.'}
+  {id:'a-netflix',kind:'acquisition',date:'2026-10-10',title:'Netflix agregado',subject:'',detail:'Servicio incorporado a tu cuenta.'}
  ];
  const glyph={
   payment:'<path d="M5 12.5 10 17l9-10"/>',
@@ -1631,7 +1632,7 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
    button.append(iconFor(entry.kind));
    const copy=document.createElement('span');copy.className='gxm-entry-copy';
    const title=document.createElement('strong');title.textContent=entry.title;
-   const sub=document.createElement('small');sub.textContent=formatDate(entry.date)+' · '+entry.subject;
+   const sub=document.createElement('small');sub.textContent=formatDate(entry.date)+(entry.subject?' · '+entry.subject:'');
    copy.append(title,sub);button.append(copy);
    const value=document.createElement('span');value.className='gxm-entry-value';value.textContent=entry.amount||'';
    if(!entry.amount)value.setAttribute('aria-hidden','true');
@@ -1654,17 +1655,24 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
   list.replaceChildren(frag);
   if(!entries.length){const empty=document.createElement('p');empty.className='gxm-empty';empty.textContent='No hay movimientos de este tipo en la muestra.';list.append(empty)}
   more.hidden=entries.length<=3;
-  more.textContent=allVisible?'Mostrar menos':'Ver todos los movimientos';
+  more.textContent=allVisible?'Mostrar menos':'Ver '+Math.max(0,entries.length-3)+' movimientos más';
  }
- filterToggle.addEventListener('click',()=>{filterPanel.hidden=!filterPanel.hidden;filterToggle.setAttribute('aria-expanded',String(!filterPanel.hidden))});
+ function syncFilterControl(){
+  const opened=!filterPanel.hidden;
+  const selected=activeFilter==='payment'?'Pagos':activeFilter==='service'?'Servicios':'Todos';
+  filterLabel.textContent=opened?'Cerrar':(selected==='Todos'?'Filtrar':selected);
+  filterToggle.setAttribute('aria-expanded',String(opened));
+  filterToggle.setAttribute('aria-label',opened?'Cerrar filtros. Selección: '+selected:'Filtrar movimientos. Selección: '+selected);
+ }
+ filterToggle.addEventListener('click',()=>{filterPanel.hidden=!filterPanel.hidden;syncFilterControl()});
  filterPanel.addEventListener('click',event=>{
   const control=event.target.closest('[data-gxm-filter]');if(!control||!filterPanel.contains(control))return;
   activeFilter=control.dataset.gxmFilter;allVisible=false;openId=null;
-  filterLabel.textContent=activeFilter==='payment'?'Pagos':activeFilter==='service'?'Servicios':'Todos';
   filterPanel.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b===control)));
-  filterPanel.hidden=true;filterToggle.setAttribute('aria-expanded','false');filterToggle.focus({preventScroll:true});draw();
+  filterPanel.hidden=true;syncFilterControl();filterToggle.focus({preventScroll:true});draw();
  });
  more.addEventListener('click',()=>{allVisible=!allVisible;openId=null;draw()});
+ syncFilterControl();
  draw();
 })();
 </script>
