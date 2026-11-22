@@ -233,11 +233,25 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 .gxb-metric-head span{font-size:11px;color:#afbece}
 .gxb-metric-head strong{font-size:13px;font-weight:700;color:#eff9ff;font-variant-numeric:tabular-nums}
 .gxb-meter{height:6px;width:100%;border-radius:99px;background:rgba(231,246,255,.105);overflow:hidden}
-.gxb-meter > span{display:block;position:relative;height:100%;background:linear-gradient(90deg,#8461ee,#04dee8);border-radius:inherit;transform-origin:left}
+.gxb-meter > span{display:block;position:relative;height:100%;background:linear-gradient(90deg,#8461ee,#04dee8);border-radius:inherit;transform-origin:left;overflow:hidden}
+/* A restrained continuous sweep keeps expanded progress visibly alive. */
+.gxb-panel:not([hidden]) .gxb-meter>span::after{animation:gxbSweep 3.1s .65s ease-in-out infinite}
 .gxb-note{font-size:11px;line-height:1.55;color:#a5b7c6;margin:12px 0 0}
-.gxb-tasks{list-style:none;margin:0;padding:0}
+.gxb-tasks{list-style:none;margin:12px 0 0;padding:0}
 .gxb-tasks li{min-height:40px;display:flex;align-items:center;justify-content:space-between;gap:9px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.045);font-size:11.5px;color:#d8e2ed}
 .gxb-tasks li:last-child{border:0}
+.gxb-task-main{display:flex;align-items:center;gap:10px;min-width:0}
+.gxb-task-check{display:grid;place-items:center;flex:0 0 23px;width:23px;height:23px;border-radius:8px;border:1px solid rgba(99,232,213,.27);background:rgba(74,218,193,.11)}
+.gxb-task-check svg{width:17px;height:17px;fill:none;stroke:#79efdb;stroke-width:2.7;stroke-linecap:round;stroke-linejoin:round;overflow:visible}
+.gxb-task-check path{stroke-dasharray:27;stroke-dashoffset:0}
+.gxb-tasks li[data-status="pending"] .gxb-task-check{border-color:rgba(198,211,236,.19);background:rgba(169,186,215,.055)}
+.gxb-tasks li[data-status="pending"] .gxb-task-check path{opacity:0}
+.gxb-panel.gxb-task-checks-active li[data-status="done"] .gxb-task-check{animation:gxbCheckPop .56s cubic-bezier(.2,1.35,.32,1) both}
+.gxb-panel.gxb-task-checks-active li[data-status="done"] .gxb-task-check path{animation:gxbCheckDraw .52s cubic-bezier(.2,.8,.25,1) both}
+.gxb-panel.gxb-task-checks-active li:nth-child(2) .gxb-task-check,
+.gxb-panel.gxb-task-checks-active li:nth-child(2) .gxb-task-check path{animation-delay:.17s}
+@keyframes gxbCheckPop{0%{transform:scale(.65);opacity:.45}60%{transform:scale(1.09);opacity:1}100%{transform:scale(1);opacity:1}}
+@keyframes gxbCheckDraw{from{stroke-dashoffset:27}to{stroke-dashoffset:0}}
 .gxb-tasks small{font-size:10px;white-space:nowrap;color:#7ddacb}
 .gxb-tasks li[data-status="pending"] small{color:#cfbfdb}
 .gxb-foot{position:relative;z-index:2;display:flex;align-items:center;gap:12px;min-height:62px;margin-top:22px;padding-right:0}
@@ -287,7 +301,7 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 @media(prefers-reduced-motion:reduce){
  .gxb-tile,.gxb-mini-progress>span,.gxb-action,.gxb-rules,.gxb-rules::before,.gxb-dismiss::before{transition:none!important;animation:none!important}
  .gxb-tile:active{transform:none}
- .gxb-emoji,.gxb-mini-progress>span::after,.gxb-panel-emoji{animation:none!important}
+ .gxb-emoji,.gxb-mini-progress>span::after,.gxb-panel-emoji,.gxb-meter>span::after,.gxb-task-check,.gxb-task-check path{animation:none!important}
  .gxb-mini-progress>span{transform:none!important;will-change:auto}
 }
 .gxc-mini-rail{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:9px}
@@ -734,7 +748,7 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
   },
   mission:{
    kicker:'MISIONES',title:'Una misión pendiente',highlight:'pendiente',copy:'Has completado 2 de las 3 actividades.',
-   detail:'<ul class="gxb-tasks"><li><span>Explorar el catálogo</span><small>Hecha ✓</small></li><li><span>Compartir tu opinión</span><small>Hecha ✓</small></li><li data-status="pending"><span>Compartir GOXION</span><small>Pendiente</small></li></ul>',
+   detail:'<div class="gxb-metric-head"><span>Misiones completadas</span><strong>2 de 3</strong></div><div class="gxb-meter" role="progressbar" aria-label="Misiones completadas" aria-valuemin="0" aria-valuemax="3" aria-valuenow="2"><span style="width:66.67%"></span></div><ul class="gxb-tasks"><li data-status="done"><span class="gxb-task-main"><span class="gxb-task-check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg></span><span>Explorar el catálogo</span></span><small>Hecha</small></li><li data-status="done"><span class="gxb-task-main"><span class="gxb-task-check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg></span><span>Compartir tu opinión</span></span><small>Hecha</small></li><li data-status="pending"><span class="gxb-task-main"><span class="gxb-task-check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg></span><span>Compartir GOXION</span></span><small>Pendiente</small></li></ul>',
    action:'Ver última misión',terms:'Las tareas oficiales pueden implicar visitas, comentarios o acciones verificables. Aquí únicamente se representan visualmente.',emoji:'🎯'
   },
   missionReady:{
@@ -762,6 +776,7 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
   }
   panel.dataset.benefit=key;
   text('gxb-copy').textContent=d.copy;
+  panel.classList.remove('gxb-task-checks-active');
   text('gxb-content').innerHTML=d.detail; // Plantillas estáticas del laboratorio, sin valores externos.
   expandedEmoji.textContent=d.emoji;
   action.textContent=d.action;
@@ -826,6 +841,11 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
  function animateContent(){
   const nodes=[panel.querySelector('.gxb-head'),text('gxb-copy'),text('gxb-content'),panel.querySelector('.gxb-foot')];
   if(reducedOrUnsupported())return;
+  if(panel.querySelector('.gxb-tasks')){
+   panel.classList.remove('gxb-task-checks-active');
+   void panel.offsetWidth;
+   panel.classList.add('gxb-task-checks-active');
+  }
   nodes.forEach((node,index)=>{if(node)node.animate(
    [{opacity:0,transform:'translateY(9px)'},{opacity:1,transform:'translateY(0)'}],
    {duration:300,delay:45+index*27,easing:'cubic-bezier(.16,1,.3,1)'}
