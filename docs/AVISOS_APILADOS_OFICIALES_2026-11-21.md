@@ -33,6 +33,16 @@ Se conservó **sin rediseño** la tarjeta real y compacta de los Términos 2.0. 
 
 Los archivos `23-avisos-apilados-beta.js`, `goxion-avisos-apilados-beta.css` y `goxion-release-oct2026.css` se retiraron de Main tras la migración; el estilo anterior ya no se carga.
 
+## Corrección general de distribución · 21/11/2026
+
+Se detectó con Casone que el comprobador del módulo de novedades buscaba `window.globalClientesData`, pero el estado compartido real de Mi Espacio se declara como `let globalClientesData` en un script clásico. La propiedad `window.globalClientesData` no existe necesariamente y podía bloquear silenciosamente el aviso para cuentas reales.
+
+- El módulo oficial ahora consulta la variable compartida lexical y mantiene `window.globalClientesData` como alternativa de compatibilidad.
+- La versión de novedades subió a `nov2026-novedades-apiladas-v2-todos`. Así **todos los perfiles con sesión y acceso habilitado vuelven a verla una sola vez**, incluso si ya cerraron la versión anterior, sin limpiar ni modificar las marcas históricas de lectura.
+- Se actualizó el parámetro de caché de `ayuda.html` para Safari.
+- Se incorporó una regresión automatizada de Casone que simula la variable lexical global, la marca de lectura de V1 y el paso de términos a novedades tras aplazarlos.
+- Las cuentas cuyo acceso está restringido por rechazo continúan sujetas a los controles legales previamente aprobados, sin mostrarles promociones ni novedades comerciales.
+
 ## QA y alcance
 
 - Código JavaScript/CSS sintácticamente verificado y referencias a archivos oficiales comprobadas.
