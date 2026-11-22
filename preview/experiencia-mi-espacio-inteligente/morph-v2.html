@@ -177,9 +177,11 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 .gxb-unit{font-size:9px;color:#9dabb9;line-height:1.3;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
 .gxb-mini-progress{width:100%;height:4px;min-height:4px;flex:0 0 4px;overflow:hidden;border-radius:99px;background:rgba(241,247,255,.085);margin-top:8px}
 .gxb-mini-progress > span{display:block;position:relative;height:100%;width:var(--gxb-pct,0%);border-radius:inherit;background:linear-gradient(90deg,#7c4dff,#00e3eb);transform-origin:left center;transform:scaleX(0);will-change:transform}
-.gxb-wrap.is-visible .gxb-mini-progress > span{transform:scaleX(1);transition:transform .98s cubic-bezier(.16,1,.3,1)}
+.gxb-wrap.is-visible .gxb-mini-progress > span{transform:scaleX(1);transition:transform .98s cubic-bezier(.16,1,.3,1),width .65s cubic-bezier(.16,1,.3,1)}
 .gxb-mini-progress > span::after,.gxb-progress span::after{content:"";position:absolute;inset:0;width:45%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.57),transparent);opacity:0;transform:translateX(-130%);pointer-events:none}
 .gxb-wrap.is-visible .gxb-mini-progress > span::after{animation:gxbSweep 1.6s 1.03s cubic-bezier(.2,.7,.3,1) 1}
+.gxb-wrap.is-visible [data-gxb="referral"] .gxb-mini-progress > span::after{animation-delay:1.18s}
+.gxb-wrap.is-visible [data-gxb="mission"] .gxb-mini-progress > span::after{animation-delay:1.33s}
 @keyframes gxbSweep{0%{transform:translateX(-130%);opacity:0}20%{opacity:.86}80%{opacity:.58}100%{transform:translateX(300%);opacity:0}}
 .gxb-ready-caption{display:block;margin:1px 0 0;color:#91e0dd;font-size:9px;line-height:1.25;font-weight:600}
 .gxb-panel{position:relative;isolation:isolate;overflow:hidden;margin-top:9px;padding:20px 19px 17px;border-radius:22px;min-width:0}
@@ -624,6 +626,11 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
     void panel.offsetWidth;
     panel.classList.add('is-opening');
     if(panel.animate)panel.animate([{opacity:0,transform:'translateY(-9px) scale(.99)'},{opacity:1,transform:'translateY(0) scale(1)'}],{duration:380,easing:'cubic-bezier(.2,.82,.2,1)'});
+   }
+   if(!wasClosed){
+    for(const node of [panel.querySelector('.gxb-head'),panel.querySelector('.gxb-copy'),panel.querySelector('#gxb-content')]){
+     if(node&&node.animate)node.animate([{opacity:.55,transform:'translateY(5px)'},{opacity:1,transform:'translateY(0)'}],{duration:250,easing:'cubic-bezier(.2,.82,.2,1)'});
+    }
    }
    const progress=panel.querySelector('.gxb-progress span');
    if(progress&&progress.animate){
