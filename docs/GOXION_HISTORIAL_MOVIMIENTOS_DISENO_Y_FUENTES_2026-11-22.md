@@ -59,11 +59,27 @@ Se descartó la tarjeta separada «Próximos movimientos» porque repetiría lo 
 **Aplicado en el laboratorio** `preview/experiencia-mi-espacio-inteligente/morph-v2.html`, commit `5f78c8ed479c8ca7b926238c3853e0daa934ef78`:
 
 - El encabezado `gxm-head` es una retícula: título a la izquierda; botón de filtro a la derecha; opciones `Todos / Pagos / Servicios` **dentro del mismo encabezado** y ancladas a su margen izquierdo en iPhone. La fila de opciones está a solo 2px del eje vertical de cabecera; `gxm-head` reduce su margen inferior a 8px. En anchuras desde 680px los tres filtros pueden compartir línea con el título, sin forzar ese acomodo en un iPhone.
-- **Mismo control que Servicios (no un parecido aproximado):** se reutilizan las clases `.gxs-icon`, `.gxs-chevron`, `.gxs-x` de `gxs-services` para la flecha y X de filas y para el control que expande las opciones. En abierto, disco cian `#79e6fc` de **35px**, glifo oscuro de **16px**, área de interacción **44px**; en cerrado, una flecha discreta sin círculo cian. `aria-expanded` permanece en el botón del filtro y en cada fila, no se duplican acciones ni botones para abrir/cerrar.
+- **Mismo control que Servicios (no un parecido aproximado):** se reutilizan las clases `.gxs-icon`, `.gxs-chevron`, `.gxs-x` de `gxs-services` para la flecha y X de filas. **Nota posterior: el control superior de filtros ya NO usa flecha ni X; ver la revisión sin flecha más abajo**. En abierto, disco cian `#79e6fc` de **35px**, glifo oscuro de **16px**, área de interacción **44px**; en cerrado, una flecha discreta sin círculo cian. `aria-expanded` permanece en el botón del filtro y en cada fila, no se duplican acciones ni botones para abrir/cerrar.
 - Los botones de categoría comparten `background:rgba(255,255,255,.08)`, radio de cápsula y texto sobrio con los CTA de GOXION. El seleccionado usa un tinte cian de alfa `.145`, sin bordes brillantes, sombras nuevas ni superficies anidadas. El tamaño táctil es 44px y se conserva el foco visible.
 - Se preservaron cuatro scripts inline sin errores de sintaxis, balance de encabezados y secciones, filtro por categoría, textos, siete fixtures y detalles desplegables. Comparación del contenido fuera del bloque `gxm-*` con commit anterior `3e48c16a3a107e080891f70caabb77403d00f4ee`: **sin modificaciones a Hero, Lealtad, Referidos, Misiones, Ahorro, Servicios o Catálogo.**
 - **Pendiente:** inspección visual del resultado exacto en Safari/iPhone, especialmente a 280–315px y al combinar un importe largo con el objetivo táctil de 44px. No se modificó `ayuda.html`, no hay datos reales en la simulación ni fusión de PR #231.
 
+## Revisión de filtro sin flecha, y unificación real de tamaño (22/nov/2026)
+
+El usuario aportó el video `ScreenRecording_11-22-2026 15-57-59_1.mp4` y distinguió dos necesidades: **no repetir una flecha/X en el filtro** y **unificar el tamaño y geometría de las flechas de cada movimiento con Servicios**.
+
+**Hallazgo del análisis visual y CSS:** ambos módulos ya tenían control de 44×44px, flecha CSS de 14px y glifo X de 16px, pero el path SVG era diferente. Servicios usaba `m5 9 7 7 7-7` y el Historial `m6 9 6 6 6-6`; en pantalla el dibujo y su proporción se percibían distintos.
+
+**Aplicado exclusivamente al laboratorio**, commit `37388f559cad5f7c78d2a753ec515fd141ae0c93`:
+
+- Botón superior de filtro: **una sola píldora de cristal con fondo de 8% blanco** y pequeño icono estático de tres líneas de filtrado (14px), **sin chevron ni X**. Toda la píldora es táctil con un mínimo de 44px.
+- Etiqueta dinámica: `Filtrar` si el filtro es Todos; `Pagos` / `Servicios` si está filtrado. **Se conserva la etiqueta al abrir el selector**, sin cambiar a `Cerrar` en el texto visual. La acción de cerrar está en la misma píldora con `aria-label` contextual, el panel mantiene `aria-expanded` y las opciones siguen su flujo.
+- Filtro distinto de Todos: fondo cian tenue `rgba(110,209,213,.135)` sin borde, glow ni otro encapsulado; al volver a Todos recupera el cristal 8%. No se requieren más adornos.
+- Los chevrons de las **filas del Historial** sí continúan convirtiéndose en la X cian común (disco 35px, X 16px, área 44px). Se igualó el **path exacto del chevron y la X** con los de Servicios (`gxs-services`), sin cambiar el dibujo, control o comportamiento de Servicios.
+- Revisado el video, el material aprobado y el componente `gxs-icon`. No tocar beneficios, ahorro, hero, catálogo, tarjetas de Servicios o los divisores de filas del Historial.
+- QA estático: cuatro scripts válidos, balance de encabezados, marcadores y estilos; se comprobó por comparación que fuera de `gxm-*` el documento visual está idéntico al commit previo. **Ocho escenarios de interacción** con DOM simulado (abrir, cerrar, escoger Pagos/Servicios, mostrar más, expandir movimiento, restaurar Todos). No sustituye renderizado final en Safari.
+
+**Prioridad documental:** este bloque **reemplaza únicamente** la afirmación anterior de que también el botón del filtro debe usar la X cian. La X común sigue siendo obligatoria en las **filas desplegables**, no en el control de filtrado. No generalizar esta elección a los controles de otros módulos.
 ## Calidad, migración y guardas
 
 1. Validar con el usuario el concepto visual en Safari real antes de considerar aprobación.
