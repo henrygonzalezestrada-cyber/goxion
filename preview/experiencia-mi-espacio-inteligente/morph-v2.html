@@ -136,9 +136,6 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 .focus[data-material="neutral"]:not([data-glass="off"]){background:rgba(8,8,12,var(--neutral-alpha,.34))!important;border:1px solid rgba(255,255,255,.035);box-shadow:0 15px 36px rgba(0,0,0,.23),inset 0 1px rgba(255,255,255,.05);-webkit-backdrop-filter:blur(var(--neutral-blur,10.3px)) saturate(1)!important;backdrop-filter:blur(var(--neutral-blur,10.3px)) saturate(1)!important}
 .focus[data-material="neutral"]::before{opacity:.06}
 .focus[data-material="neutral"]::after{opacity:.35}
-.after{margin:54px 6px 0}
-.after h2{font-size:14px;font-weight:700;letter-spacing:-.01em;margin:0 0 6px}
-.after p{font-size:11px;color:#8c9caf;margin:0}
 .demo-toggle{position:relative;display:block;margin:35px auto 8px;border:1px solid rgba(107,209,222,.18);background:rgba(8,18,29,.78);color:#d5eaf3;border-radius:25px;min-height:44px;padding:0 20px;white-space:nowrap;font-size:11px;font-weight:600;backdrop-filter:blur(12px)}
 .demo-panel{position:fixed;z-index:20;left:50%;top:calc(12px + env(safe-area-inset-top,0px));bottom:calc(12px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(370px,calc(100vw - 24px));max-height:none;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;touch-action:pan-y;padding:19px 19px 28px;border:1px solid rgba(147,175,210,.2);border-radius:23px;background:rgba(12,17,32,.98);box-shadow:0 26px 70px rgba(0,0,0,.5);backdrop-filter:blur(23px);-webkit-backdrop-filter:blur(23px)}
 html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
@@ -343,7 +340,7 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
 .gxv-amount[data-long="true"]{font-size:clamp(27px,7.3vw,42px)}
 .gxv-meaning{display:block;margin-top:4px;font-size:clamp(11.5px,2.8vw,13px);font-weight:600;line-height:1.4;color:#d4e4ed}
 .gxv-context{display:block;max-width:100%;margin-top:10px;font-size:10.5px;line-height:1.44;color:#b2c6d3}
-.gxv-savings + .after{margin-top:18px}
+.gxv-savings + .gxs-services{margin-top:18px}
 @keyframes gxvHover{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(0,var(--float),0) scale(1.012)}}
 .gxv-savings.is-visible:not([data-motion-paused="true"]) .gxv-slot{animation:gxvHover var(--duration) ease-in-out infinite;animation-delay:var(--delay,0s)}
 .gxv-slot:nth-child(1){--delay:-1.2s}
@@ -353,6 +350,65 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
 @media(max-width:380px){.gxv-savings{min-height:164px;padding:13px 12px 13px 14px;border-radius:23px}.gxv-logos{height:137px}.gxv-context{font-size:10.5px}}
 @media(max-width:315px){.gxv-savings{grid-template-columns:minmax(90px,41%) minmax(0,1fr);gap:7px;padding:12px 9px 12px 11px}.gxv-amount{font-size:34px}.gxv-amount[data-long="true"]{font-size:27px}.gxv-context{font-size:10px}}
 @media(prefers-reduced-motion:reduce){.gxv-slot{animation:none!important;transform:none!important}}
+
+
+/* Tus servicios: una superficie por servicio, sin cristales ni encabezados redundantes. */
+.gxs-services{margin:18px 2px 0;min-width:0}
+.gxs-header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 4px 12px}
+.gxs-header h2{margin:0;color:#f5f9ff;font-size:17px;font-weight:700;letter-spacing:-.03em}
+.gxs-header small{color:#a8bdcc;font-size:10.5px;font-weight:500;white-space:nowrap}
+.gxs-list{display:grid;grid-template-columns:minmax(0,1fr);gap:9px}
+.gxs-card{min-width:0;overflow:hidden;border-radius:22px;transition:background-color .3s,border-color .3s,box-shadow .3s}
+.gxs-card.is-open{border-color:rgba(166,226,240,.11);box-shadow:0 15px 35px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.055)}
+.gxs-trigger{display:grid;grid-template-columns:47px minmax(0,1fr) 44px;align-items:center;gap:12px;width:100%;min-height:78px;padding:12px 13px;border:0;background:transparent;color:#f4f9ff;text-align:left;cursor:pointer}
+.gxs-logo{width:47px;height:47px;display:block;object-fit:cover;border-radius:13px;background:rgba(255,255,255,.04);filter:drop-shadow(0 5px 9px rgba(0,0,0,.25))}
+.gxs-summary{display:grid;min-width:0;gap:5px}
+.gxs-name{font-size:14px;font-weight:700;letter-spacing:-.014em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gxs-status{display:inline-flex;align-items:center;gap:7px;color:#bccedf;font-size:10.5px;font-weight:500;line-height:1.4}
+.gxs-status:before{content:"";width:5px;height:5px;flex:0 0 5px;border-radius:50%;background:#6acfb9}
+.gxs-card[data-tone="pending"] .gxs-status:before{background:#bac5e3}
+.gxs-card[data-tone="notice"] .gxs-status:before{background:#73dce9}
+.gxs-card[data-tone="attention"] .gxs-status:before{background:#ecb68a}
+.gxs-icon{display:grid;place-items:center;width:44px;height:44px;justify-self:end;border-radius:50%;color:#b3c9d9;transition:background-color .25s,color .25s}
+.gxs-icon svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.gxs-icon .gxs-x{display:none}
+.gxs-card.is-open .gxs-icon{background:#79e6fc;color:#071c29}
+.gxs-card.is-open .gxs-icon .gxs-chevron{display:none}
+.gxs-card.is-open .gxs-icon .gxs-x{display:block;stroke-width:2.5}
+.gxs-reveal{display:grid;grid-template-rows:0fr;transition:grid-template-rows .46s cubic-bezier(.22,.82,.24,1)}
+.gxs-card.is-open .gxs-reveal{grid-template-rows:1fr}
+.gxs-reveal-inner{min-height:0;overflow:hidden;visibility:hidden;transition:visibility 0s .46s}
+.gxs-card.is-open .gxs-reveal-inner{visibility:visible;transition:visibility 0s}
+.gxs-body{padding:0 16px 17px;opacity:0;transform:translateY(-6px);transition:opacity .27s,transform .4s}
+.gxs-card.is-open .gxs-body{opacity:1;transform:translateY(0);transition-delay:.07s}
+.gxs-line{height:1px;margin-bottom:14px;background:linear-gradient(90deg,rgba(210,234,249,.12),rgba(210,234,249,.025) 85%,transparent)}
+.gxs-subtitle{font-size:12px;font-weight:650;color:#e2edf6;margin:0 0 7px}
+.gxs-accessrow{display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0;padding:10px 0}
+.gxs-accessrow+.gxs-accessrow{border-top:1px solid rgba(221,236,252,.065)}
+.gxs-copy{display:grid;min-width:0;gap:3px}
+.gxs-copy small{color:#a6b8c9;font-size:10px}
+.gxs-copy strong{font-weight:550;font-size:12px;line-height:1.4;color:#f4f8ff;overflow-wrap:anywhere}
+.gxs-rowbutton{flex:0 0 auto;border:0;background:transparent;color:#7edce6;font-size:11px;font-weight:600;min-width:47px;min-height:37px;padding:5px 0}
+.gxs-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:13px}
+.gxs-pill{min-height:38px;padding:9px 15px;border:0;border-radius:999px;background:rgba(255,255,255,.08);color:#7ee1e7;font-size:11px;font-weight:600}
+.gxs-ghost{min-height:38px;padding:8px 4px;background:transparent;border:0;color:#c1cfe0;font-size:11px;font-weight:600}
+.gxs-notice{display:grid;gap:3px;padding:12px 13px;margin:0 0 12px;border-radius:14px;background:rgba(14,25,37,.66)}
+.gxs-notice[data-tone="attention"]{background:rgba(68,41,33,.24)}
+.gxs-notice strong{font-size:12px;line-height:1.45;color:#e5f1fb}
+.gxs-notice span{font-size:10.5px;line-height:1.48;color:#b8c9d7}
+.gxs-more[hidden]{display:none!important}
+.gxs-more{display:grid;margin-top:11px;padding-top:8px;border-top:1px solid rgba(219,238,253,.065)}
+.gxs-more button{min-height:42px;padding:9px 0;text-align:left;border:0;background:transparent;color:#bfd0df;font-size:11px}
+.gxs-feedback{display:block;margin-top:9px;font-size:10.5px;line-height:1.5;color:#7cdbd4}
+.gxs-feedback:empty{display:none}
+.gxs-empty{padding:22px 18px;display:grid;gap:6px;border-radius:22px}
+.gxs-empty strong{font-size:14px;font-weight:700}
+.gxs-empty span{font-size:11px;color:#b6c6d7;line-height:1.5}
+.gxs-lab-caption{font-size:10px;line-height:1.5;color:#8ba4b5;margin:11px 5px 0}
+.gxs-trigger:focus-visible,.gxs-pill:focus-visible,.gxs-ghost:focus-visible,.gxs-rowbutton:focus-visible,.gxs-more button:focus-visible{outline:2px solid #74e7f5;outline-offset:-3px}
+@media(max-width:380px){.gxs-trigger{grid-template-columns:43px minmax(0,1fr) 44px;gap:10px;padding:11px;min-height:75px}.gxs-logo{width:43px;height:43px}.gxs-name{font-size:13.5px}.gxs-body{padding:0 13px 15px}}
+@media(max-width:315px){.gxs-trigger{gap:8px}.gxs-name{font-size:12.5px}.gxs-header h2{font-size:16px}}
+@media(prefers-reduced-motion:reduce){.gxs-card,.gxs-icon,.gxs-reveal,.gxs-reveal-inner,.gxs-body{animation:none!important;transition:none!important;transform:none!important}}
 
 .gxc-mini-rail{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:9px}
 .gxc-mini{position:relative;display:grid;grid-template-columns:35px minmax(0,1fr) 16px;gap:9px;align-items:center;padding:10px 9px;min-width:0;min-height:76px;border-radius:16px;text-align:left}
@@ -442,7 +498,11 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
   <span class="gxv-context" id="gxv-context">Ejemplo · 4 plataformas</span>
  </div>
 </section>
-<div class="after"><h2>Tus servicios</h2><p>Consulta tus accesos, beneficios y solicitudes.</p></div>
+<section class="gxs-services" id="gxs-services" aria-labelledby="gxs-title">
+ <header class="gxs-header"><h2 id="gxs-title">Tus servicios</h2><small id="gxs-count">4 plataformas</small></header>
+ <div class="gxs-list" id="gxs-list" aria-label="Plataformas del cliente, demostración"></div>
+ <p class="gxs-lab-caption">Accesos y gestiones ilustrativos · Sin cambios reales.</p>
+</section>
 
 <section class="gxc-section" aria-label="Tarjetas compactas de catálogo">
  <header class="gxc-heading"><h2>Catálogo</h2><small>Muestras compactas</small></header>
@@ -496,6 +556,18 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
  <option value="6">6 plataformas</option>
  <option value="7">7 plataformas</option>
 </select>
+<label class="hint" for="gxs-demo-case">Estado de Tus servicios</label>
+<select id="gxs-demo-case" aria-label="Probar escenarios de Tus servicios">
+ <option value="all">4 servicios activos</option>
+ <option value="one">1 servicio</option>
+ <option value="two">2 servicios</option>
+ <option value="update">Nueva contraseña · Netflix</option>
+ <option value="invitation">Invitación pendiente · YouTube</option>
+ <option value="cancel">Cancelación en revisión · Netflix</option>
+ <option value="paused">Servicio temporalmente inactivo</option>
+ <option value="empty">Sin servicios</option>
+</select>
+<span class="testcase">Toca un servicio para explorar sus accesos y acciones. Todo es de muestra.</span>
 <label class="hint" for="gxv-demo-brand">Plataforma protagonista</label>
 <select id="gxv-demo-brand" aria-label="Cambiar la plataforma protagonista">
  <option value="0">Netflix</option>
@@ -1204,6 +1276,153 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
    if(!visible){stop();currentValue=targetValue;show(targetValue)}
   },{threshold:.14}).observe(card);
  }else {card.classList.add('is-visible');seen=true;animateTo(targetValue,true)}
+})();
+</script>
+
+<script>
+/* GOXION Mi Espacio · Servicios de laboratorio. Sin conectar datos reales ni abrir gestiones.
+   Contrato para integración futura: mantener gxToggleServiceCard, gxServiceView,
+   acceso verificado (incluido PIN), soporte, credencial de una sola vista y cancelación. */
+(function(){
+ 'use strict';
+ const root=document.getElementById('gxs-services'),list=document.getElementById('gxs-list');
+ const select=document.getElementById('gxs-demo-case'),counter=document.getElementById('gxs-count');
+ if(!root||!list||!select||!counter)return;
+ const safe=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+ const originals=[
+  {id:'netflix',name:'Netflix',logo:'../../logos/netflix.PNG',status:'Activo',tone:'active',kind:'profile',email:'mario@example.com',profile:'Perfil 02',pin:'4826'},
+  {id:'youtube',name:'YouTube Premium',logo:'../../logos/youtube.PNG',status:'Activo',tone:'active',kind:'invitation',email:'mario@example.com',invite:'Invitación activa'},
+  {id:'microsoft',name:'Microsoft 365',logo:'../../logos/microsoft.PNG',status:'Activo',tone:'active',kind:'invitation',email:'mario@example.com',invite:'Invitación activa'},
+  {id:'max',name:'Max',logo:'../../logos/hbo-max.PNG',status:'Activo',tone:'active',kind:'profile',email:'mario@example.com',profile:'Perfil 01',pin:'3648'}
+ ];
+ function scenario(mode){
+  const copy=originals.map(entry=>({...entry}));
+  if(mode==='empty')return [];
+  if(mode==='one')return copy.slice(0,1);
+  if(mode==='two')return copy.slice(0,2);
+  const service=copy[0];
+  if(mode==='update'){
+   service.status='Nueva contraseña';service.tone='notice';
+   service.callout={type:'notice',title:'Actualización disponible',body:'Tienes una nueva contraseña. Para consultarla en GOXION se requiere tu PIN y solo puede verse una vez.'};
+   service.primary='Revisar actualización';service.primaryAction='credential';
+  }else if(mode==='cancel'){
+   service.status='Cancelación en revisión';service.tone='pending';
+   service.callout={type:'notice',title:'Solicitud recibida',body:'El servicio continúa activo mientras GOXION revisa la baja. No necesitas volver a solicitarla.'};
+   service.primary='Ver cancelación';service.primaryAction='cancellation';
+  }else if(mode==='paused'){
+   service.status='Temporalmente inactivo';service.tone='attention';
+   service.callout={type:'attention',title:'Servicio con incidencia',body:'Consulta el motivo confirmado y comunícate con soporte si necesitas asistencia.'};
+   service.primary='Consultar soporte';service.primaryAction='support';
+  }else if(mode==='invitation'){
+   copy[1].status='Invitación pendiente';copy[1].tone='pending';copy[1].invite='Invitación enviada';
+   copy[1].callout={type:'notice',title:'Invitación pendiente',body:'La invitación fue enviada. Completa la activación desde tu correo cuando esté disponible.'};
+   copy[1].primary='Ver invitación';copy[1].primaryAction='invitation';
+  }
+  return copy;
+ }
+ function row(label,value,action='',data=''){
+  return '<div class="gxs-accessrow"><span class="gxs-copy"><small>'+safe(label)+'</small><strong data-gxs-value="'+safe(data)+'">'+safe(value)+'</strong></span>'+
+   (action?'<button type="button" class="gxs-rowbutton" data-gxs-action="'+safe(action)+'" aria-label="'+safe(action==='pin'?'Mostrar PIN de ejemplo':'Copiar correo de ejemplo')+'">'+(action==='pin'?'Mostrar':'Copiar')+'</button>':'')+'</div>';
+ }
+ function renderCard(service){
+  const el=document.createElement('article');
+  el.className='gxs-card gxc-surface';el.dataset.service=service.id;el.dataset.tone=service.tone;
+  const details=service.kind==='invitation'
+   ? row('Correo personal',service.email,'copy',service.email)+row('Estado',service.invite)
+   : row('Correo',service.email,'copy',service.email)+row('Perfil',service.profile)+row('PIN de perfil','••••','pin',service.pin);
+  const callout=service.callout
+   ? '<div class="gxs-notice" data-tone="'+safe(service.callout.type)+'"><strong>'+safe(service.callout.title)+'</strong><span>'+safe(service.callout.body)+'</span></div>'
+   : '';
+  const label=service.name+' · '+service.status;
+  el.innerHTML=
+   '<button class="gxs-trigger" type="button" aria-expanded="false" aria-controls="gxs-detail-'+safe(service.id)+'" data-gxs-toggle="'+safe(service.id)+'" aria-label="'+safe(label)+', abrir detalles">'+
+   '<img class="gxs-logo" alt="" src="'+safe(service.logo)+'" decoding="async" loading="lazy">'+
+   '<span class="gxs-summary"><strong class="gxs-name">'+safe(service.name)+'</strong><span class="gxs-status">'+safe(service.status)+'</span></span>'+
+   '<span class="gxs-icon" aria-hidden="true"><svg class="gxs-chevron" viewBox="0 0 24 24"><path d="m5 9 7 7 7-7"/></svg><svg class="gxs-x" viewBox="0 0 24 24"><path d="M6 6 18 18M18 6 6 18"/></svg></span></button>'+
+   '<div class="gxs-reveal" id="gxs-detail-'+safe(service.id)+'"><div class="gxs-reveal-inner" inert aria-hidden="true"><div class="gxs-body">'+
+   '<div class="gxs-line"></div>'+callout+
+   '<div class="gxs-subtitle">'+(service.kind==='invitation'?'Tu invitación':'Tus accesos')+'</div>'+
+   '<div class="gxs-accesslist">'+details+'</div>'+
+   '<div class="gxs-actions"><button type="button" class="gxs-pill" data-gxs-action="'+safe(service.primaryAction||'options')+'">'+safe(service.primary||'Más opciones')+'</button>'+
+   '<button type="button" class="gxs-ghost" data-gxs-action="support">Soporte</button></div>'+
+   '<div class="gxs-more" hidden><button type="button" data-gxs-action="cancel">Gestionar cancelación</button></div>'+
+   '<span class="gxs-feedback" role="status" aria-live="polite"></span></div></div></div>';
+  return el;
+ }
+ function closeAll(exceptId){
+  list.querySelectorAll('.gxs-card').forEach(card=>{
+   const active=Boolean(exceptId&&card.dataset.service===exceptId);
+   const trigger=card.querySelector('.gxs-trigger'),inner=card.querySelector('.gxs-reveal-inner');
+   card.classList.toggle('is-open',active);
+   trigger.setAttribute('aria-expanded',String(active));
+   trigger.setAttribute('aria-label',(card.querySelector('.gxs-name')?.textContent||'Servicio')+', '+(card.querySelector('.gxs-status')?.textContent||'')+', '+(active?'cerrar detalles':'abrir detalles'));
+   inner.inert=!active;inner.setAttribute('aria-hidden',String(!active));
+   if(!active){const more=card.querySelector('.gxs-more');more.hidden=true}
+  });
+ }
+ function render(){
+  const services=scenario(select.value);list.replaceChildren();
+  // The summary indicates what matters, not a second repetition of "Tus servicios".
+  const attention=services.some(entry=>entry.tone==='attention');
+  const notice=services.some(entry=>entry.tone==='notice');
+  const pending=services.some(entry=>entry.tone==='pending');
+  counter.textContent=!services.length?'Sin servicios':attention?'1 necesita atención':notice?'1 actualización':pending?'1 en seguimiento':services.length+' '+(services.length===1?'activo':'activos');
+  if(!services.length){
+   const el=document.createElement('div');
+   el.className='gxs-empty gxc-surface';
+   el.innerHTML='<strong>Tu espacio está listo</strong><span>Tu primer servicio aparecerá aquí cuando tengas una plataforma activa.</span>';
+   list.append(el);return;
+  }
+  services.forEach(service=>list.append(renderCard(service)));
+ }
+ function feedback(card,text){
+  const node=card.querySelector('.gxs-feedback');if(node)node.textContent=text;
+ }
+ list.addEventListener('click',event=>{
+  const toggle=event.target.closest('[data-gxs-toggle]');
+  if(toggle&&list.contains(toggle)){
+   const card=toggle.closest('.gxs-card'),next=card.classList.contains('is-open')?null:card.dataset.service;
+   closeAll(next);return;
+  }
+  const action=event.target.closest('[data-gxs-action]');
+  if(!action||!list.contains(action))return;
+  const card=action.closest('.gxs-card');if(!card)return;
+  const kind=action.dataset.gxsAction;
+  if(kind==='options'){
+   const pane=card.querySelector('.gxs-more');pane.hidden=!pane.hidden;
+   feedback(card,pane.hidden?'':'Aquí aparecerán únicamente las acciones válidas para el servicio.');return;
+  }
+  if(kind==='pin'){
+   const field=action.parentElement.querySelector('[data-gxs-value]');
+   if(!field)return;
+   const visible=action.getAttribute('aria-pressed')==='true';
+   field.textContent=visible?'••••':field.dataset.gxsValue;
+   action.textContent=visible?'Mostrar':'Ocultar';
+   action.setAttribute('aria-pressed',String(!visible));
+   action.setAttribute('aria-label',(visible?'Mostrar':'Ocultar')+' PIN ficticio');
+   feedback(card,'PIN ilustrativo. El PIN real conserva su protección y comportamiento oficiales.');
+   return;
+  }
+  if(kind==='copy'){
+   const field=action.parentElement.querySelector('[data-gxs-value]');
+   if(!field)return;
+   const text=field.dataset.gxsValue||'';
+   if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>feedback(card,'Se copió el correo de ejemplo.')).catch(()=>feedback(card,'Este correo es ficticio; el navegador no permitió copiarlo.'));
+   }else feedback(card,'Correo ficticio: '+text);
+   return;
+  }
+  const messages={
+   support:'En la versión oficial se abrirá el soporte correspondiente a este servicio.',
+   cancel:'Este botón conservará la solicitud y el seguimiento oficial de cancelación. Aquí no se envía ninguna baja.',
+   cancellation:'La solicitud está en revisión. El servicio sigue activo hasta que la baja se haga efectiva.',
+   credential:'La contraseña oficial se consulta una sola vez después de confirmar tu PIN. Este laboratorio no revela credenciales.',
+   invitation:'La invitación se consulta en el servicio real. Este ejemplo no envía correos ni modifica su estado.'
+  };
+  feedback(card,messages[kind]||'Esta acción funciona exclusivamente desde Mi Espacio oficial.');
+ });
+ select.addEventListener('change',render);
+ render();
 })();
 </script>
 <script id="goxion-wave-background" src="../../assets/js/ayuda/06-wave-background.js"></script>
