@@ -17,9 +17,11 @@ button,select{font:inherit}
 button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offset:4px}
 [hidden]{display:none!important}
-.ambient{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;background:radial-gradient(ellipse at 15% -12%,rgba(108,83,227,.11),transparent 52%),radial-gradient(ellipse at 100% 82%,rgba(3,157,213,.08),transparent 55%),#030305}
-.ambient:after{content:"";position:absolute;width:140vw;height:2px;left:-35vw;top:69%;transform:rotate(-49deg);opacity:.45;background:linear-gradient(90deg,transparent,#325cff,#68daf4,transparent);filter:blur(2px);box-shadow:0 0 28px 3px rgba(63,93,255,.36)}
-.shell{width:min(100%,580px);margin:0 auto;padding:calc(22px + env(safe-area-inset-top,0px)) 18px calc(110px + env(safe-area-inset-bottom,0px))}
+.ambient{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:radial-gradient(circle at 18% 12%,rgba(124,77,255,.055),transparent 34rem),radial-gradient(circle at 88% 78%,rgba(0,242,254,.045),transparent 36rem),#030305}
+.ambient .gx-wave-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:.96;filter:saturate(1.08);transform:translateZ(0)}
+.ambient:after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,rgba(3,3,5,.08),rgba(3,3,5,.22) 46%,rgba(3,3,5,.42)),radial-gradient(circle at center,transparent 20%,rgba(3,3,5,.18) 82%,rgba(3,3,5,.42) 100%);pointer-events:none}
+.ambient.gx-wave-fallback:before{content:"";position:absolute;inset:-20%;background:linear-gradient(147deg,transparent 41%,rgba(71,79,239,.2) 49%,rgba(24,216,232,.43) 50%,transparent 56%);filter:blur(14px)}
+.shell{position:relative;z-index:1;width:min(100%,580px);margin:0 auto;padding:calc(22px + env(safe-area-inset-top,0px)) 18px calc(110px + env(safe-area-inset-bottom,0px))}
 .header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 8px 24px}
 .logo{width:132px;max-width:38%;height:36px;object-fit:contain;object-position:left center}
 .head-actions{display:flex;align-items:center;gap:10px}
@@ -37,7 +39,7 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 .greeting h1{margin:0;font-weight:700;font-size:clamp(26px,6vw,34px);letter-spacing:-.045em;line-height:1.17;max-width:100%;text-wrap:balance}
 .greeting .word{display:inline-block;will-change:transform,filter,opacity;white-space:pre}
 .greeting .name{color:#42e4e8}
-.focus{position:relative;isolation:isolate;display:grid;grid-template-columns:minmax(0,1fr) minmax(84px,30%);grid-template-rows:minmax(145px,1fr) auto;align-items:center;width:100%;min-height:277px;text-align:left;padding:29px 23px 23px 28px;overflow:hidden;border:1px solid rgba(167,190,226,.18);border-radius:32px;background:linear-gradient(142deg,rgba(25,29,48,.79),rgba(7,13,24,.89) 60%,rgba(12,23,37,.82));box-shadow:0 20px 52px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.045);color:var(--text);-webkit-backdrop-filter:blur(26px) saturate(1.2);backdrop-filter:blur(26px) saturate(1.2);transform:translateZ(0);transition:grid-template-columns .72s cubic-bezier(.2,.85,.2,1),border-radius .75s cubic-bezier(.2,.85,.2,1),border-color .65s ease,box-shadow .65s ease,background .6s ease}
+.focus{position:relative;z-index:1;isolation:isolate;display:grid;grid-template-columns:minmax(0,1fr) minmax(84px,30%);grid-template-rows:minmax(145px,1fr) auto;align-items:center;width:100%;min-height:277px;text-align:left;padding:29px 23px 23px 28px;overflow:hidden;border:1px solid rgba(167,190,226,.18);border-radius:32px;background:linear-gradient(142deg,var(--glass-top,rgba(25,29,48,.54)),var(--glass-middle,rgba(7,13,24,.63)) 60%,var(--glass-bottom,rgba(12,23,37,.55)));box-shadow:0 20px 52px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.075);color:var(--text);-webkit-backdrop-filter:blur(var(--glass-blur,19px)) saturate(1.35);backdrop-filter:blur(var(--glass-blur,19px)) saturate(1.35);transform:translateZ(0);transition:grid-template-columns .72s cubic-bezier(.2,.85,.2,1),border-radius .75s cubic-bezier(.2,.85,.2,1),border-color .65s ease,box-shadow .65s ease,background .6s ease}
 .focus:before{content:"";position:absolute;inset:-65px -55px auto auto;width:250px;height:240px;border-radius:50%;background:var(--glow,rgba(65,219,232,.22));filter:blur(59px);opacity:.6;transition:background .5s,opacity .6s;z-index:-1;pointer-events:none}
 .focus:after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(115deg,rgba(255,255,255,.045),transparent 31%,transparent 73%,rgba(96,164,220,.035));pointer-events:none}
 .focus[data-tone="attention"]{--glow:rgba(242,94,119,.26);border-color:rgba(244,128,153,.21);border-radius:35px 26px 31px 30px}
@@ -50,6 +52,7 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 .focus[data-state="new"]{grid-template-columns:minmax(0,65%) minmax(84px,35%)}
 .focus[data-state="multi"]{grid-template-columns:minmax(0,75%) minmax(72px,25%)}
 .focus[data-state="review"],.focus[data-state="extension"],.focus[data-state="cancellation"]{grid-template-columns:minmax(0,68%) minmax(84px,32%)}
+.focus[data-glass="off"]{background:rgba(6,10,18,.985)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
 .focus:active{transform:scale(.991)}
 .focus-copy{min-width:0;position:relative;align-self:center;grid-column:1;grid-row:1;z-index:2}
 .focus-title{position:relative;font-size:clamp(23px,5.6vw,33px);font-weight:700;letter-spacing:-.048em;line-height:1.16;text-wrap:balance;overflow-wrap:normal;hyphens:auto;margin:0;color:#f7f8fe;max-width:100%}
@@ -68,6 +71,24 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 .focus[data-tone="calm"]{--accent:#69e1d5}
 .focus[data-tone="due"]{--accent:#5cdaeb}
 .focus[data-tone="muted"]{--accent:#bfc9dc}
+.glass-stage{position:relative;isolation:isolate;margin:-20px -9px;padding:20px 9px}
+.glass-underlay{position:absolute;inset:-2px -1px;overflow:hidden;z-index:0;border-radius:36px;pointer-events:none}
+.glass-beam{position:absolute;left:-59%;top:22%;width:57%;height:56%;transform:rotate(-14deg);transform-origin:50% 50%;border-radius:60%;background:linear-gradient(90deg,transparent 0%,rgba(103,71,255,.03) 12%,rgba(81,75,252,.34) 43%,rgba(109,224,250,.75) 53%,rgba(75,118,252,.25) 66%,transparent 100%);filter:blur(12px);opacity:.8;animation:gx-glass-passage 10s ease-in-out infinite alternate}
+.glass-beam:after{content:"";position:absolute;left:42%;top:-8%;width:13%;height:116%;border-radius:50%;background:rgba(138,249,252,.48);filter:blur(7px)}
+.glass-underlay.manual .glass-beam{animation:none}
+.glass-orb{position:absolute;top:12%;left:55%;width:46%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 45% 48%,rgba(104,174,253,.36),rgba(106,70,232,.23) 35%,transparent 72%);filter:blur(13px);animation:gx-glass-orbit 13s ease-in-out infinite alternate}
+.glass-glyph{position:absolute;top:48%;left:-55%;font-size:clamp(30px,8vw,52px);font-weight:800;letter-spacing:.16em;white-space:nowrap;color:rgba(99,222,255,.33);text-shadow:0 0 20px rgba(86,149,255,.36);animation:gx-glass-glyph 15s linear infinite}
+@keyframes gx-glass-passage{0%{left:-59%}100%{left:104%}}
+@keyframes gx-glass-orbit{0%{transform:translate(-35%,14%) scale(.8)}100%{transform:translate(28%,-14%) scale(1.12)}}
+@keyframes gx-glass-glyph{0%{left:-55%}100%{left:110%}}
+.glass-stage .focus{display:grid}
+.glass-test-label{display:flex;align-items:center;gap:7px;color:#9fbbcb;font-size:10px;font-weight:500;letter-spacing:.01em;margin:18px 7px 0}
+.glass-test-label:before{content:"";width:6px;height:6px;background:#62dfe7;border-radius:50%;box-shadow:0 0 11px rgba(87,225,239,.44)}
+.demo-panel .glass-control{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:17px 0 7px;font-size:11px;color:#d7e4f2}
+.demo-panel .glass-control output{color:#81dce6;font-variant-numeric:tabular-nums}
+.demo-panel input[type="range"]{width:100%;height:32px;accent-color:#62dfe7;cursor:pointer}
+.demo-panel .glass-compare{margin:9px 0 0;width:100%;height:43px;border:1px solid rgba(112,204,225,.28);border-radius:13px;background:rgba(54,128,144,.1);color:#d8f4f7;font-size:11px;font-weight:700}
+.demo-panel .glass-note{display:block;font-size:9.5px;line-height:1.55;color:#9fadc2;margin-top:7px}
 .secondary{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:26px 6px 0;padding:0;min-height:32px}
 .secondary p{font-size:12px;color:#d5dfeb;margin:0;line-height:1.4}
 .secondary .right{display:flex;align-items:center;gap:10px;white-space:nowrap;color:#a0b5c8;font-size:11px}
@@ -112,11 +133,13 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 @media(prefers-reduced-motion:reduce){
  *,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
  .greeting .word{will-change:auto}
+ .glass-beam,.glass-orb,.glass-glyph{animation:none!important}
+ .glass-beam{left:20%!important}
 }
 </style>
 </head>
 <body>
-<div class="ambient" aria-hidden="true"></div>
+<div class="ambient bg" aria-hidden="true"><canvas class="gx-wave-canvas" id="gx-wave-canvas"></canvas></div>
 <main class="shell">
 <header class="header">
 <img class="logo" src="../../logo2.PNG" alt="GOXION">
@@ -134,7 +157,13 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 </nav>
 <section aria-label="Resumen contextual de cliente">
 <div class="greeting"><h1 id="greeting" aria-label="Hola, Mario">Hola, <span class="name">Mario</span></h1></div>
-<button class="focus" id="focus" type="button" data-tone="calm" aria-describedby="focus-meta">
+<div class="glass-stage" id="glass-stage">
+<div class="glass-underlay" id="glass-underlay" aria-hidden="true">
+  <span class="glass-beam" id="glass-beam"></span>
+  <span class="glass-orb"></span>
+  <span class="glass-glyph">GOXION</span>
+</div>
+<button class="focus" id="focus" type="button" data-tone="calm" data-glass="on" aria-describedby="focus-meta">
  <div class="focus-copy"><div class="focus-title" id="focus-title" aria-live="polite">Todo al corriente</div></div>
  <span class="focus-icon" id="focus-icon" aria-hidden="true">
   <svg viewBox="0 0 24 24" focusable="false"><path id="state-path" d="M20 6 9 17l-5-5"/></svg>
@@ -144,6 +173,8 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
   <span class="focus-action"><span id="focus-action">Ver mi cuenta</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 18 19 5M8 5h11v11"/></svg></span>
  </div>
 </button>
+</div>
+<div class="glass-test-label">La onda y la luz se desplazan por debajo del cristal</div>
 <div class="secondary" aria-label="Progreso de lealtad de ejemplo">
  <p>Tu lealtad</p>
  <div class="right"><span>3/4 pagos</span><span class="progress" aria-hidden="true"><span></span></span></div>
@@ -170,6 +201,12 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 <option value="combined">Rechazo + aviso secundario</option>
 </select>
 <span class="testcase" id="priority-note">La tarjeta muestra solo la acción de mayor prioridad.</span>
+<label class="glass-control" for="glass-depth"><span>Profundidad del cristal</span><output id="glass-depth-value">50%</output></label>
+<input id="glass-depth" type="range" min="0" max="100" value="50" aria-label="Profundidad del cristal">
+<label class="glass-control" for="beam-position"><span>Mover luz detrás</span><output id="beam-position-value">Auto</output></label>
+<input id="beam-position" type="range" min="0" max="100" value="50" aria-label="Mover la luz por debajo de la tarjeta">
+<button class="glass-compare" type="button" id="glass-compare" aria-pressed="false">Comparar sin cristal</button>
+<small class="glass-note">La onda es la misma que usa Mi Espacio. Los elementos que pasan debajo son una prueba visual, no notificaciones reales.</small>
 </section>
 <dialog class="detail" id="detail">
  <span class="hint">VISTA DE DEMOSTRACIÓN</span>
@@ -337,6 +374,31 @@ document.querySelectorAll('.local-only,#session,#bell').forEach(n=>n.addEventLis
  $('demo-toggle').setAttribute('aria-expanded','true');
  $('priority-note').textContent='La navegación real permanece intacta; esta vista solo demuestra la tarjeta.';
 }));
+function updateGlass(percent){
+ const n=Math.max(0,Math.min(100,Number(percent)));
+ const alpha=.29+(.54*n/100);
+ const top=(alpha*.88).toFixed(3),mid=alpha.toFixed(3),bottom=(alpha*.92).toFixed(3);
+ const card=$('focus');
+ card.style.setProperty('--glass-top','rgba(25,29,48,'+top+')');
+ card.style.setProperty('--glass-middle','rgba(7,13,24,'+mid+')');
+ card.style.setProperty('--glass-bottom','rgba(12,23,37,'+bottom+')');
+ card.style.setProperty('--glass-blur',(8+25*n/100).toFixed(1)+'px');
+ $('glass-depth-value').textContent=n+'%';
+}
+$('glass-depth').addEventListener('input',event=>updateGlass(event.target.value));
+$('beam-position').addEventListener('input',event=>{
+ const n=Number(event.target.value);
+ $('glass-underlay').classList.add('manual');
+ $('glass-beam').style.left=(-59+1.63*n)+'%';
+ $('beam-position-value').textContent=n+'%';
+});
+$('glass-compare').addEventListener('click',()=>{
+ const card=$('focus'),off=card.dataset.glass!=='off';
+ card.dataset.glass=off?'off':'on';
+ $('glass-compare').setAttribute('aria-pressed',String(off));
+ $('glass-compare').textContent=off?'Restaurar cristal':'Comparar sin cristal';
+});
+updateGlass(50);
 window.GOXION_MORPH_V2=Object.freeze({isolated:true,noBackend:true,scenarios:Object.keys(snapshots),classify,render});
 render('clear',true);
 // Morphicons: librería real, cargada solo en este prototipo. SVG nativo queda disponible sin red.
@@ -348,5 +410,6 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
 }).catch(()=>{ /* fallback SVG accesible sin la dependencia externa */ });
 })();
 </script>
+<script id="goxion-wave-background" src="../../assets/js/ayuda/06-wave-background.js"></script>
 </body>
 </html>
