@@ -1,4 +1,4 @@
-# GOXION · Navegación superior adaptable + perfil — investigación y laboratorio V1
+# GOXION · Navegación superior adaptable + perfil — investigación y laboratorio V2
 
 **Fecha:** 22/nov/2026. **Estado actual:** **IMPLEMENTADA EN LABORATORIO para evaluación visual**, **NO aprobada todavía ni publicada en `ayuda.html`**. El análisis de las secciones 1–7 fue previo al prototipo; la implementación exacta y lo que sigue pendiente se describen en la sección 8. Sin cambios en código CSS/JS oficial, Edge o datos de clientes.
 
@@ -77,6 +77,26 @@ Reubicar toda la cápsula expandida justo **sobre** el texto en el encabezado, d
 6. Documentar lo que apruebe el usuario en este expediente y en [el documento maestro de integración](GOXION_MI_ESPACIO_INTEGRACION_MAESTRA_2026-11-22.md); el estado de esta propuesta sigue **NO APROBADA**.
 
 **Dictamen:** conceptualmente **sí es compatible** con el nuevo feed, pero **no realizar un simple shrink proporcional de todo el header** ni superponer otra barra. La diferencia de GOXION debe estar en la cápsula que cambia de geometría sin perder los tres destinos, la identidad cromática controlada y la conexión intacta, no en acumular capas de vidrio.
+
+## 9. Corrección V2 tras video Safari — cápsula flotante independiente (22/nov/2026)
+
+**Fuente:** video aportado por el usuario `ScreenRecording_11-22-2026 16-39-40_1.mp4` (25,6 s, grabación iPhone). Revisados fotogramas a 2, 7, 13 y 19 s. Se observó que la V1 agrupaba logo individual, tres destinos, campana y avatar dentro de **una sola franja oscura, demasiado opaca y ancha** al deslizar. En el estado inicial, las formas de círculos/cápsula perdían proporción: el CSS V1 permitía `flex-shrink` en ítems inactivos y usaba radios de 25px con dimensiones cambiantes. El usuario pidió conservar la cápsula de la oficial y sus transiciones, no abandonar el concepto.
+
+**Decisión visual de V2:** al entrar en modo dock, **NO existe una superficie contenedora que envuelva todo**. El icono GOXION individual, la cápsula y campana/avatar son tres agrupaciones *visualmente independientes*; la **cápsula central es mucho más pequeña** (~182×60px a anchura normal; hasta 160px en 280–320px) y mantiene el cristal neutro translúcido aprobado (`rgba(8,8,12,.371)`, `blur(11.75px)`) con un borde sutil. El logo es el archivo individual oficial y campana/Goxy mantienen sus propios círculos separados. Por debajo de 376px se esconde únicamente el logo del dock para no solapar tres destinos ni reducir áreas táctiles. No hay un wrapper oscuro por detrás de los cuatro controles.
+
+**Geometría igualada a la identidad oficial:** el CSS productivo `.tab-container` / `.tab-btn` usa inactivos circulares y morph activo. V2 usa diámetro **56px en navegación inicial** (54px en pantallas pequeñas) con `flex:0 0 <diámetro>` y `border-radius:50%`, y en dock **48px** (44–46px según ancho), con diámetro exacto, sin `flex-shrink`. El activo abre una píldora y revela su etiqueta solo cuando hay espacio. La cápsula usa `border-radius:999px`, no esquinas semiflotantes/distorsionadas. Se normalizó `flex-basis` a valores numéricos durante el morph para evitar saltos de un tamaño `auto` no interpolable.
+
+**Interacción:** se mantiene **una sola navegación** en DOM; al avanzar (>185px) pasa a dock compacto, con reversa al desplazarse hacia abajo en pantalla que amplía la cápsula y muestra nombre del destino activo donde cabe; al volver al principio (<85px) retoma posición original. Se conserva listener pasivo + rAF, histéresis 29px, reduced-motion. V2 **elimina la lectura forzada `top.offsetHeight`** al entrar en dock para evitar relayout sincrónico; usa dos ciclos de `requestAnimationFrame`. El panel de pruebas puede aparecer por encima del dock; popovers de perfil y campana siguen interactivos con el dock flotante.
+
+**Alcance exacto:** solo archivos de laboratorio `adaptive-top-nav.css` y `adaptive-top-nav.js` con referencias de caché actualizadas en `morph-v2.html`. Commits V2: CSS `c5685e0e262e486ab322eb28deb192ef4722a56d`, estabilización `f3ffcbe4d641117ae73c37e3dc5e2ac2497db378`, menú `9597943f956fda0c719c0a5a6fd292dd9057747b`; JS `8b25d104ae1453176c931b205363357db4b0d6a6`; HTML de enlaces **`d2237f1cc726460ab5114d8ff2c8704a69eafb30`**. Aún sin integración en `ayuda.html`.
+
+**Pruebas:** el smoke Chromium/WebKit `check-adaptive-nav.mjs` ahora verifica anchuras de 280,320,360,390,430 y 768px, geometría cuadrada del botón, radios de círculo, fondo transparente de wrapper, vidrio real en la cápsula, no superposición con campana/Goxy, retorno al inicio y detalle del perfil. Está **añadido, no ejecutado en navegador real** en esta sesión; requiere test físico de Safari en el iPhone para concluir fluidez y transparencia. No afirmar que los resultados de la simulación V1 son prueba de esta V2.
+
+**Decisión de perfil:** se conserva el rostro original de Goxy como avatar predeterminado. El usuario quiere **posibilidad futura de cambiar el color de Goxy** además de seleccionar su propia foto; **se anota como backlog**, no implementarlo todavía. La foto sigue siendo solo muestra local temporal, no guardada en una cuenta.
+
+**Laboratorio V2:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=d2237f1
+
+---
 
 ## 8. Implementación real en el laboratorio · V1 (22/nov/2026)
 
