@@ -59,11 +59,12 @@ class FakeElement{
  setAttribute(k,v){this.attrs[k]=v}
  focus(){document.activeElement=this}
  append(e){this.children.push(e)}
+ remove(){this._removed=true}
  cloneNode(){return new FakeElement(this.tag)}
  querySelector(selector){return this.controls?.[selector]||null}
  querySelectorAll(selector){
   if(selector.includes("gx-release-v2-item:not"))return this.originalItems??[];
-  if(selector==="[data-gx-release-clone]")return this.children.filter(x=>x.dataset.gxReleaseClone);
+  if(selector==="[data-gx-release-clone]")return this.children.filter(x=>x.dataset.gxReleaseClone&&!x._removed);
   return [];
  }
  get innerHTML(){return this.html||""}
