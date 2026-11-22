@@ -241,21 +241,6 @@
   right:0;
   z-index:15;
 }
-/* Modal de novedades · encabezado y cierre siempre visibles. */
-.gx-release-sheet .gx-release-head{
-  flex:none;
-  background:linear-gradient(160deg,rgba(27,19,47,.99),rgba(13,14,28,.96));
-}
-.gx-release-sheet .gx-release-close{
-  position:absolute;
-  top:20px;
-  right:19px;
-  z-index:calc(var(--gx-modal-header-z) + 2);
-}
-.gx-release-sheet .gx-release-content{
-  min-height:0;
-  overscroll-behavior:contain;
-}
 /* Modales informativos de Ayuda: título+X permanecen juntos y fijos. */
 .modal .gx-standard-legacy-modal{
   display:flex;
