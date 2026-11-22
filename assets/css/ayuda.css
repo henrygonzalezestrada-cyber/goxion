@@ -14315,51 +14315,45 @@ body.gx-promo-morph-open{overflow:hidden!important}
 
 
 /* =========================================================
-   GOXION · MI ESPACIO / COHERENCIA DE CRISTAL — propuesta
-   Alcance: SOLO material de superficies, sin alterar layout ni JS.
-   Fuente aprobada en laboratorio: material neutro al 15 % del
-   regulador -> alpha .371; backdrop blur 11.75 px. El 15 % NO es
-   la opacidad CSS directa. La acción interna mantiene alpha .08.
+   GOXION · MI ESPACIO / ARMONÍA DEL MATERIAL — propuesta
+   ALCANCE EXCLUSIVO: tono y transparencia del relleno.
+   Cristal neutro aprobado en el laboratorio con control al 15%:
+   background rgba(8,8,12,.371). Ese 15% es un control, NO alpha .15.
 
-   Misiones y Referidos conservan su morph existente, progreso,
-   textos de estado, watermark, pulsos y destinos interactivos.
-   El clon compartido del morph hereda los valores computados.
-   El catálogo compacto únicamente adapta tarjetas SIN badges
-   de promoción; no se tocan promociones ni brand-card expandible.
+   No modificar: blur heredado, bordes, sombras, resaltados, acentos
+   de estado, geometría, animación, JS, transiciones y comportamiento.
+   Excluir superficies con promociones y máscaras de efectos.
    ========================================================= */
 
-/* Cards originales y sus variantes de estado: un solo material neutro. */
+/* Misiones / Referidos — tarjeta, estados y copia durante el morph. */
 #view-dashboard #gamif-grid .gx-gamif-card,
 #view-dashboard #gamif-grid .gx-gamif-card.pulse-referral,
 #view-dashboard #gamif-grid .gx-gamif-card.gx-referral-ready,
 #view-dashboard #gamif-grid .gx-gamif-card.pulse-mission,
 .gx-gamif-morph-ghost.gx-gamif-card {
-    background: rgba(8, 8, 12, .371) !important;
-    -webkit-backdrop-filter: blur(11.75px) saturate(1) !important;
-    backdrop-filter: blur(11.75px) saturate(1) !important;
-    border-color: rgba(255, 255, 255, .035) !important;
-    box-shadow: 0 15px 36px rgba(0, 0, 0, .23), inset 0 1px rgba(255, 255, 255, .05) !important;
+    background-color: rgba(8, 8, 12, .371) !important;
 }
 
-/* El estado expandido comparte material, no geometría ni animación. */
+/* Misiones / Referidos — panel expandido existente. */
 #view-dashboard #gamif-expanded-referral,
 #view-dashboard #gamif-expanded-coupon {
-    background: rgba(8, 8, 12, .371) !important;
-    -webkit-backdrop-filter: blur(11.75px) saturate(1) !important;
-    backdrop-filter: blur(11.75px) saturate(1) !important;
-    border-color: rgba(255, 255, 255, .035) !important;
-    box-shadow: 0 15px 36px rgba(0, 0, 0, .23), inset 0 1px rgba(255, 255, 255, .05) !important;
+    background-color: rgba(8, 8, 12, .371) !important;
 }
 
-/* Tarjetas de catálogo neutras: excluir variantes promocionales
-   cuyo brillo animado y recorte son partes de la interacción aprobada. */
+/* Servicios del cliente — misma familia cromática, sin tocar
+   el contraste/relieve específico de cada estado. */
+#view-dashboard .gx-service-manage-card {
+    background-color: rgba(8, 8, 12, .371);
+}
+
+/* Catálogo ordinario — mini tarjetas sin promociones. */
 #view-catalogo .gx-catalog-mini-card:not(.is-popular-featured):not(.is-popular-soft):not(.is-saving-soft):not(.is-new-featured):not(.is-new-soft) {
-    background: rgba(8, 8, 12, .371);
-    -webkit-backdrop-filter: blur(11.75px) saturate(1);
-    backdrop-filter: blur(11.75px) saturate(1);
-    border-color: rgba(255, 255, 255, .035);
-    box-shadow: 0 15px 36px rgba(0, 0, 0, .18), inset 0 1px rgba(255, 255, 255, .045);
+    background-color: rgba(8, 8, 12, .371);
 }
 
-/* Nada de efectos adicionales sobre transformaciones durante el morph;
-   respetar navegación, foco y preferencia de movimiento reducido. */
+/* Catálogo desplegable — solo su superficie neutral.
+   No tocar las tarjetas promocionales, sus máscaras o bordes
+   animados, ni el contenido expandible o su animación de altura. */
+#view-catalogo #catalog-container .brand-card:not(.has-promo) {
+    background-color: rgba(8, 8, 12, .371);
+}
