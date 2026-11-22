@@ -374,7 +374,6 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
 .gxs-card[data-tone="danger"]{--gxs-state-color:#ef858b;--gxs-state-surface:rgba(167,57,69,.14)}
 .gxs-status{color:var(--gxs-state-color);font-weight:600}
 .gxs-status:before{content:"";width:6px;height:6px;flex:0 0 6px;border-radius:50%;background:var(--gxs-state-color)}
-.gxs-card.is-open .gxs-line{background:linear-gradient(90deg,var(--gxs-state-color),rgba(210,234,249,.06) 26%,transparent 85%);opacity:.42}
 .gxs-icon{position:relative;display:grid;place-items:center;width:44px;height:44px;justify-self:end;border-radius:50%;color:#b3c9d9;transition:color .25s}
 .gxs-icon::before{content:"";position:absolute;inset:calc((44px - var(--gx-close-disc))/2);border-radius:50%;background:transparent;transition:background-color .25s}
 .gxs-icon svg{position:relative;width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
@@ -387,9 +386,8 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
 .gxs-card.is-open .gxs-reveal{grid-template-rows:1fr}
 .gxs-reveal-inner{min-height:0;overflow:hidden;visibility:hidden;transition:visibility 0s .46s}
 .gxs-card.is-open .gxs-reveal-inner{visibility:visible;transition:visibility 0s}
-.gxs-body{padding:0 16px 17px;opacity:0;transform:translateY(-6px);transition:opacity .27s,transform .4s}
+.gxs-body{padding:3px 16px 17px;opacity:0;transform:translateY(-6px);transition:opacity .27s,transform .4s}
 .gxs-card.is-open .gxs-body{opacity:1;transform:translateY(0);transition-delay:.07s}
-.gxs-line{height:1px;margin-bottom:14px;background:linear-gradient(90deg,rgba(210,234,249,.12),rgba(210,234,249,.025) 85%,transparent)}
 .gxs-subtitle{font-size:12px;font-weight:650;color:#e2edf6;margin:0 0 7px}
 .gxs-accessrow{display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0;padding:10px 0}
 .gxs-accessrow+.gxs-accessrow{border-top:1px solid rgba(221,236,252,.065)}
@@ -400,11 +398,11 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
 .gxs-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:13px}
 .gxs-pill{min-height:38px;padding:9px 15px;border:0;border-radius:999px;background:rgba(255,255,255,.08);color:#7ee1e7;font-size:11px;font-weight:600}
 .gxs-ghost{min-height:38px;padding:8px 4px;background:transparent;border:0;color:#c1cfe0;font-size:11px;font-weight:600}
-.gxs-notice{display:grid;gap:3px;padding:12px 13px;margin:0 0 12px;border-radius:14px;background:var(--gxs-state-surface,rgba(14,25,37,.66))}
-.gxs-notice strong{font-size:12px;line-height:1.45;color:var(--gxs-state-color,#e5f1fb)}
-.gxs-notice span{font-size:10.5px;line-height:1.48;color:#c6d7e2}
-.gxs-notice[data-tone="secondary"]{background:rgba(16,27,38,.74)}
-.gxs-notice[data-tone="secondary"] strong{color:#c2d6e7}
+.gxs-notice{margin:1px 0 13px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.045);color:#c7d6e2;font-size:10.5px;line-height:1.5}
+.gxs-extra-notice{margin:0 0 11px;font-size:10.5px;line-height:1.5;color:#b6cad6}
+.gxs-extra-notice summary{cursor:pointer;color:#94dce4;font-weight:600;padding:8px 2px;min-height:34px}
+.gxs-extra-notice p{margin:2px 0 8px;padding:0 2px;color:#b9c9d8}
+.gxs-extra-notice summary:focus-visible{outline:2px solid #79e6fc;outline-offset:3px;border-radius:6px}
 .gxs-more[hidden]{display:none!important}
 .gxs-more{display:grid;margin-top:11px;padding-top:8px;border-top:1px solid rgba(219,238,253,.065)}
 .gxs-more button{min-height:42px;padding:9px 0;text-align:left;border:0;background:transparent;color:#bfd0df;font-size:11px}
@@ -1345,39 +1343,39 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
   if(mode==='two')return copy.slice(0,2);
   if(mode==='multi-notice'){
    copy[0].status='Cancelación en revisión';copy[0].tone='pending';copy[0].cancellationPhase='solicitada';
-   copy[0].callout={type:'notice',title:'Cancelación en revisión · Prioritaria',body:'La solicitud sigue en revisión. Netflix permanece activo hasta que la baja sea efectiva.'};
-   copy[0].secondaryCallout={title:'Nueva contraseña disponible',body:'También hay una contraseña pendiente: en la versión oficial se consulta una sola vez tras verificar el PIN GOXION.'};
+   copy[0].callout={type:'notice',body:'Netflix sigue activo hasta que se efectúe la baja.'};
+   copy[0].secondaryCallout={title:'Nueva contraseña disponible',body:'Requiere PIN GOXION y se muestra una sola vez.'};
    copy[0].primary='Ver cancelación';copy[0].primaryAction='cancellation';return copy;
   }
   if(mode==='cancel-effective')return copy.slice(1); // La baja efectiva retira solo Netflix del ejemplo.
   const service=copy[0];
   if(mode==='update'){
    service.status='Nueva contraseña';service.tone='notice';
-   service.callout={type:'notice',title:'Actualización disponible',body:'Tienes una nueva contraseña. Para consultarla en GOXION se requiere tu PIN y solo puede verse una vez.'};
+   service.callout={type:'notice',body:'Requiere PIN de GOXION. Una sola consulta.'};
    service.primary='Revisar actualización';service.primaryAction='credential';
   }else if(mode==='pin-update'){
    service.status='PIN de perfil actualizado';service.tone='notice';service.pin='6951';
-   service.callout={type:'notice',title:'PIN de perfil actualizado',body:'Consulta el nuevo PIN ficticio desde Tus accesos. No es el PIN de seguridad de GOXION.'};
+   service.callout={type:'notice',body:'Consulta el PIN actualizado en tus accesos.'};
    service.primary='Mostrar PIN';service.primaryAction='showpin';
   }else if(mode==='cancel'){
    service.status='Cancelación en revisión';service.tone='pending';service.cancellationPhase='solicitada';
-   service.callout={type:'notice',title:'Solicitud recibida · En revisión',body:'Se registró la solicitud. Netflix continúa activo mientras GOXION revisa la baja. No hace falta solicitarla otra vez.'};
+   service.callout={type:'notice',body:'Tu servicio continúa activo mientras se revisa.'};
    service.primary='Ver cancelación';service.primaryAction='cancellation';
   }else if(mode==='cancel-approved'){
    service.status='Cancelación aprobada';service.tone='caution';service.cancellationPhase='aprobada';
-   service.callout={type:'notice',title:'Autorizada · Baja aún pendiente',body:'La solicitud fue aprobada, pero Netflix continúa disponible hasta la baja efectiva. Los cargos ya generados no cambian.'};
+   service.callout={type:'notice',body:'El acceso sigue disponible hasta la baja efectiva.'};
    service.primary='Ver cancelación';service.primaryAction='cancellation';
   }else if(mode==='cancel-rejected'){
    service.status='Cancelación no autorizada';service.tone='danger';service.cancellationPhase='rechazada';
-   service.callout={type:'attention',title:'Solicitud no autorizada',body:'Netflix sigue activo. Si corresponde, el cliente puede solicitar una nueva revisión.'};
+   service.callout={type:'attention',body:'El servicio sigue activo. Puedes solicitar otra revisión.'};
    service.primary='Ver resolución';service.primaryAction='cancellation';
   }else if(mode==='paused'){
    service.status='Temporalmente inactivo';service.tone='caution';
-   service.callout={type:'attention',title:'Servicio con incidencia',body:'Consulta el motivo confirmado y comunícate con soporte si necesitas asistencia.'};
+   service.callout={type:'attention',body:'Consulta soporte para conocer el motivo.'};
    service.primary='Consultar soporte';service.primaryAction='support';
   }else if(mode==='invitation'){
    copy[1].status='Invitación pendiente';copy[1].tone='pending';copy[1].invite='Invitación enviada';
-   copy[1].callout={type:'notice',title:'Invitación pendiente',body:'La invitación fue enviada. Completa la activación desde tu correo cuando esté disponible.'};
+   copy[1].callout={type:'notice',body:'Activa la invitación desde tu correo.'};
    copy[1].primary='Ver invitación';copy[1].primaryAction='invitation';
   }
   return copy;
@@ -1393,10 +1391,10 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
    ? row('Correo personal',service.email,'copy',service.email)+row('Estado',service.invite)
    : row('Correo',service.email,'copy',service.email)+row('Perfil',service.profile)+row('PIN de perfil','••••','pin',service.pin);
   const callout=service.callout
-   ? '<div class="gxs-notice" data-tone="'+safe(service.callout.type)+'"><strong>'+safe(service.callout.title)+'</strong><span>'+safe(service.callout.body)+'</span></div>'
-   : '';
-  const secondary=service.secondaryCallout
-    ? '<div class="gxs-notice" data-tone="secondary"><strong>'+safe(service.secondaryCallout.title)+'</strong><span>'+safe(service.secondaryCallout.body)+'</span></div>'
+    ? '<p class="gxs-notice">'+safe(service.callout.body)+'</p>'
+    : '';
+   const secondary=service.secondaryCallout
+    ? '<details class="gxs-extra-notice"><summary>1 novedad más</summary><p>'+safe(service.secondaryCallout.title)+' · '+safe(service.secondaryCallout.body)+'</p></details>'
     : '';
    const label=service.name+' · '+service.status;
   el.innerHTML=
@@ -1405,7 +1403,7 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
    '<span class="gxs-summary"><strong class="gxs-name">'+safe(service.name)+'</strong><span class="gxs-status">'+safe(service.status)+'</span></span>'+
    '<span class="gxs-icon" aria-hidden="true"><svg class="gxs-chevron" viewBox="0 0 24 24"><path d="m5 9 7 7 7-7"/></svg><svg class="gxs-x" viewBox="0 0 24 24"><path d="M6 6 18 18M18 6 6 18"/></svg></span></button>'+
    '<div class="gxs-reveal" id="gxs-detail-'+safe(service.id)+'"><div class="gxs-reveal-inner" inert aria-hidden="true"><div class="gxs-body">'+
-   '<div class="gxs-line"></div>'+callout+secondary+
+   callout+secondary+
    '<div class="gxs-subtitle">'+(service.kind==='invitation'?'Tu invitación':'Tus accesos')+'</div>'+
    '<div class="gxs-accesslist">'+details+'</div>'+
    '<div class="gxs-actions"><button type="button" class="gxs-pill" data-gxs-action="'+safe(service.primaryAction||'options')+'">'+safe(service.primary||'Más opciones')+'</button>'+
