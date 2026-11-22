@@ -1358,14 +1358,18 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
    const trigger=card.querySelector('.gxs-trigger'),inner=card.querySelector('.gxs-reveal-inner');
    card.classList.toggle('is-open',active);
    trigger.setAttribute('aria-expanded',String(active));
-   trigger.setAttribute('aria-label',(card.querySelector('.gxs-name')?.textContent||'Servicio')+', '+(active?'cerrar detalles':'abrir detalles'));
+   trigger.setAttribute('aria-label',(card.querySelector('.gxs-name')?.textContent||'Servicio')+', '+(card.querySelector('.gxs-status')?.textContent||'')+', '+(active?'cerrar detalles':'abrir detalles'));
    inner.inert=!active;inner.setAttribute('aria-hidden',String(!active));
    if(!active){const more=card.querySelector('.gxs-more');more.hidden=true}
   });
  }
  function render(){
   const services=scenario(select.value);list.replaceChildren();
-  counter.textContent=services.length+' '+(services.length===1?'servicio':'servicios');
+  // The summary indicates what matters, not a second repetition of "Tus servicios".
+  const attention=services.some(entry=>entry.tone==='attention');
+  const notice=services.some(entry=>entry.tone==='notice');
+  const pending=services.some(entry=>entry.tone==='pending');
+  counter.textContent=!services.length?'Sin servicios':attention?'1 necesita atención':notice?'1 actualización':pending?'1 en seguimiento':services.length+' '+(services.length===1?'activo':'activos');
   if(!services.length){
    const el=document.createElement('div');
    el.className='gxs-empty gxc-surface';
