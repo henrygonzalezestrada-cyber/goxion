@@ -149,15 +149,44 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 /* Propuesta aislada: tres beneficios en fila, un panel expandible. */
 .gxb-wrap{margin:12px 2px 0}
 .gxb-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.gxb-lab-toggle{display:flex;flex-direction:column;gap:5px;margin:13px 0}
+.gxb-lab-toggle button{min-height:40px;border-radius:13px;border:1px solid rgba(127,208,210,.21);background:rgba(67,142,150,.11);color:#c7e8e8;font-size:10px;font-weight:600}
+.gxb-lab-toggle button[aria-pressed="true"]{background:rgba(90,206,202,.17);border-color:rgba(137,234,220,.35);color:#e3f8f5}
+.gxb-lab-toggle span{font-size:9.5px;color:#92a5b6;line-height:1.4}
 .gxc-surface{background:rgba(8,8,12,.371);-webkit-backdrop-filter:blur(11.75px) saturate(1);backdrop-filter:blur(11.75px) saturate(1);border:1px solid rgba(255,255,255,.035);box-shadow:0 15px 36px rgba(0,0,0,.23),inset 0 1px rgba(255,255,255,.05);color:#f4f7ff}
-.gxb-tile{min-width:0;min-height:99px;padding:12px 10px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:4px;border-radius:19px;text-align:left;transition:background-color .2s,transform .2s}
+.gxb-tile{position:relative;isolation:isolate;overflow:hidden;min-width:0;min-height:106px;padding:12px 10px 11px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:4px;border-radius:19px;text-align:left;transition:background-color .24s,border-color .24s,transform .24s}
+.gxb-tile::before{content:attr(data-watermark);position:absolute;z-index:0;right:-7px;top:44%;font-size:55px;line-height:1;opacity:.115;pointer-events:none;user-select:none;transform:translateY(-50%) rotate(-14deg) scale(1.02);filter:saturate(.8)}
+.gxb-tile > *{position:relative;z-index:1}
+.gxb-tile[data-ready="true"]{border-color:rgba(93,221,218,.22);box-shadow:0 15px 36px rgba(0,0,0,.23),0 0 20px rgba(89,211,219,.08)}
+.gxb-tile[data-ready="true"] .gxb-number{color:#9bf0e8}
+.gxb-tile[data-ready="true"]::before{animation:gxbCelebration 2.3s cubic-bezier(.4,0,.2,1) 2}
+.gxb-tile[data-ready="true"]{animation:gxbMilestoneBreathe 2.3s cubic-bezier(.4,0,.2,1) 2}
+@keyframes gxbCelebration{
+ 0%,100%{transform:translateY(-50%) rotate(-14deg) scale(1.02);opacity:.115}
+ 50%{transform:translateY(-50%) rotate(-10deg) scale(1.13);opacity:.205}
+}
+@keyframes gxbMilestoneBreathe{
+ 0%,100%{box-shadow:0 15px 36px rgba(0,0,0,.23),0 0 0 rgba(89,211,219,0)}
+ 50%{box-shadow:0 15px 36px rgba(0,0,0,.23),0 0 23px rgba(89,211,219,.12)}
+}
 .gxb-tile[aria-expanded=true]{background:rgba(22,26,30,.52);border-color:rgba(110,215,218,.18)}
 .gxb-tile:active{transform:scale(.988)}
 .gxb-label{font-size:10px;font-weight:600;color:#c2d1dc;line-height:1.3;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
 .gxb-number{font-weight:700;font-size:clamp(18px,5.3vw,23px);line-height:1.2;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
 .gxb-tile[aria-expanded=true] .gxb-number{color:#8de0e4}
 .gxb-unit{font-size:9px;color:#9dabb9;line-height:1.3;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
-.gxb-panel{margin-top:9px;padding:20px 19px 17px;border-radius:22px;min-width:0}
+.gxb-mini-progress{width:100%;height:4px;min-height:4px;flex:0 0 4px;overflow:hidden;border-radius:99px;background:rgba(241,247,255,.085);margin-top:8px}
+.gxb-mini-progress > span{display:block;position:relative;height:100%;width:var(--gxb-pct,0%);border-radius:inherit;background:linear-gradient(90deg,#7c4dff,#00e3eb);transform-origin:left center;transform:scaleX(0);will-change:transform}
+.gxb-wrap.is-visible .gxb-mini-progress > span{transform:scaleX(1);transition:transform .98s cubic-bezier(.16,1,.3,1)}
+.gxb-mini-progress > span::after,.gxb-progress span::after{content:"";position:absolute;inset:0;width:45%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.57),transparent);opacity:0;transform:translateX(-130%);pointer-events:none}
+.gxb-wrap.is-visible .gxb-mini-progress > span::after{animation:gxbSweep 1.6s 1.03s cubic-bezier(.2,.7,.3,1) 1}
+@keyframes gxbSweep{0%{transform:translateX(-130%);opacity:0}20%{opacity:.86}80%{opacity:.58}100%{transform:translateX(300%);opacity:0}}
+.gxb-ready-caption{display:block;margin:1px 0 0;color:#91e0dd;font-size:9px;line-height:1.25;font-weight:600}
+.gxb-panel{position:relative;isolation:isolate;overflow:hidden;margin-top:9px;padding:20px 19px 17px;border-radius:22px;min-width:0}
+.gxb-panel::before{content:attr(data-watermark);position:absolute;top:25px;right:7px;z-index:0;pointer-events:none;font-size:82px;line-height:1;opacity:.07;transform:rotate(-13deg)}
+.gxb-panel > *{position:relative;z-index:1}
+.gxb-panel.is-opening::before{animation:gxbPanelMark .58s cubic-bezier(.18,.85,.2,1) both}
+@keyframes gxbPanelMark{from{opacity:0;transform:translate(12px,8px) rotate(-20deg) scale(.8)}to{opacity:.07;transform:translate(0,0) rotate(-13deg) scale(1)}}
 .gxb-head{display:flex;align-items:start;justify-content:space-between;gap:12px}
 .gxb-eyebrow{font-size:9px;color:#a8c9cf;font-weight:700;letter-spacing:.09em}
 .gxb-panel h3{font-size:18px;line-height:1.25;letter-spacing:-.035em;margin:7px 0 0}
@@ -166,7 +195,7 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 .gxb-progress-header{display:flex;justify-content:space-between;align-items:baseline;gap:9px;font-size:10px;color:#a0afbe;margin-bottom:10px}
 .gxb-progress-header strong{font-size:11px;color:#e1eef5;font-weight:600}
 .gxb-progress{height:4px;border-radius:99px;overflow:hidden;background:rgba(225,240,255,.095)}
-.gxb-progress span{display:block;height:100%;background:#69d6dc;border-radius:inherit}
+.gxb-progress span{display:block;position:relative;height:100%;background:linear-gradient(90deg,#7c4dff,#00dfe9);border-radius:inherit;transform-origin:left center;overflow:hidden}
 .gxb-note{font-size:10px;line-height:1.55;color:#9aabbb;margin:13px 0 0}
 .gxb-tasks{list-style:none;padding:0;margin:0}
 .gxb-tasks li{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:11px 0;font-size:11px;color:#c9d7e0;border-bottom:1px solid rgba(255,255,255,.055)}
@@ -175,8 +204,14 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 .gxb-tasks li:last-child small{color:#a6b1c1}
 .gxb-disclaimer{font-size:9px;line-height:1.55;color:#8195a8;margin:13px 0 0}
 .gxb-tile:focus-visible,.gxb-dismiss:focus-visible,.gxc-mini:focus-visible{outline:2px solid #6de0ef;outline-offset:3px}
-@media(max-width:350px){.gxb-row{gap:6px}.gxb-tile{min-height:95px;padding:11px 8px;border-radius:16px}.gxb-label{font-size:9px}.gxb-number{font-size:19px}.gxb-unit{font-size:8.5px}.gxb-panel{padding:18px 15px}}
-@media(prefers-reduced-motion:reduce){.gxb-tile{transition:none}.gxb-tile:active{transform:none}}
+@media(max-width:350px){.gxb-row{gap:6px}.gxb-tile{min-height:103px;padding:11px 8px 9px;border-radius:16px}.gxb-tile::before{font-size:48px;right:-8px}.gxb-label{font-size:9px}.gxb-number{font-size:19px}.gxb-unit{font-size:8.5px}.gxb-mini-progress{margin-top:6px}.gxb-panel{padding:18px 15px}}
+@media(prefers-reduced-motion:reduce){
+ .gxb-tile{transition:none!important;animation:none!important}
+ .gxb-tile:active{transform:none}
+ .gxb-tile::before,.gxb-panel::before,.gxb-mini-progress > span::after{animation:none!important}
+ .gxb-mini-progress > span{transform:none!important;transition:none!important;will-change:auto}
+ .gxb-mini-progress > span::after{opacity:0!important}
+}
 .gxc-mini-rail{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:9px}
 .gxc-mini{position:relative;display:grid;grid-template-columns:35px minmax(0,1fr) 16px;gap:9px;align-items:center;padding:10px 9px;min-width:0;min-height:76px;border-radius:16px;text-align:left}
 .gxc-mini-icon{width:34px;height:34px;display:grid;place-items:center;border-radius:10px;background:rgba(255,255,255,.035);font-size:17px}
@@ -231,9 +266,9 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 <div class="glass-test-label">La onda y la luz se desplazan por debajo del cristal</div>
 <section class="gxb-wrap" aria-label="Beneficios de ejemplo">
  <div class="gxb-row" role="group" aria-label="Lealtad, Referidos y Misiones">
-  <button type="button" class="gxb-tile gxc-surface" data-gxb="loyalty" aria-expanded="false" aria-controls="gxb-panel" aria-label="Lealtad, 3 de 4 pagos"><span class="gxb-label">Lealtad</span><strong class="gxb-number">3/4</strong><span class="gxb-unit">pagos</span></button>
-  <button type="button" class="gxb-tile gxc-surface" data-gxb="referral" aria-expanded="false" aria-controls="gxb-panel" aria-label="Referidos, 1 de 3 meses"><span class="gxb-label">Referidos</span><strong class="gxb-number">1/3</strong><span class="gxb-unit">meses</span></button>
-  <button type="button" class="gxb-tile gxc-surface" data-gxb="mission" aria-expanded="false" aria-controls="gxb-panel" aria-label="Misiones, 2 de 3 completadas"><span class="gxb-label">Misiones</span><strong class="gxb-number">2/3</strong><span class="gxb-unit">completadas</span></button>
+  <button type="button" class="gxb-tile gxc-surface" data-gxb="loyalty" data-watermark="⭐" aria-expanded="false" aria-controls="gxb-panel" aria-label="Lealtad, 3 de 4 pagos"><span class="gxb-label">Lealtad</span><strong class="gxb-number">3/4</strong><span class="gxb-unit">pagos</span><span class="gxb-mini-progress" aria-hidden="true"><span style="--gxb-pct:75%"></span></span></button>
+  <button type="button" class="gxb-tile gxc-surface" data-gxb="referral" data-watermark="🎁" aria-expanded="false" aria-controls="gxb-panel" aria-label="Referidos, 1 de 3 meses"><span class="gxb-label">Referidos</span><strong class="gxb-number">1/3</strong><span class="gxb-unit">meses</span><span class="gxb-mini-progress" aria-hidden="true"><span style="--gxb-pct:33.33%"></span></span></button>
+  <button type="button" class="gxb-tile gxc-surface" data-gxb="mission" data-watermark="🎯" aria-expanded="false" aria-controls="gxb-panel" aria-label="Misiones, 2 de 3 completadas"><span class="gxb-label">Misiones</span><strong class="gxb-number">2/3</strong><span class="gxb-unit">completadas</span><span class="gxb-mini-progress" aria-hidden="true"><span style="--gxb-pct:66.67%"></span></span></button>
  </div>
  <div id="gxb-panel" class="gxb-panel gxc-surface" role="region" aria-label="Detalle del beneficio" hidden>
   <div class="gxb-head"><div><span id="gxb-eyebrow" class="gxb-eyebrow"></span><h3 id="gxb-title"></h3></div><button id="gxb-dismiss" type="button" class="gxb-dismiss" aria-label="Cerrar detalle">×</button></div>
@@ -282,6 +317,7 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
  <button type="button" data-layout-preset="original" aria-pressed="false">Original</button>
 </div>
 <span class="layout-compare-caption" id="layout-caption">Tarjeta menos alta; acción centrada en la base y lealtad debajo, por separado.</span>
+<div class="gxb-lab-toggle"><button type="button" id="gxb-ready-toggle" aria-pressed="false">Simular recompensa lista · Misiones</button><span>Prueba el efecto de logro y compáralo con el progreso normal.</span></div>
 <div class="glass-material-selector" role="group" aria-label="Comparar materiales de cristal">
   <button type="button" data-material-preset="official" aria-pressed="false">GOXION oficial</button>
   <button type="button" data-material-preset="lab" aria-pressed="false">Laboratorio</button>
@@ -563,9 +599,42 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
  const examples={
   loyalty:{label:'LEALTAD',title:'Tu constancia suma',copy:'Llevas 3 pagos consecutivos. Falta uno para alcanzar el primer nivel.',detail:'<div class="gxb-progress-header"><span>Próximo nivel</span><strong>4 pagos · 3% OFF</strong></div><div class="gxb-progress" role="progressbar" aria-label="Pagos consecutivos" aria-valuemin="0" aria-valuemax="4" aria-valuenow="3"><span style="width:75%"></span></div><p class="gxb-note">Un pago fuera de la fecha original reinicia la racha, incluso con prórroga. El segundo nivel requiere 9 pagos.</p>'},
   referral:{label:'REFERIDOS',title:'Tu invitado avanza',copy:'En este ejemplo mantiene 2 servicios activos y 1 de 3 meses validados.',detail:'<div class="gxb-progress-header"><span>Meses validados</span><strong>1 de 3</strong></div><div class="gxb-progress" role="progressbar" aria-label="Meses de referido" aria-valuemin="0" aria-valuemax="3" aria-valuenow="1"><span style="width:33.33%"></span></div><p class="gxb-note">El programa requiere al menos 2 perfiles activos y 3 meses pagados; el mes gratuito corresponde al cuarto mes, según las reglas vigentes.</p>'},
-  mission:{label:'MISIONES',title:'Ya casi lo consigues',copy:'Has completado 2 de 3 actividades de ejemplo.',detail:'<ul class="gxb-tasks"><li><span>Visitar el catálogo</span><small>Completada ✓</small></li><li><span>Enviar un comentario</span><small>Completada ✓</small></li><li><span>Compartir GOXION</span><small>Pendiente</small></li></ul><p class="gxb-note">Las misiones y sus recompensas dependen de las tareas activadas para cada cliente.</p>'}
+  mission:{label:'MISIONES',title:'Ya casi lo consigues',copy:'Has completado 2 de 3 actividades de ejemplo.',detail:'<ul class="gxb-tasks"><li><span>Visitar el catálogo</span><small>Completada ✓</small></li><li><span>Enviar un comentario</span><small>Completada ✓</small></li><li><span>Compartir GOXION</span><small>Pendiente</small></li></ul><p class="gxb-note">Las misiones y sus recompensas dependen de las tareas activadas para cada cliente.</p>'},
+  missionReady:{label:'MISIONES',title:'¡Recompensa disponible!',copy:'Completaste las 3 actividades de este ejemplo. Tu próximo paso es revisar el beneficio.',detail:'<div class="gxb-progress-header"><span>Misiones completadas</span><strong>3 de 3 · Lista</strong></div><div class="gxb-progress" role="progressbar" aria-label="Todas las misiones completadas" aria-valuemin="0" aria-valuemax="3" aria-valuenow="3"><span style="width:100%"></span></div><p class="gxb-note">En GOXION real, la acción para reclamar o aplicar un beneficio depende de las condiciones y del estado confirmado de la cuenta.</p>'}
  };
- let current=null;
+ let current=null,missionReady=false;
+ const demoToggle=document.getElementById('gxb-ready-toggle');
+ const missionTile=tiles.find(tile=>tile.dataset.gxb==='mission');
+ const noMotion=()=>window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+ function present(key,tile){
+  const item=key==='mission'&&missionReady?examples.missionReady:examples[key];
+  if(!item)return;
+  const wasClosed=panel.hidden;
+  current=key;
+  document.getElementById('gxb-eyebrow').textContent=item.label;
+  document.getElementById('gxb-title').textContent=item.title;
+  document.getElementById('gxb-copy').textContent=item.copy;
+  document.getElementById('gxb-content').innerHTML=item.detail; // Plantillas estáticas de muestra.
+  panel.dataset.watermark=tile.dataset.watermark;
+  tiles.forEach(button=>button.setAttribute('aria-expanded',String(button===tile)));
+  panel.hidden=false;
+  if(!noMotion()){
+   panel.classList.remove('is-opening');
+   if(wasClosed){
+    void panel.offsetWidth;
+    panel.classList.add('is-opening');
+    if(panel.animate)panel.animate([{opacity:0,transform:'translateY(-9px) scale(.99)'},{opacity:1,transform:'translateY(0) scale(1)'}],{duration:380,easing:'cubic-bezier(.2,.82,.2,1)'});
+   }
+   const progress=panel.querySelector('.gxb-progress span');
+   if(progress&&progress.animate){
+    progress.animate([{transform:'scaleX(0)'},{transform:'scaleX(1)'}],{duration:920,easing:'cubic-bezier(.16,1,.3,1)'});
+   }
+   const head=panel.querySelector('.gxb-head');
+   if(head&&head.animate&&wasClosed){
+    head.animate([{opacity:.3,transform:'translateY(7px)'},{opacity:1,transform:'translateY(0)'}],{duration:420,delay:60,easing:'cubic-bezier(.2,.82,.2,1)'});
+   }
+  }
+ }
  function hide(refocus){
   const selected=tiles.find(t=>t.dataset.gxb===current);
   current=null;panel.hidden=true;
@@ -573,19 +642,30 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
   if(refocus&&selected)selected.focus({preventScroll:true});
  }
  tiles.forEach(tile=>tile.addEventListener('click',()=>{
-  const key=tile.dataset.gxb;if(current===key){hide(false);return;}
-  const item=examples[key];if(!item)return;
-  const wasClosed=panel.hidden;current=key;
-  document.getElementById('gxb-eyebrow').textContent=item.label;
-  document.getElementById('gxb-title').textContent=item.title;
-  document.getElementById('gxb-copy').textContent=item.copy;
-  document.getElementById('gxb-content').innerHTML=item.detail; // Solo HTML fijo de este laboratorio.
-  tiles.forEach(t=>t.setAttribute('aria-expanded',String(t===tile)));
-  panel.hidden=false;
-  if(wasClosed&&panel.animate&&!window.matchMedia('(prefers-reduced-motion:reduce)').matches){
-   panel.animate([{opacity:0,transform:'translateY(-8px) scale(.99)'},{opacity:1,transform:'translateY(0) scale(1)'}],{duration:360,easing:'cubic-bezier(.2,.82,.2,1)'});
-  }
+  if(current===tile.dataset.gxb){hide(false);return;}
+  present(tile.dataset.gxb,tile);
  }));
+ // Conmutar exclusivamente el ejemplo visual de misión lista, sin backend.
+ demoToggle.addEventListener('click',()=>{
+  missionReady=!missionReady;
+  demoToggle.setAttribute('aria-pressed',String(missionReady));
+  missionTile.dataset.ready=String(missionReady);
+  missionTile.dataset.watermark=missionReady?'🏆':'🎯';
+  missionTile.querySelector('.gxb-number').textContent=missionReady?'3/3':'2/3';
+  missionTile.querySelector('.gxb-unit').textContent=missionReady?'premio listo':'completadas';
+  missionTile.querySelector('.gxb-mini-progress > span').style.setProperty('--gxb-pct',missionReady?'100%':'66.67%');
+  missionTile.setAttribute('aria-label',missionReady?'Misiones, 3 de 3, recompensa disponible':'Misiones, 2 de 3 completadas');
+  if(current==='mission')present('mission',missionTile);
+ });
+ // Revelar el progreso una sola vez al entrar a la pantalla.
+ const section=document.querySelector('.gxb-wrap');
+ if(!noMotion()&&'IntersectionObserver' in window){
+  const observer=new IntersectionObserver(entries=>{
+   if(!entries.some(item=>item.isIntersecting))return;
+   section.classList.add('is-visible');observer.disconnect();
+  },{threshold:.18});
+  observer.observe(section);
+ }else section.classList.add('is-visible');
  document.getElementById('gxb-dismiss').addEventListener('click',()=>hide(true));
  panel.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();hide(true)}});
  document.querySelectorAll('[data-catalog]').forEach(button=>button.addEventListener('click',()=>{
