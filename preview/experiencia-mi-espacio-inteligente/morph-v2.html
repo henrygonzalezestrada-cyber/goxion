@@ -35,9 +35,11 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 .nav svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 .nav .active svg{color:#53dce8}
 .nav .nav-only{display:none}
-.greeting{height:clamp(106px,26vw,122px);min-height:0;display:flex;align-items:flex-end;padding:0 9px 19px;overflow:hidden}
-.greeting h1{margin:0;height:2.34em;flex:0 0 100%;font-weight:700;font-size:clamp(26px,6vw,34px);letter-spacing:-.045em;line-height:1.17;max-width:100%;text-wrap:balance;overflow:clip}
-.greeting .word{display:inline-block;will-change:transform,filter,opacity;white-space:pre}
+/* Saludo ligado al hero. Reserva dos líneas y ancla el texto abajo para evitar huecos. */
+.greeting{height:clamp(88px,23vw,102px);min-height:0;display:flex;align-items:flex-end;padding:0 9px 17px;overflow:hidden}
+.greeting h1{margin:0;height:2.32em;flex:0 0 100%;display:flex;align-items:flex-end;font-weight:700;font-size:clamp(28px,7vw,35px);letter-spacing:-.045em;line-height:1.16;max-width:100%;overflow:clip}
+.greeting-line{display:block;width:100%;max-height:2.32em;overflow:clip;text-wrap:balance}
+.greeting .word{display:inline-block;will-change:transform,filter,opacity;white-space:normal}
 .greeting .name{color:#42e4e8}
 .focus{position:relative;z-index:1;isolation:isolate;display:grid;grid-template-columns:minmax(0,1fr) minmax(84px,30%);grid-template-rows:minmax(145px,1fr) auto;align-items:center;width:100%;min-height:277px;text-align:left;padding:29px 23px 23px 28px;overflow:hidden;border:1px solid rgba(220,237,255,.035);border-radius:32px;background:linear-gradient(142deg,var(--glass-top,rgba(25,29,48,.54)),var(--glass-middle,rgba(7,13,24,.63)) 60%,var(--glass-bottom,rgba(12,23,37,.55)));box-shadow:0 20px 52px rgba(0,0,0,.19),inset 0 1px rgba(255,255,255,.055);color:var(--text);-webkit-backdrop-filter:blur(var(--glass-blur,19px)) saturate(1.35);backdrop-filter:blur(var(--glass-blur,19px)) saturate(1.35);transform:translateZ(0);transition:grid-template-columns .72s cubic-bezier(.2,.85,.2,1),border-radius .75s cubic-bezier(.2,.85,.2,1),border-color .65s ease,box-shadow .65s ease,background .6s ease}
 .focus:before{content:"";position:absolute;inset:-65px -55px auto auto;width:250px;height:240px;border-radius:50%;background:radial-gradient(ellipse at center,var(--glow,rgba(65,219,232,.22)) 0%,transparent 73%);opacity:.65;transition:background .5s,opacity .6s;z-index:-1;pointer-events:none}
@@ -155,8 +157,8 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
 .detail .close{min-height:44px;width:100%;border-radius:15px;border:1px solid rgba(130,190,220,.3);background:rgba(44,71,87,.4);color:#ddfaff}
 .detail .hint{color:#80dbe7;font-size:10px;font-weight:700}
 @media (max-width:380px){
- .greeting{height:112px;padding-bottom:17px}
- .greeting h1{font-size:clamp(24px,6.45vw,28px)}
+ .greeting{height:90px;padding-bottom:15px}
+ .greeting h1{font-size:clamp(26px,7vw,29px)}
  .shell{padding-inline:13px}
  .header{padding-inline:5px}
  .nav{grid-template-columns:2fr .7fr .7fr}
@@ -182,6 +184,8 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
  .focus-title{font-size:21px}
  .focus-action{gap:3px;font-size:9px}
  .focus-meta{font-size:9px}
+ .greeting{height:86px;padding-bottom:14px}
+ .greeting h1{font-size:25px}
 }
 @media(prefers-reduced-motion:reduce){
  *,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
@@ -316,7 +320,7 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
 }
 
 /* GOXION · Ahorro: jerarquía en la cifra, logos espaciales y mismo ritmo vertical. */
-.gxv-savings{position:relative;isolation:isolate;display:grid;grid-template-columns:minmax(92px,42%) minmax(0,1fr);align-items:center;gap:clamp(7px,2.3vw,16px);min-height:170px;margin:14px 2px 0;padding:15px 19px 15px 13px;border-radius:25px;overflow:hidden}
+.gxv-savings{position:relative;isolation:isolate;display:grid;grid-template-columns:minmax(92px,42%) minmax(0,1fr);align-items:center;gap:clamp(7px,2.3vw,16px);min-height:170px;margin:14px 2px 0;padding:15px 15px 15px 18px;border-radius:25px;overflow:hidden}
 .gxv-savings::before{content:"";position:absolute;z-index:-1;inset:0;pointer-events:none;background:radial-gradient(ellipse at 17% 48%,rgba(91,114,192,.09),transparent 58%)}
 .gxv-logos{position:relative;height:140px;min-width:0;width:100%;pointer-events:none;user-select:none;perspective:300px}
 .gxv-slot{position:absolute;display:block;width:var(--size,48px);height:var(--size,48px);z-index:var(--layer,1);transform-origin:center;--float:3px;--duration:7.5s}
@@ -346,8 +350,8 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
 .gxv-slot:nth-child(2){--delay:-3.4s}
 .gxv-slot:nth-child(3){--delay:-4.9s}
 .gxv-slot:nth-child(4){--delay:-2.6s}
-@media(max-width:380px){.gxv-savings{min-height:164px;padding:13px 12px 13px 10px;border-radius:23px}.gxv-logos{height:137px}.gxv-context{font-size:10.5px}}
-@media(max-width:315px){.gxv-savings{grid-template-columns:minmax(90px,41%) minmax(0,1fr);gap:7px;padding:12px 9px 12px 8px}.gxv-amount{font-size:34px}.gxv-amount[data-long="true"]{font-size:27px}.gxv-context{font-size:10px}}
+@media(max-width:380px){.gxv-savings{min-height:164px;padding:13px 12px 13px 14px;border-radius:23px}.gxv-logos{height:137px}.gxv-context{font-size:10.5px}}
+@media(max-width:315px){.gxv-savings{grid-template-columns:minmax(90px,41%) minmax(0,1fr);gap:7px;padding:12px 9px 12px 11px}.gxv-amount{font-size:34px}.gxv-amount[data-long="true"]{font-size:27px}.gxv-context{font-size:10px}}
 @media(prefers-reduced-motion:reduce){.gxv-slot{animation:none!important;transform:none!important}}
 
 .gxc-mini-rail{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:9px}
@@ -384,7 +388,7 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
 <button type="button" class="local-only" aria-label="Soporte de ejemplo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 5a5 5 0 0 0-6 6L2 17l5 5 6-6a5 5 0 0 0 6-6l-4 3-3-3z"/></svg></button>
 </nav>
 <section aria-label="Resumen contextual de cliente">
-<div class="greeting"><h1 id="greeting" aria-label="Hola, Mario">Hola, <span class="name">Mario</span></h1></div>
+<div class="greeting"><h1 id="greeting" aria-label="Hola, Mario"><span class="greeting-line">Hola, <span class="name">Mario</span></span></h1></div>
 <div class="glass-stage" id="glass-stage">
 <div class="glass-underlay" id="glass-underlay" aria-hidden="true">
   <span class="glass-beam" id="glass-beam"></span>
@@ -580,17 +584,22 @@ function classify(s){
 }
 function words(text,name){
  const element=$('greeting');
- element.replaceChildren();
+ const line=element.querySelector('.greeting-line')||document.createElement('span');
+ line.className='greeting-line';
+ line.replaceChildren();
+ if(!line.isConnected)element.append(line);
  const tokens=text.split(/(\s+)/);
  tokens.forEach(part=>{
   if(!part)return;
+  // Real whitespace nodes preserve wrapping; animated inline blocks hold only words.
+  if(!part.trim()){line.append(document.createTextNode(part));return}
   const s=document.createElement('span');
   s.className='word';
   s.textContent=part;
   if(name && part.indexOf('Mario')>=0)s.classList.add('name');
-  element.append(s);
+  line.append(s);
   if(!reduced() && part.trim() && s.animate){
-   const order=element.querySelectorAll('.word').length;
+   const order=line.querySelectorAll('.word').length;
    s.animate([{transform:'translateY(70%)',filter:'blur(9px)',opacity:0},{transform:'translateY(0)',filter:'blur(0)',opacity:1}],
     {duration:640,delay:Math.min(order*50,310),easing:'cubic-bezier(.16,1,.3,1)',fill:'both'});
   }
