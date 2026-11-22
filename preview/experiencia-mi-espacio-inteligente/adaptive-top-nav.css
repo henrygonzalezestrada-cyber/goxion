@@ -1,13 +1,21 @@
 /* GOXION Mi Espacio — Adaptive Top Capsule (LAB ONLY)
    Independent surface; never styles the approved hero/benefits/services.
-   One navigation DOM; a docked presentation, not a duplicated nav. */
+   One navigation DOM; a docked presentation, not a duplicated nav.
+   Morph transform-only (técnica del Index): la píldora conserva un tamaño
+   de layout fijo y solo se mueve con transform; la franja es estacionaria
+   (su cristal no se mueve, solo su opacidad). Una sola franja con la
+   píldora, la campana y la foto de perfil. */
 .gxn-stage{position:relative;height:151px;margin:0 0 15px}
 .gxn-top{position:absolute;inset:0 0 auto;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:60px 76px;grid-template-areas:"brand actions" "nav nav";row-gap:9px;column-gap:8px;z-index:11;min-width:0;isolation:isolate}
 .gxn-header{display:contents}
 .gxn-brand{grid-area:brand;display:flex;align-items:center;align-self:center;justify-content:flex-start;min-width:0;padding:0 7px}
 .gxn-wordmark{width:132px;max-width:100%;height:36px;object-fit:contain;object-position:left center}
 .gxn-brand-mark{display:none;width:32px;height:34px;object-fit:contain}
-.gxn-actions{grid-area:actions;display:flex;align-items:center;justify-self:end;align-self:center;gap:7px;position:relative}
+/* Acciones fijas (JS las fija tras medir su posición en flujo): campana y
+   foto de perfil viven siempre en la franja superior, alineadas a la
+   derecha. En reposo solapan la fila del encabezado; al acoplar, suben
+   con la franja. Solo se mueven con transform. */
+.gxn-actions{grid-area:actions;display:flex;align-items:center;justify-self:end;align-self:center;gap:7px;position:relative;will-change:transform}
 .gxn-bell,.gxn-profile-trigger{width:44px;min-width:44px;max-width:44px;height:44px;min-height:44px;flex:0 0 44px;aspect-ratio:1;display:grid;place-items:center;padding:0;border:1px solid rgba(214,231,246,.085);border-radius:50%;background:rgba(255,255,255,.07);box-shadow:none;color:#d5e4f1;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);transition:transform .22s ease,background-color .22s ease}
 .gxn-bell svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .gxn-bell:active,.gxn-profile-trigger:active{transform:scale(.965)}
@@ -24,8 +32,24 @@
 .gxn-avatar-photo{position:absolute;inset:0;z-index:3;width:100%;height:100%;object-fit:cover;border-radius:50%}
 .gxn-avatar-photo[hidden]{display:none!important}
 
+/* La franja (una sola barra): fondo de cristal fijo detrás de la píldora
+   acoplada y de las acciones. Estacionaria: solo cambia su opacidad con
+   el progreso del morph (compositor). pointer-events none: no bloquea. */
+.gxn-strip{
+ position:fixed;top:calc(10px + env(safe-area-inset-top,0px));left:50%;
+ width:min(calc(100% - 28px),552px);height:60px;z-index:1;opacity:0;
+ pointer-events:none;border:1px solid rgba(210,230,247,.10);border-radius:20px;
+ background:rgba(8,8,12,.371);
+ box-shadow:0 12px 28px rgba(0,0,0,.13),inset 0 1px rgba(255,255,255,.065);
+ -webkit-backdrop-filter:blur(11.75px) saturate(1.08);
+ backdrop-filter:blur(11.75px) saturate(1.08);
+ transform:translate(-50%,0px);will-change:transform,opacity;
+}
+
 /* The ONE nav is always fixed at viewport coordinates. The slot below
-   reserves its original place; JS animates its transform, never swaps nodes. */
+   reserves its original place; JS animates its transform, never swaps nodes.
+   El tamaño de layout se fija una vez por medición (JS escribe width/height
+   en px); por frame solo se mueve con transform (translate + scale). */
 .gxn-nav-slot{grid-area:nav;min-width:0;width:100%;height:76px;pointer-events:none}
 .gxn-nav-target{position:fixed;left:calc(14px + env(safe-area-inset-left,0px));top:calc(10px + env(safe-area-inset-top,0px));width:1px;height:1px;visibility:hidden;pointer-events:none}
 .gxn-nav{
@@ -38,9 +62,16 @@
  box-shadow:0 12px 28px rgba(0,0,0,.13),inset 0 1px rgba(255,255,255,.065);
  -webkit-backdrop-filter:blur(11.75px) saturate(1.08);
  backdrop-filter:blur(11.75px) saturate(1.08);
- isolation:isolate;contain:layout style;
+ isolation:isolate;contain:layout style;will-change:transform;
 }
 .gxn-nav.gxn-ready{visibility:visible}
+/* Acoplada, la píldora va sólida sobre la franja (el cristal lo aporta la
+   franja, estacionaria): sin backdrop-filter propio mientras se mueve,
+   para no repintar blur por frame. Un solo disparo por histéresis. */
+.gxn-nav[data-nav-label="off"]{
+ background:rgba(10,12,20,.62);
+ -webkit-backdrop-filter:none;backdrop-filter:none;
+}
 .gxn-tab{
  display:inline-flex;align-items:center;justify-content:center;
  flex:0 0 var(--gxn-circle);min-width:var(--gxn-circle);
@@ -55,12 +86,10 @@
  border-radius:999px;background:rgba(255,255,255,.075);
  color:#f1f9ff;border-color:rgba(160,219,234,.12);
 }
-.gxn-nav[data-nav-label="off"] .gxn-tab[aria-current="page"]{
- flex:0 0 var(--gxn-circle);width:var(--gxn-circle);
- height:var(--gxn-circle);aspect-ratio:1;border-radius:50%;
-}
+/* Etiquetas: solo opacidad al acoplar (sin cambio de layout: el morph es
+   transform-only y el tamaño de la píldora nunca cambia por frame). */
 .gxn-nav[data-nav-label="off"] .gxn-tab-label{
- max-width:0!important;opacity:0!important;
+ opacity:0!important;
  transform:translate3d(-8px,0,0)!important;
 }
 .gxn-tab:active{transform:scale(.97)}
@@ -68,9 +97,9 @@
 .gxn-tab[aria-current="page"] .gxn-emoji{transform:translateZ(0) scale(1.09)}
 .gxn-tab-label{display:block;max-width:0;min-width:0;overflow:hidden;opacity:0;white-space:nowrap;transform:translate3d(-9px,0,0);color:#eef7fe;font-size:12px;font-weight:650;letter-spacing:-.02em;transition:max-width .44s cubic-bezier(.2,.85,.2,1),opacity .25s ease,transform .4s cubic-bezier(.2,.85,.2,1)}
 .gxn-tab[aria-current="page"] .gxn-tab-label{max-width:106px;opacity:1;transform:translate3d(0,0,0)}
-.gxn-menu{position:absolute;right:0;top:57px;min-width:210px;max-width:min(280px,calc(100vw - 32px));padding:8px;border:1px solid rgba(211,227,246,.09);border-radius:19px;background:rgba(15,17,25,.97);box-shadow:0 18px 40px rgba(0,0,0,.37);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);z-index:5}
-.gxn-profile-menu{right:0}
-.gxn-notice-menu{right:51px;width:245px}
+.gxn-menu{position:fixed;top:calc(76px + env(safe-area-inset-top,0px));right:calc(14px + env(safe-area-inset-right,0px));min-width:210px;max-width:min(280px,calc(100vw - 32px));padding:8px;border:1px solid rgba(211,227,246,.09);border-radius:19px;background:rgba(15,17,25,.97);box-shadow:0 18px 40px rgba(0,0,0,.37);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);z-index:70}
+.gxn-profile-menu{right:calc(14px + env(safe-area-inset-right,0px))}
+.gxn-notice-menu{width:245px}
 .gxn-menu-head{display:grid;gap:3px;padding:10px 10px 8px}
 .gxn-menu-head strong{font-size:12px;font-weight:700;color:#edf6fc}
 .gxn-menu-head small{font-size:10px;color:#99adbf;line-height:1.45}
@@ -93,12 +122,11 @@
 .gxn-dialog .gxn-dialog-close{min-height:44px;padding:8px 16px;border:0;border-radius:999px;background:rgba(255,255,255,.08);color:#a6e9ed;font-size:11px;font-weight:700}
 .gxn-toast{position:fixed;z-index:75;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:max-content;max-width:calc(100vw - 34px);padding:10px 14px;border-radius:14px;background:rgba(15,23,31,.97);color:#e8f7f9;border:1px solid rgba(206,227,241,.12);box-shadow:0 12px 28px rgba(0,0,0,.32);font-size:10.5px;text-align:center}
 
-/* One continuous motion: JS moves and resizes #gxn-nav from its original
-   slot into the top-left logo zone. No shared bar, hidden-reveal or twin nav. */
+/* One continuous motion: JS moves the SAME nav node with transform from its
+   original slot into the strip. No shared bar, hidden-reveal or twin nav. */
 .gxn-top{overflow:visible}
 .gxn-brand{transform-origin:left center;will-change:auto}
 .gxn-nav .gxn-emoji{font-size:var(--gxn-emoji-size,23px);flex-basis:25px}
-.gxn-nav[data-nav-label="off"] .gxn-tab[aria-current="page"] .gxn-emoji{transform:none}
 .gxn-nav .gxn-tab-label{font-size:var(--gxn-label-size,12px)}
 .gxn-nav .gxn-tab[aria-current="page"] .gxn-tab-label{max-width:106px}
 .gxn-menu:not([hidden]){pointer-events:auto}
