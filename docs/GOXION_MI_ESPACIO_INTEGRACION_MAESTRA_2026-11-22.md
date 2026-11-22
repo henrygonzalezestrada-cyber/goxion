@@ -7,6 +7,14 @@
 
 > **Leer esto primero en otra sesión.** En caso de contradicción entre textos antiguos de continuidad y este corte, este expediente es el **índice de estado e integración más reciente**. Para medidas y microcomportamientos, consultar los **contratos específicos enlazados abajo**; no reemplazarlos con resúmenes. Cada edición futura debe actualizar este expediente junto con su contrato de componente. No suponer que una captura de laboratorio prueba una conexión real.
 
+## Nueva línea conceptual — encabezado y cápsula adaptable (aún sin prototipo)
+
+**Última solicitud registrada el 22/nov/2026:** revisar y analizar, **sin alterar todavía el laboratorio**, la cápsula de navegación superior y la cabecera: navegación que se compacta hacia la parte superior al avanzar en el feed y se reexpande al gesto contrario; logo completo o símbolo según estado; campana oficial preservada; avatar circular personalizable que abre «Mi perfil / Salir»; conservar color y personalidad sin convertirla en tab bar inferior genérica.
+
+**Análisis técnico y referencias externas:** [`GOXION_NAV_SUPERIOR_ANALISIS_CONCEPTO_2026-11-22.md`](GOXION_NAV_SUPERIOR_ANALISIS_CONCEPTO_2026-11-22.md). Veredicto provisional: **una sola cápsula, dos estados**, manteniendo los tres destinos y el morph activo, con emojis actuales como primera candidata para conservar identidad, cristal neutro y transición con histéresis. No apilar dock, cabecera y `#sticky-client-bar`. En el código oficial la campana se inyecta vía `04-client-notifications-realtime.js`, el login de `07-production-interactions-js.js` se transforma y el logout lo gestiona `cerrarSesion()`. **No existe fuente confirmada para guardar foto de avatar**; requiere API/bucket privado seguro antes de producción. Esta propuesta **no está aprobada, implementada ni conectada**. No modificar Hero, beneficios, ahorro, servicios o historial.
+
+---
+
 ## 1. Accesos y puntos de restauración
 
 | Recurso | Fuente |
