@@ -323,6 +323,31 @@ El contrato **[por componente](GOXION_FEED_CONTRATO_VISUAL_POR_COMPONENTE_2026-1
 Esta auditoría es de contrato, selectores y código actual: **no fusiona PR #231, no cambia el laboratorio visual ni altera `ayuda.html` oficial**. Si hay una incompatibilidad futura, se debe inspeccionar el selector real y comparar con el último commit aprobado antes de implementar.
 
 
+## Auditoría de utilidad «Próximos movimientos» — recomendación de DESCARTE (22/nov/2026)
+
+**Estado:** análisis realizado por solicitud del usuario, **recomendación pendiente de su decisión**; no se ha añadido el bloque al laboratorio ni a producción. Reemplaza como recomendación práctica la idea prospectiva anterior que sigue más abajo solo por trazabilidad histórica.
+
+**Criterio de utilidad:** una tarjeta nueva debe aportar un dato verificable o una acción legítima que el usuario no pueda obtener ya sin esfuerzo comparable. Se contrastó contra `ayuda.html`, `assets/js/ayuda/01e-client-dashboard.js`, `assets/js/ayuda/02-client-supabase-layer.js`, `assets/js/ayuda/04-client-notifications-realtime.js` y el hero aprobado.
+
+| Evento previsto en el bloque | Módulo que lo cubre | Dictamen |
+| --- | --- | --- |
+| Próximo corte/pago y vencimiento | Hero dinámico + Estado de cuenta (incluidas revisiones) | Duplicado |
+| Pago/comprobante en revisión o incompleto | Estado de cuenta / aviso de revisión | Duplicado |
+| Cancelación solicitada, aprobada y pendiente de baja | Servicios, card por plataforma | Duplicado |
+| Nueva contraseña, PIN, invitación o incidencias | Servicios / notificaciones existentes | Duplicado |
+| Progreso de misiones, lealtad y referidos | Tres fichas de beneficios | Duplicado |
+
+**Veredicto:** no hay valor suficiente para una sección de «Próximos movimientos» o una mini cronología adicional; **se recomienda omitirla** y comenzar el siguiente y último rediseño del feed: **Historial de pagos**, sin llenar un espacio por composición. No construir otra tarjeta de estado, motor de prioridad ni widget redundante.
+
+**Diferencia que SÍ justifica Historial:** la tarjeta principal y los servicios muestran **el presente**; el historial permite consultar **el registro confirmado de lo que ocurrió** (período, fecha de pago, monto, estatus, relación con racha de lealtad). La capa cliente ya recibe `historial_pagos` con `id`, `fecha` (período), `fecha_pago`, `monto`, `estado`, `puntual`, `lealtad_efecto` y `racha_resultado` vía `mi-espacio`. `01e-client-dashboard.js` ya tiene `gxPaymentHistoryMeta`, hasta 3 filas visibles y opción de expandir para más. Mantener esas fuentes; no inventar movimientos no bancarios ni acreditaciones adicionales.
+
+**Posible necesidad distinta, solo backlog y sin módulo nuevo por ahora:** el cliente podría querer consultar constancias históricas de bajas efectivas u otros cambios de servicios una vez que dejan de figurar como activos. Se detectó que el fetch cliente recibe `data.cancelaciones` pero las tarjetas se construyen desde `data.servicios`; esto **no prueba** que exista una bitácora completa y segura de eventos ni un modelo de constancia. Requiere verificar retención, permisos y fechas reales antes de prometerla. No mezclarla con pagos para justificar el rótulo «Historial de movimientos».
+
+**Precaución de nomenclatura:** mantener el título **Historial de pagos** por ahora, porque el dato real expuesto es una lista de pagos. Llamarlo «Historial de movimientos» exigiría fuentes confiables adicionales y trazabilidad (cancelaciones, altas, cambios, etc.), que todavía no están demostradas. Evitar reutilizar la frase legacy «Tus próximos movimientos y constancia aparecerán aquí» para una lista que aún solo contiene pagos.
+
+**Siguiente paso visual si usuario aprueba:** rediseñar el historial dentro del mismo `preview/experiencia-mi-espacio-inteligente/morph-v2.html`, con filas/agrupaciones compactas y jerarquía fecha/importe/estado, distinción real del efecto de lealtad y detalle progresivo bajo demanda. Conservar hero, beneficios, ahorro y servicios. No cambiar `ayuda.html` ni reglas de pagos sin pruebas.
+
+---
 ## Siguiente propuesta del feed: Próximos movimientos — antes de Historial de pagos (22/nov/2026)
 
 **Origen:** recuperación de la propuesta anterior hecha al usuario, no una decisión nueva ni aprobación explícita. Después de Lealtad, Referidos, Misiones, Ahorro y Tus servicios se había sugerido una sección opcional llamada **«Próximos movimientos»**, ubicada **antes del Historial de pagos**; este último se reserva como **última sección por adaptar** al nuevo lenguaje del feed.
