@@ -4,6 +4,21 @@
 **Estado:** laboratorio interactivo actualizado, pendiente de validación visual final en iPhone/Safari y de aprobación del usuario. **NO integrado en producción.**  
 **Repositorio:** `henrygonzalezestrada-cyber/goxion`.
 
+## Último ajuste de encabezado y controles — 22/nov/2026
+
+El usuario pidió acercar «Todos / Pagos / Servicios» al título «Historial de movimientos» y armonizar flechas, X y material de filtros con Servicios. **Aplicado al laboratorio, no a `ayuda.html`**, commit `5f78c8ed479c8ca7b926238c3853e0daa934ef78`.
+
+- Los tres filtros son una parte del encabezado `gxm-head`, alineados a la izquierda **justo bajo el título en iPhone** (no se fuerza a encajarlos horizontalmente con un título largo); desde 680px pueden compartir la línea con él. Disminuye el aire visual innecesario sin comprimir la lista.
+- Tanto el botón superior de filtro como las filas abiertas usan las clases reales `gxs-icon` / `gxs-chevron` / `gxs-x` de Servicios: flecha en reposo, **disco cian de 35px, X oscura de 16px, área táctil 44px** al abrirse. No alterar esas clases compartidas ni agregar una segunda versión de X.
+- Cápsulas de categoría en cristal **`rgba(255,255,255,.08)`** como los botones del resto del feed; selección con tinte cian sutil, sin bordes/glows. Mantener la lista con sus separadores funcionales y datos de prueba.
+- QA estático: scripts 4/4 válidos, encabezados/secciones balanceados, 12 transiciones de interacción simuladas satisfactorias (filtro, selección, apertura de detalle, mostrar más, retorno a todos). Se verificó que fuera de Historial no cambió HTML/CSS/JS; **Safari visual en el iPhone sigue pendiente de esta versión**.
+
+Documentación canónica: `docs/GOXION_HISTORIAL_MOVIMIENTOS_DISENO_Y_FUENTES_2026-11-22.md`.
+
+**Laboratorio actualizado:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=5f78c8e
+
+---
+
 ## Pulido de Historial basado en captura Safari — 22/nov/2026
 
 El usuario compartió captura de iPhone del nuevo Historial de movimientos y solicitó análisis independiente de limpieza, márgenes, jerarquía y separadores frente a lo aprobado. Conclusión: **no rehacer el módulo; su estructura, cristal y densidad son correctos.**
@@ -14,7 +29,7 @@ Laboratorio actualizado en `3d9eca2a83108364b858c10fb43f4840b405b611` y `3e48c16
 
 **Chequeos:** cuatro scripts JS válidos, HTML de secciones balanceado, siete registros simulados, detalles bajo demanda y X común 35px/16px intacta. Aún falta ver esta iteración exacta renderizada en Safari, y no se ha tocado la página oficial.
 
-**Laboratorio actual:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=3e48c16
+**Laboratorio actual:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=5f78c8e
 
 ---
 
@@ -35,7 +50,7 @@ Laboratorio actualizado en `3d9eca2a83108364b858c10fb43f4840b405b611` y `3e48c16
 ## Abrir primero al continuar en otro chat
 
 - **Laboratorio en GitHub Pages:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=73624b2
-- **Fuente de la última iteración:** `preview/experiencia-mi-espacio-inteligente/morph-v2.html` en commit **`3e48c16a3a107e080891f70caabb77403d00f4ee`**: auditoría visual posterior a captura Safari del historial, manteniendo separadores funcionales, mejorando ritmo y filtro sin alterar módulos aprobados. El prototipo base del historial llegó en `73624b2f59fc86b62f6f18d908a22a0937164ae8`.
+- **Fuente de la última iteración:** `preview/experiencia-mi-espacio-inteligente/morph-v2.html` en commit **`5f78c8ed479c8ca7b926238c3853e0daa934ef78`**: filtros en el encabezado y control flecha→X cian idéntico a Servicios, conservando los módulos aprobados. La auditoría previa del historial fue `3e48c16a3a107e080891f70caabb77403d00f4ee`; prototipo base `73624b2f59fc86b62f6f18d908a22a0937164ae8`.
 - **Documentación de la tarjeta principal congelada:** `docs/GOXION_MI_ESPACIO_HERO_APROBADA_2026-11-22.md`.
 - **Auditoría visual previa y principios aprendidos:** `docs/GOXION_AUDITORIA_BENEFICIOS_FEED_2026-11-22.md`.
 - **Rama que preserva la tarjeta principal aprobada:** `approved/mi-espacio-hero-compacta-centrada-20261122`, apuntando a `f33e8572c07377f4811080a87c7cb1b483983b34`. Se elimina únicamente el rótulo flotante «GOXION» rechazado, según la documentación del hero.
