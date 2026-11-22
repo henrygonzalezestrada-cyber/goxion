@@ -217,10 +217,17 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 .gxb-panel{position:relative;isolation:isolate;overflow:hidden;min-width:0;min-height:300px;margin:0;border-radius:26px;padding:23px 21px 22px;background:rgba(8,8,12,.371)!important;border:1px solid rgba(255,255,255,.035);box-shadow:0 15px 36px rgba(0,0,0,.23),inset 0 1px rgba(255,255,255,.05);-webkit-backdrop-filter:blur(11.75px) saturate(1);backdrop-filter:blur(11.75px) saturate(1)}
 .gxb-panel::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(circle at 91% 99%,rgba(64,199,204,.055),transparent 43%)}
 .gxb-panel-inner{position:relative;z-index:1;min-width:0}
-.gxb-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
-.gxb-eyebrow{font-size:10px;line-height:1.3;color:#8ec5ca;letter-spacing:.11em;font-weight:700}
-.gxb-panel h3{font-size:clamp(19px,5.3vw,24px);line-height:1.18;letter-spacing:-.043em;font-weight:700;margin:9px 0 0;color:#f7fbff;max-width:92%}
-.gxb-dismiss{min-width:44px;width:44px;height:44px;display:grid;place-items:center;border-radius:99px;border:0;background:rgba(255,255,255,.075);color:#eaf2f9;font-size:22px;line-height:1;flex:0 0 auto}
+/* Prominent title first; close control is anchored to the panel like the official modal. */
+.gxb-head{display:block;min-width:0;padding-right:50px}
+.gxb-panel h3{font-size:clamp(20px,5.5vw,25px);line-height:1.15;letter-spacing:-.043em;font-weight:700;margin:0;color:#f7fbff;max-width:100%;text-wrap:balance}
+.gxb-panel h3 .gxb-title-accent{color:var(--gxb-title-accent,#88e0de)}
+.gxb-panel[data-benefit="loyalty"]{--gxb-title-accent:#bfaaff}
+.gxb-panel[data-benefit="referral"]{--gxb-title-accent:#82e1df}
+.gxb-panel[data-benefit="mission"]{--gxb-title-accent:#9dc3ff}
+.gxb-dismiss{position:absolute;top:15px;right:16px;z-index:5;min-width:44px;width:44px;height:44px;display:grid;place-items:center;border:0;border-radius:50%;background:transparent;box-shadow:none;color:#eaf2f9;line-height:1;cursor:pointer}
+.gxb-dismiss::before{content:"";position:absolute;inset:3px;border-radius:50%;background:rgba(255,255,255,.085);pointer-events:none;transition:background-color .2s ease}
+.gxb-dismiss svg{position:relative;width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;pointer-events:none}
+.gxb-dismiss:active::before{background:rgba(255,255,255,.14)}
 .gxb-copy{font-size:12px;line-height:1.55;color:#bfcedb;margin:12px 0 22px;max-width:94%}
 .gxb-metric-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px}
 .gxb-metric-head span{font-size:11px;color:#afbece}
@@ -264,6 +271,7 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
  .gxb-number{font-size:23px}
  .gxb-unit{font-size:9.5px}
  .gxb-panel{padding:20px 18px 20px}
+ .gxb-dismiss{top:13px;right:13px}
  .gxb-foot{padding-right:0;gap:9px}
 }
 @media(max-width:315px){
@@ -277,7 +285,7 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
  .gxb-foot{padding-right:0}
 }
 @media(prefers-reduced-motion:reduce){
- .gxb-tile,.gxb-mini-progress>span,.gxb-action,.gxb-rules,.gxb-rules::before{transition:none!important;animation:none!important}
+ .gxb-tile,.gxb-mini-progress>span,.gxb-action,.gxb-rules,.gxb-rules::before,.gxb-dismiss::before{transition:none!important;animation:none!important}
  .gxb-tile:active{transform:none}
  .gxb-emoji,.gxb-mini-progress>span::after,.gxb-panel-emoji{animation:none!important}
  .gxb-mini-progress>span{transform:none!important;will-change:auto}
@@ -348,9 +356,9 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
  <div id="gxb-panel" class="gxb-panel gxc-surface" role="region" aria-label="Detalle de beneficio" hidden>
   <div class="gxb-panel-inner">
    <div class="gxb-head">
-    <div><span id="gxb-eyebrow" class="gxb-eyebrow"></span><h3 id="gxb-title"></h3></div>
-    <button id="gxb-dismiss" type="button" class="gxb-dismiss" aria-label="Volver a los beneficios">×</button>
+    <h3 id="gxb-title"></h3>
    </div>
+   <button id="gxb-dismiss" type="button" class="gxb-dismiss" aria-label="Volver a los beneficios"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
    <p id="gxb-copy" class="gxb-copy"></p>
    <div id="gxb-content"></div>
   </div>
@@ -700,37 +708,37 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
  const text=id=>document.getElementById(id);
  const entries={
   loyalty:{
-   kicker:'LEALTAD',title:'Tu constancia crece',copy:'Un pago más y desbloqueas tu primer beneficio.',
+   kicker:'LEALTAD',title:'Tu constancia crece',highlight:'crece',copy:'Un pago más y desbloqueas tu primer beneficio.',
    detail:'<div class="gxb-metric-head"><span>Racha actual</span><strong>3 de 4 pagos</strong></div><div class="gxb-meter" role="progressbar" aria-label="Racha de pagos" aria-valuemin="0" aria-valuemax="4" aria-valuenow="3"><span style="width:75%"></span></div><p class="gxb-note">Siguiente beneficio · 3% de descuento</p>',
    action:'Mis niveles',terms:'La racha se calcula con las fechas de pago originales. El segundo nivel requiere 9 pagos consecutivos.',emoji:'⭐'
   },
   referral:{
-   kicker:'REFERIDOS',title:'Tu invitado avanza',copy:'2 servicios activos · 1 mes validado.',
+   kicker:'REFERIDOS',title:'Tu invitado avanza',highlight:'avanza',copy:'2 servicios activos · 1 mes validado.',
    detail:'<div class="gxb-metric-head"><span>Camino al mes gratis</span><strong>1 de 3 meses</strong></div><div class="gxb-meter" role="progressbar" aria-label="Meses validados" aria-valuemin="0" aria-valuemax="3" aria-valuenow="1"><span style="width:33.33%"></span></div><p class="gxb-note">El beneficio se desbloquea después del tercer mes válido.</p>',
    action:'Copiar invitación',terms:'Se necesitan al menos 2 servicios activos durante 3 meses válidos. La aplicación del mes gratis depende de las reglas del programa.',emoji:'🎁'
   },
   referralNone:{
-   kicker:'REFERIDOS',title:'Invita y gana',copy:'Comparte GOXION para comenzar a obtener beneficios.',
+   kicker:'REFERIDOS',title:'Invita y gana',highlight:'gana',copy:'Comparte GOXION para comenzar a obtener beneficios.',
    detail:'<p class="gxb-note">Cuando tu invitado tenga servicios activos, aquí aparecerá su progreso. No hay meses validados todavía.</p>',
    action:'Copiar invitación',terms:'La invitación debe estar vinculada a un cliente confirmado. El laboratorio no crea referencias ni inscripciones reales.',emoji:'🫂'
   },
   referralReady:{
-   kicker:'REFERIDOS',title:'¡Beneficio desbloqueado!',copy:'Tu invitado cumplió los 3 meses necesarios.',
+   kicker:'REFERIDOS',title:'¡Beneficio desbloqueado!',highlight:'desbloqueado!',copy:'Tu invitado cumplió los 3 meses necesarios.',
    detail:'<div class="gxb-metric-head"><span>Meses validados</span><strong>3 de 3 · Listo</strong></div><div class="gxb-meter" role="progressbar" aria-label="Meses validados" aria-valuemin="0" aria-valuemax="3" aria-valuenow="3"><span style="width:100%"></span></div><p class="gxb-note">Tu mes gratuito está disponible en este escenario ficticio.</p>',
    action:'Ver beneficio',terms:'La concesión real del mes gratuito se valida antes de aplicarse a una cuenta.',emoji:'🎁'
   },
   referralClaimed:{
-   kicker:'REFERIDOS',title:'Beneficio aplicado',copy:'Tu recompensa ya fue registrada en este ejemplo.',
+   kicker:'REFERIDOS',title:'Beneficio aplicado',highlight:'aplicado',copy:'Tu recompensa ya fue registrada en este ejemplo.',
    detail:'<p class="gxb-note">Cuando una recompensa está reclamada, el estado se mantiene visible para evitar confusiones.</p>',
    action:'Ver historial',terms:'La confirmación de aplicación y el historial se consultan en los datos reales del cliente.',emoji:'💝'
   },
   mission:{
-   kicker:'MISIONES',title:'Una misión pendiente',copy:'Has completado 2 de las 3 actividades.',
+   kicker:'MISIONES',title:'Una misión pendiente',highlight:'pendiente',copy:'Has completado 2 de las 3 actividades.',
    detail:'<ul class="gxb-tasks"><li><span>Explorar el catálogo</span><small>Hecha ✓</small></li><li><span>Compartir tu opinión</span><small>Hecha ✓</small></li><li data-status="pending"><span>Compartir GOXION</span><small>Pendiente</small></li></ul>',
    action:'Ver última misión',terms:'Las tareas oficiales pueden implicar visitas, comentarios o acciones verificables. Aquí únicamente se representan visualmente.',emoji:'🎯'
   },
   missionReady:{
-   kicker:'MISIONES',title:'¡Recompensa disponible!',copy:'Completaste todas las actividades de esta ronda.',
+   kicker:'MISIONES',title:'¡Recompensa disponible!',highlight:'disponible!',copy:'Completaste todas las actividades de esta ronda.',
    detail:'<div class="gxb-metric-head"><span>Misiones completadas</span><strong>3 de 3 · Listo</strong></div><div class="gxb-meter" role="progressbar" aria-label="Misiones completas" aria-valuemin="0" aria-valuemax="3" aria-valuenow="3"><span style="width:100%"></span></div><p class="gxb-note">Tu siguiente paso es revisar el beneficio ganado.</p>',
    action:'Ver recompensa',terms:'Este escenario no reclama ni aplica cupones reales. La recompensa se valida con las funciones oficiales.',emoji:'🏆'
   }
@@ -742,8 +750,17 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
  }
  function updatePanel(key){
   const d=selectedEntry(key);
-  text('gxb-eyebrow').textContent=d.kicker;
-  text('gxb-title').textContent=d.title;
+  const titleNode=text('gxb-title');
+  const emphasized=d.highlight||'';
+  const at=emphasized?d.title.lastIndexOf(emphasized):-1;
+  if(at<0){titleNode.textContent=d.title}
+  else{
+   const accent=document.createElement('span');
+   accent.className='gxb-title-accent';
+   accent.textContent=emphasized;
+   titleNode.replaceChildren(document.createTextNode(d.title.slice(0,at)),accent,document.createTextNode(d.title.slice(at+emphasized.length)));
+  }
+  panel.dataset.benefit=key;
   text('gxb-copy').textContent=d.copy;
   text('gxb-content').innerHTML=d.detail; // Plantillas estáticas del laboratorio, sin valores externos.
   expandedEmoji.textContent=d.emoji;
