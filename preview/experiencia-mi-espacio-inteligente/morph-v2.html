@@ -244,7 +244,7 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 .gxb-rules svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
 .gxb-rules:active::before{background:rgba(255,255,255,.14)}
 .gxb-foot-action{display:inline-flex;flex-direction:row;align-items:center;justify-content:flex-start;flex-wrap:nowrap;gap:8px;width:max-content;max-width:100%;min-width:0}
-.gxb-panel-emoji{position:absolute;z-index:0;bottom:3px;right:3px;display:block;font-size:clamp(136px,38vw,165px);line-height:1;opacity:.68;pointer-events:none;user-select:none;transform:rotate(-10deg);transform-origin:center}
+.gxb-panel-emoji{position:absolute;z-index:0;bottom:3px;right:3px;display:block;font-size:clamp(136px,38vw,165px);line-height:1;opacity:.68;pointer-events:none;user-select:none;transform:translateY(var(--gxb-info-lock,0px)) rotate(-10deg);transform-origin:center}
 .gxb-rule-note{position:relative;z-index:3;max-width:100%;margin-top:12px;padding:13px 14px;border-radius:15px;border:1px solid rgba(205,224,235,.075);background:rgba(4,7,13,.88);-webkit-backdrop-filter:blur(12px) saturate(1);backdrop-filter:blur(12px) saturate(1);box-shadow:0 9px 23px rgba(0,0,0,.15);color:rgba(241,248,255,.96);font-size:11px;line-height:1.58}
 .gxb-feedback{min-height:15px;display:block;color:#84d7d4;font-size:10px;font-weight:600;line-height:1.5;margin-top:5px}
 .gxb-preview-label{display:block;font-size:10px;line-height:1.4;color:#899eb3;margin:14px 3px 0}
@@ -750,6 +750,7 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
   action.textContent=d.action;
   ruleNote.textContent=d.terms;
   ruleNote.hidden=true;
+  expandedEmoji.style.removeProperty('--gxb-info-lock');
   rules.setAttribute('aria-expanded','false');
   rules.setAttribute('aria-label','Ver condiciones');
   feedback.textContent='';
@@ -875,19 +876,29 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
    row.style.visibility='';
    row.hidden=false;panel.hidden=true;current=null;
   }finally{
-   row.style.visibility='';row.style.opacity='';busy=false;
+   row.style.visibility='';row.style.opacity='';expandedEmoji.style.removeProperty('--gxb-info-lock');busy=false;
   }
+ }
+ // Keep the large decorative emoji visually stationary while conditions change
+ // the panel's natural height. This runs in one event turn, before paint,
+ // so no intermediate emoji movement is visible in Safari.
+ function setInfoOpen(open,feedbackMessage){
+  const heightBefore=panel.getBoundingClientRect().height;
+  const offsetBefore=parseFloat(expandedEmoji.style.getPropertyValue('--gxb-info-lock'))||0;
+  ruleNote.hidden=!open;
+  rules.setAttribute('aria-expanded',String(open));
+  rules.setAttribute('aria-label',open?'Ocultar condiciones':'Ver condiciones');
+  if(feedbackMessage!==undefined)feedback.textContent=feedbackMessage;
+  const heightAfter=panel.getBoundingClientRect().height;
+  const keepOffset=offsetBefore+heightBefore-heightAfter;
+  expandedEmoji.style.setProperty('--gxb-info-lock',(Math.abs(keepOffset)<.01?0:keepOffset).toFixed(2)+'px');
  }
  tiles.forEach(tile=>tile.addEventListener('click',()=>open(tile.dataset.gxb)));
  close.addEventListener('click',collapse);
  panel.addEventListener('keydown',event=>{if(event.key==='Escape'){event.preventDefault();collapse()}});
- rules.addEventListener('click',()=>{
-  ruleNote.hidden=!ruleNote.hidden;
-  rules.setAttribute('aria-expanded',String(!ruleNote.hidden));
-  rules.setAttribute('aria-label',ruleNote.hidden?'Ver condiciones':'Ocultar condiciones');
- });
+ rules.addEventListener('click',()=>setInfoOpen(ruleNote.hidden));
  action.addEventListener('click',async()=>{
-  if(current==='loyalty'){ruleNote.hidden=false;rules.setAttribute('aria-expanded','true');rules.setAttribute('aria-label','Ocultar condiciones');feedback.textContent='Niveles de muestra: 4 pagos y 9 pagos.';return;}
+  if(current==='loyalty'){setInfoOpen(true,'Niveles de muestra: 4 pagos y 9 pagos.');return;}
   if(current==='mission'){
    if(missionReady){feedback.textContent='Recompensa de demostración. Ningún cupón se aplicó.';return;}
    feedback.textContent='En la versión oficial, esta acción conduce a la misión pendiente.';return;
