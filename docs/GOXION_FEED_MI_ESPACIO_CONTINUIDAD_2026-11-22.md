@@ -290,11 +290,11 @@ El usuario expresó conformidad con la jerarquía visual del área de Servicios 
 
 **Queja y criterio del usuario:** tras añadir los colores semánticos apareció una línea de color bajo el logo al expandir las tarjetas de Servicios, además de mucho texto duplicado en los contextos. Esto **es una regresión**, no un detalle 'premium'. El usuario pide criterio profesional y continuidad de las investigaciones/skills, no justificaciones ni asentir automáticamente.
 
-### Regla aprobada y no negociable para Servicios del feed
+### Criterios específicos de Servicios — NO extensibles a otros módulos del feed
 
-1. **Prohibido añadir separadores, rayas/gradientes de estado bajo el logo o el encabezado, líneas de adorno, halos, marcos extra o superficies anidadas**. Los estados deben ser legibles sin decoración adicional. La regla se aplica al laboratorio y a su adaptación oficial futura.
-2. **El color semántico tiene una sola función:** identificar de un vistazo el estado mediante un punto y texto corto: verde activo, ámbar pendiente/actualización, naranja precaución, rojo problema. No colorear toda la tarjeta ni agregar acento adicional en cada sección.
-3. **Primera mirada:** logo + plataforma + estado + control de expandir/cerrar. **Detalle abierto:** una microsuperficie neutra solo cuando el contexto aporta una instrucción o consecuencia real, idealmente una frase breve (30–65 caracteres en el laboratorio), nunca un encabezado que repita el estado y otro párrafo que explique lo mismo.
+1. **Solo en el componente Servicios de esta propuesta:** no reintroducir la línea decorativa (cian, de estado o neutra) bajo el logo/encabezado; tampoco sumar halos, marcos o recuadros que repitan la misma información. Esto no prohíbe las barras de progreso, separadores funcionales, animaciones, emojis ni gradientes de Lealtad, Referidos, Misiones, Ahorro o Catálogo.
+2. **En Servicios**, el verde/ámbar/naranja/rojo identifica el estado de un vistazo mediante punto y texto breve; no colorear toda esa tarjeta. **No sustituye** las paletas de identidad, contraste de títulos, métricas, checkboxes o gradientes de progreso de los otros bloques.
+3. **Primera mirada de Servicios:** logo + plataforma + estado + control de expandir/cerrar. **Detalle abierto:** una microsuperficie neutra solo si hay una instrucción o consecuencia real. Los 30–65 caracteres fueron un **objetivo de copy para avisos simulados**, no un límite global ni legal; información sensible o contractual debe permanecer accesible bajo demanda.
 4. **Información secundaria bajo demanda** (`details/summary`), no otra caja de estado visible por defecto. Mantener PIN y contraseñas en sus flujos protegidos, no duplicar la información entre los bloques.
 5. **Material ya aprobado:** conservar el ADN de cristal neutro, los controles translúcidos sin brillos artificiales, las proporciones/márgenes y los cierres del círculo cian **35px** con glifo **16px** y área de toque de **44px**. El hero y saludo congelados no se tocan. No agregar cambios cosméticos no solicitados.
 6. Toda futura incorporación de UI en Servicios debe pasar esta pregunta: **¿es información o una acción que el cliente necesita?** Si es solo decoración, se omite. Evaluar también la densidad de texto en iPhone antes de dar por finalizado.
@@ -309,7 +309,15 @@ El usuario expresó conformidad con la jerarquía visual del área de Servicios 
 
 **Laboratorio vigente (anticaché):** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=2b2576c
 
-**Seguimiento:** aplicar esta regla a próximas iteraciones sin reintroducir líneas por estilo, sin ampliar copy por defecto y sin alterar conexiones originales.
+**Seguimiento:** aplicar el veto del separador decorativo y del copy redundante **solo a próximas iteraciones de Servicios**. Para beneficios, Ahorro, Hero y Catálogo aplicar sus propios contratos, no extrapolar el veto. Fuente canónica: `docs/GOXION_FEED_CONTRATO_VISUAL_POR_COMPONENTE_2026-11-22.md`.
 
 
 **Pulido posterior de esta misma corrección:** commit `2b2576c683d2d8b0a534723f5f0eeb3469646ea2`: se retiró además el separador innecesario de «Más opciones», y «1 novedad más» conserva un área táctil de al menos 44px. El diseño permanece sin líneas decorativas ni texto duplicado. Enlace actualizado: https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=2b2576c.
+
+## Auditoría de alcance de las reglas — 22/nov/2026
+
+Tras una consulta explícita del usuario se revisaron la auditoría previa de Lealtad/Referidos/Misiones, los acuerdos de ahorro y el código vigente. **Veredicto:** la corrección visual fue apropiada en Servicios; el lenguaje «prohibido» y «regla no negociable» era demasiado amplio y podía entenderse erróneamente como una prohibición global de elementos visuales con función.
+
+El contrato **[por componente](GOXION_FEED_CONTRATO_VISUAL_POR_COMPONENTE_2026-11-22.md)** separa lo compartido (cristal neutro, ritmo, accesibilidad y X 35/16) de las identidades funcionales: Lealtad/Referidos/Misiones conservan barras, porcentajes, emojis, colores de título, morph, animación de checkbox y separadores de tareas; Ahorro conserva profundidad, logos flotantes y contador; Servicios conserva estado semántico breve sin línea decorativa. **No tocar ni aplanar los módulos protegidos para perseguir uniformidad.**
+
+Esta auditoría es de contrato, selectores y código actual: **no fusiona PR #231, no cambia el laboratorio visual ni altera `ayuda.html` oficial**. Si hay una incompatibilidad futura, se debe inspeccionar el selector real y comparar con el último commit aprobado antes de implementar.
