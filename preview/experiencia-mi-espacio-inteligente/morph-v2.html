@@ -61,13 +61,11 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 .focus-icon svg{display:block;max-width:86%;width:100%;height:100%;overflow:visible;fill:none;stroke:currentColor;stroke-width:1.35;stroke-linecap:round;stroke-linejoin:round}
 .focus-bottom{position:relative;z-index:1;grid-row:2;grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:14px}
 .focus-meta{font-size:11px;line-height:1.4;color:#b4c4d1;letter-spacing:-.01em;min-width:0;flex:1 1 auto}
-/* Material óptico integrado: misma base neutra, sin silueta de plástico.
-   Es una superficie visual interna, la tarjeta sigue siendo un único botón accesible. */
-.focus-action{position:relative;isolation:isolate;overflow:hidden;flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;width:max-content;max-width:100%;min-height:38px;padding:8px 15px;border-radius:999px;border:0;background:linear-gradient(160deg,rgba(255,255,255,.052),rgba(255,255,255,.017) 56%,rgba(255,255,255,.030));box-shadow:inset 0 1px 0 rgba(255,255,255,.055);-webkit-backdrop-filter:blur(7px) saturate(1);backdrop-filter:blur(7px) saturate(1);color:var(--accent,#69e1d5);font-size:11px;line-height:1.15;font-weight:600;white-space:nowrap;margin-left:auto;transition:background .3s ease,color .5s ease,transform .35s cubic-bezier(.2,.85,.2,1)}
-.focus-action:before{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(ellipse 90% 47% at 48% -5%,rgba(255,255,255,.11),transparent 85%);pointer-events:none}
-.focus-action>span{position:relative;z-index:1}
-.focus:hover .focus-action{background:linear-gradient(160deg,rgba(255,255,255,.072),rgba(255,255,255,.025) 56%,rgba(255,255,255,.032))}
-.focus:active .focus-action{transform:scale(.975)}
+/* Película lisa de cristal sobre el material principal. Sin segunda capa
+   con blur, sin relieves, bordes, degradados ni glow; evita "efecto globo".
+   La tarjeta exterior sigue siendo el único botón interactivo. */
+.focus-action{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;width:max-content;max-width:100%;min-height:38px;padding:8px 15px;border-radius:999px;border:0;background:rgba(255,255,255,var(--pill-alpha,.08));box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;color:var(--accent,#69e1d5);font-size:11px;line-height:1.15;font-weight:600;white-space:nowrap;margin-left:auto;transition:background-color .25s ease,color .5s ease,transform .35s cubic-bezier(.2,.85,.2,1)}
+.focus:active .focus-action{transform:scale(.985)}
 .focus[data-tone="attention"]{--accent:#f6a4b8}
 .focus[data-tone="review"]{--accent:#7bccff}
 .focus[data-tone="agreement"]{--accent:#c1b5ff}
@@ -233,6 +231,8 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 <p class="material-caption" id="material-caption" aria-live="polite">Base oscura neutra, blur experimental y reflejo mínimo.</p>
 <label class="glass-control" for="glass-depth"><span id="glass-depth-caption">Profundidad experimental</span><output id="glass-depth-value">15%</output></label>
 <input id="glass-depth" type="range" min="0" max="100" value="15" aria-label="Profundidad experimental del cristal">
+<label class="glass-control" for="pill-alpha"><span>Capa translúcida del botón</span><output id="pill-alpha-value">8%</output></label>
+<input id="pill-alpha" type="range" min="0" max="25" step="1" value="8" aria-label="Opacidad adicional del botón de cristal">
 <label class="glass-control" for="beam-position"><span>Mover luz detrás</span><output id="beam-position-value">Auto</output></label>
 <input id="beam-position" type="range" min="0" max="100" value="50" aria-label="Mover la luz por debajo de la tarjeta">
 <button class="glass-compare" type="button" id="glass-compare" aria-pressed="false">Comparar sin cristal</button>
@@ -436,6 +436,12 @@ function setGlassMaterial(mode){
  $('glass-depth-value').textContent=official?'10 px':$('glass-depth').value+'%';
 }
 $('glass-depth').addEventListener('input',event=>updateGlass(event.target.value));
+function updatePillAlpha(raw){
+ const n=Math.max(0,Math.min(25,Number(raw)));
+ $('focus').style.setProperty('--pill-alpha',(n/100).toFixed(2));
+ $('pill-alpha-value').textContent=n+'%';
+}
+$('pill-alpha').addEventListener('input',event=>updatePillAlpha(event.target.value));
 document.querySelectorAll('[data-material-preset]').forEach(button=>{
  button.addEventListener('click',()=>setGlassMaterial(button.dataset.materialPreset));
 });
@@ -462,6 +468,7 @@ $('underlay-switch').addEventListener('click',()=>{
   :'Solo la onda oficial se desplaza detrás del cristal';
 });
 updateGlass(15);
+updatePillAlpha(8);
 setGlassMaterial('neutral');
 window.GOXION_MORPH_V2=Object.freeze({isolated:true,noBackend:true,scenarios:Object.keys(snapshots),classify,render,material:setGlassMaterial});
 render('clear',true);
