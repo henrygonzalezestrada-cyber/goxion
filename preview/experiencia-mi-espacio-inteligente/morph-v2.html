@@ -367,10 +367,14 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
 .gxs-summary{display:grid;min-width:0;gap:5px}
 .gxs-name{font-size:14px;font-weight:700;letter-spacing:-.014em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .gxs-status{display:inline-flex;align-items:center;gap:7px;color:#bccedf;font-size:10.5px;font-weight:500;line-height:1.4}
-.gxs-status:before{content:"";width:5px;height:5px;flex:0 0 5px;border-radius:50%;background:#6acfb9}
-.gxs-card[data-tone="pending"] .gxs-status:before{background:#bac5e3}
-.gxs-card[data-tone="notice"] .gxs-status:before{background:#73dce9}
-.gxs-card[data-tone="attention"] .gxs-status:before{background:#ecb68a}
+/* Semántica GOXION: acentos discretos, sin tintar la tarjeta. */
+.gxs-card{--gxs-state-color:#65d3a2;--gxs-state-surface:rgba(42,131,94,.11)}
+.gxs-card[data-tone="pending"],.gxs-card[data-tone="notice"]{--gxs-state-color:#e7c66a;--gxs-state-surface:rgba(160,129,45,.12)}
+.gxs-card[data-tone="caution"]{--gxs-state-color:#ecab70;--gxs-state-surface:rgba(180,103,52,.13)}
+.gxs-card[data-tone="danger"]{--gxs-state-color:#ef858b;--gxs-state-surface:rgba(167,57,69,.14)}
+.gxs-status{color:var(--gxs-state-color);font-weight:600}
+.gxs-status:before{content:"";width:6px;height:6px;flex:0 0 6px;border-radius:50%;background:var(--gxs-state-color)}
+.gxs-card.is-open .gxs-line{background:linear-gradient(90deg,var(--gxs-state-color),rgba(210,234,249,.06) 26%,transparent 85%);opacity:.42}
 .gxs-icon{position:relative;display:grid;place-items:center;width:44px;height:44px;justify-self:end;border-radius:50%;color:#b3c9d9;transition:color .25s}
 .gxs-icon::before{content:"";position:absolute;inset:calc((44px - var(--gx-close-disc))/2);border-radius:50%;background:transparent;transition:background-color .25s}
 .gxs-icon svg{position:relative;width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
@@ -396,10 +400,11 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
 .gxs-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:13px}
 .gxs-pill{min-height:38px;padding:9px 15px;border:0;border-radius:999px;background:rgba(255,255,255,.08);color:#7ee1e7;font-size:11px;font-weight:600}
 .gxs-ghost{min-height:38px;padding:8px 4px;background:transparent;border:0;color:#c1cfe0;font-size:11px;font-weight:600}
-.gxs-notice{display:grid;gap:3px;padding:12px 13px;margin:0 0 12px;border-radius:14px;background:rgba(14,25,37,.66)}
-.gxs-notice[data-tone="attention"]{background:rgba(68,41,33,.24)}
-.gxs-notice strong{font-size:12px;line-height:1.45;color:#e5f1fb}
-.gxs-notice span{font-size:10.5px;line-height:1.48;color:#b8c9d7}
+.gxs-notice{display:grid;gap:3px;padding:12px 13px;margin:0 0 12px;border-radius:14px;background:var(--gxs-state-surface,rgba(14,25,37,.66))}
+.gxs-notice strong{font-size:12px;line-height:1.45;color:var(--gxs-state-color,#e5f1fb)}
+.gxs-notice span{font-size:10.5px;line-height:1.48;color:#c6d7e2}
+.gxs-notice[data-tone="secondary"]{background:rgba(16,27,38,.74)}
+.gxs-notice[data-tone="secondary"] strong{color:#c2d6e7}
 .gxs-more[hidden]{display:none!important}
 .gxs-more{display:grid;margin-top:11px;padding-top:8px;border-top:1px solid rgba(219,238,253,.065)}
 .gxs-more button{min-height:42px;padding:9px 0;text-align:left;border:0;background:transparent;color:#bfd0df;font-size:11px}
@@ -523,6 +528,7 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
    <option value="cancel-approved">Cancelación aprobada · Netflix</option>
    <option value="cancel-rejected">Cancelación no autorizada · Netflix</option>
    <option value="cancel-effective">Baja efectiva · Netflix desaparece</option>
+   <option value="multi-notice">Cancelación + contraseña · prioridad</option>
    <option value="invitation">Invitación pendiente · YouTube</option>
    <option value="paused">Servicio temporalmente inactivo</option>
    <option value="empty">Sin servicios</option>
@@ -599,6 +605,7 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
  <option value="cancel-approved">Cancelación aprobada · Netflix</option>
  <option value="cancel-rejected">Cancelación no autorizada · Netflix</option>
  <option value="cancel-effective">Baja efectiva · Netflix desaparece</option>
+   <option value="multi-notice">Cancelación + contraseña · prioridad</option>
  <option value="paused">Servicio temporalmente inactivo</option>
  <option value="empty">Sin servicios</option>
 </select>
@@ -1336,6 +1343,12 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
   if(mode==='empty')return [];
   if(mode==='one')return copy.slice(0,1);
   if(mode==='two')return copy.slice(0,2);
+  if(mode==='multi-notice'){
+   copy[0].status='Cancelación en revisión';copy[0].tone='pending';copy[0].cancellationPhase='solicitada';
+   copy[0].callout={type:'notice',title:'Cancelación en revisión · Prioritaria',body:'La solicitud sigue en revisión. Netflix permanece activo hasta que la baja sea efectiva.'};
+   copy[0].secondaryCallout={title:'Nueva contraseña disponible',body:'También hay una contraseña pendiente: en la versión oficial se consulta una sola vez tras verificar el PIN GOXION.'};
+   copy[0].primary='Ver cancelación';copy[0].primaryAction='cancellation';return copy;
+  }
   if(mode==='cancel-effective')return copy.slice(1); // La baja efectiva retira solo Netflix del ejemplo.
   const service=copy[0];
   if(mode==='update'){
@@ -1351,15 +1364,15 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
    service.callout={type:'notice',title:'Solicitud recibida · En revisión',body:'Se registró la solicitud. Netflix continúa activo mientras GOXION revisa la baja. No hace falta solicitarla otra vez.'};
    service.primary='Ver cancelación';service.primaryAction='cancellation';
   }else if(mode==='cancel-approved'){
-   service.status='Cancelación aprobada';service.tone='pending';service.cancellationPhase='aprobada';
+   service.status='Cancelación aprobada';service.tone='caution';service.cancellationPhase='aprobada';
    service.callout={type:'notice',title:'Autorizada · Baja aún pendiente',body:'La solicitud fue aprobada, pero Netflix continúa disponible hasta la baja efectiva. Los cargos ya generados no cambian.'};
    service.primary='Ver cancelación';service.primaryAction='cancellation';
   }else if(mode==='cancel-rejected'){
-   service.status='Cancelación no autorizada';service.tone='attention';service.cancellationPhase='rechazada';
+   service.status='Cancelación no autorizada';service.tone='danger';service.cancellationPhase='rechazada';
    service.callout={type:'attention',title:'Solicitud no autorizada',body:'Netflix sigue activo. Si corresponde, el cliente puede solicitar una nueva revisión.'};
    service.primary='Ver resolución';service.primaryAction='cancellation';
   }else if(mode==='paused'){
-   service.status='Temporalmente inactivo';service.tone='attention';
+   service.status='Temporalmente inactivo';service.tone='caution';
    service.callout={type:'attention',title:'Servicio con incidencia',body:'Consulta el motivo confirmado y comunícate con soporte si necesitas asistencia.'};
    service.primary='Consultar soporte';service.primaryAction='support';
   }else if(mode==='invitation'){
@@ -1382,14 +1395,17 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
   const callout=service.callout
    ? '<div class="gxs-notice" data-tone="'+safe(service.callout.type)+'"><strong>'+safe(service.callout.title)+'</strong><span>'+safe(service.callout.body)+'</span></div>'
    : '';
-  const label=service.name+' · '+service.status;
+  const secondary=service.secondaryCallout
+    ? '<div class="gxs-notice" data-tone="secondary"><strong>'+safe(service.secondaryCallout.title)+'</strong><span>'+safe(service.secondaryCallout.body)+'</span></div>'
+    : '';
+   const label=service.name+' · '+service.status;
   el.innerHTML=
    '<button class="gxs-trigger" type="button" aria-expanded="false" aria-controls="gxs-detail-'+safe(service.id)+'" data-gxs-toggle="'+safe(service.id)+'" aria-label="'+safe(label)+', abrir detalles">'+
    '<img class="gxs-logo" alt="" src="'+safe(service.logo)+'" decoding="async" loading="lazy">'+
    '<span class="gxs-summary"><strong class="gxs-name">'+safe(service.name)+'</strong><span class="gxs-status">'+safe(service.status)+'</span></span>'+
    '<span class="gxs-icon" aria-hidden="true"><svg class="gxs-chevron" viewBox="0 0 24 24"><path d="m5 9 7 7 7-7"/></svg><svg class="gxs-x" viewBox="0 0 24 24"><path d="M6 6 18 18M18 6 6 18"/></svg></span></button>'+
    '<div class="gxs-reveal" id="gxs-detail-'+safe(service.id)+'"><div class="gxs-reveal-inner" inert aria-hidden="true"><div class="gxs-body">'+
-   '<div class="gxs-line"></div>'+callout+
+   '<div class="gxs-line"></div>'+callout+secondary+
    '<div class="gxs-subtitle">'+(service.kind==='invitation'?'Tu invitación':'Tus accesos')+'</div>'+
    '<div class="gxs-accesslist">'+details+'</div>'+
    '<div class="gxs-actions"><button type="button" class="gxs-pill" data-gxs-action="'+safe(service.primaryAction||'options')+'">'+safe(service.primary||'Más opciones')+'</button>'+
@@ -1427,14 +1443,15 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
    'cancel-rejected':'No autorizada: Netflix sigue activo.',
    'cancel-effective':'Baja efectiva: Netflix desaparece; los demás servicios permanecen.',
    invitation:'Invitación pendiente de activar.',
-   paused:'Servicio con incidencia temporal.'
+   paused:'Servicio con incidencia temporal.',
+   'multi-notice':'Cancelación en revisión se presenta primero; la contraseña aparece como novedad secundaria.'
   };
   outcome.textContent=explanations[select.value]||'Escenario de prueba: sin cambios reales en servicios, cobros ni accesos.';
   // The summary indicates what matters, not a second repetition of "Tus servicios".
-  const attention=services.some(entry=>entry.tone==='attention');
-  const notice=services.some(entry=>entry.tone==='notice');
-  const pending=services.some(entry=>entry.tone==='pending');
-  counter.textContent=!services.length?'Sin servicios':attention?'1 necesita atención':notice?'1 actualización':pending?'1 en seguimiento':services.length+' '+(services.length===1?'activo':'activos');
+  const danger=services.some(entry=>entry.tone==='danger');
+  const caution=services.some(entry=>entry.tone==='caution');
+  const warning=services.some(entry=>entry.tone==='pending'||entry.tone==='notice');
+  counter.textContent=!services.length?'Sin servicios':danger?'1 alerta':caution?'1 requiere atención':warning?'1 pendiente':services.length+' '+(services.length===1?'activo':'activos');
   if(!services.length){
    const el=document.createElement('div');
    el.className='gxs-empty gxc-surface';
