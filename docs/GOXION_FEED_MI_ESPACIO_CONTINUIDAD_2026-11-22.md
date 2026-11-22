@@ -109,3 +109,15 @@ Abrir Lealtad, Referidos y Misiones; alternar varias veces el icono ⓘ (y «Mis
 - **Pendiente:** verificación visual en iPhone y confirmación del usuario; fuente pública sujeta a proceso de publicación Pages. No declarar aprobación del feed ni integración oficial todavía.
 
 **Al retomar otro chat:** no confundir de nuevo el pedido: se refiere **al color de cierre** (círculo cian X negra/oscura) y no a mover su posición. No devolverlo a círculo gris/transparente.
+
+## Iteración pendiente de evaluación · progreso vivo y checkboxes en Misiones (22/nov/2026)
+
+**Rama de laboratorio:** `preview/feed-beneficios-motion-20261122`.  
+**Commit del HTML:** `2a011e3872dcf8804b117d052663bdf423970157`.  
+**Archivo:** `preview/experiencia-mi-espacio-inteligente/morph-v2.html`.
+
+- Lealtad, Referidos y Misiones ahora tienen un **barrido luminoso cíclico mientras su panel expandido está visible**. No se limita a una pasada inicial; el brillo está contenido dentro del progreso ya validado, sin animar toda la tarjeta ni alterar porcentajes reales/ficticios.
+- **Misiones pendientes** agrega barra del progreso 2/3, como las otras dos tarjetas, y sustituye el texto fijo `Hecha ✓` por indicadores SVG de checkbox. Las dos misiones hechas dibujan su palomita en secuencia al abrir; la tercera permanece pendiente y visualmente distinta. No son controles interactivos ni ejecutan misiones reales.
+- En `prefers-reduced-motion: reduce` se desactivan todas las animaciones nuevas y los iconos quedan legibles. Se preservan título, X cian con símbolo oscuro, altura mínima 300px, emoji anclado al abrir información, morph de entrada/salida, hero compacto y saludo aprobados.
+- **Validación automatizada de estructura:** 3 compactas, barras en las 3 ampliadas normales, 3 iconos de misión, 2 scripts JS con sintaxis válida, estilos de cierre y altura preservados. **Falta prueba visual en Safari físico**, no afirmar aprobación final.
+- **Aún no integrado en `ayuda.html` oficial.** El usuario debe revisar las animaciones en iPhone y decidir si gusta la intensidad/ritmo antes de planificar integración.
