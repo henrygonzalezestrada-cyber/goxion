@@ -135,3 +135,20 @@ Abrir Lealtad, Referidos y Misiones; alternar varias veces el icono ⓘ (y «Mis
 - **Invariantes:** `#gxb-action` permanece EXACTAMENTE igual (38px, película al 8%, tamaño original). Tampoco se alteraron el hero aprobado, saludo, morph, botón de información, microsuperficie, X cian oscura, emoji anclado o panel mínimo de 300px. Sin acceso a backend ni `ayuda.html`.
 
 **QA alcanzado:** sintaxis válida de ambos scripts, llaves CSS balanceadas, verificación automática de estados 2/3 y 3/3, no progreso ficticio y guardas de CSS/hero/CTA. **Pendiente:** revisar rendering responsive y animaciones en Safari físico; no declarar aprobación ni integración oficial.
+
+## Nuevo bloque experimental · ahorro mensual con plataformas flotantes (22/nov/2026)
+
+**Solicitud expresa:** insertar un rectángulo ANTES de «Tus servicios» y DESPUÉS de Lealtad/Referidos/Misiones: logos auténticos de las plataformas contratadas a la izquierda, con flotación discreta derivada del lenguaje de promos del catálogo, y cantidad ahorrada a la derecha en negrita. **Sin encabezado pequeño seguido de otro título grande, sin saturación, sin degradados excesivos ni capas extra.** Se implementa primero solo en laboratorio, pendiente de reacción visual del usuario.
+
+**Rama:** `preview/mi-espacio-ahorro-flotante-20261122`.  
+**Commit:** `532ba92930629db9426be5dd7f48b9be38e858a0`.  
+**Archivo:** `preview/experiencia-mi-espacio-inteligente/morph-v2.html`.
+
+- Tarjeta única `#gxv-savings`, cristal neutro coherente con el resto, dos columnas en todos los anchos (280 a 580+), cifra dominante `#gxv-amount`, una explicación única «menos al mes que por separado» y leyenda «Ejemplo · N plataformas». No duplica titulares ni añade una nueva sección promocional.
+- Logos originarios del repositorio `/logos/*.PNG` (Netflix, Disney+, HBO Max, YouTube Premium, Prime Video, Crunchyroll, Microsoft 365), rutas relativas `../../logos/...`. Sin nuevos activos, paquetes ni sprites externos. Máximo 4 logos flotantes a la vez; el resto se representa con `+N`. Uno solo aumenta tamaño y se centra; ninguno oculta la tarjeta.
+- Movimiento continuo leve, sin rebote ni flash. Se activa solo cuando visible con `IntersectionObserver`, se pausa al ocultar la pestaña y se suprime bajo `prefers-reduced-motion`. Logos decorados sin cajas adicionales. Ningún botón falso dentro de la tarjeta.
+- **Simulación de datos:** 1 plataforma → $69; 4 → $248; 7 → $412; 0 → módulo oculto. Selector `#gxv-demo-case` únicamente en «Probar estados · Laboratorio» para probar casos. **Todos los importes son inventados a efectos de la composición y se identifican explícitamente como «Ejemplo». NO son precios ni ahorros reales.**
+- **Integración futura obligatoria:** calcular diferencia únicamente si hay precios individuales públicos verificables, tarifa contractual real y periodos compatibles. Distinguir servicios activos/inactivos y no incluir cupones, mora, lealtad ni descuentos financieros como ahorro comparativo duplicado. Sin datos comparables, omitir importe en vez de inventar. UI de Mi Espacio solo consume datos autorizados; no crea motor financiero independiente.
+- **Lo protegido:** hero compacta centrada (cristal y saludo), Lealtad/Referidos/Misiones, barras, X cian, morph, CTA 38px, calendario e Index, `ayuda.html` y backend están intactos.
+
+**QA:** se ejecutó el script con DOM simulado comprobando las 4 variaciones y sus logos; 3 scripts JS parsean, CSS balanceado, localización del bloque e invariantes de hero/beneficios/CTA confirmadas. **Aún falta revisar visualmente en Safari/iPhone físico**; no declarar aprobado ni conectar a producción.
