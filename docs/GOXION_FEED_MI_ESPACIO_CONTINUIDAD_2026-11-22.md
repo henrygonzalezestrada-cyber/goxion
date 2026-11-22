@@ -6,8 +6,8 @@
 
 ## Abrir primero al continuar en otro chat
 
-- **Laboratorio en GitHub Pages:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=ffb9313
-- **Fuente de la última iteración:** `preview/experiencia-mi-espacio-inteligente/morph-v2.html` en commit **`ffb9313eff8650ba50b57ff81c53352587441a22`**. Jerarquía de título y ubicación de X: `d04c58818d883bee63615584a302f0dd76699886`. Los cambios de botón SVG y microsuperficie provienen de `5b034547f69f0f00cf67046b97ea72c1a07afb98`.
+- **Laboratorio en GitHub Pages:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=50d71ec
+- **Fuente de la última iteración:** `preview/experiencia-mi-espacio-inteligente/morph-v2.html` en commit **`50d71ec3f6d64cc41ca31f4b1739e6bedd631315`**. Jerarquía de título y ubicación de X: `d04c58818d883bee63615584a302f0dd76699886`. Los cambios de botón SVG y microsuperficie provienen de `5b034547f69f0f00cf67046b97ea72c1a07afb98`.
 - **Documentación de la tarjeta principal congelada:** `docs/GOXION_MI_ESPACIO_HERO_APROBADA_2026-11-22.md`.
 - **Auditoría visual previa y principios aprendidos:** `docs/GOXION_AUDITORIA_BENEFICIOS_FEED_2026-11-22.md`.
 - **Rama que preserva la tarjeta principal aprobada:** `approved/mi-espacio-hero-compacta-centrada-20261122`, apuntando a `f33e8572c07377f4811080a87c7cb1b483983b34`. Se elimina únicamente el rótulo flotante «GOXION» rechazado, según la documentación del hero.
@@ -242,3 +242,18 @@ El usuario pidió no seguir atinando entre medidas de 26/28/30px, sino **poder e
 **Enlace de la versión:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=ffb9313
 
 **Próximo paso:** pedir al usuario solamente el valor del círculo en px que marca la barra (o que pulse «Copiar medida» y lo pegue aquí). Una vez elegido, **fijar ese número como valor final**, quitar el regulador experimental cuando ya no haga falta y aplicar el mismo control en las demás tarjetas del feed. No dar por validado ningún tamaño sin esa elección.
+
+### Tamaño definitivo de X elegido por el usuario · 22/nov/2026
+
+El usuario utilizó la barra y entregó exactamente: **«GOXION · X: círculo 35 px, símbolo 16 px»**. No aproximar otra medida: este es el criterio confirmado para el feed del laboratorio.
+
+- Aplicado a `preview/experiencia-mi-espacio-inteligente/morph-v2.html`, commit `50d71ec3f6d64cc41ca31f4b1739e6bedd631315`.
+- Únicas variables de tamaño compartidas en `:root`: `--gx-close-disc:35px` y `--gx-close-x:16px`, círculo cian `#79e6fc` y X oscura `#071c29`.
+- Se aplican por herencia a `.gxb-dismiss` (Lealtad/Referidos/Misiones), `.gxs-icon` abierto (todas las tarjetas de Servicios, incluidas generadas dinámicamente) y `.demo-panel-close` (panel de laboratorio). Las posiciones y áreas táctiles invisibles de **44×44px** permanecen.
+- El regulador fue retirado por haber cumplido su función: se retiraron sus HTML/CSS/JS y persistencia de `localStorage`, para que las medidas guardadas previamente no reemplacen las definitivas. Padding inferior restaurado.
+- No se modificó el hero, saludo, lógica financiera ni `ayuda.html`, `admin.html` o `index.html` oficiales.
+- QA estático: 3 superficies usan el token, los 3 glifos toman el SVG y conservan 44px táctiles, etiquetas de estilo/script balanceadas y sintaxis correcta de los 3 scripts inline restantes. **Falta validación visual física en Safari y confirmación del despliegue Pages.**
+
+**URL anticaché:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=50d71ec
+
+Preservar 35/16px para nuevas tarjetas del laboratorio hasta petición explícita de cambio.
