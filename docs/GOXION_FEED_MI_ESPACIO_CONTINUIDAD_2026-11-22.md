@@ -4,6 +4,16 @@
 **Estado:** laboratorio interactivo actualizado, pendiente de validación visual final en iPhone/Safari y de aprobación del usuario. **NO integrado en producción.**  
 **Repositorio:** `henrygonzalezestrada-cyber/goxion`.
 
+## PUNTO DE REANUDACIÓN OBLIGATORIO — integración completa del feed
+
+**Documento maestro más reciente:** [`GOXION_MI_ESPACIO_INTEGRACION_MAESTRA_2026-11-22.md`](GOXION_MI_ESPACIO_INTEGRACION_MAESTRA_2026-11-22.md). Antes de trasladar a `ayuda.html` oficial todo lo experimentado en el laboratorio, leerlo junto a `AGENTS.md` y los contratos específicos. Incluye inventario de versiones, decisiones aprobadas, diferencias con producción, rutas de datos/handlers, riesgos, fuente faltante del Historial, condición de PR #231, plan coordinado de migración, QA y rollback.
+
+**La continuidad inferior es cronológica e histórica**, por tanto contiene propuestas anteriores que fueron sustituidas: por ejemplo «Próximos movimientos» descartado, «Historial de pagos» ampliado a «Historial de movimientos», filtro del Historial que **ya NO usa flecha/X** aunque una sección histórica lo describa. **En caso de discrepancia, el contrato específico más reciente y el documento maestro prevalecen.**
+
+**No se autoriza producción:** documentar avances no equivale a fusionar PRs, actualizar `ayuda.html` ni modificar fuentes financieras. La integración total requiere autorización explícita y una revisión técnica/visual final.
+
+---
+
 ## Revisión definitiva del filtro de Historial — 22/nov/2026
 
 El usuario adjuntó video Safari y pidió **eliminar la flecha y transformación a X del botón Filtrar** para no repetir el gesto de apertura de todas las tarjetas. El mismo botón debe abrir/cerrar filtros y cambiar de nombre a Pagos/Servicios cuando se escoge una categoría. También pidió revisar dimensiones de flechas del Historial vs Servicios.
