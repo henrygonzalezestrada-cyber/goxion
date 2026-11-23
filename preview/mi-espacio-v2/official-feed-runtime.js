@@ -396,16 +396,16 @@ function setupBenefits(){
 }
 function logo(name){
  const s=clean(name);
- if(s.includes('netflix'))return '../../logos/netflix.PNG';
- if(s.includes('disney'))return '../../logos/disney.PNG';
- if(s.includes('hbo')||s.includes('max'))return '../../logos/hbo-max.PNG';
- if(s.includes('youtube'))return '../../logos/youtube.PNG';
- if(s.includes('prime')||s.includes('amazon'))return '../../logos/prime-video.PNG';
- if(s.includes('vix'))return '../../logos/vix.PNG';
- if(s.includes('crunchy'))return '../../logos/crunchyroll.PNG';
- if(s.includes('microsoft')||s.includes('365'))return '../../logos/microsoft.PNG';
- if(s.includes('google'))return '../../logos/google-one.PNG';
- return '../../logo2.PNG';
+ if(s.includes('netflix'))return './logos/netflix.PNG';
+ if(s.includes('disney'))return './logos/disney.PNG';
+ if(s.includes('hbo')||s.includes('max'))return './logos/hbo-max.PNG';
+ if(s.includes('youtube'))return './logos/youtube.PNG';
+ if(s.includes('prime')||s.includes('amazon'))return './logos/prime-video.PNG';
+ if(s.includes('vix'))return './logos/vix.PNG';
+ if(s.includes('crunchy'))return './logos/crunchyroll.PNG';
+ if(s.includes('microsoft')||s.includes('365'))return './logos/microsoft.PNG';
+ if(s.includes('google'))return './logos/google-one.PNG';
+ return './logo2.PNG';
 }
 function serviceDetail(s){
  const cancel=clean(s.cancelacion?.estado),notice=s.credencial_pendiente||s.novedades?.length;

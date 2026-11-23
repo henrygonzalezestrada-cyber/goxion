@@ -8,6 +8,7 @@ const counter=document.createElement('span');counter.className='gx-client-notif-
 const mirrorBadge=()=>{
  const source=document.getElementById('gx-client-notif-launch'),badge=document.getElementById('gx-client-notif-badge');
  const unread=!!source?.classList.contains('gx-has-new');
+ bell.classList.toggle('gx-ringing',!!source?.classList.contains('gx-ringing'));
  bell.classList.toggle('gx-has-new',unread);
  counter.textContent=unread?(badge?.textContent||'1'):'0';
  bell.disabled=!source||source.disabled;
