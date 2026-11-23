@@ -44,15 +44,14 @@ async function showClient(view){
   savingSeen=false;savingSignature='';savingCurrent=0;savingTarget=0;stopSavingsMotion();
  window.GOXION_V2_RESET_BENEFITS?.();
  state.notificationItems=[];
- $('gxi-notice-list').replaceChildren();
- $('gxn-bell').dataset.unread='false';
- $('gxn-bell .gxi-bell-count')?.remove();
+ window.GOXION_V2_CLIENT_ID=String(view.cliente.id||'');
+ window.dispatchEvent(new CustomEvent('goxion:client-space:updated',{detail:{scope:'client_state'}}));
  spinner.hidden=true;loading.hidden=true;shell.hidden=false;
  $('gxi-account-name').textContent=String(view.cliente.nombre||'Mi Espacio')+' · Mi Espacio';
  renderClient();
  navigate('space',true);
  void loadPrices();
- void loadNotifications();
+ void window.GOXION_V2_NOTIFICATIONS?.refresh();
 }
 function heroState(view){
  const c=view.cliente,review=clean(c.pago_revision_estado),st=clean(c.estado),account=view.estado_cuenta||{};
@@ -625,40 +624,6 @@ document.addEventListener('visibilitychange',()=>{
  card.dataset.motionPaused=String(document.hidden);
  if(document.hidden){stopSavingsMotion();savingCurrent=savingTarget;showSavingAmount(savingTarget)}
 });
-async function loadNotifications(){
- if(!state.view)return;
- try{
-  const current=TOKEN();const r=await data.post('notificaciones-cliente',{accion:'listar',datos:{}},current);
-  if(current!==TOKEN())return;
-  state.notificationItems=Array.isArray(r.items)?r.items:[];
-  renderNotifications();
- }catch(_){$('gxi-notice-list').textContent='Las notificaciones no están disponibles en este momento.'}
-}
-function renderNotifications(){
- const items=state.notificationItems,unread=items.filter(x=>x.leida!==true).length,bell=$('gxn-bell');
- bell.dataset.unread=String(unread>0);
- let span=bell.querySelector('.gxi-bell-count');
- if(!span){span=document.createElement('span');span.className='gxi-bell-count';bell.append(span)}
- span.textContent=unread?(unread>99?'99+':String(unread)):'';
- bell.setAttribute('aria-label',unread?'Notificaciones, '+unread+' sin leer':'Abrir notificaciones');
- const host=$('gxi-notice-list');host.replaceChildren();
- if(!items.length){host.textContent='Todo al día. No tienes notificaciones recientes.';return}
- items.forEach(item=>{
-  const block=document.createElement('div');block.className='gxi-notification';block.dataset.unread=String(item.leida!==true);
-  const title=document.createElement('strong');title.textContent=item.titulo||'GOXION';
-  const content=document.createElement('p');content.textContent=item.mensaje||'';
-  block.append(title,content);
-  if(item.leida!==true){
-   const button=document.createElement('button');button.type='button';button.textContent='Marcar como leída';
-   button.addEventListener('click',async()=>{
-    if(!ENABLE_WRITES){button.textContent='Disponible al finalizar integración';return}
-    try{await data.post('notificaciones-cliente',{accion:'marcar_leida',datos:{id:item.id,source:item.source||'general'}},TOKEN());item.leida=true;renderNotifications()}
-    catch(_){button.textContent='Intenta de nuevo'}
-   });block.append(button);
-  }
-  host.append(block);
- });
-}
 function navigate(name,skipScroll){
  if(!['space','catalog','support'].includes(name))return;
  if(name!=='space'){window.location.assign(new URL('../../ayuda.html',window.location.href).href);return}
@@ -666,26 +631,25 @@ function navigate(name,skipScroll){
  document.querySelectorAll('#gxn-nav .gxn-tab').forEach(b=>{
   if(b.dataset.gxnTarget==='space')b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');
  });
- $('gxn-profile-menu').hidden=true;$('gxn-notice-menu').hidden=true;
+ $('gxn-profile-menu').hidden=true;window.GOXION_V2_NOTIFICATIONS?.close();
  if(!skipScroll)window.scrollTo({top:0,behavior:reduced()?'instant':'smooth'});
 }
+window.GOXION_V2_OPEN_OFFICIAL=(section)=>navigate(section==='catalog'?'catalog':'support');
 document.querySelectorAll('#gxn-nav [data-gxn-target]').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.gxnTarget)));
 $('gxn-profile-trigger').addEventListener('click',()=>{
- const menu=$('gxn-profile-menu'),next=menu.hidden;$('gxn-notice-menu').hidden=true;menu.hidden=!next;
+ const menu=$('gxn-profile-menu'),next=menu.hidden;
+ window.GOXION_V2_NOTIFICATIONS?.close();menu.hidden=!next;
  $('gxn-profile-trigger').setAttribute('aria-expanded',String(next));
 });
-$('gxn-bell').addEventListener('click',()=>{
- const menu=$('gxn-notice-menu'),next=menu.hidden;$('gxn-profile-menu').hidden=true;menu.hidden=!next;
- $('gxn-bell').setAttribute('aria-expanded',String(next));if(next)void loadNotifications();
-});
-$('gxn-notice-close').addEventListener('click',()=>{$('gxn-notice-menu').hidden=true;$('gxn-bell').setAttribute('aria-expanded','false')});
 document.addEventListener('pointerdown',e=>{
- if(!e.target.closest('#gxn-profile-trigger,#gxn-profile-menu,#gxn-bell,#gxn-notice-menu')){
-  $('gxn-profile-menu').hidden=true;$('gxn-notice-menu').hidden=true;
+ if(!e.target.closest('#gxn-profile-trigger,#gxn-profile-menu')){
+  $('gxn-profile-menu').hidden=true;$('gxn-profile-trigger').setAttribute('aria-expanded','false');
  }
 });
 $('gxn-logout').addEventListener('click',()=>{
- data.logout();state.view=null;state.prices=[];state.notificationItems=[];
+ data.logout();window.GOXION_V2_CLIENT_ID='';
+ window.dispatchEvent(new CustomEvent('goxion:client-space:updated',{detail:{scope:'logout'}}));
+ state.view=null;state.prices=[];state.notificationItems=[];
  $('gxi-account').hidden=true;$('gxv-savings').hidden=true;$('gxn-profile-menu').hidden=true;
  $('gxi-user').value='';$('gxi-pin').value='';
  showLogin();
@@ -719,6 +683,6 @@ setupBenefits();mountGoxy();load();
 if(!reduced())import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
  if(typeof mod.createMorph==='function')iconHandle=mod.createMorph($('state-path'),paths[$('focus-icon').dataset.icon]||paths.check,{reducedMotion:'user'});
 }).catch(()=>{});
-setInterval(()=>{if(!document.hidden&&state.view){void refreshClient();void loadNotifications()}},45000);
-document.addEventListener('visibilitychange',()=>{if(!document.hidden&&state.view){void refreshClient();void loadNotifications()}});
+setInterval(()=>{if(!document.hidden&&state.view){void refreshClient();void window.GOXION_V2_NOTIFICATIONS?.refresh({realtime:true})}},45000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&state.view){void refreshClient();void window.GOXION_V2_NOTIFICATIONS?.refresh({realtime:true})}});
 })();
