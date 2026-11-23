@@ -92,6 +92,19 @@ Reubicar toda la cápsula expandida justo **sobre** el texto en el encabezado, d
 
 ---
 
+## V4.3 · Legibilidad y borde cian de estado activo (23/nov/2026)
+
+**Decisión del usuario:** recuperar parte de la jerarquía visual de la cápsula oficial, sin copiar literalmente su cian intenso: aumentar letra activa, distinguir selección con un borde visible y mantener el cristal neutro/aprobado. Tras análisis se seleccionó una versión más sobria que el oficial (cuyo texto mide 15–16px y cuyo borde activo usa 80% de cian). **Autorizado y aplicado al laboratorio.**
+
+- CSS `preview/experiencia-mi-espacio-inteligente/adaptive-top-nav.css` commit **`21280ac555e44d16ffbcd90bd09e970697fcc116`**: `.gxn-tab-label` pasa de `12px / 650` a **`14.5px / 700`** (ligera corrección de espaciado de letras). `.gxn-tab[aria-current="page"]` usa borde `rgba(0,242,254,.42)` en expandida. En compacta se atenúa a `rgba(0,242,254,.25)`. Se anima **`border-color .26s ease`** junto a los demás cambios de selección.
+- HTML de laboratorio `morph-v2.html` commit **`11649842c0ace57581197ac1c504a6166739198c`** solo actualiza `?v=21280ac` para evitar caché CSS antigua en Safari.
+- **Sin cambios** en JS de navegación, largo de la cápsula, círculos de 44px, material neutral, posición sticky centrada, halo anterior tenue, reserva del saludo en dos líneas, Hero y feed.
+- Validación de código: sustituciones únicas, CSS balanceado, confirmación de reglas de modos, medidas y espaciado conservados. **QA visual iPhone/WebKit aún pendiente; no se debe afirmar que el nuevo texto está probado en todos los anchos.**
+
+**Vista anticaché:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=1164984
+
+---
+
 ## V4.2 · Corrección de separación proporcional cápsula / saludo (22/nov/2026)
 
 El usuario revisó V4.1 y confirmó que la nueva cápsula y sus emojis le gustan, pero **rechazó el aire extra bajo la navegación**: el saludo quedó visualmente demasiado abajo. La nueva regla es **margen proporcional y mínimo**, respetando la reserva de 2 líneas del saludo.
