@@ -55,3 +55,10 @@ Se inspeccionaron los fuentes de login, Mi Espacio, estado de cuenta y notificac
 - `ayuda.html`, portada/login, Catálogo y Soporte oficiales no se modifican durante aceptación. Cápsula única compartida, cristal neutro, estados dinámicos y animaciones aprobadas; conservar funciones reales. Mantener escritura V2 deshabilitada en espejo público. No alterar clientes reales ni protecciones de prórroga.
 - El usuario quiere rapidez y validar la experiencia sin preparar fechas/comprobantes manualmente. Entregar bloques utilizables y resultados verificados, no largas rondas de diagnóstico o supuestas pruebas reales.
 - Consultar auditoría de paridad, contrato técnico y plan de pruebas existentes en `docs/`. Leer primero este registro y confirmar estado actual de Supabase antes de retomar.
+
+
+## Ejecución de preparación · 23/nov/2026, siguiente turno
+
+Se desplegaron exclusivamente en `nsvybyvvdpdgbgtvydfb` cuatro Edge Functions oficiales, manteniendo su autenticación original: `login-goxion` (origen v10, QA v1, ACTIVE, fuente idéntica verificada); `estado-cuenta-beta` (origen v4, QA v1, ACTIVE, fuente idéntica verificada); `notificaciones-cliente` (origen v8, QA v1, ACTIVE, fuente idéntica verificada); `novedades-cliente` (origen v3, QA v1, ACTIVE, fuente idéntica verificada). No se modificó producción ni se crearon cuentas. Esto verifica instalación y código, no login ni operaciones HTTP autenticadas.
+
+Bloqueo concreto para `mi-espacio`, `cancelaciones-cliente`, `accesos-cliente-beta`, `credenciales-cliente`: falta RPC `goxion_legal_estado_acceso` en QA; credenciales además requiere vault. No saltar protecciones. Siguiente: incorporar dependencias legales oficiales y revisar esquema/RPC; desplegar Mi Espacio y controladores restantes; crear cuenta sintética, probar HTTP y conectar ruta aislada. Cuatro de los once controladores requeridos están actualizados; quedan cuatro ausentes y tres antiguos. No entregar acceso como funcional antes de validar. Mantener `ENABLE_WRITES=false` en espejo público.
