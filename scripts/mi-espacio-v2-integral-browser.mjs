@@ -49,6 +49,7 @@ async function test(engine,name){
   await page.locator('#gx-client-notif-mark-all').click();
   await page.locator('#gx-client-notif-mark-all').click();
   await page.waitForFunction(()=>document.querySelector('#gxn-bell')?.classList.contains('gx-has-new')===false,null,{timeout:7000});
+  await page.waitForTimeout(480); // transición CSS original de 380 ms
   const collapsed=await page.locator('#gxn-bell').evaluate(el=>el.getBoundingClientRect().width);
   assert(Math.abs(collapsed-44)<2,name+' collapsed bell '+collapsed);
   await page.locator('#gx-client-notif-sheet .gx-client-notif-close').click();
