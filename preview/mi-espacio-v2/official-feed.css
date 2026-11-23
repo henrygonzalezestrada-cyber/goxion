@@ -13,7 +13,7 @@ body.gx-v2-private-visible > .gxb-morph-surface,body.gx-v2-private-visible > .gx
 body.gx-v2-private-visible > .gxb-morph-surface{border:1px solid rgba(255,255,255,.035);box-shadow:0 15px 36px rgba(0,0,0,.23);background:rgba(8,8,12,.371);-webkit-backdrop-filter:blur(11.75px) saturate(1);backdrop-filter:blur(11.75px) saturate(1)}
 body.gx-v2-private-visible > .gxb-morph-emoji{display:block;line-height:1;text-align:center;white-space:nowrap;transform-origin:center}
 
-#gx-v2-feed{--bg:#030305;--text:#f5f8ff;--muted:#a8b5c9;--cyan:#36dbe8;--purple:#8067f5;--gx-close-disc:35px;--gx-close-x:16px;color:#f5f8ff;font-family:Poppins,system-ui,sans-serif;isolation:isolate}
+#gx-v2-feed{--bg:#030305;--text:#f5f8ff;--muted:#a8b5c9;--cyan:#36dbe8;--purple:#8067f5;--gx-close-disc:35px;--gx-close-x:16px;--neutral-alpha:.371;--neutral-blur:11.75px;position:relative;color:#f5f8ff;font-family:Poppins,system-ui,sans-serif;isolation:isolate}
 #gx-v2-feed[hidden]{display:none!important}
 #gx-v2-feed .shell{max-width:580px!important;width:100%!important;margin:0 auto!important;padding:0 0 calc(110px + env(safe-area-inset-bottom,0px))!important}
 #view-dashboard.gx-v2-rendered > #gx-v2-legacy-host{display:none!important}

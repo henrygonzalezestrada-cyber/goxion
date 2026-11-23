@@ -64,14 +64,25 @@ function onOfficialReady(){
  syncView();
 }
 window.addEventListener('goxion:client-ready',onOfficialReady);
-window.addEventListener('goxion:v2-feed:rendered',()=>{rendered=true;authorized=true;syncView()});
+let syncTimeout=null;
+window.addEventListener('goxion:client-ready',()=>{
+ clearTimeout(syncTimeout);
+ syncTimeout=setTimeout(()=>{
+  if(!authorized||rendered)return;
+  veilCopy.textContent='La conexión tarda más de lo habitual. Puedes reintentar.';
+  retry.hidden=false;
+ },12000);
+});
+window.addEventListener('goxion:v2-feed:rendered',()=>{clearTimeout(syncTimeout);rendered=true;authorized=true;syncView()});
 window.addEventListener('goxion:v2-feed:error',event=>{
+ clearTimeout(syncTimeout);
  if(!authorized)return;
  rendered=false;
  veilCopy.textContent=String(event.detail?.message||'No pudimos sincronizar tu información.');
  retry.hidden=false;syncView();
 });
 window.addEventListener('goxion:client-logout',()=>{
+ clearTimeout(syncTimeout);
  authorized=false;rendered=false;accountKey='';feed.hidden=true;
  document.body.classList.remove('gx-v2-private-visible');dash.classList.remove('gx-v2-rendered');
 });
