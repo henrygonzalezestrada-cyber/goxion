@@ -1,0 +1,236 @@
+/* GOXION · Mi Espacio / espejo oficial · solo presentación.
+   La página oficial y los contratos de Supabase permanecen intactos.
+   V4.3: una cápsula sticky, icono seleccionado con borde cian, cristal neutro. */
+html[data-gx-mirror="client"]{--gxm-glass:rgba(8,8,12,.371);--gxm-cyan:#36dbe8;--gxm-text:#f6f9ff}
+html[data-gx-mirror="client"] #sticky-client-bar{display:none!important}
+html[data-gx-mirror="client"] .container{overflow:visible!important;padding-bottom:55px}
+html[data-gx-mirror="client"] .app-header{margin-bottom:7px!important;min-height:58px}
+html[data-gx-mirror="client"] .app-header .app-logo{max-height:32px;max-width:140px;object-fit:contain}
+html[data-gx-mirror="client"] .app-header .gx-header-actions{gap:7px}
+html[data-gx-mirror="client"] #gx-client-notif-launch{flex:0 0 44px;width:44px!important;height:44px!important;border-radius:50%!important}
+html[data-gx-mirror="client"] #goxion-main-nav{
+ display:flex!important;align-items:center!important;justify-content:space-between!important;
+ position:sticky!important;top:calc(8px + env(safe-area-inset-top,0px))!important;
+ width:100%!important;height:76px!important;max-width:100%!important;margin:9px auto 9px!important;
+ gap:7px!important;padding:9px!important;isolation:isolate;overflow:hidden!important;
+ border:1px solid rgba(210,230,247,.10)!important;border-radius:999px!important;
+ background:var(--gxm-glass)!important;box-shadow:0 12px 28px rgba(0,0,0,.13),inset 0 1px rgba(255,255,255,.065)!important;
+ -webkit-backdrop-filter:blur(11.75px) saturate(1.08)!important;backdrop-filter:blur(11.75px) saturate(1.08)!important;
+ transition:width .38s cubic-bezier(.2,.8,.2,1),height .38s cubic-bezier(.2,.8,.2,1),padding .38s cubic-bezier(.2,.8,.2,1),gap .38s cubic-bezier(.2,.8,.2,1),margin-bottom .38s cubic-bezier(.2,.8,.2,1)!important;
+ z-index:110!important
+}
+html[data-gx-mirror="client"] #goxion-main-nav .tab-btn{
+ display:inline-flex!important;align-items:center!important;justify-content:center!important;
+ flex:0 0 56px!important;min-width:56px!important;max-width:none!important;width:56px!important;height:56px!important;
+ aspect-ratio:1;gap:5px!important;padding:0!important;overflow:hidden!important;
+ border:1px solid rgba(255,255,255,.055)!important;border-radius:50%!important;
+ background:rgba(255,255,255,.032)!important;box-shadow:none!important;color:#b7c9da!important;
+ transition:flex-basis .38s cubic-bezier(.2,.8,.2,1),width .38s cubic-bezier(.2,.8,.2,1),background .26s ease,border-color .26s ease!important
+}
+html[data-gx-mirror="client"] #goxion-main-nav .tab-btn.active{
+ flex:1 1 56px!important;width:auto!important;aspect-ratio:auto!important;min-width:0!important;
+ border-radius:999px!important;background:rgba(255,255,255,.075)!important;
+ border-color:rgba(0,242,254,.42)!important;color:#f1f9ff!important
+}
+html[data-gx-mirror="client"] #goxion-main-nav .gx-nav-icon{
+ flex:0 0 25px!important;display:grid!important;place-items:center!important;
+ min-width:25px!important;width:25px!important;height:30px!important;
+ font-size:23px!important;line-height:1!important;filter:none!important;transform:none!important
+}
+html[data-gx-mirror="client"] #goxion-main-nav .gx-nav-label{
+ font-size:14.5px!important;font-weight:700!important;letter-spacing:-.025em!important;
+ max-width:0!important;opacity:0!important;min-width:0!important;margin:0!important;
+ overflow:hidden!important;white-space:nowrap!important;transform:translateX(-8px)!important
+}
+html[data-gx-mirror="client"] #goxion-main-nav .tab-btn.active .gx-nav-label{
+ max-width:108px!important;opacity:1!important;margin-left:4px!important;transform:none!important
+}
+html[data-gx-mirror="client"] #goxion-main-nav[data-mode="compact"]{
+ width:min(160px,100%)!important;height:56px!important;padding:5px!important;gap:5px!important;margin-bottom:29px!important
+}
+html[data-gx-mirror="client"] #goxion-main-nav[data-mode="compact"] .tab-btn,
+html[data-gx-mirror="client"] #goxion-main-nav[data-mode="compact"] .tab-btn.active{
+ flex:0 0 44px!important;min-width:44px!important;max-width:44px!important;
+ width:44px!important;height:44px!important;min-height:44px!important;aspect-ratio:1!important;
+ border-radius:50%!important;padding:0!important;
+}
+html[data-gx-mirror="client"] #goxion-main-nav[data-mode="compact"] .tab-btn.active{
+ background:rgba(105,197,210,.115)!important;border-color:rgba(0,242,254,.25)!important;
+ box-shadow:0 0 12px rgba(94,220,240,.085)!important
+}
+html[data-gx-mirror="client"] #goxion-main-nav[data-mode="compact"] .gx-nav-icon{
+ flex:0 0 24px!important;width:24px!important;height:24px!important;font-size:19px!important;min-width:24px!important
+}
+html[data-gx-mirror="client"] #goxion-main-nav[data-mode="compact"] .gx-nav-label{display:none!important}
+@media(max-width:320px){
+ html[data-gx-mirror="client"] #goxion-main-nav[data-mode="compact"]{width:min(158px,100%)!important;margin-bottom:27px!important}
+ html[data-gx-mirror="client"] #goxion-main-nav{gap:5px!important;padding:9px 7px!important}
+ html[data-gx-mirror="client"] #goxion-main-nav .tab-btn{flex-basis:54px!important;min-width:54px!important;width:54px!important;height:54px!important}
+ html[data-gx-mirror="client"] #goxion-main-nav[data-mode="compact"]{padding:5px!important}
+}
+/* El saludo original conserva nombre/sesión/rotación reales. */
+html[data-gx-mirror="client"] #dash-greeting-container{
+ display:flex;align-items:flex-end;min-height:88px!important;margin:0 2px 14px!important;
+ padding:0 6px 9px!important;text-align:left!important;overflow:hidden
+}
+html[data-gx-mirror="client"] #dynamic-greeting-text{
+ margin:0!important;min-height:2.32em;display:flex;align-items:center;
+ font-size:clamp(27px,6.9vw,34px)!important;line-height:1.16!important;
+ font-weight:750!important;letter-spacing:-.045em!important;text-wrap:balance
+}
+html[data-gx-mirror="client"] #dynamic-greeting-text span{color:#42e4e8!important}
+html[data-gx-mirror="client"] #dash-billing-card{display:none!important}
+/* Hero visual nuevo: solo DOM de estado original, sin acciones demo. */
+html[data-gx-mirror="client"] .gx-mirror-priority{
+ position:relative;isolation:isolate;display:grid;grid-template-columns:minmax(0,1fr) minmax(78px,32%);
+ grid-template-rows:minmax(125px,1fr) auto;align-items:center;min-height:242px;
+ padding:24px 23px 19px 27px;margin:0 0 14px;overflow:hidden;
+ border:1px solid rgba(255,255,255,.035);border-radius:32px;
+ background:var(--gxm-glass);box-shadow:0 15px 36px rgba(0,0,0,.23),inset 0 1px rgba(255,255,255,.05);
+ -webkit-backdrop-filter:blur(11.75px) saturate(1);backdrop-filter:blur(11.75px) saturate(1);
+ --gxm-accent:#69e1d5
+}
+html[data-gx-mirror="client"] .gx-mirror-priority[data-tone="review"]{--gxm-accent:#7bccff}
+html[data-gx-mirror="client"] .gx-mirror-priority[data-tone="attention"]{--gxm-accent:#f6a4b8}
+html[data-gx-mirror="client"] .gx-mirror-priority[data-tone="due"]{--gxm-accent:#5cdaeb}
+html[data-gx-mirror="client"] .gx-mirror-priority::before{
+ content:"";position:absolute;z-index:-1;inset:-30% -40% auto auto;width:105%;height:100%;
+ background:radial-gradient(circle, color-mix(in srgb,var(--gxm-accent) 12%,transparent), transparent 70%);
+ pointer-events:none
+}
+html[data-gx-mirror="client"] .gx-mirror-priority-copy{align-self:center;grid-area:1/1;min-width:0}
+html[data-gx-mirror="client"] .gx-mirror-priority h2{
+ margin:0 0 9px;color:#f7f8fe;font-size:clamp(22px,5.5vw,32px);
+ line-height:1.16;letter-spacing:-.048em;font-weight:700;text-wrap:balance
+}
+html[data-gx-mirror="client"] .gx-mirror-priority .gx-mirror-sub{
+ display:block;font-size:11px;line-height:1.45;color:#b5c5d2;font-weight:500
+}
+html[data-gx-mirror="client"] .gx-mirror-icon{grid-area:1/2;display:grid;place-items:center;color:var(--gxm-accent)}
+html[data-gx-mirror="client"] .gx-mirror-icon svg{width:min(90%,110px);height:auto;overflow:visible;fill:none;stroke:currentColor;stroke-width:1.35;stroke-linecap:round;stroke-linejoin:round}
+html[data-gx-mirror="client"] .gx-mirror-hero-action{grid-area:2/1/3/3;display:flex;justify-content:center;margin-top:10px}
+html[data-gx-mirror="client"] .gx-mirror-hero-action .gx-account-capsule{
+ min-height:38px!important;width:max-content!important;max-width:100%;margin:0!important;padding:8px 15px!important;
+ border:0!important;border-radius:999px!important;background:rgba(255,255,255,.08)!important;
+ color:var(--gxm-accent)!important;box-shadow:none!important;backdrop-filter:none!important;
+ font:600 11px/1.2 Poppins,system-ui!important
+}
+html[data-gx-mirror="client"] .gx-mirror-hero-action .gx-account-capsule svg{max-height:16px}
+html[data-gx-mirror="client"] .gx-mirror-icon[data-kind="clock"] .gx-mirror-clock-hand{
+ transform-box:view-box;transform-origin:12px 12px;animation:gx-mirror-clock 6s linear infinite
+}
+@keyframes gx-mirror-clock{to{transform:rotate(360deg)}}
+html[data-gx-mirror="client"] .gx-mirror-icon.is-changed:not([data-kind="clock"]) svg{
+ animation:gx-mirror-arrive .6s cubic-bezier(.18,.84,.2,1)
+}
+@keyframes gx-mirror-arrive{from{opacity:.4;transform:scale(.93)}to{opacity:1;transform:scale(1)}}
+@media(max-width:380px){
+ html[data-gx-mirror="client"] .gx-mirror-priority{min-height:236px;padding:22px 18px 17px 20px;grid-template-rows:minmax(120px,1fr) auto}
+}
+html[data-gx-mirror="client"] .gx-mirror-priority[hidden]{display:none!important}
+/* Beneficios: únicamente números reales del DOM oficial. */
+html[data-gx-mirror="client"] #gamif-grid{
+ display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:8px!important;margin:14px 2px 0!important
+}
+html[data-gx-mirror="client"] #gamif-grid .gx-gamif-card,
+html[data-gx-mirror="client"] #gamif-grid .gx-mirror-loyalty{
+ position:relative;isolation:isolate;min-width:0;min-height:121px!important;height:auto!important;
+ padding:12px 10px 10px!important;border-radius:20px!important;
+ border:1px solid rgba(255,255,255,.045)!important;
+ background:var(--gxm-glass)!important;box-shadow:0 10px 26px rgba(0,0,0,.11)!important;
+ -webkit-backdrop-filter:blur(11.75px) saturate(1);backdrop-filter:blur(11.75px) saturate(1);
+ text-align:left!important;display:flex!important;flex-direction:column!important;align-items:flex-start!important;
+ justify-content:center!important;gap:4px!important;overflow:hidden;color:#f6f9ff!important;
+ font-family:Poppins,system-ui;cursor:pointer
+}
+html[data-gx-mirror="client"] #gamif-grid .gx-gamif-card::after{display:none!important}
+html[data-gx-mirror="client"] #gamif-grid .gx-gamif-card-top{margin:0!important;padding:0!important}
+html[data-gx-mirror="client"] #gamif-grid .gx-gamif-card-kicker,
+html[data-gx-mirror="client"] #gamif-grid .gx-mirror-loyalty-label{
+ font-size:11px!important;font-weight:650!important;line-height:1.25!important;
+ letter-spacing:0!important;text-transform:none!important;color:#e0e9f4!important
+}
+html[data-gx-mirror="client"] #gamif-grid .gamif-title,
+html[data-gx-mirror="client"] #gamif-grid .gx-mirror-loyalty-value{
+ font-size:clamp(16px,4.8vw,24px)!important;line-height:1.12!important;letter-spacing:-.045em!important;
+ font-weight:750!important;text-align:left!important;margin:2px 0!important;
+ white-space:normal!important;word-break:normal!important;overflow-wrap:anywhere
+}
+html[data-gx-mirror="client"] #gamif-grid .gx-gamif-card-status,
+html[data-gx-mirror="client"] #gamif-grid .gx-gamif-card-meta,
+html[data-gx-mirror="client"] #gamif-grid .gx-mirror-loyalty-unit{
+ font-size:9px!important;line-height:1.35!important;font-weight:500!important;color:#b7c5d5!important;
+ margin:0!important;display:block!important;min-height:0!important
+}
+html[data-gx-mirror="client"] #gamif-grid .gx-gamif-progress,
+html[data-gx-mirror="client"] #gamif-grid .gx-mirror-meter{
+ width:100%!important;min-height:4px!important;height:4px!important;flex:0 0 4px;margin:7px 0 0!important;
+ background:rgba(237,246,255,.1)!important;border-radius:999px;overflow:hidden
+}
+html[data-gx-mirror="client"] #gamif-grid .gx-gamif-progress>span,
+html[data-gx-mirror="client"] #gamif-grid .gx-mirror-meter>span{
+ display:block;height:100%;border-radius:inherit;
+ background:linear-gradient(90deg,#8163ef,#17d8e3);transition:width .85s cubic-bezier(.16,1,.3,1)
+}
+html[data-gx-mirror="client"] #gamif-grid .gx-mirror-loyalty-emoji{
+ position:absolute;right:3px;top:40%;transform:translateY(-50%) rotate(-8deg);font-size:25px;pointer-events:none
+}
+html[data-gx-mirror="client"] #gamif-grid .gx-mirror-loyalty-value{padding-right:26px}
+html[data-gx-mirror="client"] .gx-mirror-loyalty-expanded{
+ margin:12px 2px 14px;padding:20px;min-height:175px;border-radius:25px;
+ background:var(--gxm-glass);border:1px solid rgba(255,255,255,.04);
+ -webkit-backdrop-filter:blur(11.75px);backdrop-filter:blur(11.75px)
+}
+html[data-gx-mirror="client"] .gx-mirror-loyalty-expanded[hidden]{display:none!important}
+html[data-gx-mirror="client"] .gx-mirror-loyalty-expanded h3{font-size:21px;margin:0 52px 10px 0;color:#f6f9ff}
+html[data-gx-mirror="client"] .gx-mirror-loyalty-expanded p{font-size:12px;line-height:1.6;color:#b8c8dc}
+html[data-gx-mirror="client"] .gx-mirror-close{float:right;min-width:44px;height:44px;border:0;border-radius:50%;background:#79e6fc;color:#071c29;font-size:16px}
+html[data-gx-mirror="client"] #gamif-grid .gx-gamif-card[data-watermark]::before{
+ content:attr(data-watermark);position:absolute;z-index:0;right:1px;top:35%;
+ font-size:27px;opacity:1;line-height:1;pointer-events:none
+}
+html[data-gx-mirror="client"] #gamif-grid .gx-gamif-card{padding-right:9px!important}
+html[data-gx-mirror="client"] #gamif-grid .gx-gamif-card .gamif-title{padding-right:19px}
+html[data-gx-mirror="client"] #gamif-grid .gx-gamif-card .gx-gamif-progress[data-progress="0"]{display:none!important}
+@media(max-width:355px){
+ html[data-gx-mirror="client"] #gamif-grid{gap:6px!important}
+ html[data-gx-mirror="client"] #gamif-grid .gx-gamif-card,
+ html[data-gx-mirror="client"] #gamif-grid .gx-mirror-loyalty{padding:10px 7px!important}
+ html[data-gx-mirror="client"] #gamif-grid .gamif-title,
+ html[data-gx-mirror="client"] #gamif-grid .gx-mirror-loyalty-value{font-size:18px!important}
+}
+/* Servicios e historial: no se sustituyen sus handlers ni elementos de seguridad. */
+html[data-gx-mirror="client"] #view-dashboard .gx-dashboard-section-head{margin:18px 2px 12px}
+html[data-gx-mirror="client"] #view-dashboard .gx-dashboard-section-head .section-title{
+ margin:0!important;text-align:left;font-size:17px!important;letter-spacing:-.03em;font-weight:700
+}
+html[data-gx-mirror="client"] #view-dashboard .gx-dashboard-section-subtitle{font-size:10.5px;line-height:1.5;color:#91a4bc}
+html[data-gx-mirror="client"] #dash-services .gx-service-manage-card{border-radius:19px;background:var(--gxm-glass)}
+html[data-gx-mirror="client"] #dash-services .gx-service-state-line{font-size:11px}
+html[data-gx-mirror="client"] #dash-history .gx-payment-history-card{background:var(--gxm-glass);border-radius:26px}
+html[data-gx-mirror="client"] #dash-history .gx-payment-history-row{min-height:85px}
+html[data-gx-mirror="client"] #dash-payment-review-alert:empty{display:none}
+/* Cierre: conservar documentos legales funcionales y horario verídico, quitar aire. */
+html[data-gx-mirror="client"] .footer-info{
+ max-width:580px;margin:24px auto 0!important;padding:18px 16px calc(25px + env(safe-area-inset-bottom,0px))!important;
+ border-top:1px solid rgba(222,237,251,.09)!important;text-align:left!important;background:transparent!important
+}
+html[data-gx-mirror="client"] .footer-info .schedule{display:flex;flex-direction:column;gap:5px}
+html[data-gx-mirror="client"] .footer-info .schedule-title{
+ margin:0!important;font-size:13px!important;font-weight:650!important;color:#dde7f3!important
+}
+html[data-gx-mirror="client"] .footer-info .schedule-time{
+ font-size:11px!important;line-height:1.6!important;color:#96a8bc!important
+}
+html[data-gx-mirror="client"] .footer-info .schedule + div{
+ margin-top:13px!important;font-size:10px!important;color:#73849b!important
+}
+html[data-gx-mirror="client"] .goxion-release-version{display:none!important}
+@media(prefers-reduced-motion:reduce){
+ html[data-gx-mirror="client"] #goxion-main-nav,
+ html[data-gx-mirror="client"] #goxion-main-nav *,
+ html[data-gx-mirror="client"] .gx-mirror-icon *,
+ html[data-gx-mirror="client"] .gx-mirror-priority *{
+  animation:none!important;transition:none!important
+ }
+}
