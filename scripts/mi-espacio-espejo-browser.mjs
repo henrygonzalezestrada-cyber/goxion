@@ -1,0 +1,110 @@
+/* GOXION · Pruebas visuales aisladas (NO acceden a cuentas reales).
+   Los estados ficticios viven exclusivamente dentro del navegador de CI.
+   La página entregada no incluye fixtures ni controles de escenarios. */
+import assert from "node:assert/strict";
+import {spawn} from "node:child_process";
+import {chromium,webkit} from "playwright";
+const PORT=4266, origin="http://127.0.0.1:"+PORT;
+const nap=ms=>new Promise(r=>setTimeout(r,ms));
+const server=spawn(process.execPath,["scripts/serve-preview.mjs"],{
+ env:{...process.env,PORT:String(PORT)},stdio:"ignore"
+});
+async function serverReady(){
+ for(let i=0;i<100;i++){
+  try{if((await fetch(origin+"/preview/mi-espacio-espejo/index.html")).ok)return;}catch(_){}
+  await nap(100);
+ }
+ throw Error("Servidor local no disponible");
+}
+async function test(engine,name){
+ const browser=await engine.launch({headless:true});
+ try{
+  for(const width of [390,320,280]){
+   const page=await browser.newPage({viewport:{width,height:844},reducedMotion:"reduce"});
+   await page.route("**/*",route=>{
+    const url=route.request().url();
+    if(url.startsWith(origin))return route.continue();
+    return route.abort();
+   });
+   await page.goto(origin+"/preview/mi-espacio-espejo/index.html",{
+    waitUntil:"domcontentloaded",timeout:30000
+   });
+   await page.locator("#gx-mirror-priority").waitFor({state:"attached",timeout:10000});
+   const basic=await page.evaluate(()=>{
+    const find=s=>document.querySelector(s);
+    return {
+     noDemo:!document.querySelector("#demo-panel,#gxb-lab-toggle,#gxs-lab-controls"),
+     navCount:document.querySelectorAll("#goxion-main-nav").length,
+     navSticky:getComputedStyle(find("#goxion-main-nav")).position==="sticky",
+     oldStickyHidden:getComputedStyle(find("#sticky-client-bar")).display==="none",
+     releaseHidden:getComputedStyle(find(".goxion-release-version")).display==="none",
+     legal:!!document.getElementById("modal-terminos"),
+     originalCredentials:!!document.getElementById("header-action-btn"),
+     officialServices:!!document.getElementById("dash-services")
+    };
+   });
+   for(const [key,value] of Object.entries(basic)){
+    assert(value===true||value===1,name+"/"+width+": "+key+"="+value);
+   }
+   await page.evaluate(()=>{
+    document.body.classList.remove("no-scroll");
+    globalClientesData={qa:{
+      nombre:"QA",folio:"QA-LOCAL",
+      estado_cuenta:{estado:"revision",lealtad:{pagos_efectivos:3,racha_reiniciada_virtual:false}},
+      pago_revision_estado:"revision",pago_en_revision:true
+    }};
+    window.goxionCurrentClientKey="qa";
+    document.getElementById("view-dashboard").classList.add("active");
+    document.getElementById("dash-onboarding-card").hidden=true;
+    document.getElementById("dash-date").textContent="15 de diciembre";
+    document.getElementById("loyalty-count").textContent="3/4 Pagos";
+    document.getElementById("loyalty-msg").textContent="Acumula 4 pagos consecutivos.";
+    document.getElementById("referral-section-container").innerHTML=
+      '<div id="gamif-grid" class="gamification-grid"></div>';
+   });
+   await nap(300);
+   const review=await page.evaluate(()=>({
+    title:document.getElementById("gx-mirror-priority-title").textContent,
+    clock:document.getElementById("gx-mirror-priority-icon").dataset.kind,
+    loyalty:document.getElementById("gx-mirror-loyalty-value").textContent,
+    emoji:document.getElementById("gx-mirror-loyalty-emoji").textContent,
+    realBadgeCount:document.querySelectorAll("#gx-client-notif-badge").length
+   }));
+   assert.equal(review.title,"Estamos revisando tu comprobante",name+"/"+width+" review title");
+   assert.equal(review.clock,"clock",name+"/"+width+" clock");
+   assert.equal(review.loyalty,"3/4",name+"/"+width+" loyalty");
+   assert.equal(review.emoji,"⭐",name+"/"+width+" star");
+   assert(review.realBadgeCount<=1,name+"/"+width+" duplicate notification badge");
+   await page.locator("#gx-mirror-loyalty").click();
+   assert.equal(await page.locator("#gx-mirror-loyalty-expanded").isVisible(),true,name+"/"+width+" loyalty detail");
+   await page.locator(".gx-mirror-close").click();
+   await page.evaluate(()=>{
+    globalClientesData.qa.estado_cuenta.estado="pagado";
+    globalClientesData.qa.estado_cuenta.lealtad.racha_reiniciada_virtual=true;
+    globalClientesData.qa.pago_revision_estado="";
+    globalClientesData.qa.pago_en_revision=false;
+    document.getElementById("loyalty-count").textContent="0/4 Pagos";
+   });
+   await nap(250);
+   assert.equal(await page.locator("#gx-mirror-priority-icon").getAttribute("data-kind"),"check",name+"/"+width+" confirmation");
+   assert.equal(await page.locator("#gx-mirror-loyalty-emoji").textContent(),"💔",name+"/"+width+" lost streak");
+   await page.evaluate(()=>{
+    const filler=document.createElement("div");filler.style.height="2400px";document.body.append(filler);
+    window.scrollTo(0,450);
+    window.dispatchEvent(new Event("scroll"));
+   });
+   await nap(450);
+   const nav=await page.locator("#goxion-main-nav").boundingBox();
+   const max=width<=320?158:160;
+   assert(nav&&Math.abs(nav.width-max)<3,name+"/"+width+" compact width "+nav?.width);
+   await page.close();
+  }
+ }finally{await browser.close();}
+}
+try{
+ await serverReady();
+ for(const [name,engine] of Object.entries({chromium,webkit})){
+  await test(engine,name);
+  console.log(name+": 390/320/280 px · navegación, estados, lealtad y sin escenarios visibles: OK");
+ }
+}finally{server.kill("SIGTERM");}
