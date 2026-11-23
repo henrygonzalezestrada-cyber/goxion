@@ -85,7 +85,7 @@ function renderHero(){
   title.textContent=s[1];
   if(!reduced()&&title.animate)title.animate([{opacity:0,filter:'blur(10px)',transform:'translateY(20px)'},{opacity:1,filter:'blur(0)',transform:'translateY(0)'}],{duration:560,easing:'cubic-bezier(.18,.85,.2,1)'});
  }
- $('focus-meta').textContent=s[2];$('focus-action').textContent=s[0]==='new'?'Ver catálogo':'Ver mi cuenta';
+ $('focus-meta').textContent=s[2];$('focus-action').textContent=s[0]==='new'?'Ver catálogo':'Ver mi cuenta';$('focus-action').setAttribute('aria-label',s[0]==='new'?'Abrir catálogo oficial':'Abrir mi estado de cuenta oficial');
  const icon=$('focus-icon');icon.dataset.icon=s[4];
  const path=$('state-path'),shape=paths[s[4]]||paths.check;
  if(iconHandle){try{iconHandle.morphTo(shape,'smooth')}catch(_){path.setAttribute('d',shape)}}
@@ -96,12 +96,17 @@ function renderHero(){
  $('gxi-account-info').textContent=account?.publicable===true && Number.isFinite(Number(account.total_actual))
  ?'Importe confirmado por GOXION: '+data.money(account.total_actual)+'. Fecha principal de pago: día '+(Number(c.dia_pago)||15)+'.'
  :'Consulta tus movimientos registrados. Cuando el estado de cuenta esté conciliado, GOXION confirmará los importes y fechas de pago.';
- card.setAttribute('aria-label',s[1]+'. '+s[2]+'. '+$('focus-action').textContent);
+ card.setAttribute('aria-label',s[1]+'. '+s[2]+'. Estado informativo; utiliza el botón para consultar.');
 }
-$('focus').addEventListener('click',()=>{
+$('focus-action').addEventListener('click',event=>{
+ event.stopPropagation();
  if(state.lastState==='new'){navigate('catalog');return}
- const box=$('gxi-account');box.hidden=!box.hidden;
- if(!box.hidden)box.scrollIntoView({block:'nearest',behavior:reduced()?'instant':'smooth'});
+ // Reutiliza la ruta original hacia index.html o B2 multifecha.
+ if(typeof window.irAlTicket==='function'){window.irAlTicket();return}
+ const toast=$('gxn-toast');
+ toast.textContent='No pudimos abrir el estado de cuenta. Inténtalo nuevamente.';
+ toast.hidden=false;
+ window.setTimeout(()=>{toast.hidden=true},3700);
 });
 function missionInfo(view){
  const g=view.gamificacion||{};
