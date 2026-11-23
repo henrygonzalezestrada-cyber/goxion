@@ -81,6 +81,12 @@ async function test(engine,name){
    assert.equal(review.loyalty,"3/4",name+"/"+width+" loyalty");
    assert.equal(await page.locator("#gamif-grid .gxb-tile").count(),3,name+"/"+width+" compactas aprobadas");
    assert.equal(await page.locator("#gamif-grid .gxb-live-visual").count(),2,name+"/"+width+" cards oficiales estilizadas");
+   const row=await page.evaluate(()=>{
+    const cards=[...document.querySelectorAll("#gamif-grid > .gxb-tile")].map(x=>x.getBoundingClientRect());
+    return {count:cards.length,oneLine:cards.length===3&&cards.every(r=>Math.abs(r.top-cards[0].top)<4),widths:cards.map(r=>r.width)};
+   });
+   assert(row.oneLine,name+"/"+width+" tres beneficios deben compartir la misma fila: "+JSON.stringify(row));
+   assert(row.widths.every(w=>w>50),name+"/"+width+" compactas sin colapso horizontal");
    const clean=await page.evaluate(()=>{
     const root=document.getElementById("gamif-grid");
     const a=root.querySelector(".gx-gamif-card-ref");
@@ -114,11 +120,14 @@ async function test(engine,name){
    await nap(250);
    assert.equal(await page.locator("#gx-mirror-priority-icon").getAttribute("data-icon"),"check",name+"/"+width+" confirmation");
    assert.equal(await page.locator("#gx-mirror-loyalty-emoji").textContent(),"💔",name+"/"+width+" lost streak");
+   // El click del acordeón puede mover el scroll: generar desplazamiento
+   // real desde arriba, en vez de asumir que y=450 siempre implica bajar.
    await page.evaluate(()=>{
     const filler=document.createElement("div");filler.style.height="2400px";document.body.append(filler);
-    window.scrollTo(0,450);
-    window.dispatchEvent(new Event("scroll"));
+    window.scrollTo(0,0);window.dispatchEvent(new Event("scroll"));
    });
+   await nap(100);
+   await page.evaluate(()=>{window.scrollTo(0,550);window.dispatchEvent(new Event("scroll"));});
    await nap(450);
    const nav=await page.locator("#goxion-main-nav").boundingBox();
    const max=width<=320?158:160;
