@@ -39,6 +39,15 @@ Se revisó el video del espejo oficial-root que muestra Mi Espacio, servicios Yo
 - **Cápsula:** mantener el mismo `#gxn-nav` en Inicio/Catálogo/Soporte. Animar realmente `flex-grow` de la pastilla activa durante 380ms y evitar cambio inmediato a `width:auto` que deforma la anchura al cambiar. Respeto de `prefers-reduced-motion`.
 - **Control previo a oficial:** CI de estructura y Chromium/WebKit con datos QA de lectura, pruebas aisladas de toque en superficie y CTA, SVG y flecha-X. Safari real y los controladores de escritura/retención/confeti siguen siendo puertas pendientes; nunca dar por migrado un comportamiento solo porque el script oficial siga cargado.
 
+## Ajuste de identidad en el acceso privado · 23/nov/2026
+
+- **Espejo actual y único:** `ayuda-espejo-feed-v2.html`. Se mantiene `ayuda.html` oficial sin cambios, al igual que la pantalla pública antes de autenticar.
+- **Logo oficial:** la pantalla pública conserva el splash `#splash-screen` y su logo `Logo individual.png`. Cuando se confirma una sesión válida de Mi Espacio, `official-feed-intro.js` muestra una transición privada del **mismo archivo individual** hacia la posición de `.gxn-wordmark` en el encabezado. Termina revelando el arte gráfico oficial `logo2.PNG`, **no texto compuesto**. Se anima posición/escala uniforme con Web Animations, sin modificar el layout de Inicio/Catálogo/Soporte. Animación de una sola vez por sesión/página; nunca repetir al cambiar pestaña.
+- **Barra discreta:** progreso indeterminado auténtico de 2px (sin porcentajes inventados), `Preparando tu espacio` solo si la sincronización tarda más de 480ms. No retrasar entradas rápidas por una animación de carga adicional. La transición no debe bloquear el uso cuando falla la conexión; salida de seguridad y error del feed continúan siendo de los controladores.
+- **Accesibilidad:** respetar `prefers-reduced-motion` y desactivar la animación, no solo acortar su duración. No ejecutar la transición para invitados o páginas públicas.
+- **X simétrica de notificaciones:** tras crear el sheet original, sustituir únicamente el contenido gráfico del botón de cerrar por `span.gx-v2-notif-cross` con dos trazos CSS del mismo ancho, altura y centro, girados ±45°. Conservar el mismo `button.gx-client-notif-close` y su `onclick` oficial; **jamás duplicar o reemplazar controladores de notificaciones**.
+- **Pruebas:** `scripts/mi-espacio-v2-intro-browser.mjs` comprueba vuelo de logo y cierre geométrico en Chromium y WebKit con DOM sintético aislado, además de movimiento reducido y portada pública. Pruebas estructurales y de shell protegen ruta de acceso y no escriben datos comerciales.
+
 ## A. Tres fuentes, tres responsabilidades (NO mezclar)
 
 1. **Oficial funcional:** ayuda.html, assets/css/ayuda.css y scripts oficiales assets/js/ayuda/**. Fuente de verdad de lógica comercial, autorización, backend, flujos y todo lo que está fuera del feed privado.
