@@ -1,5 +1,8 @@
 # GOXION · Mi Espacio — expediente maestro de avance e integración coordinada
 
+> **PUNTO DE REANUDACIÓN ACTUAL (23/NOV/2026):** [`GOXION_MI_ESPACIO_REANUDACION_2026-11-23.md`](GOXION_MI_ESPACIO_REANUDACION_2026-11-23.md). **La navegación V4.3 fue validada visualmente por el usuario** («Mucho mejor»). Esto no implica que la página oficial esté integrada ni que Safari o conexiones reales hayan pasado QA. Último laboratorio: https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=1164984. **Este aviso y la bitácora V4.3 prevalecen sobre notas históricas V1–V4.2.**
+
+
 **Corte documental:** 22 de noviembre de 2026, después de la revisión «Filtrar» sin flecha del Historial de movimientos.  
 **Propósito:** entregar el rediseño completo del feed de forma coordinada cuando el usuario autorice la integración **oficial**, sin perder las aprobaciones del laboratorio ni duplicar lógica de negocio.  
 **Estado real:** **laboratorio de diseño en GitHub Pages**; la mayoría de los componentes nuevos **NO están implementados en `ayuda.html` de producción**. Existe una rama de integración parcial de Servicios **sin fusionar**. **Este documento NO es autorización de despliegue**.  
