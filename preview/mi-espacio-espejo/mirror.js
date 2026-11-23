@@ -442,6 +442,17 @@
   }
   const ref=$("referral-section-container");
   if(ref)new MutationObserver(queueRefresh).observe(ref,{childList:true});
+  // Los renderizadores oficiales reemplazan las compactas al cambiar de cliente,
+  // completar tareas o recibir una actualización; la fila se adapta sin fixtures.
+  const grid=$("gamif-grid");
+  if(grid){
+   new MutationObserver(queueRefresh).observe(grid,{childList:true});
+   grid.addEventListener("click",event=>{
+    if(!event.target.closest(".gx-gamif-card")||!loyaltyExpanded||loyaltyExpanded.hidden)return;
+    loyaltyExpanded.hidden=true;
+    loyaltyTile?.setAttribute("aria-expanded","false");
+   });
+  }
   const onboarding=$("dash-onboarding-card");
   if(onboarding)new MutationObserver(queueRefresh).observe(onboarding,{attributes:true,attributeFilter:["hidden"]});
   const dash=$("view-dashboard");
