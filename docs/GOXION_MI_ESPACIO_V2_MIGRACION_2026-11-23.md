@@ -45,5 +45,8 @@ Las referencias consultadas están guardadas con URL y fecha en cada fila. El ca
 6. **Pruebas móviles:** iPhone Safari, viewport 280–430, orientación, accesibilidad, `prefers-reduced-motion`, sin saltos de layout ni controles de laboratorio visibles.
 7. Tras la aprobación, migrar la lógica de negocio sin duplicar componentes visuales, hacer respaldo y desplegar `ayuda.html` de forma controlada con rollback.
 
+## Protección de la vista previa
+Las acciones que pueden modificar datos del cliente (reclamar cupón, reclamar mes gratis, acreditar una misión, marcar notificación como leída) están **bloqueadas deliberadamente** con `ENABLE_WRITES=false` en esta rama. La autenticación y las lecturas sí usan los contratos reales. Esta protección debe seguir activa hasta pasar pruebas de negocio, permisos, autenticación y anti-duplicación; las interacciones de expansión, navegación, filtrado y copia sí operan localmente.
+
 ## Limitaciones conocidas en esta etapa
 La V2 ya muestra componentes aprobados conectados a endpoints reales, pero **no representa paridad completa con `ayuda.html`**. No cambiar producción ni promoverla como lanzamiento final. En particular, no está listo el flujo integral de soporte, catálogo, seguridad de credenciales nuevas, cancelaciones, Goxy/chat, legal, ni todas las notificaciones. Registrar estos bloqueos evita confundir un prototipo conectado con un sistema completamente migrado.
