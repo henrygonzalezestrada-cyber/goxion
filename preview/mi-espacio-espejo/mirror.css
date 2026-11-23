@@ -12,16 +12,20 @@ html[data-gx-mirror="client"] .app-header .gx-header-actions{gap:7px}
 html[data-gx-mirror="client"] #gx-client-notif-launch{
  flex:0 0 44px;width:44px!important;min-width:44px!important;
  height:44px!important;min-height:44px!important;box-sizing:border-box!important;
- border-radius:22px!important;overflow:hidden;max-width:74px
+ border-radius:22px!important;overflow:hidden;max-width:78px
 }
 html[data-gx-mirror="client"] #gx-client-notif-launch.gx-has-new:not(.gx-session-guest){
- flex:0 0 74px!important;width:74px!important;min-width:74px!important;
- padding:0 9px!important;gap:5px!important;border-radius:22px!important
+ flex:0 0 78px!important;width:78px!important;min-width:78px!important;
+ padding:0 8px!important;gap:5px!important;border-radius:22px!important
 }
 html[data-gx-mirror="client"] #gx-client-notif-launch.gx-session-guest{
  flex:0 0 0!important;width:0!important;min-width:0!important;
  padding:0!important;opacity:0!important;border-color:transparent!important;
  pointer-events:none!important
+}
+@media(max-width:355px){
+ html[data-gx-mirror="client"] .app-header .app-logo{max-width:112px!important}
+ html[data-gx-mirror="client"] .app-header .gx-header-actions{gap:4px!important}
 }
 html[data-gx-mirror="client"] #gx-client-notif-launch .gx-client-notif-icon{
  flex:0 0 20px!important;width:20px!important;min-width:20px!important
