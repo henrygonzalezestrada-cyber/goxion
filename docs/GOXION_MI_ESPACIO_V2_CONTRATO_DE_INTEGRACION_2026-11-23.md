@@ -31,6 +31,14 @@ Se revisó el video del espejo oficial-root que muestra Mi Espacio, servicios Yo
 
 **Regla:** no convertir la cápsula en tres componentes ni cargar el motor de notificaciones dos veces. La integración definitiva requiere extraer el HTML legacy antes de promover `ayuda.html`. Esta revisión se limita al espejo.
 
+## Corrección visual y de acciones del espejo · 23/nov/2026, seguimiento de pruebas
+
+- **Hero / tarjeta principal:** es un `div.focus` informativo que conserva sus estados dinámicos. **Sólo** `button#focus-action` es clicable. Eliminar para siempre el listener `#focus` que activaba toda la tarjeta. Para cuentas existentes llamar a `window.irAlTicket()` de la oficial, nunca `location.href='./index.html'` directo: el adaptador `18-b2-index-ruta-oficial.js` resuelve régimen y seguridad del calendario multifecha. Para cuentas nuevas, botón «Ver catálogo» usa el controlador oficial `switchTab`. No reactivar `#gxi-account` inline como sustituto del resumen.
+- **Historial:** usar SVG originales del laboratorio para pagos, altas verificadas, renovaciones y cancelaciones. Mostrar «servicio agregado» sólo con una fecha explícita de contratación o activación del servidor; jamás inventar líneas de la demo. La flecha y la X deben alternar con `is-open` y `aria-expanded`, solo mediante el botón de la fila.
+- **Notificaciones:** no tocar `04-client-notifications-realtime.js`. Corregir en el espejo cierre circular de 35px dentro de una diana táctil de 44px, trazo de 16px; **no** usar pseudo-elemento con `z-index:-1` que queda oculto en WebKit. El header debe tener fondo neutral uniforme y menos sombra negra, conservando swipe, deshacer, confirmación y animaciones.
+- **Cápsula:** mantener el mismo `#gxn-nav` en Inicio/Catálogo/Soporte. Animar realmente `flex-grow` de la pastilla activa durante 380ms y evitar cambio inmediato a `width:auto` que deforma la anchura al cambiar. Respeto de `prefers-reduced-motion`.
+- **Control previo a oficial:** CI de estructura y Chromium/WebKit con datos QA de lectura, pruebas aisladas de toque en superficie y CTA, SVG y flecha-X. Safari real y los controladores de escritura/retención/confeti siguen siendo puertas pendientes; nunca dar por migrado un comportamiento solo porque el script oficial siga cargado.
+
 ## A. Tres fuentes, tres responsabilidades (NO mezclar)
 
 1. **Oficial funcional:** ayuda.html, assets/css/ayuda.css y scripts oficiales assets/js/ayuda/**. Fuente de verdad de lógica comercial, autorización, backend, flujos y todo lo que está fuera del feed privado.
