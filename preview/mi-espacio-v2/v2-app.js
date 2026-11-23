@@ -36,6 +36,11 @@ $('gxi-login-form').addEventListener('submit',async event=>{
 });
 async function showClient(view){
  state.view=view;
+ state.lastState='';
+ state.activeFilter='all';
+ state.showAllHistory=false;
+ state.openHistory=null;
+ window.GOXION_V2_RESET_BENEFITS?.();
  state.notificationItems=[];
  $('gxi-notice-list').replaceChildren();
  $('gxn-bell').dataset.unread='false';
@@ -188,6 +193,12 @@ function setupBenefits(){
  const sourceFor=key=>tiles.find(tile=>tile.dataset.gxb===key);
  function updatePanel(key){setBenefitPanel(benefitState(key),key)}
  window.GOXION_V2_UPDATE_PANEL=updatePanel;
+ window.GOXION_V2_RESET_BENEFITS=()=>{
+  current=null;busy=false;
+  panel.hidden=true;row.hidden=false;
+  panel.style.opacity='';panel.style.visibility='';row.style.visibility='';row.style.opacity='';
+  tiles.forEach(tile=>tile.setAttribute('aria-expanded','false'));
+ };
  function reducedOrUnsupported(){return prefersReduced()||!Element.prototype.animate}
  function coordinates(rect){return {left:rect.left+'px',top:rect.top+'px',width:rect.width+'px',height:rect.height+'px'}}
  function snapshotEmoji(element){
