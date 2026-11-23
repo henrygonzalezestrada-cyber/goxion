@@ -21,9 +21,17 @@ async function load(){
  const identity=typeof getCurrentClientKey==='function'?getCurrentClientKey():window.goxionCurrentClientKey;
  if(!identity)return;
  loadingOfficial=true;
- try{const view=await data.load();if(view&&TOKEN())await showClient(view)}
- catch(e){console.warn('GOXION: espejo feed V2 sin alterar oficial',e)}
- finally{loadingOfficial=false}
+ const tokenAtStart=TOKEN();
+ try{
+  const view=await data.load();
+  if(!view||!TOKEN()||TOKEN()!==tokenAtStart)return;
+  await showClient(view);
+ }catch(e){
+  if(TOKEN()===tokenAtStart){
+   window.dispatchEvent(new CustomEvent('goxion:v2-feed:error',{detail:{message:'No se pudo sincronizar tu información. Puedes reintentar sin cerrar sesión.'}}));
+   console.warn('GOXION: el nuevo feed no pudo sincronizarse',e);
+  }
+ }finally{loadingOfficial=false}
 }
 async function showClient(view){
  state.view=view;
@@ -676,8 +684,9 @@ async function refreshClient(){
  finally{state.refreshing=false}
 }
 setupBenefits();mountGoxy();
+window.GOXION_V2_RETRY_FEED=()=>load();
 window.addEventListener('goxion:client-ready',()=>{void load()});
-window.addEventListener('goxion:client-logout',()=>{state.view=null;shell.hidden=true});
+window.addEventListener('goxion:client-logout',()=>{state.view=null;shell.hidden=true;window.GOXION_V2_CLIENT_ID=''});
 if(typeof getCurrentClientKey==='function'&&getCurrentClientKey())void load();
 // Se conserva Morphicons del laboratorio aprobado; icono SVG nativo si no hay red.
 if(!reduced())import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
