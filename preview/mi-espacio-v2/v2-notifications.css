@@ -1,7 +1,7 @@
 /* GOXION V2 · Cristal neutro + jerarquía aprobada, motor oficial sin CSS legado de header */
 .gxn-bell{gap:6px}
 .gxn-bell .gx-client-notif-badge{display:none;font-size:10px;font-weight:700;font-variant-numeric:tabular-nums;color:#edf5f9}
-.gxn-bell.gx-has-new{width:75px;min-width:75px;max-width:75px;flex:0 0 75px;border-radius:22px;background:rgba(240,245,250,.08);border-color:rgba(196,220,230,.17)}
+.gxn-bell.gx-has-new{display:flex;align-items:center;justify-content:center;gap:6px;width:75px;min-width:75px;max-width:75px;flex:0 0 75px;border-radius:22px;background:rgba(240,245,250,.08);border-color:rgba(196,220,230,.17)}
 .gxn-bell.gx-has-new .gx-client-notif-badge{display:inline}
 .gxn-bell.gx-ringing .gx-client-notif-bell{animation:gxBellRing .9s ease-out}
 .gxn-bell.gx-ringing .gx-client-notif-clapper{animation:gxBellClapper .9s ease-out}
