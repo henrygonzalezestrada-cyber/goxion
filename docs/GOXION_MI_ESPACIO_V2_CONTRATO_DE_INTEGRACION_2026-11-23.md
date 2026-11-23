@@ -48,6 +48,10 @@ Se revisó el video del espejo oficial-root que muestra Mi Espacio, servicios Yo
 - **X simétrica de notificaciones:** tras crear el sheet original, sustituir únicamente el contenido gráfico del botón de cerrar por `span.gx-v2-notif-cross` con dos trazos CSS del mismo ancho, altura y centro, girados ±45°. Conservar el mismo `button.gx-client-notif-close` y su `onclick` oficial; **jamás duplicar o reemplazar controladores de notificaciones**.
 - **Pruebas:** `scripts/mi-espacio-v2-intro-browser.mjs` comprueba vuelo de logo y cierre geométrico en Chromium y WebKit con DOM sintético aislado, además de movimiento reducido y portada pública. Pruebas estructurales y de shell protegen ruta de acceso y no escriben datos comerciales.
 
+## Auditoría de paridad · revisión de grabación 16:32
+
+La nueva referencia de diferencias es `docs/GOXION_MI_ESPACIO_V2_AUDITORIA_PARIDAD_2026-11-23.md`. Prevalece sobre la indicación anterior de dos superficies de carga: el espejo usa un único nodo de arranque. La X de avisos clona el SVG del cierre de beneficios y anula **ambos** pseudoelementos heredados. El saludo recupera el ciclo exacto del laboratorio y el ahorro separa cantidad visual de plataformas de cobertura monetaria. No se habilitan escrituras ni se publica en la oficial.
+
 ## A. Tres fuentes, tres responsabilidades (NO mezclar)
 
 1. **Oficial funcional:** ayuda.html, assets/css/ayuda.css y scripts oficiales assets/js/ayuda/**. Fuente de verdad de lógica comercial, autorización, backend, flujos y todo lo que está fuera del feed privado.

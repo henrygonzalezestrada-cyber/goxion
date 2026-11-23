@@ -12,7 +12,7 @@
  const inSpace=()=>document.body.classList.contains('gx-v2-private-visible')&&!feed.hidden&&dash.classList.contains('active');
  function clearTimers(){clearTimeout(delayTimer);clearTimeout(guardTimer)}
  function hide(){
-  sequence++;active=false;clearTimers();
+  sequence++;active=false;clearTimers();clearTimeout(window.GOXION_V2_BOOT_TIMER);
   try{flight?.cancel();fade?.cancel()}catch(_){}flight=null;fade=null;
   root.hidden=true;root.classList.remove('is-flying');
   document.body.classList.remove('gx-v2-handoff-active','no-scroll');
@@ -21,7 +21,7 @@
  function begin(){
   if(completed||active||!inSpace())return;
   if(reduced()){hide();return}
-  active=true;
+  active=true;clearTimeout(window.GOXION_V2_BOOT_TIMER);
   const id=++sequence;
   root.hidden=false;root.classList.remove('is-flying');wait.hidden=true;
   mark.removeAttribute('style');document.body.classList.add('gx-v2-handoff-active');

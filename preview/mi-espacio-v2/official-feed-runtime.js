@@ -66,7 +66,7 @@ function heroState(view){
  if(account.prorroga_confirmada===true)return ['extension','Tu nueva fecha está registrada','Consulta el acuerdo','agreement','calendar'];
  if((view.servicios||[]).some(x=>['solicitada','aprobada'].includes(clean(x.cancelacion?.estado))))return ['cancellation','Tu cancelación está en proceso','Consulta el seguimiento','review','layers'];
  if(st==='pagado')return ['clear','Todo al corriente','Fecha de pago principal · día '+(Number(c.dia_pago)||15),'calm','check'];
- if((view.servicios||[]).length===0)return ['new','Tu espacio está listo','Explora el catálogo','calm','spark'];
+
  return ['soon','Revisa tu próximo pago','Fecha principal · día '+(Number(c.dia_pago)||15),'due','calendar'];
 }
 const paths={alert:'M12 2 22 20H2L12 2z',clock:'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18',check:'M4 12l5 5L20 6',calendar:'M5 3v4M19 3v4M3 9h18M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2',layers:'M12 3 21 8 12 13 3 8 12 3z',spark:'M12 2v20M2 12h20M5 5l14 14M19 5 5 19'};
@@ -173,13 +173,13 @@ function updateMini(tile,detail){
 }
 function renderBenefits(){
  document.querySelectorAll('#gxb-row .gxb-tile').forEach(tile=>updateMini(tile,benefitState(tile.dataset.gxb)));
- if(!$('gxb-panel').hidden){const key=$('gxb-panel').dataset.benefit;if(key)window.GOXION_V2_UPDATE_PANEL?.(key)}
+ if(!$('gxb-panel').hidden){const key=$('gxb-panel').dataset.benefit;if(key){const digest=JSON.stringify(benefitState(key),(_k,v)=>v instanceof Set?[...v]:v);if($('gxb-panel').dataset.detailDigest!==digest)window.GOXION_V2_UPDATE_PANEL?.(key)}}
 }
 function setBenefitPanel(detail,key){
  const titleNode=$('gxb-title');const full=detail.title,accent=detail.accent;const at=full.lastIndexOf(accent);
  titleNode.replaceChildren(document.createTextNode(full.slice(0,at>=0?at:full.length)));
  if(at>=0){const span=document.createElement('span');span.className='gxb-title-accent';span.textContent=accent;titleNode.append(span,document.createTextNode(full.slice(at+accent.length)))}
- const panel=$('gxb-panel');panel.dataset.benefit=key;panel.dataset.phase=detail.phase;
+ const panel=$('gxb-panel');panel.dataset.benefit=key;panel.dataset.phase=detail.phase;panel.dataset.detailDigest=JSON.stringify(detail,(_k,v)=>v instanceof Set?[...v]:v);
  $('gxb-copy').textContent=detail.copy;
  const content=$('gxb-content');
  const total=key==='loyalty'?(detail.num.split('/')[1]||'4'):key==='referral'?'3':String(detail.tasks.total);
@@ -562,16 +562,17 @@ function drawHistory(){
   cancellation:'<path d="M5 12h14"/>'
  };
  shown.forEach((item,i)=>{
-  const row=document.createElement('div');row.className='gxm-entry';row.dataset.kind=item.kind;
+  const row=document.createElement('div');row.className='gxm-entry';row.dataset.kind=item.kind;row.dataset.movement=item.id;
+  const expanded=state.openHistory===item.id;row.classList.toggle('is-open',expanded);
   const b=document.createElement('button');b.type='button';b.className='gxm-entry-button';
-  b.setAttribute('aria-expanded','false');b.setAttribute('aria-controls','gxm-detail-'+i);
+  b.setAttribute('aria-expanded',String(expanded));b.setAttribute('aria-controls','gxm-detail-'+i);
   b.innerHTML='<span class="gxm-icon" aria-hidden="true"><svg viewBox="0 0 24 24">'+(glyph[item.kind]||glyph.acquisition)+'</svg></span>'+
    '<span class="gxm-entry-copy"><strong>'+esc(item.title)+'</strong><small>'+esc(dateLabel(item.date)+(item.subject?' · '+item.subject:''))+'</small></span>'+
    '<span class="gxm-entry-value">'+esc(item.amount)+'</span>'+
    '<span class="gxm-arrow gxs-icon" aria-hidden="true"><svg class="gxs-chevron" viewBox="0 0 24 24"><path d="m5 9 7 7 7-7"/></svg><svg class="gxs-x" viewBox="0 0 24 24"><path d="M6 6 18 18M18 6 6 18"/></svg></span>';
-  const detail=document.createElement('p');detail.id='gxm-detail-'+i;detail.className='gxm-detail';detail.textContent=item.detail;detail.hidden=true;
+  const detail=document.createElement('p');detail.id='gxm-detail-'+i;detail.className='gxm-detail';detail.textContent=item.detail;detail.hidden=!expanded;
   b.addEventListener('click',()=>{
-   const opening=detail.hidden;
+   const opening=detail.hidden;state.openHistory=opening?item.id:null;
    list.querySelectorAll('.gxm-entry').forEach(other=>{
     const opened=opening&&other===row;
     other.classList.toggle('is-open',opened);
@@ -581,13 +582,14 @@ function drawHistory(){
   });
   row.append(b,detail);list.append(row);
  });
- const more=$('gxm-more');more.hidden=records.length<=3;more.textContent=state.showAllHistory?'Mostrar menos':'Ver todos los movimientos';
+ const more=$('gxm-more');more.hidden=records.length<=3;more.textContent=state.showAllHistory?'Mostrar menos':'Ver '+Math.max(0,records.length-3)+' '+(records.length===4?'movimiento':'movimientos')+' más';
 }
 $('gxm-more').addEventListener('click',()=>{state.showAllHistory=!state.showAllHistory;drawHistory()});
 $('gxm-filter-toggle').addEventListener('click',()=>{$('gxm-filters').hidden=!$('gxm-filters').hidden;$('gxm-filter-toggle').setAttribute('aria-expanded',String(!$('gxm-filters').hidden))});
 $('gxm-filters').addEventListener('click',event=>{
  const b=event.target.closest('[data-gxm-filter]');if(!b)return;
- state.activeFilter=b.dataset.gxmFilter;state.showAllHistory=false;
+ state.activeFilter=b.dataset.gxmFilter;state.showAllHistory=false;state.openHistory=null;
+ $('gxm-filter-toggle').dataset.selected=String(state.activeFilter!=='all');
  $('gxm-filter-label').textContent=state.activeFilter==='all'?'Filtrar':state.activeFilter==='payment'?'Pagos':'Servicios';
  $('gxm-filters').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
  $('gxm-filters').hidden=true;$('gxm-filter-toggle').setAttribute('aria-expanded','false');drawHistory();
@@ -673,7 +675,7 @@ function renderSavings(){
  if(!savingObserver){showSavingAmount(savingTarget);observeSavings();}
  else if(card.classList.contains('is-visible')&&savingSeen&&Math.abs(savingTarget-savingCurrent)>.01)animateSavings(savingTarget);
  else if(card.classList.contains('is-visible')&&!savingSeen){animateSavings(savingTarget,true);savingSeen=true}
- else if(!savingSeen)showSavingAmount(savingTarget);
+ else if(!card.classList.contains('is-visible')){stopSavingsMotion();savingCurrent=savingTarget;showSavingAmount(savingTarget)}
 }
 document.addEventListener('visibilitychange',()=>{
  const card=$('gxv-savings');if(!card)return;
@@ -735,7 +737,10 @@ async function refreshClient(){
  catch(_){/* Mantener el último estado verificado; no inventar pagos. */}
  finally{state.refreshing=false}
 }
-setupBenefits();mountGoxy();
+$('focus-icon').dataset.motionPaused=String(document.hidden);
+ document.querySelector('.gxb-wrap').dataset.motionPaused=String(document.hidden);
+ $('gxv-savings').dataset.motionPaused=String(document.hidden);
+ setupBenefits();mountGoxy();
 window.GOXION_V2_RETRY_FEED=()=>load();
 window.addEventListener('goxion:client-ready',()=>{void load()});
 window.addEventListener('goxion:client-logout',()=>{clearInterval(greetingTimer);greetingTimer=0;stopSavingsMotion();state.view=null;shell.hidden=true;window.GOXION_V2_CLIENT_ID=''});
