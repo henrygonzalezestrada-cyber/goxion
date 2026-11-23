@@ -1,5 +1,13 @@
 name: Mi Espacio V2 · Laboratorio fuente unica
 on:
+  push:
+    branches:
+      - feat/mi-espacio-v2-lab-first-20261123
+    paths:
+      - 'preview/mi-espacio-v2/**'
+      - 'ayuda-espejo-feed-v2.html'
+      - 'scripts/mi-espacio-v2-official-shell-browser.mjs'
+      - '.github/workflows/mi-espacio-v2.yml'
   pull_request:
     paths:
       - 'preview/mi-espacio-v2/**'
