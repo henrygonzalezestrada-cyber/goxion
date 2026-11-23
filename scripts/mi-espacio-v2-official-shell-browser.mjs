@@ -12,6 +12,8 @@ const data={ok:true,cliente:{id:'qa-v2-root',clave:'QA',nombre:'Cliente QA',foli
 // Eventos sintéticos solo para QA: nunca se escriben en la base ni se entregan en el espejo.
 data.pagos=[{id:'qa-pago-1',fecha:'2026-11-18',periodo:'Noviembre',monto:289,estado:'acreditado'}];
 data.servicios[0].fecha_activacion='2026-11-17';
+// QA: seis plataformas contratadas, una única tarifa comparable.
+data.servicios.push(...['Disney+','HBO Max','YouTube Premium','Microsoft 365','Google One'].map((nombre,i)=>({id:'qa-extra-'+i,nombre,monto:50,activo:true})));
 const refs=[{clave:'crunchyroll-mega-fan',plataforma:'Crunchyroll',plan:'Mega Fan',precio_mensual_mxn:159,revisado_el:'2026-11-23'}];
 async function run(browserType,label){
  const browser=await browserType.launch({headless:true});
@@ -75,7 +77,7 @@ async function run(browserType,label){
    }
    await page.locator('#gxs-list .gxs-card').first().waitFor({state:'visible',timeout:10000});
    await page.locator('#gx-v2-handoff').waitFor({state:'attached'});
-   assert.equal(await page.locator('#gx-v2-handoff').isVisible(),false,label+'/'+width+' movimiento reducido sin pantalla extra');
+   await page.locator('#gx-v2-handoff').waitFor({state:'hidden',timeout:4000});
    await page.evaluate(()=>{
     if(!document.getElementById('gx-client-notif-sheet')){
      const s=document.createElement('section');s.id='gx-client-notif-sheet';
@@ -83,15 +85,25 @@ async function run(browserType,label){
      document.body.appendChild(s);
     }
    });
-   await page.locator('#gx-client-notif-sheet .gx-v2-notif-cross').waitFor({state:'attached',timeout:3000});
+   await page.locator('#gx-client-notif-sheet .gx-client-notif-close[data-gx-v2-close=shared]').waitFor({state:'attached',timeout:3000});
    const cross=await page.evaluate(()=>{
-    const el=document.querySelector('.gx-v2-notif-cross');
-    const a=getComputedStyle(el,'::before'),b=getComputedStyle(el,'::after');
-    return {w:a.width,h:a.height,w2:b.width,h2:b.height,angleA:a.transform,angleB:b.transform};
+    const close=document.querySelector('#gx-client-notif-sheet .gx-client-notif-close'),svg=close.querySelector('svg');
+    return {path:svg.querySelector('path').getAttribute('d'),expected:document.querySelector('#gxb-dismiss svg path').getAttribute('d'),
+     before:getComputedStyle(close,'::before').content,after:getComputedStyle(close,'::after').content,
+     width:getComputedStyle(svg).width,height:getComputedStyle(svg).height};
    });
-   assert.equal(cross.w,cross.w2,label+'/'+width+' brazos iguales');
-   assert.equal(cross.h,cross.h2,label+'/'+width+' grosor de brazos igual');
-   assert.notEqual(cross.angleA,cross.angleB,label+'/'+width+' diagonales inversas');
+   assert.equal(cross.path,cross.expected,label+'/'+width+' SVG idéntico al cierre de beneficios');
+   assert.equal(cross.before,'none',label+'/'+width+' sin diagonal heredada before');
+   assert.equal(cross.after,'none',label+'/'+width+' sin diagonal heredada after');
+   assert.equal(cross.width,'16px',label+'/'+width+' X 16px');
+   assert.equal(cross.height,'16px',label+'/'+width+' X cuadrada');
+   assert.equal(await page.locator('#splash-screen').count(),0,label+'/'+width+' sin segundo splash');
+   assert.equal(await page.locator('#gx-v2-handoff').count(),1,label+'/'+width+' arranque único');
+   const savings=page.locator('#gxv-savings');
+   await savings.waitFor({state:'visible',timeout:8000});
+   assert.equal(await savings.locator('.gxv-slot').count(),4,label+'/'+width+' cuatro logos de seis contratados');
+   assert.equal(await savings.locator('.gxv-more').textContent(),'+2',label+'/'+width+' +2 aunque solo un precio comparable');
+   assert.equal(await savings.locator('#gxv-context').textContent(),'Estimación · 1 de 6 servicios comparables',label+'/'+width+' cobertura monetaria honesta');
    assert.equal(await page.locator('#focus').evaluate(e=>e.tagName),'DIV',label+'/'+width+' hero no pulsable');
    assert.equal(await page.locator('#focus-action').evaluate(e=>e.tagName),'BUTTON',label+'/'+width+' solo CTA pulsable');
    await page.locator('#focus').click({position:{x:12,y:12}});

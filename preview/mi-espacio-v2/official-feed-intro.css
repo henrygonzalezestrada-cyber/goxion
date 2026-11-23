@@ -1,4 +1,4 @@
-/* Identidad visual de carga. Solo se ejecuta tras confirmar sesión en Mi Espacio. */
+/* Única pantalla de arranque del espejo; viaje del logo solo en sesión privada. */
 #gx-v2-handoff[hidden]{display:none!important}
 #gx-v2-handoff{
  position:fixed;inset:0;z-index:10005;display:grid;place-items:center;
@@ -19,7 +19,7 @@
  filter:drop-shadow(0 0 27px rgba(0,242,254,.23));
  will-change:transform,opacity
 }
-#gx-v2-handoff .gx-v2-handoff-wait{display:flex;flex-direction:column;gap:12px;align-items:center}
+#gx-v2-handoff .gx-v2-handoff-wait{position:absolute;top:calc(100% + 20px);left:50%;transform:translateX(-50%);display:flex;flex-direction:column;gap:12px;align-items:center;white-space:nowrap}
 #gx-v2-handoff .gx-v2-handoff-wait[hidden]{display:none!important}
 #gx-v2-handoff .gx-v2-handoff-track{
  position:relative;overflow:hidden;display:block;width:106px;height:2px;
@@ -38,14 +38,17 @@ body.gx-v2-handoff-active #gx-v2-shared-header .gxn-wordmark{opacity:0!important
  #gx-v2-handoff,#gx-v2-handoff::before,#gx-v2-shared-header .gxn-wordmark{transition:none!important}
  #gx-v2-handoff .gx-v2-handoff-track>span{animation:none!important}
 }
-/* X de notificaciones: dos barras idénticas, sin icono SVG deformable en Safari. */
-.gx-client-notif-close .gx-v2-notif-cross{
- position:relative;display:block;width:18px;height:18px;pointer-events:none
+
+/* MISMO dibujo que gxb-dismiss, única fuente gráfica. Se desactivan AMBOS
+   trazos globales de goxion-modal-headers.css: no superponer una tercera diagonal. */
+body.gx-v2-client-session .gx-client-notif-close::before,
+body.gx-v2-client-session .gx-client-notif-close::after{content:none!important;display:none!important}
+body.gx-v2-client-session .gx-client-notif-close svg{
+ display:block!important;position:relative;width:16px!important;height:16px!important;
+ fill:none!important;stroke:currentColor!important;stroke-width:2.5!important;
+ stroke-linecap:round!important;transform:none!important;pointer-events:none
 }
-.gx-client-notif-close .gx-v2-notif-cross::before,
-.gx-client-notif-close .gx-v2-notif-cross::after{
- content:"";position:absolute;top:8px;left:0;width:18px;height:2px;
- border-radius:999px;background:currentColor;transform-origin:50% 50%
+body.gx-v2-client-session .gx-client-notif-close svg path{
+ stroke:currentColor!important;stroke-width:2.5!important;stroke-linecap:round!important;
+ fill:none!important;transform:none!important
 }
-.gx-client-notif-close .gx-v2-notif-cross::before{transform:rotate(45deg)}
-.gx-client-notif-close .gx-v2-notif-cross::after{transform:rotate(-45deg)}

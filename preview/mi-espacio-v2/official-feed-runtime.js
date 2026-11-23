@@ -56,27 +56,42 @@ async function showClient(view){
 function heroState(view){
  const c=view.cliente,review=clean(c.pago_revision_estado),st=clean(c.estado),account=view.estado_cuenta||{};
  const accountStatus=clean(account.estado||'');
+ const fresh=clean(c.origen_cliente)==='goxion'&&c.promo_nuevo_elegible===true&&Boolean(String(c.usuario_acceso||'').trim())&&!(view.servicios||[]).length&&!(view.pagos||[]).length;
+ if(fresh)return ['new','Tu espacio está listo','Explora tu primer servicio','calm','spark'];
  if(review.includes('rechaz'))return ['correction','Tu comprobante necesita atención','Revisa la observación','attention','alert'];
  if(review.includes('incomplet'))return ['incomplete','Hay un pago incompleto','Revisa el importe faltante','attention','alert'];
  if(st.includes('suspend'))return ['suspended','Tu servicio está suspendido','Consulta tu situación','attention','alert'];
  if(st.includes('vencid')||accountStatus.includes('vencid'))return ['overdue','Tienes un pago vencido','Consulta tu estado de cuenta','attention','clock'];
  if(c.pago_en_revision===true||review.includes('revision'))return ['review','Estamos revisando tu comprobante','Ya lo recibimos','review','clock'];
  if(account.prorroga_confirmada===true)return ['extension','Tu nueva fecha está registrada','Consulta el acuerdo','agreement','calendar'];
+ if((view.servicios||[]).some(x=>['solicitada','aprobada'].includes(clean(x.cancelacion?.estado))))return ['cancellation','Tu cancelación está en proceso','Consulta el seguimiento','review','layers'];
  if(st==='pagado')return ['clear','Todo al corriente','Fecha de pago principal · día '+(Number(c.dia_pago)||15),'calm','check'];
- if((view.servicios||[]).length===0)return ['new','Tu espacio está listo','Explora el catálogo','calm','spark'];
+
  return ['soon','Revisa tu próximo pago','Fecha principal · día '+(Number(c.dia_pago)||15),'due','calendar'];
 }
-const paths={alert:'M12 2 22 20H2L12 2z',clock:'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18',check:'M4 12l5 5L20 6',calendar:'M5 3v4M19 3v4M3 9h18M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2',spark:'M12 2v20M2 12h20M5 5l14 14M19 5 5 19'};
-function greeting(name,urgent){
+const paths={alert:'M12 2 22 20H2L12 2z',clock:'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18',check:'M4 12l5 5L20 6',calendar:'M5 3v4M19 3v4M3 9h18M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2',layers:'M12 3 21 8 12 13 3 8 12 3z',spark:'M12 2v20M2 12h20M5 5l14 14M19 5 5 19'};
+let greetingTimer=0;
+function greeting(name,phrase){
  const h=$('greeting'),line=h.querySelector('.greeting-line');line.replaceChildren();
- const phrase='Hola, '+name;
+ // Texto real del cliente: misma animación por palabras que el laboratorio.
  for(const part of phrase.split(/(\s+)/)){
   if(!part)continue;if(!part.trim()){line.append(document.createTextNode(part));continue}
   const span=document.createElement('span');span.className='word';span.textContent=part;
-  if(part.includes(name))span.classList.add('name');line.append(span);
+  if(part===name)span.classList.add('name');line.append(span);
   if(!reduced()&&span.animate)span.animate([{transform:'translateY(70%)',filter:'blur(9px)',opacity:0},{transform:'translateY(0)',filter:'blur(0)',opacity:1}],{duration:640,delay:Math.min(line.childElementCount*50,310),easing:'cubic-bezier(.16,1,.3,1)',fill:'both'});
  }
  h.setAttribute('aria-label',phrase);
+}
+function updateGreeting(name,code){
+ clearInterval(greetingTimer);greetingTimer=0;
+ const urgent=['correction','incomplete','suspended','overdue','review'].includes(code);
+ const phrases=['Hola, '+name,'Qué gusto, '+name,'Bienvenido, '+name];
+ let i=0;greeting(name,phrases[0]);
+ if(urgent||reduced())return;
+ greetingTimer=setInterval(()=>{
+  if(document.hidden||state.lastState!==code||!state.view||!document.body.classList.contains('gx-v2-private-visible'))return;
+  i=(i+1)%phrases.length;greeting(name,phrases[i]);
+ },13000);
 }
 function renderHero(){
  const s=heroState(state.view),prev=state.lastState;state.lastState=s[0];
@@ -88,10 +103,9 @@ function renderHero(){
  $('focus-meta').textContent=s[2];$('focus-action').textContent=s[0]==='new'?'Ver catálogo':'Ver mi cuenta';$('focus-action').setAttribute('aria-label',s[0]==='new'?'Abrir catálogo oficial':'Abrir mi estado de cuenta oficial');
  const icon=$('focus-icon');icon.dataset.icon=s[4];
  const path=$('state-path'),shape=paths[s[4]]||paths.check;
- if(iconHandle){try{iconHandle.morphTo(shape,'smooth')}catch(_){path.setAttribute('d',shape)}}
- else path.setAttribute('d',shape);
- if(prev&&prev!==s[0]&&!reduced()){icon.classList.remove('gx-focus-once');void icon.offsetWidth;icon.classList.add('gx-focus-once')}
- if(!prev||prev!==s[0])greeting(firstName(),['correction','incomplete','suspended','overdue','review'].includes(s[0]));
+ if(prev!==s[0]||path.getAttribute('d')!==shape){if(iconHandle){try{iconHandle.morphTo(shape,'smooth')}catch(_){path.setAttribute('d',shape)}}else path.setAttribute('d',shape);}
+ if(prev!==s[0]&&!reduced()){icon.classList.remove('gx-focus-once');void icon.offsetWidth;icon.classList.add('gx-focus-once')}
+ if(!prev||prev!==s[0])updateGreeting(firstName(),s[0]);
  const c=state.view.cliente,account=state.view.estado_cuenta;
  $('gxi-account-info').textContent=account?.publicable===true && Number.isFinite(Number(account.total_actual))
  ?'Importe confirmado por GOXION: '+data.money(account.total_actual)+'. Fecha principal de pago: día '+(Number(c.dia_pago)||15)+'.'
@@ -159,13 +173,13 @@ function updateMini(tile,detail){
 }
 function renderBenefits(){
  document.querySelectorAll('#gxb-row .gxb-tile').forEach(tile=>updateMini(tile,benefitState(tile.dataset.gxb)));
- if(!$('gxb-panel').hidden){const key=$('gxb-panel').dataset.benefit;if(key)window.GOXION_V2_UPDATE_PANEL?.(key)}
+ if(!$('gxb-panel').hidden){const key=$('gxb-panel').dataset.benefit;if(key){const digest=JSON.stringify(benefitState(key),(_k,v)=>v instanceof Set?[...v]:v);if($('gxb-panel').dataset.detailDigest!==digest)window.GOXION_V2_UPDATE_PANEL?.(key)}}
 }
 function setBenefitPanel(detail,key){
  const titleNode=$('gxb-title');const full=detail.title,accent=detail.accent;const at=full.lastIndexOf(accent);
  titleNode.replaceChildren(document.createTextNode(full.slice(0,at>=0?at:full.length)));
  if(at>=0){const span=document.createElement('span');span.className='gxb-title-accent';span.textContent=accent;titleNode.append(span,document.createTextNode(full.slice(at+accent.length)))}
- const panel=$('gxb-panel');panel.dataset.benefit=key;panel.dataset.phase=detail.phase;
+ const panel=$('gxb-panel');panel.dataset.benefit=key;panel.dataset.phase=detail.phase;panel.dataset.detailDigest=JSON.stringify(detail,(_k,v)=>v instanceof Set?[...v]:v);
  $('gxb-copy').textContent=detail.copy;
  const content=$('gxb-content');
  const total=key==='loyalty'?(detail.num.split('/')[1]||'4'):key==='referral'?'3':String(detail.tasks.total);
@@ -548,16 +562,17 @@ function drawHistory(){
   cancellation:'<path d="M5 12h14"/>'
  };
  shown.forEach((item,i)=>{
-  const row=document.createElement('div');row.className='gxm-entry';row.dataset.kind=item.kind;
+  const row=document.createElement('div');row.className='gxm-entry';row.dataset.kind=item.kind;row.dataset.movement=item.id;
+  const expanded=state.openHistory===item.id;row.classList.toggle('is-open',expanded);
   const b=document.createElement('button');b.type='button';b.className='gxm-entry-button';
-  b.setAttribute('aria-expanded','false');b.setAttribute('aria-controls','gxm-detail-'+i);
+  b.setAttribute('aria-expanded',String(expanded));b.setAttribute('aria-controls','gxm-detail-'+i);
   b.innerHTML='<span class="gxm-icon" aria-hidden="true"><svg viewBox="0 0 24 24">'+(glyph[item.kind]||glyph.acquisition)+'</svg></span>'+
    '<span class="gxm-entry-copy"><strong>'+esc(item.title)+'</strong><small>'+esc(dateLabel(item.date)+(item.subject?' · '+item.subject:''))+'</small></span>'+
    '<span class="gxm-entry-value">'+esc(item.amount)+'</span>'+
    '<span class="gxm-arrow gxs-icon" aria-hidden="true"><svg class="gxs-chevron" viewBox="0 0 24 24"><path d="m5 9 7 7 7-7"/></svg><svg class="gxs-x" viewBox="0 0 24 24"><path d="M6 6 18 18M18 6 6 18"/></svg></span>';
-  const detail=document.createElement('p');detail.id='gxm-detail-'+i;detail.className='gxm-detail';detail.textContent=item.detail;detail.hidden=true;
+  const detail=document.createElement('p');detail.id='gxm-detail-'+i;detail.className='gxm-detail';detail.textContent=item.detail;detail.hidden=!expanded;
   b.addEventListener('click',()=>{
-   const opening=detail.hidden;
+   const opening=detail.hidden;state.openHistory=opening?item.id:null;
    list.querySelectorAll('.gxm-entry').forEach(other=>{
     const opened=opening&&other===row;
     other.classList.toggle('is-open',opened);
@@ -567,13 +582,14 @@ function drawHistory(){
   });
   row.append(b,detail);list.append(row);
  });
- const more=$('gxm-more');more.hidden=records.length<=3;more.textContent=state.showAllHistory?'Mostrar menos':'Ver todos los movimientos';
+ const more=$('gxm-more');more.hidden=records.length<=3;more.textContent=state.showAllHistory?'Mostrar menos':'Ver '+Math.max(0,records.length-3)+' '+(records.length===4?'movimiento':'movimientos')+' más';
 }
 $('gxm-more').addEventListener('click',()=>{state.showAllHistory=!state.showAllHistory;drawHistory()});
 $('gxm-filter-toggle').addEventListener('click',()=>{$('gxm-filters').hidden=!$('gxm-filters').hidden;$('gxm-filter-toggle').setAttribute('aria-expanded',String(!$('gxm-filters').hidden))});
 $('gxm-filters').addEventListener('click',event=>{
  const b=event.target.closest('[data-gxm-filter]');if(!b)return;
- state.activeFilter=b.dataset.gxmFilter;state.showAllHistory=false;
+ state.activeFilter=b.dataset.gxmFilter;state.showAllHistory=false;state.openHistory=null;
+ $('gxm-filter-toggle').dataset.selected=String(state.activeFilter!=='all');
  $('gxm-filter-label').textContent=state.activeFilter==='all'?'Filtrar':state.activeFilter==='payment'?'Pagos':'Servicios';
  $('gxm-filters').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
  $('gxm-filters').hidden=true;$('gxm-filter-toggle').setAttribute('aria-expanded','false');drawHistory();
@@ -608,11 +624,13 @@ function animateSavings(next,initial=false){
 }
 function observeSavings(){
  const card=$('gxv-savings');
- if(savingObserver||!('IntersectionObserver' in window)){card.classList.add('is-visible');animateSavings(savingTarget,!savingSeen);savingSeen=true;return}
+ if(savingObserver)return;
+ if(!('IntersectionObserver' in window)){card.classList.add('is-visible');animateSavings(savingTarget,!savingSeen);savingSeen=true;return}
  savingObserver=new IntersectionObserver(entries=>{
   const visible=entries.some(entry=>entry.isIntersecting);
   card.classList.toggle('is-visible',visible);
   if(visible){if(!savingSeen||Math.abs(savingTarget-savingCurrent)>.01){animateSavings(savingTarget,!savingSeen);savingSeen=true}}
+  else {stopSavingsMotion();savingCurrent=savingTarget;showSavingAmount(savingTarget)}
  },{threshold:.15});
  savingObserver.observe(card);
 }
@@ -622,16 +640,24 @@ function renderSavings(){
  if(!sum||sum.difference<=0){card.hidden=true;if(details)details.hidden=true;stopSavingsMotion();savingSeen=false;return}
  card.hidden=false;
  savingTarget=sum.difference;
- const signatures=sum.entries.map(e=>String(e.service.id||e.service.nombre)+':'+String(e.reference.clave)).join('|');
+ // Las plataformas visuales NO dependen de si conocemos su precio público.
+ // Una plataforma por marca, conservando orden original de servicios reales.
+ const platforms=[];const seen=new Set();
+ for(const service of state.view.servicios||[]){
+  const name=String(service.nombre||service.servicio_nombre||'').trim();if(!name)continue;
+  const src=logo(name);const key=src==='./logo2.PNG'?clean(name):src;
+  if(seen.has(key))continue;seen.add(key);platforms.push({name,src});
+ }
+ const signatures=platforms.map(p=>p.name+':'+p.src).join('|');
  if(signatures!==savingSignature){
   savingSignature=signatures;
-  const logos=$('gxv-logos');logos.replaceChildren();logos.dataset.count=String(Math.min(4,sum.entries.length));
-  sum.entries.slice(0,4).forEach(e=>{
+  const logos=$('gxv-logos');logos.replaceChildren();logos.dataset.count=String(Math.min(4,platforms.length));
+  platforms.slice(0,4).forEach(e=>{
    const slot=document.createElement('span');slot.className='gxv-slot';
-   const img=document.createElement('img');img.src=logo(e.service.nombre);img.alt=e.service.nombre;img.loading='lazy';img.decoding='async';
+   const img=document.createElement('img');img.src=e.src;img.alt=e.name;img.loading='lazy';img.decoding='async';
    slot.append(img);logos.append(slot);
   });
-  if(sum.entries.length>4){const more=document.createElement('span');more.className='gxv-more';more.textContent='+'+(sum.entries.length-4);more.setAttribute('aria-label','y '+(sum.entries.length-4)+' plataformas más');logos.append(more)}
+  if(platforms.length>4){const more=document.createElement('span');more.className='gxv-more';more.textContent='+'+(platforms.length-4);more.setAttribute('aria-label','y '+(platforms.length-4)+' plataformas más');logos.append(more)}
  }
  if(!details){
   details=document.createElement('details');details.id='gxi-saving-note';details.className='gxi-saving-note';
@@ -640,19 +666,22 @@ function renderSavings(){
   card.insertAdjacentElement('afterend',details);
  }
  $('gxv-context').textContent='Estimación · '+sum.covered+' de '+sum.total+' '+(sum.total===1?'servicio comparable':'servicios comparables');
- card.setAttribute('aria-label','Ahorro estimado de '+savingsMoney(savingTarget)+' al mes entre '+sum.covered+' servicios comparables.');
+ card.setAttribute('aria-label','Ahorro estimado de '+savingsMoney(savingTarget)+' al mes entre '+sum.covered+' servicios comparables. Las imágenes representan las plataformas contratadas.');
  if(details){
   details.hidden=false;
   const newest=sum.entries.map(e=>e.reference.revisado_el).filter(Boolean).sort().at(-1)||'';
-  details.querySelector('p').textContent='Comparación orientativa con tarifas mensuales individuales públicas, sin ofertas ni anualidades. Algunos accesos GOXION son perfiles o invitaciones, no cuentas completas equivalentes. Tarifas revisadas: '+(newest||'fecha no disponible')+'.';
+  details.querySelector('p').textContent='Los iconos muestran tus plataformas contratadas; el importe solo incluye servicios con un precio público comparable. Comparación orientativa con tarifas mensuales individuales públicas, sin ofertas ni anualidades. Algunos accesos GOXION son perfiles o invitaciones, no cuentas completas equivalentes. Tarifas revisadas: '+(newest||'fecha no disponible')+'.';
  }
  if(!savingObserver){showSavingAmount(savingTarget);observeSavings();}
  else if(card.classList.contains('is-visible')&&savingSeen&&Math.abs(savingTarget-savingCurrent)>.01)animateSavings(savingTarget);
- else if(!savingSeen)showSavingAmount(savingTarget);
+ else if(card.classList.contains('is-visible')&&!savingSeen){animateSavings(savingTarget,true);savingSeen=true}
+ else if(!card.classList.contains('is-visible')){stopSavingsMotion();savingCurrent=savingTarget;showSavingAmount(savingTarget)}
 }
 document.addEventListener('visibilitychange',()=>{
  const card=$('gxv-savings');if(!card)return;
  card.dataset.motionPaused=String(document.hidden);
+ $('focus-icon').dataset.motionPaused=String(document.hidden);
+ document.querySelector('.gxb-wrap').dataset.motionPaused=String(document.hidden);
  if(document.hidden){stopSavingsMotion();savingCurrent=savingTarget;showSavingAmount(savingTarget)}
 });
 function navigate(name,skipScroll){
@@ -708,10 +737,13 @@ async function refreshClient(){
  catch(_){/* Mantener el último estado verificado; no inventar pagos. */}
  finally{state.refreshing=false}
 }
-setupBenefits();mountGoxy();
+$('focus-icon').dataset.motionPaused=String(document.hidden);
+ document.querySelector('.gxb-wrap').dataset.motionPaused=String(document.hidden);
+ $('gxv-savings').dataset.motionPaused=String(document.hidden);
+ setupBenefits();mountGoxy();
 window.GOXION_V2_RETRY_FEED=()=>load();
 window.addEventListener('goxion:client-ready',()=>{void load()});
-window.addEventListener('goxion:client-logout',()=>{state.view=null;shell.hidden=true;window.GOXION_V2_CLIENT_ID=''});
+window.addEventListener('goxion:client-logout',()=>{clearInterval(greetingTimer);greetingTimer=0;stopSavingsMotion();state.view=null;shell.hidden=true;window.GOXION_V2_CLIENT_ID=''});
 if(typeof getCurrentClientKey==='function'&&getCurrentClientKey())void load();
 // Se conserva Morphicons del laboratorio aprobado; icono SVG nativo si no hay red.
 if(!reduced())import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{

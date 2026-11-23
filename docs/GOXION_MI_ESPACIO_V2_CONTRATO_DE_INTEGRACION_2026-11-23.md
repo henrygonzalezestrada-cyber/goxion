@@ -6,6 +6,52 @@
 
 > REGLA PRINCIPAL: SOLO SE REDISEÑA EL FEED PRIVADO DE UN CLIENTE CON SESIÓN INICIADA (view-dashboard). No se rediseñan la portada inicial pública, login, recuperación/activación, Catálogo, carrito, promociones, Soporte, registro, legales ni modales globales. El espejo integral debe incluirlos todos **sin duplicarlos**, para verificar un recorrido auténtico. Esta regla prevalece sobre planes anteriores que consideraban rediseñar otras áreas.
 
+## Avance de implementación · espejo oficial-root (23/nov/2026)
+
+**Nueva fuente de integración vigente:** `ayuda-espejo-feed-v2.html` (nivel raíz, junto a `ayuda.html`). Se generó como copia literal de la oficial, con un injerto de V2 exclusivamente dentro de `#view-dashboard`. Conserva los IDs y controladores oficiales de portada, login, Catálogo, Soporte y elementos globales. **No utiliza iframe**.
+
+- `preview/mi-espacio-v2/official-feed.css`: estilos V2 limitados por `@scope (#gx-v2-feed)` y propiedades de compatibilidad que se aplican solo cuando el feed privado está visible. Fuera de `#view-dashboard`, GOXION conserva su material y comportamiento oficial.
+- `preview/mi-espacio-v2/official-feed-runtime.js`: render visual V2 que utiliza la sesión **ya confirmada por la oficial** a través del evento `goxion:client-ready`. No tiene un segundo formulario ni inicia una sesión distinta. Acciones comerciales V2 protegidas por `ENABLE_WRITES=false`.
+- `preview/mi-espacio-v2/official-feed-host.js`: conmutación visual entre V2 y dashboard anterior, adaptador del contador de la campana oficial sin segundo motor de notificaciones y navegación por `switchTab` original. Se mantiene un contenedor oculto `#gx-v2-legacy-host` de compatibilidad para los controladores oficiales antiguos; **se debe eliminar después de migrar cada handler, antes de lanzamiento**.
+- `preview/mi-espacio-v2/espejo.html` queda como prototipo anterior de navegación con iframe, **no candidato** a oficial. Evitar hacer cambios funcionales nuevos en él.
+- Probar no solo el aspecto sino también la integridad 1:1 del contenido de la portada y de Catálogo/Soporte, ausencia de IDs duplicados y de login paralelo, además de Chromium/WebKit para navegación.
+- **Sin promesa de funciones aún no conectadas:** confeti, cancelaciones, retención, cupones, B2, pago/comprobante, credenciales seguras y escritura funcional del feed están **pendientes de paridad V2**, aunque sus fuentes originales siguen en el espejo. No decir que el rediseño está listo por mantener scripts cargados. Ninguna función de demo equivale al evento real.
+
+La oficial `ayuda.html` se conserva intacta. Este espejo es una **base técnica de integración progresiva**, no la build definitiva que se publicará sin rehacer.
+
+## Correcciones del recorrido real · grabación 23/nov/2026 (15:18, ~99 s)
+
+Se revisó el video del espejo oficial-root que muestra Mi Espacio, servicios YouTube/Crunchyroll, notificaciones y cambio a Catálogo/Soporte. Las decisiones y correcciones aplicadas son:
+
+- **Navegación privada persistente:** trasladar el **mismo nodo** `#gxn-nav` y la cabecera `#gxn-stage` a hosts compartidos `#gx-v2-shared-nav` y `#gx-v2-shared-header` dentro del documento oficial-root, fuera de `#view-dashboard`. Las tres vistas siguen usando `switchTab` oficial; solo cambia `aria-current` y la vista, sin recrear la cápsula ni mostrar `#goxion-main-nav` antigua mientras hay cliente autenticado. Los estilos del laboratorio se limitan a `@scope (#gx-v2-feed, #gx-v2-shared-header, #gx-v2-shared-nav)`. La portada invitado no se toca.
+- **Notificaciones:** conservar `assets/js/ayuda/04-client-notifications-realtime.js` íntegro, con slide-in, confirmar lectura, borrar, swipe, undo y feedback. Cambiar únicamente hoja cristal neutra en sesión privada, manteniendo material legible, y la X homogénea de disco 35px / trazo 16px / diana 44px. El icono de la campana con badge degradado se refleja desde la instancia oficial, sin segundo sistema.
+- **Opciones servicio:** `.gxs-more[hidden]{display:none!important}` para que Gestionar cancelación nunca aparezca accidentalmente sin pulsar «Más opciones». La acción real de cancelación/retención **todavía no está integrada** en las tarjetas V2 y NO debe declararse lista ni escribir en datos reales en este espejo.
+- **Final del feed:** el relleno de `#gx-v2-feed .shell` pasa de 110px a 18px (más safe area); Documentos mantiene su contenido oficial. No introducir un spacer de laboratorio debajo del historial.
+- **QA que protege el cambio:** el mismo elemento `#gxn-nav` debe sobrevivir a las tres pestañas (`===` referencia DOM); `#gxn-bell` único; X y desenfoque neutro; opciones de cancelación inicialmente ocultas; portada y Catálogo/Soporte sin alterar. Pruebas Chromium/WebKit 390/320px en la rama de integración.
+
+**Regla:** no convertir la cápsula en tres componentes ni cargar el motor de notificaciones dos veces. La integración definitiva requiere extraer el HTML legacy antes de promover `ayuda.html`. Esta revisión se limita al espejo.
+
+## Corrección visual y de acciones del espejo · 23/nov/2026, seguimiento de pruebas
+
+- **Hero / tarjeta principal:** es un `div.focus` informativo que conserva sus estados dinámicos. **Sólo** `button#focus-action` es clicable. Eliminar para siempre el listener `#focus` que activaba toda la tarjeta. Para cuentas existentes llamar a `window.irAlTicket()` de la oficial, nunca `location.href='./index.html'` directo: el adaptador `18-b2-index-ruta-oficial.js` resuelve régimen y seguridad del calendario multifecha. Para cuentas nuevas, botón «Ver catálogo» usa el controlador oficial `switchTab`. No reactivar `#gxi-account` inline como sustituto del resumen.
+- **Historial:** usar SVG originales del laboratorio para pagos, altas verificadas, renovaciones y cancelaciones. Mostrar «servicio agregado» sólo con una fecha explícita de contratación o activación del servidor; jamás inventar líneas de la demo. La flecha y la X deben alternar con `is-open` y `aria-expanded`, solo mediante el botón de la fila.
+- **Notificaciones:** no tocar `04-client-notifications-realtime.js`. Corregir en el espejo cierre circular de 35px dentro de una diana táctil de 44px, trazo de 16px; **no** usar pseudo-elemento con `z-index:-1` que queda oculto en WebKit. El header debe tener fondo neutral uniforme y menos sombra negra, conservando swipe, deshacer, confirmación y animaciones.
+- **Cápsula:** mantener el mismo `#gxn-nav` en Inicio/Catálogo/Soporte. Animar realmente `flex-grow` de la pastilla activa durante 380ms y evitar cambio inmediato a `width:auto` que deforma la anchura al cambiar. Respeto de `prefers-reduced-motion`.
+- **Control previo a oficial:** CI de estructura y Chromium/WebKit con datos QA de lectura, pruebas aisladas de toque en superficie y CTA, SVG y flecha-X. Safari real y los controladores de escritura/retención/confeti siguen siendo puertas pendientes; nunca dar por migrado un comportamiento solo porque el script oficial siga cargado.
+
+## Ajuste de identidad en el acceso privado · 23/nov/2026
+
+- **Espejo actual y único:** `ayuda-espejo-feed-v2.html`. Se mantiene `ayuda.html` oficial sin cambios, al igual que la pantalla pública antes de autenticar.
+- **Logo oficial:** la pantalla pública conserva el splash `#splash-screen` y su logo `Logo individual.png`. Cuando se confirma una sesión válida de Mi Espacio, `official-feed-intro.js` muestra una transición privada del **mismo archivo individual** hacia la posición de `.gxn-wordmark` en el encabezado. Termina revelando el arte gráfico oficial `logo2.PNG`, **no texto compuesto**. Se anima posición/escala uniforme con Web Animations, sin modificar el layout de Inicio/Catálogo/Soporte. Animación de una sola vez por sesión/página; nunca repetir al cambiar pestaña.
+- **Barra discreta:** progreso indeterminado auténtico de 2px (sin porcentajes inventados), `Preparando tu espacio` solo si la sincronización tarda más de 480ms. No retrasar entradas rápidas por una animación de carga adicional. La transición no debe bloquear el uso cuando falla la conexión; salida de seguridad y error del feed continúan siendo de los controladores.
+- **Accesibilidad:** respetar `prefers-reduced-motion` y desactivar la animación, no solo acortar su duración. No ejecutar la transición para invitados o páginas públicas.
+- **X simétrica de notificaciones:** tras crear el sheet original, sustituir únicamente el contenido gráfico del botón de cerrar por `span.gx-v2-notif-cross` con dos trazos CSS del mismo ancho, altura y centro, girados ±45°. Conservar el mismo `button.gx-client-notif-close` y su `onclick` oficial; **jamás duplicar o reemplazar controladores de notificaciones**.
+- **Pruebas:** `scripts/mi-espacio-v2-intro-browser.mjs` comprueba vuelo de logo y cierre geométrico en Chromium y WebKit con DOM sintético aislado, además de movimiento reducido y portada pública. Pruebas estructurales y de shell protegen ruta de acceso y no escriben datos comerciales.
+
+## Auditoría de paridad · revisión de grabación 16:32
+
+La nueva referencia de diferencias es `docs/GOXION_MI_ESPACIO_V2_AUDITORIA_PARIDAD_2026-11-23.md`. Prevalece sobre la indicación anterior de dos superficies de carga: el espejo usa un único nodo de arranque. La X de avisos clona el SVG del cierre de beneficios y anula **ambos** pseudoelementos heredados. El saludo recupera el ciclo exacto del laboratorio y el ahorro separa cantidad visual de plataformas de cobertura monetaria. No se habilitan escrituras ni se publica en la oficial.
+
 ## A. Tres fuentes, tres responsabilidades (NO mezclar)
 
 1. **Oficial funcional:** ayuda.html, assets/css/ayuda.css y scripts oficiales assets/js/ayuda/**. Fuente de verdad de lógica comercial, autorización, backend, flujos y todo lo que está fuera del feed privado.
