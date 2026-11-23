@@ -66,6 +66,71 @@
   new MutationObserver(syncNavigation).observe(nav,{attributes:true,attributeFilter:["class"],subtree:true});
   syncNavigation();
  }
+ function createHeaderAvatar(){
+  const header=document.querySelector(".app-header");
+  if(!header||$("gx-mirror-goxy"))return;
+  const root=header.querySelector(".gx-header-actions")||header;
+  const profile=create("button","gx-mirror-goxy");
+  profile.id="gx-mirror-goxy";
+  profile.type="button";
+  profile.setAttribute("aria-label","Abrir menú de GOXION y Goxy");
+  profile.setAttribute("aria-expanded","false");
+  profile.setAttribute("aria-controls","gx-mirror-profile-menu");
+  profile.innerHTML='<span class="gxn-avatar" aria-hidden="true">'+
+   '<span class="gxn-goxy-fallback"><svg viewBox="0 0 52 52" focusable="false" aria-hidden="true"><defs><linearGradient id="gx-mirror-goxy-case" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#5873cc"/><stop offset="1" stop-color="#233e85"/></linearGradient></defs><rect x="5.5" y="9" width="41" height="35" rx="12" fill="url(#gx-mirror-goxy-case)" stroke="#a9bce5" stroke-width="1.5"/><rect x="10.5" y="14.5" width="31" height="25" rx="8" fill="#eaf8ff"/><rect x="16.5" y="24" width="7.5" height="6.5" rx="3.1" fill="#2c438c"/><rect x="28" y="24" width="7.5" height="6.5" rx="3.1" fill="#2c438c"/><path d="M21 34q5 3 10 0" fill="none" stroke="#8ca9d9" stroke-width="1.8" stroke-linecap="round"/></svg></span>'+
+   '<span class="gxn-goxy-real"><span class="gxai-avatar"><span class="gxai-canvas-slot" id="gx-mirror-goxy-canvas" data-mood="idle"></span></span></span></span>';
+  root.append(profile);
+  const menu=create("div","gx-mirror-profile-menu");
+  menu.id="gx-mirror-profile-menu";
+  menu.hidden=true;
+  menu.setAttribute("role","group");
+  menu.setAttribute("aria-label","Cuenta y asistencia GOXION");
+  const label=create("strong","gx-mirror-profile-name","Mi Espacio");
+  const help=create("button","","Hablar con Goxy");
+  help.type="button";
+  const session=create("button","gx-mirror-session-control","Iniciar sesión");
+  session.type="button";
+  menu.append(label,help,session);
+  root.append(menu);
+  const close=()=>{menu.hidden=true;profile.setAttribute("aria-expanded","false");};
+  profile.addEventListener("click",()=>{
+   const open=menu.hidden;menu.hidden=!open;profile.setAttribute("aria-expanded",String(open));
+   if(open)session.focus();
+  });
+  help.addEventListener("click",()=>{
+   close();
+   if(window.GOXION_AI_BETA?.open)window.GOXION_AI_BETA.open();
+   else if(typeof switchTab==="function"){switchTab("soporte");document.querySelector(".gxai-open")?.click();}
+  });
+  session.addEventListener("click",()=>{
+   close();
+   if(officialClient()){if(typeof cerrarSesion==="function")cerrarSesion();}
+   else if(typeof openAuthSheet==="function")openAuthSheet();
+  });
+  document.addEventListener("click",event=>{
+   if(!root.contains(event.target))close();
+  });
+  document.addEventListener("keydown",event=>{if(event.key==="Escape")close();});
+  const slot=$("gx-mirror-goxy-canvas"),avatar=profile.querySelector(".gxn-avatar");
+  if(slot&&window.GOXY_ROBOT?.mount&&!reduce()){
+   try{
+    const mo=new MutationObserver(()=>{
+     if(slot.childElementCount){avatar.classList.add("gxn-robot-ready");mo.disconnect();}
+    });
+    mo.observe(slot,{childList:true,subtree:true});
+    window.GOXY_ROBOT.mount(slot);
+    if(slot.childElementCount){avatar.classList.add("gxn-robot-ready");mo.disconnect();}
+    setTimeout(()=>mo.disconnect(),5000);
+   }catch(_){}
+  }
+ }
+ function refreshHeaderAvatar(client){
+  const menu=$("gx-mirror-profile-menu");
+  if(!menu)return;
+  menu.querySelector(".gx-mirror-profile-name").textContent=client?String(client.nombre||"Mi Espacio"):"Mi Espacio";
+  menu.querySelector(".gx-mirror-session-control").textContent=client?"Cerrar sesión":"Iniciar sesión";
+ }
+
  function createGreeting(){
   const container=$("dash-greeting-container");
   const original=$("dynamic-greeting-text");
@@ -348,6 +413,8 @@
  }
 
  function refresh(){
+  createHeaderAvatar();
+  refreshHeaderAvatar(officialClient());
   refreshHero();refreshLoyalty();
  }
  function queueRefresh(){
@@ -376,7 +443,7 @@
  }
  function boot(){
   if(!$("view-dashboard")||!$("goxion-main-nav"))return;
-  initNav();createGreeting();createHero();createLoyalty();syncRealSources();
+  initNav();createHeaderAvatar();createGreeting();createHero();createLoyalty();syncRealSources();
   hideLiteralEscapedNewline();
   refresh();
   window.addEventListener("pageshow",queueRefresh);
