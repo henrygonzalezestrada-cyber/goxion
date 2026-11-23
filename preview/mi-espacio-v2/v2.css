@@ -1,5 +1,12 @@
 
 /* GOXION V2 · Extensiones nuevas exclusivamente; geometría aprobada vive en el HTML del laboratorio. */
+.gxi-loading{position:fixed;inset:0;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:19px;background:radial-gradient(circle at 50% 45%,rgba(42,172,207,.085),transparent 34%),#030305}
+.gxi-loading img{width:min(42vw,155px);max-height:65px;object-fit:contain}
+.gxi-loading-line{display:block;position:relative;width:120px;height:2px;overflow:hidden;border-radius:2px;background:rgba(89,190,205,.12)}
+.gxi-loading-line::after{content:"";position:absolute;left:-45%;width:45%;height:100%;background:#79e6e8;animation:gxiLine 1.5s ease-in-out infinite}
+.gxi-loading-text{font-size:10px;letter-spacing:.02em;color:#9db4c7}
+@keyframes gxiLine{to{left:110%}}
+@media(prefers-reduced-motion:reduce){.gxi-loading-line::after{animation:none;left:0;width:100%;opacity:.6}}
 .gxi-auth{position:relative;z-index:2;display:grid;place-items:center;min-height:100dvh;padding:42px 20px;background:radial-gradient(circle at 50% 35%,rgba(48,130,178,.09),transparent 66%),#030305}
 .gxi-auth-card{width:min(100%,425px);padding:32px 26px;border-radius:28px;background:rgba(13,16,22,.81);border:1px solid rgba(114,206,229,.12);box-shadow:0 22px 90px rgba(0,0,0,.35)}
 .gxi-auth-brand{display:block;max-width:163px;max-height:58px;object-fit:contain;margin:0 0 32px}
