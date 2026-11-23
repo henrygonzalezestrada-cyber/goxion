@@ -615,7 +615,7 @@ function renderSavings(){
   const newest=sum.entries.map(e=>e.reference.revisado_el).filter(Boolean).sort().at(-1)||'';
   details.querySelector('p').textContent='Comparación orientativa con tarifas mensuales individuales públicas, sin ofertas ni anualidades. Algunos accesos GOXION son perfiles o invitaciones, no cuentas completas equivalentes. Tarifas revisadas: '+(newest||'fecha no disponible')+'.';
  }
- if(!savingObserver)observeSavings();
+ if(!savingObserver){showSavingAmount(savingTarget);observeSavings();}
  else if(card.classList.contains('is-visible')&&savingSeen&&Math.abs(savingTarget-savingCurrent)>.01)animateSavings(savingTarget);
  else if(!savingSeen)showSavingAmount(savingTarget);
 }
