@@ -1,5 +1,8 @@
 # GOXION · Navegación superior adaptable + perfil — investigación y laboratorio V4
 
+> **ÚLTIMO ESTADO V4.3 · 23/NOV/2026:** el usuario respondió «Mucho mejor» al último ajuste de texto y contraste de la cápsula. **Aprobación visual conversacional de la navegación V4.3; NO integración oficial ni QA real Safari.** Fuente de reanudación: [`GOXION_MI_ESPACIO_REANUDACION_2026-11-23.md`](GOXION_MI_ESPACIO_REANUDACION_2026-11-23.md). Contrato de V4.3 más abajo; V1–V4.2 solo tienen valor histórico cuando contradigan V4.3.
+
+
 **Fecha:** 22/nov/2026. **Estado actual:** **V4 IMPLEMENTADA EN LABORATORIO para revisión**, aún **NO aprobada ni publicada en `ayuda.html`**. Las secciones 1–10 contienen análisis y versiones históricas; **la sección 11 explica la V4 vigente y reemplaza las decisiones de movimiento lateral de la V3**. Sin cambios en CSS/JS oficial, Edge ni datos de clientes.
 
 ## 1. Brief del usuario (no convertir en instrucciones contradictorias)
