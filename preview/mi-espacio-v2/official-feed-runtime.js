@@ -15,14 +15,17 @@ const spinner={hidden:true},shell=$('gxi-shell'),loading={hidden:true};
 let iconHandle=null;
 function firstName(){return String(state.view?.cliente?.nombre||'Cliente').trim().split(/\s+/)[0]||'Cliente'}
 const TOKEN=data.takeToken;
+window.__GOXION_INTEGRATION_TEST={loaded:true,loadCalls:0};
 let loadingOfficial=false;
 async function load(){
- if(loadingOfficial||!TOKEN())return;
+ window.__GOXION_INTEGRATION_TEST.loadCalls++;
+ if(loadingOfficial||!TOKEN()){window.__GOXION_INTEGRATION_TEST.skip='loading or no token';return}
  const identity=typeof getCurrentClientKey==='function'?getCurrentClientKey():window.goxionCurrentClientKey;
- if(!identity)return;
+ if(!identity){window.__GOXION_INTEGRATION_TEST.skip='no identity';return}
+ window.__GOXION_INTEGRATION_TEST.identity=String(identity);
  loadingOfficial=true;
  try{const view=await data.load();if(view&&TOKEN())await showClient(view)}
- catch(e){console.warn('GOXION: espejo feed V2 sin alterar oficial',e)}
+ catch(e){window.__GOXION_INTEGRATION_TEST.error=String(e?.stack||e);console.warn('GOXION: espejo feed V2 sin alterar oficial',e)}
  finally{loadingOfficial=false}
 }
 async function showClient(view){
@@ -41,6 +44,7 @@ async function showClient(view){
  $('gxi-account-name').textContent=String(view.cliente.nombre||'Mi Espacio')+' · Mi Espacio';
  renderClient();
  state.tab='space';
+ window.__GOXION_INTEGRATION_TEST.rendered=true;
  window.dispatchEvent(new CustomEvent('goxion:v2-feed:rendered',{detail:{clientId:String(view.cliente.id||'')}}));
  void loadPrices();
  void window.GOXION_V2_NOTIFICATIONS?.refresh();
