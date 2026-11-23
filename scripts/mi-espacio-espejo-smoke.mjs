@@ -15,9 +15,9 @@ const js=load("preview/mi-espacio-espejo/mirror.js");
 let normalized=mirror
  .replace(' data-gx-mirror="client"',"")
  .replace('<base href="../../">\n<meta name="robots" content="noindex,nofollow"/>\n',"")
- .replace('<link rel="stylesheet" href="./preview/mi-espacio-espejo/mirror.css?v=fidelity-20261123-v3"/>\n',"")
- .replace('<link rel="stylesheet" href="./preview/mi-espacio-espejo/approved-visual.css?v=fidelity-20261123-v3"/>\n',"")
- .replace('<script src="./preview/mi-espacio-espejo/mirror.js?v=fidelity-20261123-v3"></script>\n',"");
+ .replace('<link rel="stylesheet" href="./preview/mi-espacio-espejo/mirror.css?v=fidelity-20261123-v4"/>\n',"")
+ .replace('<link rel="stylesheet" href="./preview/mi-espacio-espejo/approved-visual.css?v=fidelity-20261123-v4"/>\n',"")
+ .replace('<script src="./preview/mi-espacio-espejo/mirror.js?v=fidelity-20261123-v4"></script>\n',"");
 const original=source.replace(/<\/script>\\n(?=\s*<script)/g,"</script>");
 assert.equal(normalized,original,"No modificar HTML oficial fuera de los tres enlaces aislados.");
 const sources=[...source.matchAll(/<script\b[^>]+src="([^"]+)"[^>]*><\/script>/g)].map(m=>m[1]);
