@@ -7,6 +7,14 @@
 
 > **Leer esto primero en otra sesión.** En caso de contradicción entre textos antiguos de continuidad y este corte, este expediente es el **índice de estado e integración más reciente**. Para medidas y microcomportamientos, consultar los **contratos específicos enlazados abajo**; no reemplazarlos con resúmenes. Cada edición futura debe actualizar este expediente junto con su contrato de componente. No suponer que una captura de laboratorio prueba una conexión real.
 
+## CONTRATO DE PRESERVACIÓN OBLIGATORIA · Interacciones oficiales (23/nov/2026)
+
+**Nueva auditoría real del código oficial ante dudas del usuario:** [`GOXION_MI_ESPACIO_CONTRATO_INTERACCIONES_OFICIALES_2026-11-22.md`](GOXION_MI_ESPACIO_CONTRATO_INTERACCIONES_OFICIALES_2026-11-22.md). Este documento es **vinculante para la integración**: inventaría confeti de misiones/cupones/referidos, toast y secuencia de checkbox, progreso y CTA de reclamo, campana real con contador sin leer y `99+`, ringing por nuevas notificaciones, swipe/borrar/deshacer/marcar leídos, realtime y sesión; también gamificación, morph de tarjetas, navegación, PIN/credenciales, soporte, Catálogo, Goxy asistente real y bienvenida. **Conservar la funcionalidad/feedback, no necesariamente copiar la estética antigua.**
+
+**Diferencia crítica:** el laboratorio `morph-v2.html` contiene **campana ilustrativa sin contador real** y misiones de ejemplo, por tanto la integración oficial debe **reusar** `#gx-client-notif-launch`/`#gx-client-notif-badge` y `goxionMissionAPI`, `lanzarConfeti`, `marcarMisionVisual` y los handlers originales, en vez de copiar los mocks. Recompensas solo tras confirmación; usuario no debe perder ningún flujo antiguo. **No marcar listo el lanzamiento sin aprobar pruebas de regresión del contrato.** Esta auditoría fue documental: `ayuda.html` y el laboratorio NO se editaron.
+
+---
+
 ## Última corrección V4.2 · aire proporcional con saludo (22/nov/2026)
 
 La cápsula V4.1 estaba aprobada salvo por **el espacio inferior excesivo**. Se restauró simetría: margen superior **9px**, inferior **9px**, sin alterar el saludo aprobado ni su reserva de dos líneas. CSS commit `1c5a45cf869c5c8927d9382d9904b2d568cdb853`; caché de HTML `56c6d11aa6f93b6420f8ec9dfdd6862b2e29c8bb`. En compacto se compensa margen: 29px normal / 27px <=355px, manteniendo espacio total sin saltos. Ver [contrato de navegación](GOXION_NAV_SUPERIOR_ANALISIS_CONCEPTO_2026-11-22.md), V4.2. **Solo laboratorio**, sin edición de `ayuda.html`.
