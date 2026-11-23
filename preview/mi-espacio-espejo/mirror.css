@@ -7,7 +7,29 @@ html[data-gx-mirror="client"] .container{overflow:visible!important;padding-bott
 html[data-gx-mirror="client"] .app-header{margin-bottom:7px!important;min-height:58px}
 html[data-gx-mirror="client"] .app-header .app-logo{max-height:32px;max-width:140px;object-fit:contain}
 html[data-gx-mirror="client"] .app-header .gx-header-actions{gap:7px}
-html[data-gx-mirror="client"] #gx-client-notif-launch{flex:0 0 44px;width:44px!important;height:44px!important;border-radius:50%!important}
+/* Campana auténtica: el conteo hace morph de círculo (0) a cápsula (1–99+).
+   No comprimir icono y contador dentro de un círculo de 44 px. */
+html[data-gx-mirror="client"] #gx-client-notif-launch{
+ flex:0 0 44px;width:44px!important;min-width:44px!important;
+ height:44px!important;min-height:44px!important;box-sizing:border-box!important;
+ border-radius:22px!important;overflow:hidden;max-width:74px
+}
+html[data-gx-mirror="client"] #gx-client-notif-launch.gx-has-new:not(.gx-session-guest){
+ flex:0 0 74px!important;width:74px!important;min-width:74px!important;
+ padding:0 9px!important;gap:5px!important;border-radius:22px!important
+}
+html[data-gx-mirror="client"] #gx-client-notif-launch.gx-session-guest{
+ flex:0 0 0!important;width:0!important;min-width:0!important;
+ padding:0!important;opacity:0!important;border-color:transparent!important;
+ pointer-events:none!important
+}
+html[data-gx-mirror="client"] #gx-client-notif-launch .gx-client-notif-icon{
+ flex:0 0 20px!important;width:20px!important;min-width:20px!important
+}
+html[data-gx-mirror="client"] #gx-client-notif-launch.gx-has-new .gx-client-notif-badge{
+ flex:0 1 auto!important;min-width:22px!important;max-width:32px!important;
+ white-space:nowrap!important;box-sizing:border-box!important
+}
 html[data-gx-mirror="client"] #goxion-main-nav{
  display:flex!important;align-items:center!important;justify-content:space-between!important;
  position:sticky!important;top:calc(8px + env(safe-area-inset-top,0px))!important;
@@ -87,7 +109,7 @@ html[data-gx-mirror="client"] #dash-billing-card{display:none!important}
 /* Servicios e historial: no se sustituyen sus handlers ni elementos de seguridad. */
 html[data-gx-mirror="client"] #view-dashboard .gx-dashboard-section-head{margin:18px 2px 12px}
 html[data-gx-mirror="client"] #view-dashboard .gx-dashboard-section-head .section-title{
- margin:0!important;text-align:left;font-size:17px!important;letter-spacing:-.03em;font-weight:700
+ margin:0!important;text-align:left;font-size:17px!important;letter-spacing:-.03em;font-weight:700;text-transform:none!important
 }
 html[data-gx-mirror="client"] #view-dashboard .gx-dashboard-section-subtitle{font-size:10.5px;line-height:1.5;color:#91a4bc}
 html[data-gx-mirror="client"] #dash-services .gx-service-manage-card{border-radius:19px;background:var(--gxm-glass)}
