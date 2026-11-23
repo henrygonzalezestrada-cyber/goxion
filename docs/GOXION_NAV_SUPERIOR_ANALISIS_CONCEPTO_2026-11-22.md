@@ -92,6 +92,23 @@ Reubicar toda la cápsula expandida justo **sobre** el texto en el encabezado, d
 
 ---
 
+## V4.1 · Pulido de cápsula compacta, geometría y emojis (22/nov/2026)
+
+El usuario validó la **V4 centrada y sticky** en captura de iPhone y pidió un pulido contenido: cápsula **un poco más pequeña**, centrado óptico de los emojis, discreto distintivo de selección y mejor ritmo con el saludo. **No rediseñar ni cambiar navegación/scroll, Goxy o tarjetas aprobadas.**
+
+**Aplicación REAL en laboratorio:** CSS `adaptive-top-nav.css` commit `f9a6f921c004b20ddfa05344f85625b68f77f830`, corrección final de fila única `03fa1c8d7afbfea2ed615498e475f50e241e80a1`; HTML con caché versionada `morph-v2.html` commit `65b6ad03d87b7c5a029c91a9f5ad6ed699796dd4`.
+
+- Estado compacto estándar **160 × 56 px**, y **158 × 56 px** hasta 320px. **Tres botones de 44 × 44 px** sin posibilidad de encogimiento; diámetros mínimos táctiles respetados.
+- Los emojis usan cuadro fijo **24 × 24 px**, `display:grid;place-items:center`, tamaño de fuente **19 px** y compensación óptica de −0,5px. El botón conserva **flex en una sola fila** con `gap:0`; la etiqueta escondida ocupa ancho cero. Evitar `display:grid` en el botón porque introduciría una segunda fila invisible y descentraría el emoji.
+- El destino activo usa **cristal cian muy tenue**, `rgba(105,197,210,.115)` y sombra de baja intensidad `0 0 12px rgba(94,220,240,.085)` sin ornamentos adicionales.
+- Separación inicial de la cápsula con el saludo: margen inferior **15→19px**. En compacta se compensa la diferencia de altura (**76+19=56+39=95px**, o **74+19=56+37=93px** en móvil estrecho), evitando desplazar el contenido al cambiar de tamaño.
+- **Validación hecha:** sustituciones exactas y CSS balanceado; cálculos de capacidad (160/158px >= 154px requeridos para tres objetivos táctiles + gaps + padding + bordes); HTML pin actualizado. **No se ejecutó Safari físico ni Playwright en esta sesión**.
+
+**Vista de revisión V4.1:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=65b6ad0
+
+**Importante:** conserva la V4 sticky centrada, Goxy, notificaciones de laboratorio y los demás módulos. No alterar `ayuda.html` hasta autorización explícita.
+
+---
 ## 11. V4 · Cápsula centrada, sticky y de tamaño variable (22/nov/2026)
 
 **Nueva decisión del usuario después de restaurar la V3 previa a Muse:** reconsideró el riesgo de hacer viajar la cápsula hacia la esquina y propuso simplificar: tomar las transformaciones del botón activo de la navegación oficial, **mantener la cápsula en el centro**, fijarla arriba al desplazar contenido, reducirla de tamaño, hacer que encabezado/logo/campana/Goxy salgan del viewport de forma normal y **reexpandir la misma cápsula al deslizar el dedo hacia abajo**, sin obligar a volver al inicio. El usuario pidió implementarla en laboratorio, no en producción.
