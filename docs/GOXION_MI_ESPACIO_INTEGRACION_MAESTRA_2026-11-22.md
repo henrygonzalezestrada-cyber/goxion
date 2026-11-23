@@ -15,6 +15,14 @@
 
 ---
 
+## Última iteración V4.3 · contraste de cápsula activa (23/nov/2026)
+
+El usuario autorizó replicar **el principio de contraste del control oficial** sin copiar su borde al 80%: texto de la etiqueta activa `14.5px/700` (antes 12px/650), borde cian activo `rgba(0,242,254,.42)` al ampliar y `.25` al compactar, `border-color` animado discretamente. CSS commit **`21280ac555e44d16ffbcd90bd09e970697fcc116`**, HTML anticaché **`11649842c0ace57581197ac1c504a6166739198c`**. Se conservaron los 9px proporcionales de V4.2, cristal, círculos táctiles, Goxy y el resto del feed. Solo laboratorio, sin implementación oficial.
+
+**Probar:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=1164984
+
+---
+
 ## Última corrección V4.2 · aire proporcional con saludo (22/nov/2026)
 
 La cápsula V4.1 estaba aprobada salvo por **el espacio inferior excesivo**. Se restauró simetría: margen superior **9px**, inferior **9px**, sin alterar el saludo aprobado ni su reserva de dos líneas. CSS commit `1c5a45cf869c5c8927d9382d9904b2d568cdb853`; caché de HTML `56c6d11aa6f93b6420f8ec9dfdd6862b2e29c8bb`. En compacto se compensa margen: 29px normal / 27px <=355px, manteniendo espacio total sin saltos. Ver [contrato de navegación](GOXION_NAV_SUPERIOR_ANALISIS_CONCEPTO_2026-11-22.md), V4.2. **Solo laboratorio**, sin edición de `ayuda.html`.
