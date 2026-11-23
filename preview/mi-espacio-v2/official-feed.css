@@ -22,11 +22,37 @@ body.gx-v2-private-visible > .gxb-morph-emoji{display:block;line-height:1;text-a
 body.gx-v2-client-session .gx-client-notif-sheet{background:rgba(8,8,12,.74);-webkit-backdrop-filter:blur(11.75px) saturate(1);backdrop-filter:blur(11.75px) saturate(1);border:1px solid rgba(255,255,255,.035);box-shadow:0 20px 54px rgba(0,0,0,.43),inset 0 1px rgba(255,255,255,.05)}
 body.gx-v2-client-session .gx-client-notif-overlay{background:rgba(1,4,9,.63);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 /* Igual que X de lealtad, referidos, misiones y servicio: diana 44, disco 35, X 16. */
-body.gx-v2-client-session .gx-client-notif-close{position:relative;isolation:isolate;width:44px;min-width:44px;height:44px;min-height:44px;padding:0;background:transparent;border:0;box-shadow:none;color:#071c29}
-body.gx-v2-client-session .gx-client-notif-close::before{content:"";position:absolute;inset:4.5px;border-radius:50%;background:#79e6fc;transition:background-color .2s ease;z-index:-1}
-body.gx-v2-client-session .gx-client-notif-close svg{position:relative;width:16px;height:16px;stroke-width:2.5}
-body.gx-v2-client-session .gx-client-notif-close:active::before{background:#5bd4ed}
-body.gx-v2-client-session .gx-client-notif-close:hover{box-shadow:none}
+/* Safari iOS: no colocar el círculo detrás del fondo con z-index negativo. */
+body.gx-v2-client-session .gx-client-notif-close{
+ position:relative;display:grid;place-items:center;grid-column:3;justify-self:end;
+ width:44px;min-width:44px;max-width:44px;height:44px;min-height:44px;max-height:44px;
+ padding:0;border:0;border-radius:50%;color:#071c29!important;
+ background:radial-gradient(circle 17.5px at center,#79e6fc 97%,transparent 100%)!important;
+ box-shadow:none!important;-webkit-tap-highlight-color:transparent
+}
+body.gx-v2-client-session .gx-client-notif-close::before{content:none!important}
+body.gx-v2-client-session .gx-client-notif-close svg{
+ display:block!important;position:relative;z-index:1;width:16px!important;height:16px!important;
+ stroke:#071c29!important;stroke-width:2.5!important;fill:none!important
+}
+body.gx-v2-client-session .gx-client-notif-close:active{
+ transform:scale(.97)!important;
+ background:radial-gradient(circle 17.5px at center,#5bd4ed 97%,transparent 100%)!important
+}
+body.gx-v2-client-session .gx-client-notif-head{
+ display:grid;grid-template-columns:minmax(74px,1fr) auto minmax(44px,1fr);
+ align-items:center;gap:7px;min-height:62px;background:transparent!important;
+ border:0!important;box-shadow:none!important
+}
+body.gx-v2-client-session .gx-client-notif-head::before,
+body.gx-v2-client-session .gx-client-notif-head::after{content:none!important}
+body.gx-v2-client-session .gx-client-notif-head-title{white-space:nowrap}
+body.gx-v2-client-session .gx-client-notif-sheet{
+ box-shadow:0 17px 44px rgba(0,0,0,.26),inset 0 1px rgba(255,255,255,.05)
+}
+body.gx-v2-client-session .gx-client-notif-overlay{
+ background:rgba(1,4,9,.51);-webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px)
+}
 /* Mismo encabezado y cápsula; dos paneles V2 persistentes en las tres vistas. */
 #gx-v2-shared-header{width:min(100%,580px);height:60px;position:relative;z-index:81;margin:0 auto}
 #gx-v2-shared-nav{width:min(100%,580px);position:sticky;top:calc(8px + env(safe-area-inset-top,0px));z-index:80;margin:0 auto;isolation:isolate}
@@ -71,7 +97,8 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 .focus[data-state="multi"]{grid-template-columns:minmax(0,75%) minmax(72px,25%)}
 .focus[data-state="review"],.focus[data-state="extension"],.focus[data-state="cancellation"]{grid-template-columns:minmax(0,68%) minmax(84px,32%)}
 .focus[data-glass="off"]{background:rgba(6,10,18,.985)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
-.focus:active{transform:scale(.991)}
+.focus{cursor:default}
+.focus:active{transform:none}
 .focus-copy{min-width:0;position:relative;align-self:center;grid-column:1;grid-row:1;z-index:2}
 .focus-title{position:relative;font-size:clamp(23px,5.6vw,33px);font-weight:700;letter-spacing:-.048em;line-height:1.16;text-wrap:balance;overflow-wrap:normal;hyphens:auto;margin:0;color:#f7f8fe;max-width:100%}
 .focus-title.shadow-out{position:absolute;top:0;left:0;right:0;bottom:auto;pointer-events:none}
@@ -162,7 +189,8 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
    con blur, sin relieves, bordes, degradados ni glow; evita "efecto globo".
    La tarjeta exterior sigue siendo el único botón interactivo. */
 .focus-action{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;width:max-content;max-width:100%;min-height:38px;padding:8px 15px;border-radius:999px;border:0;background:rgba(255,255,255,var(--pill-alpha,.08));box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;color:var(--accent,#69e1d5);font-size:11px;line-height:1.15;font-weight:600;white-space:nowrap;margin-left:auto;transition:background-color .25s ease,color .5s ease,transform .35s cubic-bezier(.2,.85,.2,1)}
-.focus:active .focus-action{transform:scale(.985)}
+.focus-action{cursor:pointer;touch-action:manipulation}
+.focus-action:active{transform:scale(.985)}
 /* Agrupar la información sin reducir el tamaño: comparación reversible. */
 .focus[data-layout="balanced"] .focus-copy{display:flex;flex-direction:column;justify-content:center;gap:12px;align-self:center;min-height:0}
 .focus[data-layout="balanced"] .focus-meta{display:block;flex:none;max-width:100%;font-size:11px;line-height:1.45;color:#b5c5d2;font-weight:500}
@@ -642,7 +670,7 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
  aspect-ratio:1;gap:5px;padding:0;border:1px solid rgba(255,255,255,.055);
  border-radius:50%;background:rgba(255,255,255,.032);
  color:#b7c9da;white-space:nowrap;overflow:hidden;
- transition:flex-basis .38s cubic-bezier(.2,.8,.2,1),
+ transition:flex-grow .38s cubic-bezier(.2,.8,.2,1),flex-basis .38s cubic-bezier(.2,.8,.2,1),
   min-width .38s cubic-bezier(.2,.8,.2,1),
   width .38s cubic-bezier(.2,.8,.2,1),
   height .38s cubic-bezier(.2,.8,.2,1),
@@ -650,7 +678,7 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
   background-color .26s ease,border-color .26s ease,color .26s ease,transform .2s ease;
 }
 .gxn-tab[aria-current="page"]{
- flex:1 1 56px;width:auto;aspect-ratio:auto;border-radius:999px;
+ flex:1 1 56px;width:56px;aspect-ratio:auto;border-radius:999px;
  background:rgba(255,255,255,.075);color:#f1f9ff;
  border-color:rgba(0,242,254,.42);
 }
@@ -1361,3 +1389,7 @@ html.gx-notif-open{overflow:hidden;overscroll-behavior:none}
 /* Reducir espacio entre Historial y Documentos, sin rediseñar el footer oficial. */
 #view-dashboard.gx-v2-rendered{padding-bottom:0!important}
 #gx-v2-feed .gxm-history{margin-bottom:0}
+
+/* Mismo morph sin saltos de ancho al alternar Inicio, Catálogo y Soporte. */
+#gx-v2-shared-nav .gxn-tab{min-height:44px;min-width:44px;will-change:flex-grow}
+@media(prefers-reduced-motion:reduce){#gx-v2-shared-nav .gxn-tab{will-change:auto}}

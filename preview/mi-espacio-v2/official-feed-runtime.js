@@ -85,7 +85,7 @@ function renderHero(){
   title.textContent=s[1];
   if(!reduced()&&title.animate)title.animate([{opacity:0,filter:'blur(10px)',transform:'translateY(20px)'},{opacity:1,filter:'blur(0)',transform:'translateY(0)'}],{duration:560,easing:'cubic-bezier(.18,.85,.2,1)'});
  }
- $('focus-meta').textContent=s[2];$('focus-action').textContent=s[0]==='new'?'Ver catálogo':'Ver mi cuenta';
+ $('focus-meta').textContent=s[2];$('focus-action').textContent=s[0]==='new'?'Ver catálogo':'Ver mi cuenta';$('focus-action').setAttribute('aria-label',s[0]==='new'?'Abrir catálogo oficial':'Abrir mi estado de cuenta oficial');
  const icon=$('focus-icon');icon.dataset.icon=s[4];
  const path=$('state-path'),shape=paths[s[4]]||paths.check;
  if(iconHandle){try{iconHandle.morphTo(shape,'smooth')}catch(_){path.setAttribute('d',shape)}}
@@ -96,12 +96,17 @@ function renderHero(){
  $('gxi-account-info').textContent=account?.publicable===true && Number.isFinite(Number(account.total_actual))
  ?'Importe confirmado por GOXION: '+data.money(account.total_actual)+'. Fecha principal de pago: día '+(Number(c.dia_pago)||15)+'.'
  :'Consulta tus movimientos registrados. Cuando el estado de cuenta esté conciliado, GOXION confirmará los importes y fechas de pago.';
- card.setAttribute('aria-label',s[1]+'. '+s[2]+'. '+$('focus-action').textContent);
+ card.setAttribute('aria-label',s[1]+'. '+s[2]+'. Estado informativo; utiliza el botón para consultar.');
 }
-$('focus').addEventListener('click',()=>{
+$('focus-action').addEventListener('click',event=>{
+ event.stopPropagation();
  if(state.lastState==='new'){navigate('catalog');return}
- const box=$('gxi-account');box.hidden=!box.hidden;
- if(!box.hidden)box.scrollIntoView({block:'nearest',behavior:reduced()?'instant':'smooth'});
+ // Reutiliza la ruta original hacia index.html o B2 multifecha.
+ if(typeof window.irAlTicket==='function'){window.irAlTicket();return}
+ const toast=$('gxn-toast');
+ toast.textContent='No pudimos abrir el estado de cuenta. Inténtalo nuevamente.';
+ toast.hidden=false;
+ window.setTimeout(()=>{toast.hidden=true},3700);
 });
 function missionInfo(view){
  const g=view.gamificacion||{};
@@ -519,26 +524,46 @@ function historyRows(){
  }
  for(const c of view.cancelaciones||[]){
   const st=clean(c.estado);if(!['efectiva','efectuada','completada','aprobada','rechazada'].includes(st))continue;
-  items.push({id:'c-'+c.id,date:c.resuelta_at||c.updated_at||c.created_at||'',title:st==='aprobada'?'Cancelación aprobada':st==='rechazada'?'Cancelación no autorizada':'Baja de servicio registrada',subject:String(c.servicio_nombre||c.nombre||'Servicio'),amount:'',detail:'Estado confirmado: '+String(c.estado),kind:'service'});
+  items.push({id:'c-'+c.id,date:c.resuelta_at||c.updated_at||c.created_at||'',title:st==='aprobada'?'Cancelación aprobada':st==='rechazada'?'Cancelación no autorizada':'Baja de servicio registrada',subject:String(c.servicio_nombre||c.nombre||'Servicio'),amount:'',detail:'Estado confirmado: '+String(c.estado),kind:'cancellation'});
+ }
+ // Solo altas respaldadas por una fecha explícita de contratación/activación del servidor.
+ // No copiar los datos ilustrativos del laboratorio ni inferir fechas desde el catálogo.
+ for(const service of view.servicios||[]){
+  const date=service.fecha_alta||service.fecha_contratacion||service.fecha_activacion||service.activated_at||'';
+  if(!/^\d{4}-\d{2}-\d{2}/.test(String(date))||!service.id)continue;
+  items.push({id:'a-'+service.id,date,title:String(service.nombre||service.servicio_nombre||'Servicio')+' agregado',
+   subject:'',amount:'',detail:'Servicio incorporado a tu cuenta.',kind:'acquisition'});
  }
  return items.sort((a,b)=>String(b.date).localeCompare(String(a.date)));
 }
 function drawHistory(){
  const list=$('gxm-list');list.replaceChildren();
- const records=historyRows().filter(x=>state.activeFilter==='all'||(state.activeFilter==='payment'?x.kind==='payment':x.kind==='service'));
+ const records=historyRows().filter(x=>state.activeFilter==='all'||(state.activeFilter==='payment'?x.kind==='payment':x.kind!=='payment'));
  const shown=state.showAllHistory?records:records.slice(0,3);
  if(!shown.length){list.innerHTML='<div class="gxm-empty">No hay movimientos registrados para este filtro.</div>'}
- shown.forEach(item=>{
+ const glyph={
+  payment:'<path d="M5 12.5 10 17l9-10"/>',
+  acquisition:'<path d="M12 5v14M5 12h14"/>',
+  renewal:'<path d="M20 11a8 8 0 1 0-2.3 5.7M20 5v6h-6"/>',
+  cancellation:'<path d="M5 12h14"/>'
+ };
+ shown.forEach((item,i)=>{
   const row=document.createElement('div');row.className='gxm-entry';row.dataset.kind=item.kind;
-  const b=document.createElement('button');b.type='button';b.className='gxm-entry-button';b.setAttribute('aria-expanded','false');
-  b.innerHTML='<span class="gxm-icon" aria-hidden="true">'+(item.kind==='payment'?'✓':'✦')+'</span>'+
+  const b=document.createElement('button');b.type='button';b.className='gxm-entry-button';
+  b.setAttribute('aria-expanded','false');b.setAttribute('aria-controls','gxm-detail-'+i);
+  b.innerHTML='<span class="gxm-icon" aria-hidden="true"><svg viewBox="0 0 24 24">'+(glyph[item.kind]||glyph.acquisition)+'</svg></span>'+
    '<span class="gxm-entry-copy"><strong>'+esc(item.title)+'</strong><small>'+esc(dateLabel(item.date)+(item.subject?' · '+item.subject:''))+'</small></span>'+
-   '<span class="gxm-entry-value">'+esc(item.amount)+'</span><span class="gxm-arrow gxs-icon" aria-hidden="true">›</span>';
-  const detail=document.createElement('p');detail.className='gxm-detail';detail.textContent=item.detail;detail.hidden=true;
+   '<span class="gxm-entry-value">'+esc(item.amount)+'</span>'+
+   '<span class="gxm-arrow gxs-icon" aria-hidden="true"><svg class="gxs-chevron" viewBox="0 0 24 24"><path d="m5 9 7 7 7-7"/></svg><svg class="gxs-x" viewBox="0 0 24 24"><path d="M6 6 18 18M18 6 6 18"/></svg></span>';
+  const detail=document.createElement('p');detail.id='gxm-detail-'+i;detail.className='gxm-detail';detail.textContent=item.detail;detail.hidden=true;
   b.addEventListener('click',()=>{
-   const was=detail.hidden;list.querySelectorAll('.gxm-detail').forEach(d=>d.hidden=true);
-   list.querySelectorAll('.gxm-entry-button').forEach(x=>x.setAttribute('aria-expanded','false'));
-   detail.hidden=!was;b.setAttribute('aria-expanded',String(was));
+   const opening=detail.hidden;
+   list.querySelectorAll('.gxm-entry').forEach(other=>{
+    const opened=opening&&other===row;
+    other.classList.toggle('is-open',opened);
+    other.querySelector('.gxm-entry-button')?.setAttribute('aria-expanded',String(opened));
+    const d=other.querySelector('.gxm-detail');if(d)d.hidden=!opened;
+   });
   });
   row.append(b,detail);list.append(row);
  });

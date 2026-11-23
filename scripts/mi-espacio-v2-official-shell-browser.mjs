@@ -9,6 +9,9 @@ const nap=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 async function ready(){for(let i=0;i<90;i++){try{if((await fetch(url)).ok)return}catch(_){ }await nap(120)}throw Error('Servidor local del QA sin respuesta')}
 const reply=x=>({status:200,contentType:'application/json',body:JSON.stringify(x)});
 const data={ok:true,cliente:{id:'qa-v2-root',clave:'QA',nombre:'Cliente QA',folio:'TEST',estado:'pagado',dia_pago:15,pagos_puntuales:3},servicios:[{id:'qa-svc',nombre:'Crunchyroll Mega Fan',monto:45,activo:true,perfil_nombre:'Perfil QA'}],pagos:[],referidos:[],gamificacion:{tareas:'',descuento:0},misiones_progreso:[],catalogo:[]};
+// Eventos sintéticos solo para QA: nunca se escriben en la base ni se entregan en el espejo.
+data.pagos=[{id:'qa-pago-1',fecha:'2026-11-18',periodo:'Noviembre',monto:289,estado:'acreditado'}];
+data.servicios[0].fecha_activacion='2026-11-17';
 const refs=[{clave:'crunchyroll-mega-fan',plataforma:'Crunchyroll',plan:'Mega Fan',precio_mensual_mxn:159,revisado_el:'2026-11-23'}];
 async function run(browserType,label){
  const browser=await browserType.launch({headless:true});
@@ -71,6 +74,23 @@ async function run(browserType,label){
     throw e;
    }
    await page.locator('#gxs-list .gxs-card').first().waitFor({state:'visible',timeout:10000});
+   assert.equal(await page.locator('#focus').evaluate(e=>e.tagName),'DIV',label+'/'+width+' hero no pulsable');
+   assert.equal(await page.locator('#focus-action').evaluate(e=>e.tagName),'BUTTON',label+'/'+width+' solo CTA pulsable');
+   await page.locator('#focus').click({position:{x:12,y:12}});
+   assert.equal(await page.locator('#gxi-account').isVisible(),false,label+'/'+width+' tocar cristal no abre panel');
+   await page.evaluate(()=>{window.__qaAccountCalls=0;window.irAlTicket=()=>{window.__qaAccountCalls++}});
+   await page.locator('#focus-action').click();
+   assert.equal(await page.evaluate(()=>window.__qaAccountCalls),1,label+'/'+width+' CTA invoca solo la ruta index/B2 oficial');
+   const movement=page.locator('#gxm-list .gxm-entry').first();
+   await movement.waitFor({state:'visible'});
+   assert.equal(await movement.locator('.gxm-icon svg path').count(),1,label+'/'+width+' icono de movimiento SVG');
+   assert.equal(await movement.locator('.gxm-arrow .gxs-chevron').count(),1,label+'/'+width+' flecha original');
+   assert.equal(await movement.locator('.gxm-arrow .gxs-x').count(),1,label+'/'+width+' X de historial');
+   await movement.locator('.gxm-entry-button').click();
+   assert.equal(await movement.evaluate(e=>e.classList.contains('is-open')),true,label+'/'+width+' movimiento expandido');
+   assert.equal(await movement.locator('.gxm-arrow .gxs-x').isVisible(),true,label+'/'+width+' flecha se transforma en X');
+   await movement.locator('.gxm-entry-button').click();
+   assert.equal(await movement.evaluate(e=>e.classList.contains('is-open')),false,label+'/'+width+' movimiento contraído');
    const v=await page.evaluate(()=>{
     const hero=document.getElementById('focus'),surface=document.querySelector('#gx-v2-feed .gxc-surface');
     return {old:!!document.getElementById('dash-services'),oldHidden:getComputedStyle(document.getElementById('gx-v2-legacy-host')).display,

@@ -46,7 +46,7 @@
 <link rel="stylesheet" href="./assets/css/goxion-legal-v2.css?v=purple-cyan-5">
 <link rel="stylesheet" href="./assets/css/goxion-legal-access.css?v=legal-general-1">
 <meta name="robots" content="noindex,nofollow">
-<link rel="stylesheet" href="./preview/mi-espacio-v2/official-feed.css?v=single-capsule-3">
+<link rel="stylesheet" href="./preview/mi-espacio-v2/official-feed.css?v=hero-history-fix-4">
 </head>
 <body class="no-scroll">
 <div id="splash-screen">
@@ -434,7 +434,7 @@
 <div class="greeting"><h1 id="greeting" aria-label="Hola"><span class="greeting-line">Hola</span></h1></div>
 <div class="glass-stage" id="glass-stage">
 <!-- No copiar la luz experimental del laboratorio; onda oficial como fondo. -->
-<button class="focus" id="focus" type="button" data-tone="muted" data-glass="on" data-material="neutral" data-layout="compact" aria-describedby="focus-meta">
+<div class="focus" id="focus" data-tone="muted" data-glass="on" data-material="neutral" data-layout="compact" aria-labelledby="focus-title" aria-describedby="focus-meta">
  <div class="focus-copy"><div class="focus-title" id="focus-title" aria-live="polite">Consultando tu estado</div><span class="focus-meta" id="focus-meta">Sincronizando datos</span></div>
  <span class="focus-icon" id="focus-icon" aria-hidden="true">
   <svg viewBox="0 0 24 24" focusable="false">
@@ -448,9 +448,9 @@
   </svg>
  </span>
  <div class="focus-bottom">
-  <span class="focus-action"><span id="focus-action">Ver mi cuenta</span></span>
+  <button class="focus-action" id="focus-action" type="button" aria-label="Ver mi cuenta">Ver mi cuenta</button>
  </div>
-</button>
+</div>
 </div>
 
 <section class="gxi-account gxc-surface" id="gxi-account" aria-live="polite" hidden><h2>Tu estado de cuenta</h2><p id="gxi-account-info">Cargando datos oficiales…</p></section>
@@ -1029,7 +1029,7 @@
 <script id="goxion-legal-v2" src="./assets/js/ayuda/21-legal-v2-documents.js?v=cola-v1"></script>
 <script src="./assets/js/ayuda/22-legal-access.js?v=legal-general-1"></script>
 <script src="./preview/mi-espacio-v2/v2-data.js?v=feed-mount-20261123b"></script>
-<script src="./preview/mi-espacio-v2/official-feed-runtime.js?v=single-capsule-3"></script>
+<script src="./preview/mi-espacio-v2/official-feed-runtime.js?v=hero-history-fix-4"></script>
 <script src="./preview/mi-espacio-v2/official-feed-host.js?v=single-capsule-3"></script>
 </body>
 </html>
