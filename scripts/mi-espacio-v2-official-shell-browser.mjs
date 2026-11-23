@@ -103,7 +103,7 @@ async function run(browserType,label){
    await savings.waitFor({state:'visible',timeout:8000});
    assert.equal(await savings.locator('.gxv-slot').count(),4,label+'/'+width+' cuatro logos de seis contratados');
    assert.equal(await savings.locator('.gxv-more').textContent(),'+2',label+'/'+width+' +2 aunque solo un precio comparable');
-   assert.equal(await savings.locator('#gxv-context').textContent(),'Estimación · 1 de 6 servicios comparables',label+'/'+width+' cobertura monetaria honesta');
+   assert.equal(await savings.locator('#gxv-context').textContent(),'Frente a suscripciones directas · 1 de 6 servicios incluidos',label+'/'+width+' cobertura monetaria honesta');
    assert.equal(await page.locator('#focus').evaluate(e=>e.tagName),'DIV',label+'/'+width+' hero no pulsable');
    assert.equal(await page.locator('#focus-action').evaluate(e=>e.tagName),'BUTTON',label+'/'+width+' solo CTA pulsable');
    await page.locator('#focus').click({position:{x:12,y:12}});

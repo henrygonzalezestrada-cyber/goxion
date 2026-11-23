@@ -13,6 +13,8 @@
   const clean=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
   const nameKey=name=>{
     const n=clean(name);
+    if(/disney/.test(n))return 'disney-plus-premium';
+    if(/google\s*(one|fotos|photos)|\bgoogle\s*2\s*tb\b/.test(n))return 'google-one-2tb';
     if(/netflix/.test(n))return 'netflix-premium';
     if(/hbo|max|warner/.test(n))return 'hbo-max-platino';
     if(/\bvix\b/.test(n))return 'vix-premium';
