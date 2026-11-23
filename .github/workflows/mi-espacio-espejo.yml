@@ -13,7 +13,7 @@ on:
       - 'scripts/mi-espacio-espejo-browser.mjs'
 jobs:
   integridad:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
     steps:
@@ -24,7 +24,7 @@ jobs:
       - name: Comprobar integridad, contratos y ausencia de escenarios
         run: node scripts/mi-espacio-espejo-smoke.mjs
   navegador:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: integridad
     permissions:
       contents: read
