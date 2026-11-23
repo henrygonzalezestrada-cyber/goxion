@@ -40,10 +40,11 @@
  function attachObserver(){
   observer?.disconnect();
   const doc=frame.contentDocument;if(!doc)return;
-  const scope=doc.querySelector('.container');
-  if(!scope)return;
+  const views=['view-inicio','view-dashboard','view-catalogo','view-soporte']
+   .map(id=>doc.getElementById(id)).filter(Boolean);
+  if(!views.length)return;
   observer=new MutationObserver(()=>synchronize());
-  observer.observe(scope,{subtree:true,attributes:true,attributeFilter:['class']});
+  views.forEach(view=>observer.observe(view,{attributes:true,attributeFilter:['class']}));
  }
  function showSection(){
   if(!ready)return;
