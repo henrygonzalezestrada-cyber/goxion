@@ -11,12 +11,12 @@ const reduced=()=>data.motionReduced();
 const state={view:null,prices:[],savings:null,notificationItems:[],tab:'space',lastState:'',activeFilter:'all',showAllHistory:false,openHistory:null,refreshing:false};
 // Preview protegida: no ejecuta mutaciones comerciales hasta completar la paridad funcional.
 const ENABLE_WRITES=false;
-const spinner=$('gxi-auth'),shell=$('gxi-shell');
+const spinner=$('gxi-auth'),shell=$('gxi-shell'),loading=$('gxi-loading');
 let iconHandle=null;
 function firstName(){return String(state.view?.cliente?.nombre||'Cliente').trim().split(/\s+/)[0]||'Cliente'}
 function error(message){const el=$('gxi-login-error');el.textContent=message;el.hidden=false}
 function showLogin(message){
- shell.hidden=true;spinner.hidden=false;
+ shell.hidden=true;loading.hidden=true;spinner.hidden=false;
  $('gxi-login-button').disabled=false;$('gxi-login-button').textContent='Entrar a Mi Espacio';
  if(message)error(message);
 }
@@ -40,7 +40,7 @@ async function showClient(view){
  $('gxi-notice-list').replaceChildren();
  $('gxn-bell').dataset.unread='false';
  $('gxn-bell .gxi-bell-count')?.remove();
- spinner.hidden=true;shell.hidden=false;
+ spinner.hidden=true;loading.hidden=true;shell.hidden=false;
  $('gxi-account-name').textContent=String(view.cliente.nombre||'Mi Espacio')+' · Mi Espacio';
  renderClient();
  navigate('space',true);
