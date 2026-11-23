@@ -8,6 +8,8 @@
 
 > **23/nov/2026 · corrección de bucles:** tras aclaración del usuario, todos los iconos semánticos del hero repiten movimientos en intervalos propios, no solo la primera vez que aparecen. Palomita se vuelve a dibujar cada 5.8 s; alerta marca un latido cada 6.6 s; calendario traza el día cada 7.1 s; capas se dibujan en secuencia cada 7.7 s; destello tiene gesto cada 7.3 s; reloj mantiene 6 s continuos como Index. Respeta pausa al salir de pestaña y movimiento reducido. Únicamente laboratorio, sin producción; QA sintáctico, todavía pendiente validación Safari real. El estado de Lealtad rota/💔 continúa intacto.
 
+> **DECISIÓN FINAL DE MOVIMIENTO · 23/nov/2026:** tras evaluar diseño premium, el usuario aprobó **volver al movimiento selectivo**: únicamente el reloj mantiene animación periódica continua (6 segundos, como el Index); palomita, alerta, calendario, capas y destello solo tienen una animación de entrada cuando su estado cambia, SIN ciclos recurrentes. Se eliminó la propuesta previa de loops en todos los iconos. Mantener las demás animaciones aprobadas del feed (progreso, emojis, saludo, navegación) y la simulación de Lealtad rota 💔. Modificado solo laboratorio; `ayuda.html` e `index.html` no se tocan. Verificación sintáctica realizada, prueba real Safari iPhone pendiente.
+
 ## 1. Qué está aprobado y dónde retomar
 
 **Diseño visual actual:** cápsula superior GOXION **V4.3**, aprobada de manera conversacional por el usuario («Mucho mejor», 23/nov/2026). Esto **no es una prueba automatizada de Safari** ni significa que toda la experiencia esté publicada o conectada.
