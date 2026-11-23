@@ -1,5 +1,8 @@
 # GOXION · Mi Espacio — continuidad visual del feed
 
+> **CORTE ACTUAL · 23/NOV/2026:** navegador de laboratorio **V4.3 aprobado visualmente** por el usuario («Mucho mejor»). [`GOXION_MI_ESPACIO_REANUDACION_2026-11-23.md`](GOXION_MI_ESPACIO_REANUDACION_2026-11-23.md) es el punto de continuación. La integración productiva y pruebas WebKit/Safari reales siguen pendientes. La frase histórica «pendiente de aprobación del usuario» abajo se refiere al conjunto del feed, **no** a la cápsula V4.3 ya aceptada.
+
+
 **Actualizado:** 22 de noviembre de 2026  
 **Estado:** laboratorio interactivo actualizado, pendiente de validación visual final en iPhone/Safari y de aprobación del usuario. **NO integrado en producción.**  
 **Repositorio:** `henrygonzalezestrada-cyber/goxion`.
