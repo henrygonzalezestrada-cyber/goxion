@@ -342,7 +342,12 @@ html[data-gx-mirror="client"] #gamif-grid .gx-gamif-card{
  display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:flex-start!important;
  gap:3px!important;min-width:0;text-align:left!important;color:#f4f7ff!important
 }
-html[data-gx-mirror="client"] #gamif-grid .gx-gamif-card::before,
+/* La fuente oficial del morph mide ::before; mantener su geometría
+   calculable aunque el emoji visible sea el gxb-emoji aprobado. */
+html[data-gx-mirror="client"] #gamif-grid .gx-gamif-card::before{
+ content:none!important;display:none!important;font-size:28px!important;
+ right:-3px!important;top:50%!important;opacity:1!important
+}
 html[data-gx-mirror="client"] #gamif-grid .gx-gamif-card::after{content:none!important;display:none!important}
 html[data-gx-mirror="client"] #gamif-grid .gx-gamif-card>:not(.gxb-live-visual){display:none!important}
 html[data-gx-mirror="client"] #gamif-grid .gxb-live-visual{display:contents}
