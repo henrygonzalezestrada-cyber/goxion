@@ -471,6 +471,8 @@
   hideLiteralEscapedNewline();
   refresh();
   window.addEventListener("pageshow",queueRefresh);
+  // La fuente oficial emite este evento después de renderDashboard(key) en Realtime.
+  window.addEventListener("goxion:client-space:updated",queueRefresh);
   document.addEventListener("visibilitychange",()=>{
    const icon=$("gx-mirror-priority-icon");
    if(icon)icon.style.animationPlayState=document.hidden?"paused":"running";
