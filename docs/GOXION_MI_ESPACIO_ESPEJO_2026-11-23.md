@@ -19,6 +19,14 @@
 
 El primer espejo era un skin aproximado: Referidos/Misiones mostraban estructura antigua y Hero reconstruido a mano. Después de la observación del usuario, se sustituyó por estructura compacta y CSS extraídos del laboratorio aprobado, con medidas, tipografía, emojis, barras, cristal y gestos, y datos procedentes de controladores oficiales. Los elementos antiguos permanecen solo como soporte de eventos/handlers dentro del DOM, ocultos visualmente.
 
+### Corrección posterior por comparación de grabaciones · 23/nov/2026
+
+Se detectó una colisión real: `assets/css/ayuda.css` conserva `#gamif-grid{grid-template-columns:1fr 1fr!important}` para móvil. El espejo tenía tres columnas sin `!important`, por lo que el CSS heredado ganaba y disponía las tres compactas en 2+1. Corregido **solo** en `approved-visual.css`; no forzar `display:grid!important` porque `openGamif/closeGamif` deben poder esconder el grid durante el morph.
+
+En `mirror.css`, la campana auténtica ahora alterna círculo 44px sin mensajes / cápsula 74px con avisos y respeta el estado invitado sin romper contador, timbre ni hoja de notificaciones. Etiquetas de novedades redundantes de los servicios: visualmente ocultas en la compacta (permanecen accesibles en DOM), reemplazadas por punto discreto; estados reales y detalle de cada acción siguen intactos. Subtítulos estáticos duplicados del Dashboard ocultos. En `mirror.js` se observa la sustitución de tarjetas oficiales por cliente y se mantiene exclusividad con el detalle de Lealtad.
+
+Recursos del espejo versionados `fidelity-20261123-v3` para evitar caché antigua. CI de navegador usa Ubuntu 24.04 para compatibilidad con Playwright 1.56.1. **La comparación visual de un cliente real en Safari aún debe revisarse; estas correcciones no autorizan publicación en `ayuda.html`.**
+
 **La fidelidad por código no es prueba visual de Safari.** No certificar todavía el espejo para publicación oficial. Ahorro e historial mixto continúan sin fuente confiable suficiente para incorporarlos sin inventar información.
 
 ## Bloqueos para publicación oficial
