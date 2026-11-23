@@ -37,5 +37,7 @@ jobs:
       - run: npx playwright install --with-deps chromium webkit
       - name: Validar 390, 320, 280 px en Chromium/WebKit
         run: node scripts/mi-espacio-v2-browser.mjs
+      - name: Validar espejo V2 montado dentro de ayuda oficial
+        run: node scripts/mi-espacio-v2-official-shell-browser.mjs
       - name: Validar espejo integral y morph de campana en móvil
         run: node scripts/mi-espacio-v2-integral-browser.mjs
