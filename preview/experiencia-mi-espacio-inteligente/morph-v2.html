@@ -49,6 +49,37 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 .focus-title.shadow-out{position:absolute;top:0;left:0;right:0;bottom:auto;pointer-events:none}
 .focus-icon{position:relative;grid-column:2;grid-row:1;place-self:center;z-index:1;display:grid;place-items:center;width:100%;max-width:130px;aspect-ratio:1;color:var(--accent,#42e0e5);transition:color .5s ease}
 .focus-icon svg{display:block;max-width:86%;width:100%;height:100%;overflow:visible;fill:none;stroke:currentColor;stroke-width:1.35;stroke-linecap:round;stroke-linejoin:round}
+
+/* Mismo reloj que Index: manecilla de 6 s, sin girar el contorno.
+   Los otros estados tienen gestos semánticos muy breves y discretos.
+   Solo se mueve el icono, nunca el texto ni el tamaño de la tarjeta. */
+.focus-icon .gx-focus-clock-fixed,.focus-icon .gx-focus-clock-hand{
+ opacity:0;pointer-events:none;transition:opacity .24s ease;
+}
+.focus-icon[data-icon="clock"] .gx-focus-clock-fixed,
+.focus-icon[data-icon="clock"] .gx-focus-clock-hand{opacity:1}
+.focus-icon[data-icon="clock"] .gx-focus-clock-hand{
+ transform-box:view-box;transform-origin:12px 12px;
+ animation:gx-focus-clock 6s linear infinite;
+}
+@keyframes gx-focus-clock{to{transform:rotate(360deg)}}
+.focus-icon[data-icon="check"]{animation:gx-focus-confirm .65s cubic-bezier(.2,.85,.2,1) both}
+.focus-icon[data-icon="alert"]{animation:gx-focus-alert 7s ease-in-out infinite}
+.focus-icon[data-icon="calendar"]{animation:gx-focus-arrive .72s cubic-bezier(.2,.85,.2,1) both}
+.focus-icon[data-icon="layers"]{animation:gx-focus-arrive 1s cubic-bezier(.2,.85,.2,1) both}
+.focus-icon[data-icon="spark"]{animation:gx-focus-spark 8s ease-in-out infinite}
+@keyframes gx-focus-confirm{0%{opacity:.6;transform:scale(.94)}65%{transform:scale(1.035)}100%{opacity:1;transform:scale(1)}}
+@keyframes gx-focus-alert{0%,80%,100%{transform:scale(1)}85%{transform:scale(1.035)}90%{transform:scale(1)}}
+@keyframes gx-focus-arrive{0%{opacity:.62;transform:translateY(5px) scale(.96)}100%{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes gx-focus-spark{0%,86%,100%{opacity:1;transform:scale(1)}92%{opacity:.88;transform:scale(1.035)}}
+.focus-icon[data-motion-paused="true"],.focus-icon[data-motion-paused="true"] .gx-focus-clock-hand{animation-play-state:paused!important}
+@media(prefers-reduced-motion:reduce){
+ .focus-icon,.focus-icon .gx-focus-clock-hand{animation:none!important;transition:none!important;transform:none!important;opacity:1}
+ .focus-icon .gx-focus-clock-fixed,.focus-icon .gx-focus-clock-hand{transition:none!important}
+ .focus-icon:not([data-icon="clock"]) .gx-focus-clock-fixed,
+ .focus-icon:not([data-icon="clock"]) .gx-focus-clock-hand{opacity:0!important}
+}
+
 .focus-bottom{position:relative;z-index:1;grid-row:2;grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:14px}
 .focus-meta{font-size:11px;line-height:1.4;color:#b4c4d1;letter-spacing:-.01em;min-width:0;flex:1 1 auto}
 /* Película lisa de cristal sobre el material principal. Sin segunda capa
@@ -474,7 +505,7 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
 }
 
 </style>
-<link rel="stylesheet" href="./adaptive-top-nav.css?v=21280ac" />
+<link rel="stylesheet" href="./adaptive-top-nav.css?v=goxy-single-20261122" />
 </head>
 <body>
 <div class="ambient bg" aria-hidden="true"><canvas class="gx-wave-canvas" id="gx-wave-canvas"></canvas></div>
@@ -546,7 +577,7 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
 <button class="focus" id="focus" type="button" data-tone="calm" data-glass="on" data-layout="compact" aria-describedby="focus-meta">
  <div class="focus-copy"><div class="focus-title" id="focus-title" aria-live="polite">Todo al corriente</div><span class="focus-meta" id="focus-meta">Próximo corte · 15 dic</span></div>
  <span class="focus-icon" id="focus-icon" aria-hidden="true">
-  <svg viewBox="0 0 24 24" focusable="false"><path id="state-path" d="M20 6 9 17l-5-5"/></svg>
+  <svg viewBox="0 0 24 24" focusable="false"><path id="state-path" d="M20 6 9 17l-5-5"/><path class="gx-focus-clock-fixed" d="M12 7v5"/><path class="gx-focus-clock-hand" d="M12 12l3 2"/></svg>
  </span>
  <div class="focus-bottom">
   <span class="focus-action"><span id="focus-action">Ver mi cuenta</span></span>
@@ -768,7 +799,7 @@ const states={
 };
 const paths={
  alert:'M12 2 22 20H2L12 2zM12 8v5M12 16v1',
- clock:'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18M12 7v5l3 2',
+ clock:'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18',
  check:'M4 12l5 5L20 6',
  calendar:'M5 3v4M19 3v4M3 9h18M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2',
  layers:'M12 3 21 8 12 13 3 8 12 3zM3 12l9 5 9-5M3 16l9 5 9-5',
@@ -847,6 +878,7 @@ function transitionText(next){
  }
 }
 function setIcon(next){
+ $('focus-icon').dataset.icon=next;
  const path=$('state-path');
  const shape=paths[next]||paths.check;
  if(iconHandle){try{iconHandle.morphTo(shape,'smooth');return;}catch(_){}}
@@ -995,6 +1027,10 @@ setGlassMaterial('neutral');
 setLayout('compact');
 window.GOXION_MORPH_V2=Object.freeze({isolated:true,noBackend:true,scenarios:Object.keys(snapshots),classify,render,material:setGlassMaterial});
 render('clear',true);
+// Pausar el movimiento ornamental fuera de la pestaña, igual que Index.
+const syncHeroMotion=()=>{$('focus-icon').dataset.motionPaused=String(document.hidden)};
+document.addEventListener('visibilitychange',syncHeroMotion);
+syncHeroMotion();
 // Morphicons: librería real, cargada solo en este prototipo. SVG nativo queda disponible sin red.
 import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
  if(typeof mod.createMorph!=='function')return;
