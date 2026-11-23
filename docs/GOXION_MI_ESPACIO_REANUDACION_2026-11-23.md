@@ -2,6 +2,8 @@
 
 > **LEER PRIMERO EN CUALQUIER CHAT NUEVO.** Estado vigente al terminar la sesión de diseño del 23/nov/2026. El usuario acaba de decir **«Mucho mejor»** sobre la navegación **V4.3**, tras la actualización de legibilidad y borde cian, y pidió dejar el seguimiento listo. **Este es un punto de continuación, no permiso para cambiar producción.** En caso de contradicciones con V1–V4.2 en documentos históricos, **V4.3 y los contratos de componentes más recientes prevalecen**.
 
+> **AJUSTE SIGUIENTE · 22/nov/2026 (laboratorio):** en el encabezado Goxy ahora utiliza **una sola circunferencia visible** (avatar 42px dentro de un botón táctil de 44px); se elimina únicamente el material/círculo externo, sin modificar su menú ni la campana. El hero conserva su composición y el morph de estados, y recibe microanimaciones **ligadas al icono semántico**: reloj con manecilla de 6 s como el Index oficial, verificación/alerta/calendario/capas/destello con gestos discretos; pausar al ocultar pestaña y respetar movimiento reducido. Archivos limitados a `preview/experiencia-mi-espacio-inteligente/morph-v2.html` y `adaptive-top-nav.css`. Sin tocar `index.html`, `ayuda.html`, Admin ni backend. Validar en Safari iPhone; **no supone aprobación visual** de este nuevo pulido.
+
 ## 1. Qué está aprobado y dónde retomar
 
 **Diseño visual actual:** cápsula superior GOXION **V4.3**, aprobada de manera conversacional por el usuario («Mucho mejor», 23/nov/2026). Esto **no es una prueba automatizada de Safari** ni significa que toda la experiencia esté publicada o conectada.
