@@ -15,13 +15,26 @@ body.gx-v2-private-visible > .gxb-morph-emoji{display:block;line-height:1;text-a
 
 #gx-v2-feed{--bg:#030305;--text:#f5f8ff;--muted:#a8b5c9;--cyan:#36dbe8;--purple:#8067f5;--gx-close-disc:35px;--gx-close-x:16px;--neutral-alpha:.371;--neutral-blur:11.75px;position:relative;color:#f5f8ff;font-family:Poppins,system-ui,sans-serif;isolation:isolate}
 #gx-v2-feed[hidden]{display:none!important}
-#gx-v2-feed .shell{max-width:580px!important;width:100%!important;margin:0 auto!important;padding:0 0 calc(110px + env(safe-area-inset-bottom,0px))!important}
+#gx-v2-feed .shell{max-width:580px!important;width:100%!important;margin:0 auto!important;padding:0 0 calc(18px + env(safe-area-inset-bottom,0px))!important}
 #view-dashboard.gx-v2-rendered > #gx-v2-legacy-host{display:none!important}
 /* Notificación oficial con cristal neutro SOLO al abrir el feed renovado */
-body.gx-v2-private-visible .gx-client-notif-sheet{background:rgba(21,25,32,.90);-webkit-backdrop-filter:blur(22px) saturate(1.08);backdrop-filter:blur(22px) saturate(1.08);border-color:rgba(215,228,238,.14)}
-body.gx-v2-private-visible .gx-client-notif-overlay{background:rgba(1,4,9,.57);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
-body.gx-v2-private-visible .app-header,body.gx-v2-private-visible #goxion-main-nav,body.gx-v2-private-visible #sticky-client-bar{display:none!important}
-@scope (#gx-v2-feed){
+/* Presentación neutra de panel oficial; swipe, acciones, undo y animaciones sin reescritura. */
+body.gx-v2-client-session .gx-client-notif-sheet{background:rgba(8,8,12,.74);-webkit-backdrop-filter:blur(11.75px) saturate(1);backdrop-filter:blur(11.75px) saturate(1);border:1px solid rgba(255,255,255,.035);box-shadow:0 20px 54px rgba(0,0,0,.43),inset 0 1px rgba(255,255,255,.05)}
+body.gx-v2-client-session .gx-client-notif-overlay{background:rgba(1,4,9,.63);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+/* Igual que X de lealtad, referidos, misiones y servicio: diana 44, disco 35, X 16. */
+body.gx-v2-client-session .gx-client-notif-close{position:relative;isolation:isolate;width:44px;min-width:44px;height:44px;min-height:44px;padding:0;background:transparent;border:0;box-shadow:none;color:#071c29}
+body.gx-v2-client-session .gx-client-notif-close::before{content:"";position:absolute;inset:4.5px;border-radius:50%;background:#79e6fc;transition:background-color .2s ease;z-index:-1}
+body.gx-v2-client-session .gx-client-notif-close svg{position:relative;width:16px;height:16px;stroke-width:2.5}
+body.gx-v2-client-session .gx-client-notif-close:active::before{background:#5bd4ed}
+body.gx-v2-client-session .gx-client-notif-close:hover{box-shadow:none}
+/* Mismo encabezado y cápsula; dos paneles V2 persistentes en las tres vistas. */
+#gx-v2-shared-header{width:min(100%,580px);height:60px;position:relative;z-index:81;margin:0 auto}
+#gx-v2-shared-nav{width:min(100%,580px);position:sticky;top:calc(8px + env(safe-area-inset-top,0px));z-index:80;margin:0 auto;isolation:isolate}
+#gx-v2-shared-header[hidden],#gx-v2-shared-nav[hidden]{display:none!important}
+#gx-v2-shared-nav .gxn-nav{position:relative;top:auto}
+body.gx-v2-client-session .app-header,body.gx-v2-client-session #goxion-main-nav,body.gx-v2-client-session #sticky-client-bar{display:none!important}
+body.gx-v2-client-session #gx-v2-shared-header,body.gx-v2-client-session #gx-v2-shared-nav{display:block}
+@scope (#gx-v2-feed, #gx-v2-shared-header, #gx-v2-shared-nav){
 
 :root{color-scheme:dark;--bg:#030305;--text:#f5f8ff;--muted:#a8b5c9;--cyan:#36dbe8;--purple:#8067f5;--gx-close-disc:35px;--gx-close-x:16px}
 *{box-sizing:border-box}
@@ -487,6 +500,7 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
 .gxs-extra-notice summary:focus-visible{outline:2px solid #79e6fc;outline-offset:3px;border-radius:6px}
 .gxs-more[hidden]{display:none!important}
 .gxs-more{display:grid;margin-top:11px;padding-top:8px}
+.gxs-more[hidden]{display:none!important}
 .gxs-more button{min-height:42px;padding:9px 0;text-align:left;border:0;background:transparent;color:#bfd0df;font-size:11px}
 .gxs-feedback{display:block;margin-top:9px;font-size:10.5px;line-height:1.5;color:#7cdbd4}
 .gxs-feedback:empty{display:none}
@@ -1343,3 +1357,7 @@ html.gx-notif-open{overflow:hidden;overscroll-behavior:none}
 }
 
 }
+
+/* Reducir espacio entre Historial y Documentos, sin rediseñar el footer oficial. */
+#view-dashboard.gx-v2-rendered{padding-bottom:0!important}
+#gx-v2-feed .gxm-history{margin-bottom:0}
