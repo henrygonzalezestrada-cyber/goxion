@@ -1,0 +1,36 @@
+
+/* GOXION V2 · Extensiones nuevas exclusivamente; geometría aprobada vive en el HTML del laboratorio. */
+.gxi-auth{position:relative;z-index:2;display:grid;place-items:center;min-height:100dvh;padding:42px 20px;background:radial-gradient(circle at 50% 35%,rgba(48,130,178,.09),transparent 66%),#030305}
+.gxi-auth-card{width:min(100%,425px);padding:32px 26px;border-radius:28px;background:rgba(13,16,22,.81);border:1px solid rgba(114,206,229,.12);box-shadow:0 22px 90px rgba(0,0,0,.35)}
+.gxi-auth-brand{display:block;max-width:163px;max-height:58px;object-fit:contain;margin:0 0 32px}
+.gxi-auth h1{font-size:clamp(24px,6vw,29px);letter-spacing:-.055em;line-height:1.16;margin:0 0 9px}
+.gxi-auth p{font-size:12px;line-height:1.7;color:#aabaca;margin:0 0 24px}
+.gxi-auth form{display:grid;gap:10px}
+.gxi-auth label{font-size:11px;letter-spacing:.01em;color:#ccd4e2;font-weight:600}
+.gxi-auth input{height:49px;width:100%;border:1px solid rgba(155,176,214,.2);border-radius:14px;background:rgba(255,255,255,.055);color:#fff;padding:0 15px;font-size:15px;outline:0}
+.gxi-auth input:focus{border-color:#70e0e9;box-shadow:0 0 0 2px rgba(94,232,234,.12)}
+.gxi-auth form button{margin-top:10px;border:1px solid rgba(116,224,231,.27);border-radius:15px;background:linear-gradient(132deg,rgba(66,226,232,.19),rgba(70,87,157,.19));color:#e7ffff;min-height:50px;font-weight:700}
+.gxi-auth button:disabled{opacity:.64;cursor:wait}
+.gxi-auth .gxi-auth-error{color:#ffaebc;line-height:1.5;margin:8px 0 0;font-size:11px}
+.gxi-account{margin:13px 2px 16px;padding:17px 18px;border-radius:19px;background:rgba(16,22,32,.68);border:1px solid rgba(159,190,223,.09)}
+.gxi-account h2{font-size:15px;letter-spacing:-.035em;margin:0 0 8px;color:#edfaff}
+.gxi-account p{margin:0;color:#b6c9da;font-size:11px;line-height:1.7}
+.gxi-note{font-size:10px;color:#9dbac8;line-height:1.55}
+.gxi-saving-note{margin:10px 3px 0;color:#94adba;font-size:9px;line-height:1.5}
+#gxi-catalog,#gxi-support{margin-top:22px}
+#gxi-catalog-list{grid-auto-flow:row;grid-auto-columns:auto;grid-template-columns:repeat(2,minmax(0,1fr));display:grid}
+.gxi-support-card{border-radius:22px;padding:19px;color:#d2e0e8;font-size:12px}
+.gxi-support-card a{display:inline-flex;margin-top:11px;min-height:44px;align-items:center;padding:0 18px;border:1px solid rgba(64,214,227,.26);border-radius:13px;text-decoration:none;font-size:12px;color:#83e8ef}
+.gxn-note-copy{max-height:min(50vh,400px);overflow:auto}
+.gxi-notification{padding:11px 5px;border-bottom:1px solid rgba(255,255,255,.08);font-size:11px;line-height:1.5}
+.gxi-notification strong{display:block;color:#eef7ff;margin-bottom:3px}
+.gxi-notification p{color:#b7cad5;font-size:10.5px;margin:0 0 8px}
+.gxi-notification button{border:0;background:transparent;padding:5px 4px;color:#80e3ec;font-size:10px;min-height:32px}
+.gxi-notification[data-unread=true] strong::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:#4fdee9;margin-right:7px}
+.gxn-bell[data-unread=true]{min-width:75px;border-radius:22px}
+.gxn-bell .gxi-bell-count{font-size:10px;font-weight:700;padding:1px 5px}
+.gxm-empty{font-size:11px;color:#aebdcc}
+.gxs-feedback{display:block;margin-top:10px;color:#9ae8f0}
+.gxs-reveal-inner [hidden]{display:none!important}
+.gxi-offline{color:#fec6c9}
+@media(prefers-reduced-motion:reduce){.gxi-auth form button{transition:none!important}}
