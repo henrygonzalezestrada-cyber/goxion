@@ -13,6 +13,16 @@ const refs=[{clave:'crunchyroll-mega-fan',plataforma:'Crunchyroll',plan:'Mega Fa
 async function run(browserType,label){
  const browser=await browserType.launch({headless:true});
  try{
+  const visitor=await browser.newPage({viewport:{width:390,height:844},reducedMotion:'reduce'});
+  await visitor.route('**/*',route=>{
+   const u=route.request().url();
+   if(u.startsWith(origin))return route.continue();
+   if(u.includes('/functions/v1/mi-espacio'))return route.fulfill(reply({ok:true,cliente:null,catalogo:[],clientes:{},modo:'publico'}));
+   return route.abort();
+  });
+  await visitor.goto(url,{waitUntil:'domcontentloaded',timeout:30000});
+  assert.equal(await visitor.locator('#gx-v2-feed').isVisible(),false,label+' invitado no ve V2');
+  await visitor.close();
   for(const width of [390,320]){
    const page=await browser.newPage({viewport:{width,height:844},reducedMotion:'reduce'});
    const failures=[];
@@ -33,7 +43,9 @@ async function run(browserType,label){
    await page.addInitScript(()=>localStorage.setItem('goxion_client_token','QA-SESSION-SIMULADA-SOLO-CI'));
    await page.goto(url,{waitUntil:'domcontentloaded',timeout:30000});
    await page.waitForTimeout(750); // completar inicialización pública antes de simular el evento de sesión
-   assert.equal(await page.locator('#gx-v2-feed').isVisible(),false,label+'/'+width+' no mostrar V2 al invitado');
+   // El contexto ya trae token de prueba desde addInitScript: esta página es un cliente autenticado.
+   // La prueba de invitado se ejecuta en una página independiente sin token.
+   assert.equal(await page.locator('#gxi-auth').count(),0,label+'/'+width+' sin segundo formulario de login');
    await page.evaluate(()=>{
     localStorage.setItem(window.GOXION_CORE.STORAGE.CLIENT_TOKEN,'QA-SESSION-SIMULADA-SOLO-CI');
     window.goxionCurrentClientKey='QA';
