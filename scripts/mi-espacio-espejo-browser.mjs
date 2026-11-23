@@ -72,7 +72,9 @@ async function test(engine,name){
     clock:document.getElementById("gx-mirror-priority-icon").dataset.icon,
     loyalty:document.getElementById("gx-mirror-loyalty-value").textContent,
     emoji:document.getElementById("gx-mirror-loyalty-emoji").textContent,
-    realBadgeCount:document.querySelectorAll("#gx-client-notif-badge").length
+    realBadgeCount:document.querySelectorAll("#gx-client-notif-badge").length,
+    goxyCount:document.querySelectorAll("#gx-mirror-goxy").length,
+    greeting:document.getElementById("gx-mirror-greeting")?.getAttribute("aria-label")
    }));
    assert.equal(review.title,"Estamos revisando tu comprobante",name+"/"+width+" review title");
    assert.equal(review.clock,"clock",name+"/"+width+" clock");
@@ -90,11 +92,15 @@ async function test(engine,name){
       noOverflow:document.documentElement.scrollWidth<=innerWidth+1};
    });
    assert(clean.originalHidden,name+"/"+width+" sin textos legados visibles");
+   assert.equal(await page.locator("#gamif-grid .gx-gamif-card-ref .gxb-label").textContent(),"Referidos",name+"/"+width+" etiqueta real");
+   assert.equal(await page.locator("#gamif-grid .gx-gamif-card-mission .gxb-label").textContent(),"Misiones",name+"/"+width+" etiqueta real");
    assert(clean.noOverflow,name+"/"+width+" desbordamiento horizontal");
    assert(clean.refSize>=120&&clean.refSize<180,name+"/"+width+" altura de tarjeta compacta");
    assert(clean.missionSize>=120&&clean.missionSize<180,name+"/"+width+" altura de Misiones");
    assert.equal(review.emoji,"⭐",name+"/"+width+" star");
    assert(review.realBadgeCount<=1,name+"/"+width+" duplicate notification badge");
+   assert.equal(review.goxyCount,1,name+"/"+width+" avatar Goxy único");
+   assert.equal(review.greeting,"Hola, QA",name+"/"+width+" saludo auténtico");
    await page.locator("#gx-mirror-loyalty").click();
    assert.equal(await page.locator("#gx-mirror-loyalty-expanded").isVisible(),true,name+"/"+width+" loyalty detail");
    await page.locator("#gx-mirror-loyalty-expanded .gxb-dismiss").click();
