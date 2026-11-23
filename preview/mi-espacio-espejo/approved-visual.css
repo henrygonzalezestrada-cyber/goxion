@@ -572,3 +572,57 @@ html[data-gx-mirror="client"] #gx-mirror-greeting .name{color:#42e4e8!important}
  html[data-gx-mirror="client"] #gx-mirror-greeting{font-size:clamp(24px,6.45vw,28px)!important}
 }
 @media(prefers-reduced-motion:reduce){html[data-gx-mirror="client"] #gx-mirror-greeting .word{will-change:auto;animation:none!important}}
+
+/* Avatar único de Goxy: geometría importada del lab V4.3. */
+.gxn-avatar{position:relative;width:38px;height:38px;display:grid;place-items:center;overflow:hidden;border-radius:50%;background:radial-gradient(circle at 38% 27%,rgba(106,141,222,.26),rgba(8,19,37,.86) 70%);border:1px solid rgba(150,198,240,.18);isolation:isolate}
+.gxn-goxy-fallback{position:absolute;inset:0;display:grid;place-items:center;transition:opacity .25s ease;z-index:1}
+.gxn-goxy-fallback svg{width:37px;height:37px;display:block}
+.gxn-goxy-real{position:absolute;inset:0;display:grid;place-items:center;opacity:0;transition:opacity .22s ease;z-index:2;overflow:hidden}
+.gxn-goxy-real .gxai-avatar{display:grid;place-items:center;width:46px;height:46px}
+.gxn-goxy-real .gxai-canvas-slot{display:block;width:46px;height:46px}
+.gxn-goxy-real .gxai-canvas-slot>*,.gxn-goxy-real svg{max-width:none}
+.gxn-avatar.gxn-robot-ready .gxn-goxy-real{opacity:1}
+.gxn-avatar.gxn-robot-ready .gxn-goxy-fallback{opacity:0}
+.gxn-avatar-photo{position:absolute;inset:0;z-index:3;width:100%;height:100%;object-fit:cover;border-radius:50%}
+.gxn-avatar-photo[hidden]{display:none!important}
+/* Goxy: un solo círculo visual; el botón conserva área táctil de 44px.
+   Solo se retira la cápsula exterior, no el avatar ni su menú. */
+.gxn-profile-trigger,
+.gxn-profile-trigger[aria-expanded="true"]{
+ border:0;background:transparent;box-shadow:none;
+ -webkit-backdrop-filter:none;backdrop-filter:none;
+}
+.gxn-profile-trigger .gxn-avatar{width:42px;height:42px}
+
+
+
+html[data-gx-mirror="client"] .app-header .gx-header-actions{position:relative}
+html[data-gx-mirror="client"] .app-header .gx-auth-root.gx-client-session-active{display:none!important}
+html[data-gx-mirror="client"] .gx-mirror-goxy{
+ flex:0 0 44px;width:44px;height:44px;min-width:44px;min-height:44px;
+ display:grid;place-items:center;padding:0;margin:0;border:0;border-radius:50%;
+ background:transparent;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;
+ cursor:pointer
+}
+html[data-gx-mirror="client"] .gx-mirror-goxy .gxn-avatar{width:42px;height:42px}
+html[data-gx-mirror="client"] .gx-mirror-profile-menu{
+ position:absolute;right:0;top:53px;z-index:200;display:grid;gap:3px;min-width:205px;
+ border:1px solid rgba(211,227,246,.09);border-radius:18px;padding:9px;
+ background:rgba(15,17,25,.98);box-shadow:0 18px 40px rgba(0,0,0,.37);
+ -webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)
+}
+html[data-gx-mirror="client"] .gx-mirror-profile-menu[hidden]{display:none!important}
+html[data-gx-mirror="client"] .gx-mirror-profile-menu strong{
+ font:700 12px/1.5 Poppins,sans-serif;color:#edf6fc;padding:9px 10px;overflow-wrap:anywhere
+}
+html[data-gx-mirror="client"] .gx-mirror-profile-menu button{
+ min-height:44px;display:flex;align-items:center;text-align:left;padding:9px 11px;
+ border:0;border-radius:12px;background:transparent;color:#d2e2ef;
+ font:600 11px Poppins,sans-serif;cursor:pointer
+}
+html[data-gx-mirror="client"] .gx-mirror-profile-menu button:active{background:rgba(255,255,255,.065)}
+html[data-gx-mirror="client"] .gx-mirror-profile-menu .gx-mirror-session-control{color:#f1bdc0}
+@media(prefers-reduced-motion:reduce){
+ html[data-gx-mirror="client"] .gxn-avatar,html[data-gx-mirror="client"] .gxn-goxy-real,
+ html[data-gx-mirror="client"] .gxn-goxy-fallback{transition:none!important;animation:none!important}
+}
