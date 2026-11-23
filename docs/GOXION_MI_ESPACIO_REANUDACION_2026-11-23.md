@@ -6,6 +6,8 @@
 
 > **SIGUIENTE PULIDO · 23/nov/2026 (laboratorio):** los iconos de estado del Hero ahora animan sus **trazos internos** según semántica, no mediante pulsos genéricos de toda la figura: check se dibuja, alerta respira en el signo, fecha muestra casilla, capas se trazan secuencialmente, estrella destella; reloj conserva manecilla de 6 s de Index. Se mantienen path morph, pausa de pestaña oculta y reduced-motion. Lealtad incorpora botón solo en panel de prueba para simular **racha interrumpida**: en miniatura y tarjeta ampliada cambia ⭐ → 💔, valor 3/4 → 0/4 y copy/avance accesible, sin backend; en producción, el Index ya usa HeartCrack al reportar `racha_reiniciada_virtual`. No confundir el icono ilustrativo con estado real; **no se modificó la oficial**.
 
+> **23/nov/2026 · corrección de bucles:** tras aclaración del usuario, todos los iconos semánticos del hero repiten movimientos en intervalos propios, no solo la primera vez que aparecen. Palomita se vuelve a dibujar cada 5.8 s; alerta marca un latido cada 6.6 s; calendario traza el día cada 7.1 s; capas se dibujan en secuencia cada 7.7 s; destello tiene gesto cada 7.3 s; reloj mantiene 6 s continuos como Index. Respeta pausa al salir de pestaña y movimiento reducido. Únicamente laboratorio, sin producción; QA sintáctico, todavía pendiente validación Safari real. El estado de Lealtad rota/💔 continúa intacto.
+
 ## 1. Qué está aprobado y dónde retomar
 
 **Diseño visual actual:** cápsula superior GOXION **V4.3**, aprobada de manera conversacional por el usuario («Mucho mejor», 23/nov/2026). Esto **no es una prueba automatizada de Safari** ni significa que toda la experiencia esté publicada o conectada.
