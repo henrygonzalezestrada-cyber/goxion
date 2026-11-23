@@ -333,7 +333,11 @@ html[data-gx-mirror="client"] #gx-mirror-priority.focus .focus-icon:not([data-ic
  animation:gx-mirror-state-once .58s cubic-bezier(.2,.85,.2,1) both
 }
 @keyframes gx-mirror-state-once{0%{opacity:.5;transform:scale(.94)}100%{opacity:1;transform:scale(1)}}
-html[data-gx-mirror="client"] #gamif-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:0!important}
+/* Prioridad sobre el media query !important de la UI antigua (2 columnas).
+   No forzar display !important: el morph oficial necesita ocultar su grid. */
+html[data-gx-mirror="client"] #gamif-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:9px!important;margin:0!important}
+html[data-gx-mirror="client"] #gamif-grid > .gxb-tile,
+html[data-gx-mirror="client"] #gamif-grid > .gx-gamif-card{grid-column:auto!important;min-width:0;max-width:100%;box-sizing:border-box}
 html[data-gx-mirror="client"] #gamif-grid .gx-gamif-card{
  min-height:121px!important;height:auto!important;padding:12px 11px 11px!important;
  border-radius:21px!important;background:rgba(8,8,12,.371)!important;
@@ -454,6 +458,17 @@ html[data-gx-mirror="client"] #dash-services .gx-service-name{
 html[data-gx-mirror="client"] #dash-services .gx-service-state-line{
  display:flex!important;align-items:center;gap:7px;min-width:0;margin:0!important;flex-wrap:wrap
 }
+/* No reintroducir etiquetas de novedades heredadas en las compactas.
+   El texto y los controladores siguen en el DOM para accesibilidad y detalle. */
+html[data-gx-mirror="client"] #dash-services .gx-service-summary .gx-service-update-badge{
+ position:absolute!important;width:1px!important;height:1px!important;padding:0!important;
+ overflow:hidden!important;clip:rect(0,0,0,0)!important;clip-path:inset(50%)!important;
+ white-space:nowrap!important;border:0!important;margin:-1px!important
+}
+html[data-gx-mirror="client"] #dash-services .gx-service-manage-card.gx-service-has-update:not(.expanded) .gx-service-expand-icon::after{
+ content:"";position:absolute;right:4px;top:4px;width:7px;height:7px;
+ background:#8de9db;border-radius:50%;box-shadow:0 0 8px rgba(141,233,219,.28);pointer-events:none
+}
 html[data-gx-mirror="client"] #dash-services .gx-service-state{
  display:inline-flex;align-items:center;gap:7px;margin:0!important;
  font-size:10.5px!important;font-weight:600!important;line-height:1.4!important;
@@ -497,6 +512,8 @@ html[data-gx-mirror="client"] #dash-services .gx-service-expanded{
 html[data-gx-mirror="client"] #view-dashboard .gx-dashboard-section-head:has(+ #dash-services) .gx-dashboard-section-subtitle{
  display:none!important
 }
+/* Se eliminan las explicaciones estáticas duplicadas: cada tarjeta comunica su estado real. */
+html[data-gx-mirror="client"] #view-dashboard .gx-dashboard-section-head .gx-dashboard-section-subtitle{display:none!important}
 /* Historial: conservar la lista financiera oficial y su fecha/importe/estado,
    pero adoptar el ritmo sobrio de las filas del laboratorio, sin pagos inventados. */
 html[data-gx-mirror="client"] #dash-history .gx-payment-history-card{
