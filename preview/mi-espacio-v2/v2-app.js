@@ -632,6 +632,7 @@ document.addEventListener('visibilitychange',()=>{
 });
 function navigate(name,skipScroll){
  if(!['space','catalog','support'].includes(name))return;
+ const previous=state.tab;
  if(name!=='space'){
   if(!window.GOXION_V2_OFFICIAL_BRIDGE?.open(name)){
    window.location.assign(new URL('../../ayuda.html',window.location.href).href);
@@ -646,6 +647,10 @@ function navigate(name,skipScroll){
   if(b.dataset.gxnTarget===name)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');
  });
  $('gxn-profile-menu').hidden=true;window.GOXION_V2_NOTIFICATIONS?.close();
+ if(name==='space'&&previous!=='space'){
+  void refreshClient();
+  void window.GOXION_V2_NOTIFICATIONS?.refresh();
+ }
  if(!skipScroll)window.scrollTo({top:0,behavior:reduced()?'instant':'smooth'});
 }
 window.GOXION_V2_OPEN_OFFICIAL=(section)=>{
