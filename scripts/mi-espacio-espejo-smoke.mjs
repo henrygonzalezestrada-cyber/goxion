@@ -15,9 +15,9 @@ const js=load("preview/mi-espacio-espejo/mirror.js");
 let normalized=mirror
  .replace(' data-gx-mirror="client"',"")
  .replace('<base href="../../">\n<meta name="robots" content="noindex,nofollow"/>\n',"")
- .replace('<link rel="stylesheet" href="./preview/mi-espacio-espejo/mirror.css?v=fidelity-20261123-v2"/>\n',"")
- .replace('<link rel="stylesheet" href="./preview/mi-espacio-espejo/approved-visual.css?v=fidelity-20261123-v2"/>\n',"")
- .replace('<script src="./preview/mi-espacio-espejo/mirror.js?v=fidelity-20261123-v2"></script>\n',"");
+ .replace('<link rel="stylesheet" href="./preview/mi-espacio-espejo/mirror.css?v=fidelity-20261123-v3"/>\n',"")
+ .replace('<link rel="stylesheet" href="./preview/mi-espacio-espejo/approved-visual.css?v=fidelity-20261123-v3"/>\n',"")
+ .replace('<script src="./preview/mi-espacio-espejo/mirror.js?v=fidelity-20261123-v3"></script>\n',"");
 const original=source.replace(/<\/script>\\n(?=\s*<script)/g,"</script>");
 assert.equal(normalized,original,"No modificar HTML oficial fuera de los tres enlaces aislados.");
 const sources=[...source.matchAll(/<script\b[^>]+src="([^"]+)"[^>]*><\/script>/g)].map(m=>m[1]);
@@ -42,6 +42,8 @@ assert(/#sticky-client-bar\s*\{display:none!important\}/.test(css),"Eliminar vis
 assert(css.includes("position:sticky!important"),"Cápsula nueva sticky.");
 assert(css.includes("rgba(0,242,254,.42)"),"Cian activo V4.3.");
 assert(css.includes("width:min(160px,100%)"),"Compacta V4.3.");
+assert(css.includes("#gx-client-notif-launch.gx-has-new:not(.gx-session-guest)"),"El contador no debe deformar la campana.");
+assert(approved.includes("grid-template-columns:repeat(3,minmax(0,1fr))!important"),"Tres compactas en una sola fila incluso en móvil.");
 assert(!/#gamif-grid\s*\{[^}]*display:grid!important/.test(css),"No bloquear el morph real con important.");
 for(const needle of [
  '.focus[data-layout="compact"]{min-height:242px',
