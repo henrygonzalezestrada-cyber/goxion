@@ -31,6 +31,7 @@ async function run(browserType,label){
     return route.abort();
    });
    await page.goto(url,{waitUntil:'domcontentloaded',timeout:30000});
+   await page.waitForTimeout(750); // completar inicialización pública antes de simular el evento de sesión
    assert.equal(await page.locator('#gx-v2-feed').isVisible(),false,label+'/'+width+' no mostrar V2 al invitado');
    await page.evaluate(()=>{
     localStorage.setItem(window.GOXION_CORE.STORAGE.CLIENT_TOKEN,'QA-SESSION-SIMULADA-SOLO-CI');
