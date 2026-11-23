@@ -95,5 +95,39 @@ async function run(engine,name){
   }
  }finally{await browser.close()}
 }
-try{await ready();await run(chromium,'chromium');await run(webkit,'webkit')}
+/* Animaciones reales: el modo reduce se prueba arriba; aquí comprobamos el morph premium. */
+async function motionTest(){
+ const browser=await chromium.launch({headless:true});
+ try{
+  const page=await browser.newPage({viewport:{width:390,height:844},reducedMotion:'no-preference'});
+  await page.addInitScript(()=>localStorage.setItem('goxion_client_token','QA-MOTION-ONLY'));
+  await page.route('**/*',route=>{
+   const u=route.request().url();
+   if(u.startsWith(origin))return route.continue();
+   if(u.includes('/rest/v1/goxion_precios_referencia'))return route.fulfill(body(refs));
+   if(u.includes('/functions/v1/mi-espacio'))return route.fulfill(body(client(true)));
+   if(u.includes('/functions/v1/estado-cuenta-beta'))return route.fulfill(body({ok:true,estado_cuenta:{publicable:true,total_actual:188,estado:'vencido'}}));
+   if(u.includes('/functions/v1/cancelaciones-cliente'))return route.fulfill(body({ok:true,solicitudes:[]}));
+   if(u.includes('/functions/v1/credenciales-cliente'))return route.fulfill(body({ok:true,entregas:[]}));
+   if(u.includes('/functions/v1/novedades-cliente'))return route.fulfill(body({ok:true,novedades:[]}));
+   if(u.includes('/functions/v1/accesos-cliente-beta'))return route.fulfill(body({ok:true,accesos:[]}));
+   if(u.includes('/functions/v1/notificaciones-cliente'))return route.fulfill(body({ok:true,items:[]}));
+   return route.abort();
+  });
+  await page.goto(url,{waitUntil:'domcontentloaded',timeout:30000});
+  await page.locator('#gxi-shell').waitFor({state:'visible',timeout:12000});
+  const clock=await page.evaluate(()=>getComputedStyle(document.querySelector('.gx-focus-clock-hand')).animationName);
+  assert(clock!=='none','El reloj necesita conservar su animación continua');
+  await page.locator('#gxb-row [data-gxb="mission"]').click();
+  await page.locator('.gxb-morph-surface').waitFor({state:'attached',timeout:2500});
+  await page.locator('.gxb-morph-surface').waitFor({state:'detached',timeout:3300});
+  const check=await page.evaluate(()=>getComputedStyle(document.querySelector('#gxb-panel .gxb-task-check')).animationName);
+  assert(check!=='none','El checkbox de misiones debe animarse al desplegarse');
+  await page.locator('#gxb-dismiss').click();
+  await page.locator('.gxb-morph-surface').waitFor({state:'detached',timeout:3300});
+  assert.equal(await page.locator('#gxb-panel').isVisible(),false,'El morph debe cerrar sin dejar el panel');
+  await page.close();console.log('OK chromium 390px movimiento completo — morph + reloj + checkbox');
+ }finally{await browser.close()}
+}
+try{await ready();await run(chromium,'chromium');await run(webkit,'webkit');await motionTest()}
 finally{server.kill('SIGTERM')}
