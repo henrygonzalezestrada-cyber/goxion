@@ -7,6 +7,47 @@
 .gxn-bell.gx-ringing .gx-client-notif-clapper{animation:gxBellClapper .9s ease-out}
 @keyframes gxBellRing{0%,100%{transform:rotate(0)}18%,54%{transform:rotate(-13deg)}36%,72%{transform:rotate(12deg)}}
 @keyframes gxBellClapper{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(2px)}40%,80%{transform:translateX(-2px)}}
+/* Geometría oficial de campana: esfera vacía, expansión a 74px y círculo morado-cian del contador.
+   Material neutro únicamente en fondo y borde, sin alterar la microinteracción. */
+.gxn-bell{
+ display:flex;align-items:center;justify-content:center;gap:0;overflow:hidden;
+ width:44px;min-width:44px;max-width:44px;height:44px;min-height:44px;
+ flex:0 0 44px;padding:0;border-radius:50%;
+ transition:width .38s cubic-bezier(.22,.82,.22,1),
+ min-width .38s cubic-bezier(.22,.82,.22,1),max-width .38s cubic-bezier(.22,.82,.22,1),
+ flex-basis .38s cubic-bezier(.22,.82,.22,1),
+ padding .38s cubic-bezier(.22,.82,.22,1),gap .38s cubic-bezier(.22,.82,.22,1),
+ border-radius .38s cubic-bezier(.22,.82,.22,1),
+ border-color .25s ease,background .25s ease,transform .34s cubic-bezier(.22,.82,.22,1);
+}
+.gxn-bell .gx-client-notif-icon{flex:0 0 20px;width:20px;height:20px;display:grid;place-items:center}
+.gxn-bell .gx-client-notif-bell{display:block;width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transform-origin:50% 18%}
+.gxn-bell .gx-client-notif-badge{
+ display:grid;place-items:center;flex:0 0 auto;
+ width:0;min-width:0;max-width:0;height:22px;padding:0;margin:0;overflow:hidden;opacity:0;
+ border-radius:999px;background:linear-gradient(135deg,#7c4dff,#00f2fe);color:#fff;
+ box-shadow:0 0 14px rgba(0,242,254,.18);
+ font-size:10px;line-height:1;font-weight:900;letter-spacing:-.02em;font-variant-numeric:tabular-nums;
+ transform:translateX(-5px) scale(.78);
+ transition:opacity .22s ease,width .38s cubic-bezier(.22,.82,.22,1),
+ min-width .38s cubic-bezier(.22,.82,.22,1),
+ max-width .38s cubic-bezier(.22,.82,.22,1),
+ padding .38s cubic-bezier(.22,.82,.22,1),
+ transform .32s cubic-bezier(.22,.82,.22,1);
+}
+.gxn-bell.gx-has-new{
+ display:flex;align-items:center;justify-content:center;gap:7px;
+ width:74px;min-width:74px;max-width:74px;flex:0 0 74px;
+ padding:0 8px;border-radius:22px;
+ border-color:rgba(194,217,229,.19);background:rgba(236,242,248,.085);
+ box-shadow:inset 0 1px rgba(255,255,255,.055),0 0 20px rgba(200,216,230,.035);
+}
+.gxn-bell.gx-has-new .gx-client-notif-badge{
+ width:22px;min-width:22px;max-width:34px;opacity:1;padding:0 6px;
+ transform:translateX(0) scale(1);
+}
+@media(prefers-reduced-motion:reduce){.gxn-bell,.gxn-bell .gx-client-notif-badge{transition:none!important}}
+
 html.gx-notif-open{overflow:hidden;overscroll-behavior:none}
 /* Notification sheet · iOS-safe, low-noise GOXION */
 .gx-client-notif-overlay{
