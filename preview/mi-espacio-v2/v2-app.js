@@ -593,7 +593,7 @@ function observeSavings(){
 }
 function renderSavings(){
  const sum=data.savings(state.view,state.prices);state.savings=sum;
- const card=$('gxv-savings'),details=$('gxi-saving-note');
+ const card=$('gxv-savings');let details=$('gxi-saving-note');
  if(!sum||sum.difference<=0){card.hidden=true;if(details)details.hidden=true;stopSavingsMotion();savingSeen=false;return}
  card.hidden=false;
  savingTarget=sum.difference;
@@ -607,6 +607,12 @@ function renderSavings(){
    slot.append(img);logos.append(slot);
   });
   if(sum.entries.length>4){const more=document.createElement('span');more.className='gxv-more';more.textContent='+'+(sum.entries.length-4);more.setAttribute('aria-label','y '+(sum.entries.length-4)+' plataformas más');logos.append(more)}
+ }
+ if(!details){
+  details=document.createElement('details');details.id='gxi-saving-note';details.className='gxi-saving-note';
+  const summary=document.createElement('summary');summary.textContent='Cómo calculamos el ahorro';
+  const p=document.createElement('p');details.append(summary,p);
+  card.insertAdjacentElement('afterend',details);
  }
  $('gxv-context').textContent='Estimación · '+sum.covered+' de '+sum.total+' '+(sum.total===1?'servicio comparable':'servicios comparables');
  card.setAttribute('aria-label','Ahorro estimado de '+savingsMoney(savingTarget)+' al mes entre '+sum.covered+' servicios comparables.');
