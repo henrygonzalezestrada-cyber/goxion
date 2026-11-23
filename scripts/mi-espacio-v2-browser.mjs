@@ -129,5 +129,40 @@ async function motionTest(){
   await page.close();console.log('OK chromium 390px movimiento completo — morph + reloj + checkbox');
  }finally{await browser.close()}
 }
-try{await ready();await run(chromium,'chromium');await run(webkit,'webkit');await motionTest()}
+async function authenticationTest(){
+ const browser=await chromium.launch({headless:true});
+ try{
+  const page=await browser.newPage({viewport:{width:390,height:844},reducedMotion:'reduce'});
+  await page.route('**/*',route=>{
+   const u=route.request().url();
+   if(u.startsWith(origin))return route.continue();
+   if(u.includes('/functions/v1/login-goxion'))return route.fulfill(body({ok:true,session_token:'QA-LOGIN-SAFE',cliente:{clave:'QA'}}));
+   if(u.includes('/functions/v1/mi-espacio'))return route.fulfill(body(client()));
+   if(u.includes('/rest/v1/goxion_precios_referencia'))return route.fulfill(body(refs));
+   if(u.includes('/functions/v1/estado-cuenta-beta'))return route.fulfill(body({ok:true,estado_cuenta:{publicable:true,total_actual:188,estado:'pagado'}}));
+   if(u.includes('/functions/v1/cancelaciones-cliente'))return route.fulfill(body({ok:true,solicitudes:[]}));
+   if(u.includes('/functions/v1/credenciales-cliente'))return route.fulfill(body({ok:true,entregas:[]}));
+   if(u.includes('/functions/v1/novedades-cliente'))return route.fulfill(body({ok:true,novedades:[]}));
+   if(u.includes('/functions/v1/accesos-cliente-beta'))return route.fulfill(body({ok:true,accesos:[]}));
+   if(u.includes('/functions/v1/notificaciones-cliente'))return route.fulfill(body({ok:true,items:[]}));
+   return route.abort();
+  });
+  await page.goto(url,{waitUntil:'domcontentloaded'});
+  await page.locator('#gxi-auth').waitFor({state:'visible',timeout:6000});
+  assert.equal(await page.locator('#gxi-loading').isVisible(),false,'Sin loader después de sesión invitada');
+  await page.locator('#gxi-user').fill('QA navegador');
+  await page.locator('#gxi-pin').fill('1234');
+  await page.locator('#gxi-login-button').click();
+  await page.locator('#gxi-shell').waitFor({state:'visible',timeout:12000});
+  assert.equal(await page.locator('#gxi-auth').isVisible(),false,'Login oculto tras sesión segura');
+  await page.locator('#gxn-profile-trigger').click();
+  await page.locator('#gxn-logout').click();
+  await page.locator('#gxi-auth').waitFor({state:'visible',timeout:3000});
+  assert.equal(await page.locator('#gxi-shell').isVisible(),false,'No mostrar información de cliente tras cerrar sesión');
+  const persisted=await page.evaluate(()=>localStorage.getItem('goxion_client_token'));
+  assert.equal(persisted,null,'La sesión de cliente se elimina al cerrar');
+  await page.close();console.log('OK chromium autenticación — inicio, cierre y aislamiento');
+ }finally{await browser.close()}
+}
+try{await ready();await run(chromium,'chromium');await run(webkit,'webkit');await motionTest();await authenticationTest()}
 finally{server.kill('SIGTERM')}
