@@ -1,0 +1,36 @@
+name: Mi Espacio V2 · Laboratorio fuente unica
+on:
+  pull_request:
+    paths:
+      - 'preview/mi-espacio-v2/**'
+      - 'scripts/mi-espacio-v2-smoke.mjs'
+      - 'scripts/mi-espacio-v2-browser.mjs'
+      - '.github/workflows/mi-espacio-v2.yml'
+  workflow_dispatch:
+jobs:
+  pureza:
+    name: Integridad de fuente y seguridad
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node scripts/mi-espacio-v2-smoke.mjs
+  navegadores:
+    name: UI realista con datos aislados
+    needs: pureza
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-save playwright@1.56.1
+      - run: npx playwright install --with-deps chromium webkit
+      - name: Validar 390, 320, 280 px en Chromium/WebKit
+        run: node scripts/mi-espacio-v2-browser.mjs
