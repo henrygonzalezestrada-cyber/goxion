@@ -30,6 +30,7 @@ async function run(browserType,label){
     if(u.includes('/functions/v1/notificaciones-cliente'))return route.fulfill(reply({ok:true,items:[]}));
     return route.abort();
    });
+   await page.addInitScript(()=>localStorage.setItem('goxion_client_token','QA-SESSION-SIMULADA-SOLO-CI'));
    await page.goto(url,{waitUntil:'domcontentloaded',timeout:30000});
    await page.waitForTimeout(750); // completar inicialización pública antes de simular el evento de sesión
    assert.equal(await page.locator('#gx-v2-feed').isVisible(),false,label+'/'+width+' no mostrar V2 al invitado');

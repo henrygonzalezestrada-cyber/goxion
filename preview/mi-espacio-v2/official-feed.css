@@ -1,5 +1,19 @@
 /* GOXION · el único rediseño es el contenido de #view-dashboard. */
-#gx-v2-feed{--bg:#030305;--text:#f5f8ff;--muted:#a8b5c9;--cyan:#36dbe8;--purple:#8067f5;--gx-close-disc:35px;--gx-close-x:16px;color:#f5f8ff;font-family:Poppins,system-ui,sans-serif;isolation:isolate}
+/* Montaje fiel: el usuario autenticado nunca ve los dos feeds juntos. */
+#view-dashboard.gx-v2-rendered #gx-v2-legacy-host{display:none!important}
+#gx-v2-feed .gx-v2-sync[hidden]{display:none!important}
+#gx-v2-feed .gx-v2-sync{position:absolute;z-index:21;inset:0;min-height:390px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:15px;padding:35px 20px;background:#030305;color:#d7e4ed;text-align:center;font-size:13px;line-height:1.5}
+#gx-v2-feed .gx-v2-sync-spinner{width:24px;height:24px;border:2px solid rgba(229,241,250,.12);border-top-color:#b0dfe2;border-radius:50%;animation:gxV2SyncSpin .8s linear infinite}
+#gx-v2-feed .gx-v2-sync-retry{min-height:42px;padding:9px 19px;border-radius:999px;border:1px solid rgba(202,226,235,.17);color:#e9f5f9;background:rgba(255,255,255,.08)}
+@keyframes gxV2SyncSpin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){#gx-v2-feed .gx-v2-sync-spinner{animation:none!important}}
+/* El morph de tarjetas se dibuja sobre body: mantenerle exactamente el material del laboratorio
+   porque las reglas de @scope no alcanzan overlays montados fuera de #gx-v2-feed. */
+body.gx-v2-private-visible > .gxb-morph-surface,body.gx-v2-private-visible > .gxb-morph-emoji{position:fixed;z-index:10010;pointer-events:none;user-select:none}
+body.gx-v2-private-visible > .gxb-morph-surface{border:1px solid rgba(255,255,255,.035);box-shadow:0 15px 36px rgba(0,0,0,.23);background:rgba(8,8,12,.371);-webkit-backdrop-filter:blur(11.75px) saturate(1);backdrop-filter:blur(11.75px) saturate(1)}
+body.gx-v2-private-visible > .gxb-morph-emoji{display:block;line-height:1;text-align:center;white-space:nowrap;transform-origin:center}
+
+#gx-v2-feed{--bg:#030305;--text:#f5f8ff;--muted:#a8b5c9;--cyan:#36dbe8;--purple:#8067f5;--gx-close-disc:35px;--gx-close-x:16px;--neutral-alpha:.371;--neutral-blur:11.75px;position:relative;color:#f5f8ff;font-family:Poppins,system-ui,sans-serif;isolation:isolate}
 #gx-v2-feed[hidden]{display:none!important}
 #gx-v2-feed .shell{max-width:580px!important;width:100%!important;margin:0 auto!important;padding:0 0 calc(110px + env(safe-area-inset-bottom,0px))!important}
 #view-dashboard.gx-v2-rendered > #gx-v2-legacy-host{display:none!important}

@@ -15,18 +15,23 @@ const spinner={hidden:true},shell=$('gxi-shell'),loading={hidden:true};
 let iconHandle=null;
 function firstName(){return String(state.view?.cliente?.nombre||'Cliente').trim().split(/\s+/)[0]||'Cliente'}
 const TOKEN=data.takeToken;
-window.__GOXION_INTEGRATION_TEST={loaded:true,loadCalls:0};
 let loadingOfficial=false;
 async function load(){
- window.__GOXION_INTEGRATION_TEST.loadCalls++;
- if(loadingOfficial||!TOKEN()){window.__GOXION_INTEGRATION_TEST.skip='loading or no token';return}
+ if(loadingOfficial||!TOKEN())return;
  const identity=typeof getCurrentClientKey==='function'?getCurrentClientKey():window.goxionCurrentClientKey;
- if(!identity){window.__GOXION_INTEGRATION_TEST.skip='no identity';return}
- window.__GOXION_INTEGRATION_TEST.identity=String(identity);
+ if(!identity)return;
  loadingOfficial=true;
- try{const view=await data.load();if(view&&TOKEN())await showClient(view)}
- catch(e){window.__GOXION_INTEGRATION_TEST.error=String(e?.stack||e);console.warn('GOXION: espejo feed V2 sin alterar oficial',e)}
- finally{loadingOfficial=false}
+ const tokenAtStart=TOKEN();
+ try{
+  const view=await data.load();
+  if(!view||!TOKEN()||TOKEN()!==tokenAtStart)return;
+  await showClient(view);
+ }catch(e){
+  if(TOKEN()===tokenAtStart){
+   window.dispatchEvent(new CustomEvent('goxion:v2-feed:error',{detail:{message:'No se pudo sincronizar tu información. Puedes reintentar sin cerrar sesión.'}}));
+   console.warn('GOXION: el nuevo feed no pudo sincronizarse',e);
+  }
+ }finally{loadingOfficial=false}
 }
 async function showClient(view){
  state.view=view;
@@ -44,7 +49,6 @@ async function showClient(view){
  $('gxi-account-name').textContent=String(view.cliente.nombre||'Mi Espacio')+' · Mi Espacio';
  renderClient();
  state.tab='space';
- window.__GOXION_INTEGRATION_TEST.rendered=true;
  window.dispatchEvent(new CustomEvent('goxion:v2-feed:rendered',{detail:{clientId:String(view.cliente.id||'')}}));
  void loadPrices();
  void window.GOXION_V2_NOTIFICATIONS?.refresh();
@@ -680,8 +684,9 @@ async function refreshClient(){
  finally{state.refreshing=false}
 }
 setupBenefits();mountGoxy();
+window.GOXION_V2_RETRY_FEED=()=>load();
 window.addEventListener('goxion:client-ready',()=>{void load()});
-window.addEventListener('goxion:client-logout',()=>{state.view=null;shell.hidden=true});
+window.addEventListener('goxion:client-logout',()=>{state.view=null;shell.hidden=true;window.GOXION_V2_CLIENT_ID=''});
 if(typeof getCurrentClientKey==='function'&&getCurrentClientKey())void load();
 // Se conserva Morphicons del laboratorio aprobado; icono SVG nativo si no hay red.
 if(!reduced())import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
