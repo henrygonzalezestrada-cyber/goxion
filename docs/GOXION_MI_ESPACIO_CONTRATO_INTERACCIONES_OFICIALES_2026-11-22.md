@@ -1,8 +1,11 @@
 # GOXION · Mi Espacio — contrato de preservación de interacciones oficiales
 
+> **ACTUALIZACIÓN DE ESTADO · 23/NOV/2026:** el diseño de navegación aprobado visualmente ya es **V4.3** (etiqueta 14.5px/700, borde cian .42 expandida/.25 compacta). El contrato de preservación funcional sigue vigente **sin cambios**. Leer [`GOXION_MI_ESPACIO_REANUDACION_2026-11-23.md`](GOXION_MI_ESPACIO_REANUDACION_2026-11-23.md) antes de avanzar en otra sesión. No confundir aprobación estética con pruebas de integración real.
+
+
 **Fecha de auditoría:** 22–23 de noviembre de 2026.  
 **Alcance:** código en la rama `main` de `henrygonzalezestrada-cyber/goxion`. Este contrato documenta **lo que existe en producción y lo que NO debe perderse** cuando se integre en `ayuda.html` el nuevo feed del laboratorio. **No autoriza despliegue ni fusión.**  
-**Último laboratorio de diseño aprobado de navegación:** V4.2 `preview/experiencia-mi-espacio-inteligente/morph-v2.html` (la aprobación del usuario fue visual; **no demuestra que el backend ya está integrado**).
+**Último laboratorio de diseño aprobado de navegación:** V4.3 `preview/experiencia-mi-espacio-inteligente/morph-v2.html` (el usuario aprobó visualmente la V4.3; **no demuestra que el backend ya está integrado ni que Safari haya pasado QA**).
 
 ## Respuesta a las dos dudas explícitas del usuario
 
