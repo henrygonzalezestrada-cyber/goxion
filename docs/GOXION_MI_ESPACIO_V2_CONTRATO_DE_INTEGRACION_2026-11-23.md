@@ -6,6 +6,19 @@
 
 > REGLA PRINCIPAL: SOLO SE REDISEÑA EL FEED PRIVADO DE UN CLIENTE CON SESIÓN INICIADA (view-dashboard). No se rediseñan la portada inicial pública, login, recuperación/activación, Catálogo, carrito, promociones, Soporte, registro, legales ni modales globales. El espejo integral debe incluirlos todos **sin duplicarlos**, para verificar un recorrido auténtico. Esta regla prevalece sobre planes anteriores que consideraban rediseñar otras áreas.
 
+## Avance de implementación · espejo oficial-root (23/nov/2026)
+
+**Nueva fuente de integración vigente:** `ayuda-espejo-feed-v2.html` (nivel raíz, junto a `ayuda.html`). Se generó como copia literal de la oficial, con un injerto de V2 exclusivamente dentro de `#view-dashboard`. Conserva los IDs y controladores oficiales de portada, login, Catálogo, Soporte y elementos globales. **No utiliza iframe**.
+
+- `preview/mi-espacio-v2/official-feed.css`: estilos V2 limitados por `@scope (#gx-v2-feed)` y propiedades de compatibilidad que se aplican solo cuando el feed privado está visible. Fuera de `#view-dashboard`, GOXION conserva su material y comportamiento oficial.
+- `preview/mi-espacio-v2/official-feed-runtime.js`: render visual V2 que utiliza la sesión **ya confirmada por la oficial** a través del evento `goxion:client-ready`. No tiene un segundo formulario ni inicia una sesión distinta. Acciones comerciales V2 protegidas por `ENABLE_WRITES=false`.
+- `preview/mi-espacio-v2/official-feed-host.js`: conmutación visual entre V2 y dashboard anterior, adaptador del contador de la campana oficial sin segundo motor de notificaciones y navegación por `switchTab` original. Se mantiene un contenedor oculto `#gx-v2-legacy-host` de compatibilidad para los controladores oficiales antiguos; **se debe eliminar después de migrar cada handler, antes de lanzamiento**.
+- `preview/mi-espacio-v2/espejo.html` queda como prototipo anterior de navegación con iframe, **no candidato** a oficial. Evitar hacer cambios funcionales nuevos en él.
+- Probar no solo el aspecto sino también la integridad 1:1 del contenido de la portada y de Catálogo/Soporte, ausencia de IDs duplicados y de login paralelo, además de Chromium/WebKit para navegación.
+- **Sin promesa de funciones aún no conectadas:** confeti, cancelaciones, retención, cupones, B2, pago/comprobante, credenciales seguras y escritura funcional del feed están **pendientes de paridad V2**, aunque sus fuentes originales siguen en el espejo. No decir que el rediseño está listo por mantener scripts cargados. Ninguna función de demo equivale al evento real.
+
+La oficial `ayuda.html` se conserva intacta. Este espejo es una **base técnica de integración progresiva**, no la build definitiva que se publicará sin rehacer.
+
 ## A. Tres fuentes, tres responsabilidades (NO mezclar)
 
 1. **Oficial funcional:** ayuda.html, assets/css/ayuda.css y scripts oficiales assets/js/ayuda/**. Fuente de verdad de lógica comercial, autorización, backend, flujos y todo lo que está fuera del feed privado.
