@@ -649,6 +649,7 @@ async function markOne(id,source){
 
   function openSheet(){
     ensureUi();
+    document.getElementById("gxn-bell")?.setAttribute("aria-expanded","true");
     bindNotificationViewport();
     bindSheetScrollGuard();
     syncNotificationViewport();
@@ -663,6 +664,7 @@ async function markOne(id,source){
   }
 
   function closeSheet(){
+    document.getElementById("gxn-bell")?.setAttribute("aria-expanded","false");
     state.scrollLockY=null;
     resetActionConfirmation();
     clearTimeout(state.feedbackTimer);
