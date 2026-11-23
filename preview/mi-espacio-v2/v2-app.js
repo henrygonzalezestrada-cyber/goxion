@@ -10,6 +10,7 @@ const clean=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toL
 const reduced=()=>data.motionReduced();
 const state={view:null,prices:[],savings:null,notificationItems:[],tab:'space',lastState:'',activeFilter:'all',showAllHistory:false,openHistory:null,refreshing:false};
 const spinner=$('gxi-auth'),shell=$('gxi-shell');
+let iconHandle=null;
 function firstName(){return String(state.view?.cliente?.nombre||'Cliente').trim().split(/\s+/)[0]||'Cliente'}
 function error(message){const el=$('gxi-login-error');el.textContent=message;el.hidden=false}
 function showLogin(message){
@@ -33,6 +34,10 @@ $('gxi-login-form').addEventListener('submit',async event=>{
 });
 async function showClient(view){
  state.view=view;
+ state.notificationItems=[];
+ $('gxi-notice-list').replaceChildren();
+ $('gxn-bell').dataset.unread='false';
+ $('gxn-bell .gxi-bell-count')?.remove();
  spinner.hidden=true;shell.hidden=false;
  $('gxi-account-name').textContent=String(view.cliente.nombre||'Mi Espacio')+' · Mi Espacio';
  renderClient();
@@ -73,7 +78,10 @@ function renderHero(){
   if(!reduced()&&title.animate)title.animate([{opacity:0,filter:'blur(10px)',transform:'translateY(20px)'},{opacity:1,filter:'blur(0)',transform:'translateY(0)'}],{duration:560,easing:'cubic-bezier(.18,.85,.2,1)'});
  }
  $('focus-meta').textContent=s[2];$('focus-action').textContent=s[0]==='new'?'Ver catálogo':'Ver mi cuenta';
- const icon=$('focus-icon');icon.dataset.icon=s[4];$('state-path').setAttribute('d',paths[s[4]]||paths.check);
+ const icon=$('focus-icon');icon.dataset.icon=s[4];
+ const path=$('state-path'),shape=paths[s[4]]||paths.check;
+ if(iconHandle){try{iconHandle.morphTo(shape,'smooth')}catch(_){path.setAttribute('d',shape)}}
+ else path.setAttribute('d',shape);
  if(prev&&prev!==s[0]&&!reduced()){icon.classList.remove('gx-focus-once');void icon.offsetWidth;icon.classList.add('gx-focus-once')}
  if(!prev||prev!==s[0])greeting(firstName(),['correction','incomplete','suspended','overdue','review'].includes(s[0]));
  const c=state.view.cliente,account=state.view.estado_cuenta;
@@ -641,6 +649,10 @@ async function refreshClient(){
  finally{state.refreshing=false}
 }
 setupBenefits();mountGoxy();load();
+// Se conserva Morphicons del laboratorio aprobado; icono SVG nativo si no hay red.
+if(!reduced())import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
+ if(typeof mod.createMorph==='function')iconHandle=mod.createMorph($('state-path'),paths[$('focus-icon').dataset.icon]||paths.check,{reducedMotion:'user'});
+}).catch(()=>{});
 setInterval(()=>{if(!document.hidden&&state.view){void refreshClient();void loadNotifications()}},45000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&state.view){void refreshClient();void loadNotifications()}});
 })();
