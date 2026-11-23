@@ -10,7 +10,7 @@
  let stateKind="",refreshQueued=false,loyaltyTile=null,loyaltyExpanded=null,hero=null;
  const iconPaths={
   check:'<path d="M4 12l5 5L20 6"/>',
-  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5"/><path class="gx-mirror-clock-hand" d="M12 12l3 2"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5"/><path class="gx-focus-clock-hand" d="M12 12l3 2"/>',
   alert:'<path d="M12 2 22 20H2L12 2z"/><path d="M12 8v5M12 16v1"/>',
   calendar:'<path d="M5 3v4M19 3v4M3 9h18M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2"/><path d="M9 13h6v5H9z"/>',
   spark:'<path d="M12 2v20M2 12h20M5 5l14 14M19 5 5 19"/>'
@@ -66,28 +66,44 @@
   syncNavigation();
  }
  function createHero(){
-  const dashboard=$("view-dashboard"),original=$("dash-billing-card");
-  if(!dashboard||!original||hero)return;
-  hero=create("section","gx-mirror-priority");
+  const original=$("dash-billing-card");
+  const alert=$("dash-payment-review-alert");
+  if(!original||!alert||hero)return;
+  const stage=create("div","glass-stage");
+  stage.id="gx-mirror-glass-stage";
+  stage.dataset.layout="compact";
+  const underlay=create("div","glass-underlay");
+  underlay.setAttribute("aria-hidden","true");
+  underlay.innerHTML='<span class="glass-beam"></span><span class="glass-orb"></span>';
+  hero=create("section","focus");
   hero.id="gx-mirror-priority";
+  hero.dataset.layout="compact";
+  hero.dataset.material="neutral";
+  hero.dataset.glass="on";
   hero.setAttribute("aria-label","Estado de tu cuenta");
-  const copy=create("div","gx-mirror-priority-copy");
-  const title=create("h2");
+  hero.style.setProperty("--neutral-alpha",".371");
+  hero.style.setProperty("--neutral-blur","11.8px");
+  const copy=create("div","focus-copy");
+  const title=create("h2","focus-title","Tu próximo corte");
   title.id="gx-mirror-priority-title";
-  title.textContent="Tu próxima fecha de corte";
-  const meta=create("span","gx-mirror-sub");
+  const meta=create("span","focus-meta");
   meta.id="gx-mirror-priority-meta";
   copy.append(title,meta);
-  const icon=create("span","gx-mirror-icon");
+  const icon=create("span","focus-icon");
   icon.id="gx-mirror-priority-icon";
   icon.setAttribute("aria-hidden","true");
-  const action=create("div","gx-mirror-hero-action");
-  const realCta=original.querySelector(".gx-account-capsule");
-  if(realCta)action.append(realCta); // Un único CTA real: conserva irAlTicket().
-  hero.append(copy,icon,action);
-  const anchor=$("dash-payment-review-alert")||original;
-  anchor.parentElement.insertBefore(hero,anchor);
+  const bottom=create("div","focus-bottom");
+  const realCTA=original.querySelector(".gx-account-capsule");
+  if(realCTA){
+   realCTA.classList.add("focus-action");
+   // La acción sigue siendo el mismo botón original irAlTicket().
+   bottom.append(realCTA);
+  }
+  hero.append(copy,icon,bottom);
+  stage.append(underlay,hero);
+  alert.parentElement.insertBefore(stage,alert);
  }
+
  function classify(client){
   const state=String(client?.estado_cuenta?.estado||"").toLowerCase();
   const rev=String(client?.pago_revision_estado||"").toLowerCase();
@@ -102,89 +118,179 @@
  function refreshHero(){
   if(!hero)return;
   const client=officialClient();
-  const authenticated=Boolean(client);
   const onboarding=$("dash-onboarding-card");
   const inDashboard=$("view-dashboard")?.classList.contains("active");
-  hero.hidden=!authenticated||Boolean(onboarding&&!onboarding.hidden)||!inDashboard;
-  if(hero.hidden)return;
-  const state=classify(client);
-  hero.dataset.tone=state.tone;
+  const hide=!client||Boolean(onboarding&&!onboarding.hidden)||!inDashboard;
+  const stage=$("gx-mirror-glass-stage");
+  if(stage)stage.hidden=hide;
+  hero.hidden=hide;
+  if(hide)return;
+  const next=classify(client);
+  hero.dataset.tone=next.tone;
+  hero.dataset.state=next.kind==="check"?"clear":next.kind==="clock"?"review":next.kind==="calendar"?"soon":"correction";
   const title=$("gx-mirror-priority-title");
-  if(title&&title.textContent!==state.title)title.textContent=state.title;
+  if(title&&title.textContent!==next.title)title.textContent=next.title;
   const date=String($("dash-date")?.textContent||"").trim();
   const meta=$("gx-mirror-priority-meta");
   if(meta)meta.textContent=date&&!/cargando/i.test(date)?"Próximo corte · "+date:"";
   const icon=$("gx-mirror-priority-icon");
-  if(icon&&(stateKind!==state.kind)){
-   stateKind=state.kind;
-   icon.dataset.kind=state.kind;
+  if(icon&&stateKind!==next.kind){
+   stateKind=next.kind;
+   icon.dataset.icon=next.kind;
    icon.classList.remove("is-changed");
-   icon.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">'+(iconPaths[state.kind]||iconPaths.calendar)+'</svg>';
+   icon.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">'+
+    (iconPaths[next.kind]||iconPaths.calendar)+'</svg>';
    if(!reduce()){void icon.offsetWidth;icon.classList.add("is-changed");}
   }
  }
+
  function createLoyalty(){
   if(loyaltyTile)return;
-  loyaltyTile=create("button","gx-mirror-loyalty");
+  loyaltyTile=create("button","gxb-tile gxc-surface");
   loyaltyTile.type="button";
   loyaltyTile.id="gx-mirror-loyalty";
+  loyaltyTile.dataset.gxb="loyalty";
   loyaltyTile.setAttribute("aria-expanded","false");
   loyaltyTile.setAttribute("aria-controls","gx-mirror-loyalty-expanded");
-  const label=create("span","gx-mirror-loyalty-label","Lealtad");
-  const number=create("strong","gx-mirror-loyalty-value");
+  const label=create("span","gxb-label","Lealtad");
+  const metric=create("span","gxb-metric-row");
+  const number=create("strong","gxb-number");
   number.id="gx-mirror-loyalty-value";
-  const emoji=create("span","gx-mirror-loyalty-emoji","⭐");
-  emoji.id="gx-mirror-loyalty-emoji";
-  const unit=create("small","gx-mirror-loyalty-unit","pagos seguidos");
-  const meter=create("span","gx-mirror-meter");
+  const emoji=create("span","gxb-emoji","⭐");
+  emoji.id="gx-mirror-loyalty-emoji";emoji.setAttribute("aria-hidden","true");
+  metric.append(number,emoji);
+  const unit=create("span","gxb-unit","pagos seguidos");
+  const meter=create("span","gxb-mini-progress");
   meter.setAttribute("aria-hidden","true");
-  const fill=create("span");fill.id="gx-mirror-loyalty-fill";meter.append(fill);
-  loyaltyTile.append(label,number,emoji,unit,meter);
-  loyaltyExpanded=create("section","gx-mirror-loyalty-expanded");
+  const fill=create("span");fill.id="gx-mirror-loyalty-fill";fill.style.setProperty("--gxb-pct","0%");
+  meter.append(fill);loyaltyTile.append(label,metric,unit,meter);
+
+  loyaltyExpanded=create("section","gxb-panel gxc-surface");
   loyaltyExpanded.id="gx-mirror-loyalty-expanded";
+  loyaltyExpanded.dataset.benefit="loyalty";
   loyaltyExpanded.hidden=true;
-  const close=create("button","gx-mirror-close","×");
-  close.type="button";close.setAttribute("aria-label","Cerrar detalle de Lealtad");
-  const title=create("h3","","Tu lealtad");
-  title.id="gx-mirror-loyalty-heading";
-  const detail=create("p");detail.id="gx-mirror-loyalty-description";
-  loyaltyExpanded.append(close,title,detail);
+  const close=create("button","gxb-dismiss");
+  close.type="button";close.setAttribute("aria-label","Cerrar detalle de lealtad");
+  close.innerHTML='<svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+  const inner=create("div","gxb-panel-inner");
+  const head=create("div","gxb-head");
+  const h=create("h3");
+  h.id="gx-mirror-loyalty-heading";
+  head.append(h);
+  const copy=create("p","gxb-copy");copy.id="gx-mirror-loyalty-description";
+  const mhead=create("div","gxb-metric-head");
+  mhead.innerHTML='<span>Tu constancia</span><strong id="gx-mirror-loyalty-detail-value">—</strong>';
+  const mbar=create("div","gxb-meter");
+  const progress=create("span");
+  progress.id="gx-mirror-loyalty-detail-fill";
+  mbar.append(progress);
+  inner.append(head,copy,mhead,mbar);
+  const note=create("p","gxb-note");
+  note.textContent="La constancia se actualiza cuando se acredita cada pago.";
+  inner.append(note);
+  const foot=create("div","gxb-foot");
+  const action=create("button","gxb-action","Ver estado de cuenta");
+  action.type="button";
+  action.addEventListener("click",()=>{if(typeof irAlTicket==="function")irAlTicket();});
+  foot.append(action);
+  const watermark=create("span","gxb-panel-emoji","⭐");
+  watermark.id="gx-mirror-loyalty-large-emoji";
+  watermark.setAttribute("aria-hidden","true");
+  loyaltyExpanded.append(close,inner,foot,watermark);
+
   loyaltyTile.addEventListener("click",()=>{
-   const open=loyaltyExpanded.hidden;
-   loyaltyExpanded.hidden=!open;
-   loyaltyTile.setAttribute("aria-expanded",String(open));
-   if(open)loyaltyExpanded.scrollIntoView({behavior:reduce()?"auto":"smooth",block:"nearest"});
+   const isOpening=loyaltyExpanded.hidden;
+   loyaltyExpanded.hidden=!isOpening;
+   loyaltyTile.setAttribute("aria-expanded",String(isOpening));
+   if(isOpening)loyaltyExpanded.scrollIntoView({behavior:reduce()?"auto":"smooth",block:"nearest"});
   });
   close.addEventListener("click",()=>{
    loyaltyExpanded.hidden=true;loyaltyTile.setAttribute("aria-expanded","false");loyaltyTile.focus();
   });
-  const ref=$("referral-section-container");
-  ref?.insertAdjacentElement("afterend",loyaltyExpanded);
  }
+ function benefitVisual(card,kind,metric,emoji,unit,pct,showMeter,ready){
+  if(!card)return;
+  card.classList.add("gxb-tile","gxc-surface");
+  card.dataset.gxb=kind;
+  card.dataset.phase=showMeter?"active":"none";
+  card.dataset.ready=ready?"true":"false";
+  let visual=card.querySelector(".gxb-live-visual");
+  if(!visual){
+   visual=create("span","gxb-live-visual");
+   visual.innerHTML='<span class="gxb-label"></span><span class="gxb-metric-row"><strong class="gxb-number"></strong><span class="gxb-emoji" aria-hidden="true"></span></span><span class="gxb-unit"></span><span class="gxb-mini-progress" aria-hidden="true"><span></span></span>';
+   card.append(visual);
+  }
+  visual.querySelector(".gxb-label").textContent=kind==="referral"?"Referidos":"Misiones";
+  visual.querySelector(".gxb-number").textContent=metric;
+  visual.querySelector(".gxb-emoji").textContent=emoji;
+  visual.querySelector(".gxb-unit").textContent=unit;
+  const bar=visual.querySelector(".gxb-mini-progress");
+  bar.hidden=!showMeter;
+  bar.querySelector("span").style.setProperty("--gxb-pct",Math.max(0,Math.min(100,pct))+"%");
+  card.setAttribute("role","button");
+  card.setAttribute("tabindex","0");
+  card.setAttribute("aria-label",(kind==="referral"?"Referidos":"Misiones")+", "+metric+" "+unit+", abrir detalle");
+  if(!card.dataset.gxMirrorKeyboard){
+   card.dataset.gxMirrorKeyboard="1";
+   card.addEventListener("keydown",event=>{
+    if(event.key!=="Enter"&&event.key!==" ")return;
+    event.preventDefault();card.click();
+   });
+  }
+ }
+ function refreshBenefits(client,grid){
+  // Los nodos auténticos conservan su identidad, onclick y la fuente de recompensas.
+  const referral=grid.querySelector(".gx-gamif-card-ref");
+  const ref=client.referido_activo;
+  if(referral){
+   const months=ref?Math.max(0,Math.min(3,Number(ref.meses_efectivos??ref.meses_override??ref.meses??0)||0)):0;
+   const services=ref?(Array.isArray(ref.servicios)?ref.servicios.length:Number(ref.plataformas)||0):0;
+   const claimed=ref?.beneficio_reclamado===true;
+   const ready=Boolean(ref&&services>=2&&months>=3&&!claimed);
+   benefitVisual(referral,"referral",ref?months+"/3":"Invita",claimed?"💝":ready?"🎁":"🫂",ref?"meses válidos":"sin referidos",months/3*100,Boolean(ref&&months>0),ready);
+  }
+  const mission=grid.querySelector(".gx-gamif-card-mission");
+  if(mission){
+   const g=client.gamificacion||{};
+   const tasks=String(g.tareas||"").split("\n").filter(x=>x.trim());
+   const done=new Set((Array.isArray(g.progreso)?g.progreso:[]).map(x=>Number(x.mision_index)).filter(Number.isInteger));
+   const count=tasks.reduce((sum,_,i)=>sum+(done.has(i)?1:0),0);
+   const total=tasks.length;
+   const claimed=(Number(g.cupon_reclamado_ciclo)||0)>=(Math.max(1,Number(g.cupon_ciclo)||1));
+   const ready=total>0&&count===total&&!claimed;
+   benefitVisual(mission,"mission",total?count+"/"+total:"Sin tareas",claimed?"✅":ready?"🏆":"🎯",total?"completadas":"sin misiones",total?count/total*100:0,total>0,ready);
+  }
+ }
+
  function refreshLoyalty(){
+  const grid=$("gamif-grid"),client=officialClient(),ref=$("referral-section-container");
+  if(!grid||!client||!ref)return;
   createLoyalty();
-  const grid=$("gamif-grid");
-  if(!grid||!loyaltyTile)return;
+  ref.classList.add("gxb-wrap","is-visible");
+  grid.classList.add("gxb-row");
   if(!grid.contains(loyaltyTile))grid.insertBefore(loyaltyTile,grid.firstChild);
-  const client=officialClient();
-  if(!client)return;
+  if(!ref.contains(loyaltyExpanded))grid.insertAdjacentElement("afterend",loyaltyExpanded);
   const info=String($("loyalty-count")?.textContent||"").trim();
   const match=info.match(/(\d+)\s*\/\s*(\d+)/);
-  const value=match?Number(match[1]):null,target=match?Number(match[2]):null;
+  const n=match?Number(match[1]):null,max=match?Number(match[2]):null;
   const lost=client.estado_cuenta?.lealtad?.racha_reiniciada_virtual===true;
-  const number=$("gx-mirror-loyalty-value");
-  if(number)number.textContent=match?value+"/"+target:(info||"—");
-  const emoji=$("gx-mirror-loyalty-emoji");if(emoji)emoji.textContent=lost?"💔":"⭐";
-  const unit=loyaltyTile.querySelector(".gx-mirror-loyalty-unit");
-  if(unit)unit.textContent=lost?"racha reiniciada":"pagos seguidos";
-  const pct=value!==null&&target>0?Math.max(0,Math.min(100,(value/target)*100)):0;
-  const fill=$("gx-mirror-loyalty-fill");if(fill)fill.style.width=pct+"%";
-  const h=$("gx-mirror-loyalty-heading");
-  if(h)h.textContent=lost?"Tu racha se reinició":"Tu constancia crece";
-  const desc=$("gx-mirror-loyalty-description");
-  if(desc)desc.textContent=String($("loyalty-msg")?.textContent||"").trim();
-  loyaltyTile.setAttribute("aria-label",lost?"Lealtad, racha reiniciada, abrir detalle":("Lealtad, "+info+", abrir detalle"));
+  const metric=match?n+"/"+max:(info||"—");
+  $("gx-mirror-loyalty-value").textContent=metric;
+  $("gx-mirror-loyalty-emoji").textContent=lost?"💔":"⭐";
+  $("gx-mirror-loyalty-large-emoji").textContent=lost?"💔":"⭐";
+  loyaltyTile.dataset.phase=lost?"lost":"active";
+  loyaltyExpanded.dataset.phase=lost?"lost":"active";
+  loyaltyTile.querySelector(".gxb-unit").textContent=lost?"racha reiniciada":"pagos seguidos";
+  const pct=n!==null&&max>0?Math.max(0,Math.min(100,n/max*100)):0;
+  $("gx-mirror-loyalty-fill").style.setProperty("--gxb-pct",pct+"%");
+  $("gx-mirror-loyalty-detail-fill").style.width=pct+"%";
+  $("gx-mirror-loyalty-detail-value").textContent=metric+" pagos";
+  $("gx-mirror-loyalty-heading").textContent=lost?"Tu racha se reinició":"Tu constancia crece";
+  $("gx-mirror-loyalty-description").textContent=String($("loyalty-msg")?.textContent||"").trim();
+  loyaltyTile.setAttribute("aria-label","Lealtad, "+(lost?"racha reiniciada, ": "")+metric+", abrir detalle");
+  refreshBenefits(client,grid);
  }
+
  function refresh(){
   refreshHero();refreshLoyalty();
  }
