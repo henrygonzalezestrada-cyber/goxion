@@ -419,7 +419,7 @@ function renderServices(){
   article.className='gxs-card gxc-surface';article.dataset.service=String(s.id||index);article.dataset.tone=status[1];article.dataset.index=String(index);
   const access=(email?accessRow(isInvite?'Correo personal':'Correo',email,'copy',email):'')+
     (profile?accessRow('Perfil',profile):'')+
-    (pin?accessRow('PIN de perfil','••••','pin',pin):'')+
+    (pin?accessRow('PIN de perfil','••••','pin',''):'')+
     (isInvite&&a.estado_invitacion?accessRow('Invitación',String(a.estado_invitacion)):'');
   let note='';
   if(s.cancelacion&&['solicitada','aprobada','rechazada'].includes(clean(s.cancelacion.estado)))
@@ -457,8 +457,15 @@ $('gxs-list').addEventListener('click',event=>{
  const feedback=tile.querySelector('.gxs-feedback'),row=action.closest('.gxs-accessrow');
  if(kind==='copy'&&row){const v=row.querySelector('[data-gxs-value]')?.dataset.gxsValue||'';
   navigator.clipboard?.writeText(v).then(()=>feedback.textContent='Correo copiado.',()=>feedback.textContent='No se pudo copiar.');return}
- if(kind==='pin'&&row){const node=row.querySelector('[data-gxs-value]');const isHidden=node.textContent==='••••';
-   node.textContent=isHidden?node.dataset.gxsValue:'••••';action.textContent=isHidden?'Ocultar':'Mostrar';return}
+ if(kind==='pin'&&row){
+   const currentService=state.view?.servicios?.[Number(tile.dataset.index)];
+   const currentAccess=currentService?.accesos?.[0]||currentService;
+   const secret=String(currentAccess?.perfil_pin||currentService?.perfil_pin||'');
+   if(!secret){feedback.textContent='El PIN no está disponible para este acceso.';return}
+   const node=row.querySelector('.gxs-copy strong');
+   const isHidden=node.textContent==='••••';node.textContent=isHidden?secret:'••••';
+   action.textContent=isHidden?'Ocultar':'Mostrar';return
+  }
  if(kind==='support'){navigate('support');return}
  if(kind==='cancel'){
   const s=state.view.servicios[Number(tile.dataset.index)];
@@ -527,7 +534,8 @@ function renderSavings(){
  sum.entries.slice(0,4).forEach(e=>{const slot=document.createElement('span');slot.className='gxv-slot';const img=document.createElement('img');img.src=logo(e.service.nombre);img.alt=e.service.nombre;img.loading='lazy';slot.append(img);logos.append(slot)});
  if(sum.entries.length>4){const more=document.createElement('span');more.className='gxv-more';more.textContent='+'+(sum.entries.length-4);logos.append(more)}
  let note=card.querySelector('.gxi-saving-note');if(!note){note=document.createElement('p');note.className='gxi-saving-note';card.append(note)}
- note.textContent='Estimación contra tarifas mensuales individuales públicas, sin ofertas ni anualidades. GOXION puede ofrecer perfiles o invitaciones. Datos revisados: 23 nov 2026.';
+ const newest=sum.entries.map(e=>e.reference.revisado_el).filter(Boolean).sort().at(-1)||'';
+ note.textContent='Estimación contra tarifas mensuales individuales públicas, sin ofertas ni anualidades. GOXION puede ofrecer perfiles o invitaciones. Fuentes revisadas: '+(newest||'fecha no disponible')+'.';
 }
 async function loadNotifications(){
  if(!state.view)return;
