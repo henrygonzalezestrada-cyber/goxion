@@ -64,7 +64,10 @@ async function run(engine,name){
     nav:document.querySelectorAll('#gxn-nav').length,
     noOldStyles:![...document.styleSheets].some(s=>(s.href||'').includes('assets/css/ayuda.css')),
     noDemos:!document.querySelector('#demo-panel,#gxs-demo-case,#gxv-demo-case'),
-    savings:document.getElementById('gxv-amount').textContent
+    savings:document.getElementById('gxv-amount').textContent,
+     savingsHeight:document.getElementById('gxv-savings').getBoundingClientRect().height,
+     savingsLogoLayout:document.getElementById('gxv-logos').dataset.count,
+     savingsNoteOutside:!document.querySelector('#gxv-savings .gxi-saving-note')
    }));
    assert.equal(geometry.row.length,3,name+'/'+width+' tres compactas lab');
    assert(geometry.row.every(r=>r.width>52&&Math.abs(r.top-geometry.row[0].top)<3),name+'/'+width+' una fila '+JSON.stringify(geometry.row));
@@ -72,6 +75,9 @@ async function run(engine,name){
    assert.equal(geometry.nav,1,name+'/'+width+' cápsula única');
    assert(geometry.logo&&geometry.noOldStyles&&geometry.noDemos,name+'/'+width+' pureza de laboratorio');
    assert.match(geometry.savings,/340/,name+'/'+width+' ahorro = (369+159)-(109+79) sin fixtures en página');
+    assert.equal(geometry.savingsLogoLayout,'2',name+'/'+width+' distribución de logos');
+    assert(geometry.savingsHeight<=250,name+'/'+width+' ahorro compacto, alto '+geometry.savingsHeight);
+    assert(geometry.savingsNoteOutside,name+'/'+width+' nota fuera de la cuadrícula');
    assert.equal(await page.locator('#gxs-list .gxs-card').count(),2,name+'/'+width+' solo servicios activos');
    assert.equal(await page.locator('#gxm-list .gxm-entry').count(),1,name+'/'+width+' historial real');
    const hero=await page.locator('#focus-title').textContent();
@@ -89,6 +95,9 @@ async function run(engine,name){
    assert.match(await page.locator('#gxs-list').innerText(),/4826/,name+'/'+width+' PIN solo después de acción explícita');
    await page.locator('#gxs-list [data-gxi-action=pin]').click();
    assert.equal(await page.locator('#gxs-list').evaluate(el=>el.innerHTML.includes('4826')),false,name+'/'+width+' PIN vuelve a ocultarse');
+    await page.locator('#gxs-list [data-gxi-action=options]').first().click();
+    assert.equal(await page.locator('#gxs-list [data-gxi-action=cancel]').first().isVisible(),true,name+'/'+width+' más opciones del lab');
+    assert.equal(await page.locator('#gxi-catalog').count(),0,name+'/'+width+' sin catálogo paralelo');
    assert.deepEqual(errors,[],name+'/'+width+' excepciones JS');
    await page.close();
    console.log('OK '+name+' '+width+' px — lab, estados, ahorro, servicios, morph, privacidad');

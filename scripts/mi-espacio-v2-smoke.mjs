@@ -9,7 +9,7 @@ const data=fs.readFileSync(base+'v2-data.js','utf8');
 const app=fs.readFileSync(base+'v2-app.js','utf8');
 const css=fs.readFileSync(base+'v2.css','utf8');
 for(const [name,text] of Object.entries({lab,html,data,app,css}))assert(text.length>300,name+' no debe estar vacío');
-for(const selector of ['gxn-nav','greeting','focus','gxb-row','gxb-panel','gxv-savings','gxs-list','gxm-list','gxi-auth','gxi-space','gxi-catalog','gxi-support']){
+for(const selector of ['gxn-nav','greeting','focus','gxb-row','gxb-panel','gxv-savings','gxs-list','gxm-list','gxi-auth','gxi-space']){
  assert(html.includes('id="'+selector+'"'),selector+' requerido en el DOM V2');
 }
 for(const s of ['gxb-morph-surface','gxb-morph-emoji','gxb-dismiss','gxs-card','gxm-entry','gxi-auth-card']){
@@ -18,6 +18,10 @@ for(const s of ['gxb-morph-surface','gxb-morph-emoji','gxb-dismiss','gxs-card','
 assert(html.includes('<style>')&&html.includes('</style>'),'CSS canónico del laboratorio, sin skin heredado');
 assert(html.includes('adaptive-top-nav.css'),'componente navegación aprobada');
 assert(app.includes("function snapshotEmoji")&&app.includes("async function transition("),'morph animado recuperado del laboratorio');
+assert(!html.includes('id="gxi-catalog"')&&!html.includes('id="gxi-support"'),'módulos oficiales no duplicados');
+assert(app.includes("window.location.assign(new URL('../../ayuda.html'"),'Catálogo y Soporte a GOXION oficial');
+assert(app.includes("logos.dataset.count="),'Geometría de logos');
+assert(app.includes("card.insertAdjacentElement('afterend',details)"),'Explicación de ahorro fuera de tarjeta');
 assert(!html.includes('assets/css/ayuda.css'),'el diseño viejo no se carga');
 assert(!html.includes('01e-client-dashboard'),'no hay renderizadores antiguos');
 assert(!html.includes('mirror.js'),'no hay adaptador del espejo');
