@@ -32,6 +32,19 @@ assert(app.includes('function observeSavings'),'ahorro animado y visible en scro
 assert(data.includes('crunchyroll-mega-fan'),'Crunchyroll Mega Fan con tarifa independiente');
 assert(!html.includes('id="gxn-notice-menu"'),'no existe dropdown provisional');
 assert(notifyCSS.includes('rgba(21,25,32,.9)'),'cristal neutro en notificaciones');
+/* Contrato de integración 23NOV: eliminar haz experimental, conservar onda oficial. */
+assert(lab.includes('.glass-beam')&&lab.includes('gx-glass-passage'),'laboratorio histórico se conserva');
+for(const page of [html,fs.readFileSync(base+'espejo.html','utf8')]){
+ for(const banned of ['glass-underlay','glass-beam','glass-orb','gx-glass-passage','gx-glass-orbit']){
+  assert(!page.includes(banned),'No reintroducir luz experimental '+banned);
+ }
+ assert(page.includes('class="bg" aria-hidden="true"'),'fondo oficial único');
+ assert(page.includes('id="gx-wave-canvas"'),'mismo canvas de fondo');
+ assert(page.includes('../../assets/js/ayuda/06-wave-background.js'),'motor de neón oficial, sin clon');
+ assert(page.includes('.gxc-surface{background:rgba(8,8,12,.371)'),'opacidad neutral base .371 aprobada');
+ assert(page.includes('blur(11.75px) saturate(1)'),'desenfoque neutral base 11.75px aprobado');
+ assert(page.includes('.focus[data-material="neutral"]'),'hero neutral de laboratorio, sin skin anterior');
+}
 const mirror=fs.readFileSync(base+'espejo.html','utf8');
 const bridge=fs.readFileSync(base+'v2-official-bridge.js','utf8');
 const notice=fs.readFileSync(base+'v2-notifications.js','utf8');
