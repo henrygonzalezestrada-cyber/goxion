@@ -41,17 +41,17 @@ async function showClient(view){
  state.showAllHistory=false;
  state.openHistory=null;
  state.openService=null;state.serviceDigest='';
+  savingSeen=false;savingSignature='';savingCurrent=0;savingTarget=0;stopSavingsMotion();
  window.GOXION_V2_RESET_BENEFITS?.();
  state.notificationItems=[];
- $('gxi-notice-list').replaceChildren();
- $('gxn-bell').dataset.unread='false';
- $('gxn-bell .gxi-bell-count')?.remove();
+ window.GOXION_V2_CLIENT_ID=String(view.cliente.id||'');
+ window.dispatchEvent(new CustomEvent('goxion:client-space:updated',{detail:{scope:'client_state'}}));
  spinner.hidden=true;loading.hidden=true;shell.hidden=false;
  $('gxi-account-name').textContent=String(view.cliente.nombre||'Mi Espacio')+' · Mi Espacio';
  renderClient();
  navigate('space',true);
  void loadPrices();
- void loadNotifications();
+ void window.GOXION_V2_NOTIFICATIONS?.refresh();
 }
 function heroState(view){
  const c=view.cliente,review=clean(c.pago_revision_estado),st=clean(c.estado),account=view.estado_cuenta||{};
@@ -558,57 +558,72 @@ async function loadPrices(){
  try{state.prices=await data.getPriceReferences();renderSavings()}
  catch(_){$('gxv-savings').hidden=true}
 }
+/* Ahorro · misma animación y distribución adaptativa del laboratorio aprobado. */
+const savingsMoney=value=>new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN',minimumFractionDigits:Number.isInteger(value)?0:2,maximumFractionDigits:Number.isInteger(value)?0:2}).format(value);
+let savingCurrent=0,savingTarget=0,savingFrame=0,savingSeen=false,savingObserver=null,savingSignature='';
+function stopSavingsMotion(){if(savingFrame){cancelAnimationFrame(savingFrame);savingFrame=0}}
+function showSavingAmount(value){
+ const node=$('gxv-amount');node.textContent=savingsMoney(value);
+ node.dataset.long=String(node.textContent.length>7);
+}
+function animateSavings(next,initial=false){
+ stopSavingsMotion();
+ const start=initial?0:savingCurrent,change=next-start;
+ if(reduced()||document.hidden||Math.abs(change)<.01){savingCurrent=next;showSavingAmount(next);return}
+ const startTime=performance.now(),duration=initial?1050:760;
+ function frame(now){
+  const p=Math.min(1,Math.max(0,(now-startTime)/duration));
+  const ease=p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2;
+  savingCurrent=Math.round((start+change*ease)*100)/100;
+  showSavingAmount(savingCurrent);
+  if(p<1)savingFrame=requestAnimationFrame(frame);else{savingFrame=0;savingCurrent=next;showSavingAmount(next)}
+ }
+ savingCurrent=start;showSavingAmount(start);
+ savingFrame=requestAnimationFrame(frame);
+}
+function observeSavings(){
+ const card=$('gxv-savings');
+ if(savingObserver||!('IntersectionObserver' in window)){card.classList.add('is-visible');animateSavings(savingTarget,!savingSeen);savingSeen=true;return}
+ savingObserver=new IntersectionObserver(entries=>{
+  const visible=entries.some(entry=>entry.isIntersecting);
+  card.classList.toggle('is-visible',visible);
+  if(visible){if(!savingSeen||Math.abs(savingTarget-savingCurrent)>.01){animateSavings(savingTarget,!savingSeen);savingSeen=true}}
+ },{threshold:.15});
+ savingObserver.observe(card);
+}
 function renderSavings(){
  const sum=data.savings(state.view,state.prices);state.savings=sum;
- const card=$('gxv-savings'),oldNote=$('gxi-saving-note');
- if(!sum||sum.difference<=0){card.hidden=true;if(oldNote)oldNote.hidden=true;return}
- card.hidden=false;card.classList.add('is-visible');
- const amount=data.money(sum.difference);$('gxv-amount').textContent=amount;
- $('gxv-amount').dataset.long=String(amount.length>7);
+ const card=$('gxv-savings'),details=$('gxi-saving-note');
+ if(!sum||sum.difference<=0){card.hidden=true;if(details)details.hidden=true;stopSavingsMotion();savingSeen=false;return}
+ card.hidden=false;
+ savingTarget=sum.difference;
+ const signatures=sum.entries.map(e=>String(e.service.id||e.service.nombre)+':'+String(e.reference.clave)).join('|');
+ if(signatures!==savingSignature){
+  savingSignature=signatures;
+  const logos=$('gxv-logos');logos.replaceChildren();logos.dataset.count=String(Math.min(4,sum.entries.length));
+  sum.entries.slice(0,4).forEach(e=>{
+   const slot=document.createElement('span');slot.className='gxv-slot';
+   const img=document.createElement('img');img.src=logo(e.service.nombre);img.alt=e.service.nombre;img.loading='lazy';img.decoding='async';
+   slot.append(img);logos.append(slot);
+  });
+  if(sum.entries.length>4){const more=document.createElement('span');more.className='gxv-more';more.textContent='+'+(sum.entries.length-4);more.setAttribute('aria-label','y '+(sum.entries.length-4)+' plataformas más');logos.append(more)}
+ }
  $('gxv-context').textContent='Estimación · '+sum.covered+' de '+sum.total+' '+(sum.total===1?'servicio comparable':'servicios comparables');
- const logos=$('gxv-logos');logos.replaceChildren();logos.dataset.count=String(Math.min(4,sum.entries.length));
- sum.entries.slice(0,4).forEach(e=>{const slot=document.createElement('span');slot.className='gxv-slot';const img=document.createElement('img');img.src=logo(e.service.nombre);img.alt=e.service.nombre;img.loading='lazy';slot.append(img);logos.append(slot)});
- if(sum.entries.length>4){const more=document.createElement('span');more.className='gxv-more';more.textContent='+'+(sum.entries.length-4);logos.append(more)}
- let details=oldNote;
- if(!details){details=document.createElement('details');details.id='gxi-saving-note';details.className='gxi-saving-note';const summary=document.createElement('summary');summary.textContent='Cómo calculamos el ahorro';const p=document.createElement('p');details.append(summary,p);card.insertAdjacentElement('afterend',details)}
- details.hidden=false;
- const newest=sum.entries.map(e=>e.reference.revisado_el).filter(Boolean).sort().at(-1)||'';
- details.querySelector('p').textContent='Comparación orientativa con tarifas mensuales individuales públicas, sin ofertas ni anualidades. Algunos accesos de GOXION son perfiles o invitaciones y no equivalen a una suscripción individual completa. Tarifas revisadas: '+(newest||'fecha no disponible')+'.';
+ card.setAttribute('aria-label','Ahorro estimado de '+savingsMoney(savingTarget)+' al mes entre '+sum.covered+' servicios comparables.');
+ if(details){
+  details.hidden=false;
+  const newest=sum.entries.map(e=>e.reference.revisado_el).filter(Boolean).sort().at(-1)||'';
+  details.querySelector('p').textContent='Comparación orientativa con tarifas mensuales individuales públicas, sin ofertas ni anualidades. Algunos accesos GOXION son perfiles o invitaciones, no cuentas completas equivalentes. Tarifas revisadas: '+(newest||'fecha no disponible')+'.';
+ }
+ if(!savingObserver){showSavingAmount(savingTarget);observeSavings();}
+ else if(card.classList.contains('is-visible')&&savingSeen&&Math.abs(savingTarget-savingCurrent)>.01)animateSavings(savingTarget);
+ else if(!savingSeen)showSavingAmount(savingTarget);
 }
-async function loadNotifications(){
- if(!state.view)return;
- try{
-  const current=TOKEN();const r=await data.post('notificaciones-cliente',{accion:'listar',datos:{}},current);
-  if(current!==TOKEN())return;
-  state.notificationItems=Array.isArray(r.items)?r.items:[];
-  renderNotifications();
- }catch(_){$('gxi-notice-list').textContent='Las notificaciones no están disponibles en este momento.'}
-}
-function renderNotifications(){
- const items=state.notificationItems,unread=items.filter(x=>x.leida!==true).length,bell=$('gxn-bell');
- bell.dataset.unread=String(unread>0);
- let span=bell.querySelector('.gxi-bell-count');
- if(!span){span=document.createElement('span');span.className='gxi-bell-count';bell.append(span)}
- span.textContent=unread?(unread>99?'99+':String(unread)):'';
- bell.setAttribute('aria-label',unread?'Notificaciones, '+unread+' sin leer':'Abrir notificaciones');
- const host=$('gxi-notice-list');host.replaceChildren();
- if(!items.length){host.textContent='Todo al día. No tienes notificaciones recientes.';return}
- items.forEach(item=>{
-  const block=document.createElement('div');block.className='gxi-notification';block.dataset.unread=String(item.leida!==true);
-  const title=document.createElement('strong');title.textContent=item.titulo||'GOXION';
-  const content=document.createElement('p');content.textContent=item.mensaje||'';
-  block.append(title,content);
-  if(item.leida!==true){
-   const button=document.createElement('button');button.type='button';button.textContent='Marcar como leída';
-   button.addEventListener('click',async()=>{
-    if(!ENABLE_WRITES){button.textContent='Disponible al finalizar integración';return}
-    try{await data.post('notificaciones-cliente',{accion:'marcar_leida',datos:{id:item.id,source:item.source||'general'}},TOKEN());item.leida=true;renderNotifications()}
-    catch(_){button.textContent='Intenta de nuevo'}
-   });block.append(button);
-  }
-  host.append(block);
- });
-}
+document.addEventListener('visibilitychange',()=>{
+ const card=$('gxv-savings');if(!card)return;
+ card.dataset.motionPaused=String(document.hidden);
+ if(document.hidden){stopSavingsMotion();savingCurrent=savingTarget;showSavingAmount(savingTarget)}
+});
 function navigate(name,skipScroll){
  if(!['space','catalog','support'].includes(name))return;
  if(name!=='space'){window.location.assign(new URL('../../ayuda.html',window.location.href).href);return}
@@ -616,26 +631,25 @@ function navigate(name,skipScroll){
  document.querySelectorAll('#gxn-nav .gxn-tab').forEach(b=>{
   if(b.dataset.gxnTarget==='space')b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');
  });
- $('gxn-profile-menu').hidden=true;$('gxn-notice-menu').hidden=true;
+ $('gxn-profile-menu').hidden=true;window.GOXION_V2_NOTIFICATIONS?.close();
  if(!skipScroll)window.scrollTo({top:0,behavior:reduced()?'instant':'smooth'});
 }
+window.GOXION_V2_OPEN_OFFICIAL=(section)=>navigate(section==='catalog'?'catalog':'support');
 document.querySelectorAll('#gxn-nav [data-gxn-target]').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.gxnTarget)));
 $('gxn-profile-trigger').addEventListener('click',()=>{
- const menu=$('gxn-profile-menu'),next=menu.hidden;$('gxn-notice-menu').hidden=true;menu.hidden=!next;
+ const menu=$('gxn-profile-menu'),next=menu.hidden;
+ window.GOXION_V2_NOTIFICATIONS?.close();menu.hidden=!next;
  $('gxn-profile-trigger').setAttribute('aria-expanded',String(next));
 });
-$('gxn-bell').addEventListener('click',()=>{
- const menu=$('gxn-notice-menu'),next=menu.hidden;$('gxn-profile-menu').hidden=true;menu.hidden=!next;
- $('gxn-bell').setAttribute('aria-expanded',String(next));if(next)void loadNotifications();
-});
-$('gxn-notice-close').addEventListener('click',()=>{$('gxn-notice-menu').hidden=true;$('gxn-bell').setAttribute('aria-expanded','false')});
 document.addEventListener('pointerdown',e=>{
- if(!e.target.closest('#gxn-profile-trigger,#gxn-profile-menu,#gxn-bell,#gxn-notice-menu')){
-  $('gxn-profile-menu').hidden=true;$('gxn-notice-menu').hidden=true;
+ if(!e.target.closest('#gxn-profile-trigger,#gxn-profile-menu')){
+  $('gxn-profile-menu').hidden=true;$('gxn-profile-trigger').setAttribute('aria-expanded','false');
  }
 });
 $('gxn-logout').addEventListener('click',()=>{
- data.logout();state.view=null;state.prices=[];state.notificationItems=[];
+ data.logout();window.GOXION_V2_CLIENT_ID='';
+ window.dispatchEvent(new CustomEvent('goxion:client-space:updated',{detail:{scope:'logout'}}));
+ state.view=null;state.prices=[];state.notificationItems=[];
  $('gxi-account').hidden=true;$('gxv-savings').hidden=true;$('gxn-profile-menu').hidden=true;
  $('gxi-user').value='';$('gxi-pin').value='';
  showLogin();
@@ -669,6 +683,6 @@ setupBenefits();mountGoxy();load();
 if(!reduced())import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
  if(typeof mod.createMorph==='function')iconHandle=mod.createMorph($('state-path'),paths[$('focus-icon').dataset.icon]||paths.check,{reducedMotion:'user'});
 }).catch(()=>{});
-setInterval(()=>{if(!document.hidden&&state.view){void refreshClient();void loadNotifications()}},45000);
-document.addEventListener('visibilitychange',()=>{if(!document.hidden&&state.view){void refreshClient();void loadNotifications()}});
+setInterval(()=>{if(!document.hidden&&state.view){void refreshClient();void window.GOXION_V2_NOTIFICATIONS?.refresh({realtime:true})}},45000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&state.view){void refreshClient();void window.GOXION_V2_NOTIFICATIONS?.refresh({realtime:true})}});
 })();

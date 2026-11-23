@@ -18,6 +18,7 @@
     if(/\bvix\b/.test(n))return 'vix-premium';
     if(/prime|amazon/.test(n))return 'prime-video';
     if(/youtube/.test(n))return 'youtube-premium';
+     if(/crunchy\s*roll|crunchyroll/.test(n))return 'crunchyroll-mega-fan';
     if(/microsoft|office|365/.test(n))return 'microsoft-365';
     return '';
   };

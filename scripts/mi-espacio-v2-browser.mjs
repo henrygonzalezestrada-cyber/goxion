@@ -9,7 +9,8 @@ const server=spawn(process.execPath,['scripts/serve-preview.mjs'],{env:{...proce
 async function ready(){for(let i=0;i<90;i++){try{if((await fetch(url)).ok)return}catch(_){}await nap(120)}throw Error('Servidor QA no disponible')}
 const refs=[
  {clave:'netflix-premium',plataforma:'Netflix',plan:'Premium 4K',precio_mensual_mxn:369,revisado_el:'2026-11-23',fuente_url:'https://www.netflix.com/mx',notas:''},
- {clave:'youtube-premium',plataforma:'YouTube',plan:'Individual',precio_mensual_mxn:159,revisado_el:'2026-11-23',fuente_url:'https://www.telcel.com',notas:''}
+ {clave:'youtube-premium',plataforma:'YouTube',plan:'Individual',precio_mensual_mxn:159,revisado_el:'2026-11-23',fuente_url:'https://www.telcel.com',notas:''},
+ {clave:'crunchyroll-mega-fan',plataforma:'Crunchyroll',plan:'Mega Fan',precio_mensual_mxn:159,revisado_el:'2026-11-23',fuente_url:'https://apps.apple.com/mx/app/crunchyroll/id329913454',notas:''}
 ];
 const common={
  servicios:[
@@ -23,7 +24,7 @@ const common={
  catalogo:[{id:'ca',nombre:'Netflix Premium',precio:109,activo:true}]
 };
 function client(overdue=false){
- return {ok:true,...common,cliente:{id:'qa-client',clave:'QA',folio:'QA001',nombre:overdue?'Casone QA':'Mario QA',
+ return {ok:true,...common,servicios:overdue?[{id:'svc-crunchy',nombre:'Crunchyroll Mega fan',monto:45,activo:true,perfil_nombre:'Perfil 1',perfil_pin:'4826'},{id:'svc-youtube',nombre:'YouTube Premium',monto:79,activo:true,modo_acceso:'invitacion'}]:common.servicios,cliente:{id:'qa-client',clave:'QA',folio:'QA001',nombre:overdue?'Casone QA':'Mario QA',
  pagos_puntuales:3,dia_pago:15,estado:overdue?'pendiente':'pagado',pago_en_revision:false,pago_revision_estado:''}};
 }
 function body(json){return {status:200,contentType:'application/json',body:JSON.stringify(json)}}
@@ -74,7 +75,7 @@ async function run(engine,name){
    assert(geometry.viewportWidth<=geometry.windowWidth+1,name+'/'+width+' sin scroll horizontal '+JSON.stringify(geometry));
    assert.equal(geometry.nav,1,name+'/'+width+' cápsula única');
    assert(geometry.logo&&geometry.noOldStyles&&geometry.noDemos,name+'/'+width+' pureza de laboratorio');
-   assert.match(geometry.savings,/340/,name+'/'+width+' ahorro = (369+159)-(109+79) sin fixtures en página');
+   assert.match(geometry.savings,overdue?/194/:/340/,name+'/'+width+' ahorro verificado por perfil');
     assert.equal(geometry.savingsLogoLayout,'2',name+'/'+width+' distribución de logos');
     assert(geometry.savingsHeight<=250,name+'/'+width+' ahorro compacto, alto '+geometry.savingsHeight);
     assert(geometry.savingsNoteOutside,name+'/'+width+' nota fuera de la cuadrícula');
@@ -82,7 +83,13 @@ async function run(engine,name){
    assert.equal(await page.locator('#gxm-list .gxm-entry').count(),1,name+'/'+width+' historial real');
    const hero=await page.locator('#focus-title').textContent();
    assert.equal(hero,overdue?'Tienes un pago vencido':'Todo al corriente',name+'/'+width+' estado real');
-   assert.equal(await page.locator('#gxn-bell .gxi-bell-count').textContent(),'12',name+'/'+width+' conteo real');
+   await page.waitForFunction(()=>document.querySelector('#gx-client-notif-badge')?.textContent==='12',null,{timeout:8000});
+    assert.equal(await page.locator('#gxn-bell #gx-client-notif-badge').textContent(),'12',name+'/'+width+' badge real');
+    await page.locator('#gxn-bell').click();
+    await page.locator('#gx-client-notif-sheet.show').waitFor({state:'visible'});
+    assert.equal(await page.locator('#gx-client-notif-list .gx-client-notif-item').count(),12,name+'/'+width+' avisos de engine');
+    assert.equal(await page.locator('#gx-client-notif-mark-all').count(),1,name+'/'+width+' toolbar oficial');
+    await page.locator('#gx-client-notif-sheet .gx-client-notif-close').click();
    await page.locator('#gxb-row [data-gxb="referral"]').click();
    await page.locator('#gxb-panel').waitFor({state:'visible'});
    assert.match(await page.locator('#gxb-title').textContent(),/invitado avanza/i,name+'/'+width+' panel laboratorio real');

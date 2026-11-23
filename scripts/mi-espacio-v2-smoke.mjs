@@ -22,6 +22,16 @@ assert(!html.includes('id="gxi-catalog"')&&!html.includes('id="gxi-support"'),'m
 assert(app.includes("window.location.assign(new URL('../../ayuda.html'"),'Catálogo y Soporte a GOXION oficial');
 assert(app.includes("logos.dataset.count="),'Geometría de logos');
 assert(app.includes("card.insertAdjacentElement('afterend',details)"),'Explicación de ahorro fuera de tarjeta');
+const notify=fs.readFileSync(base+'v2-notifications.js','utf8');
+const notifyCSS=fs.readFileSync(base+'v2-notifications.css','utf8');
+new Function(notify);
+assert(notify.includes('function bindSwipeRows')&&notify.includes('function undoPendingDelete'),'gestos y deshacer oficiales');
+assert(html.includes('v2-notifications.js')&&html.includes('v2-notifications.css'),'avisos con cristal neutro integrado');
+assert(app.includes('GOXION_V2_NOTIFICATIONS?.refresh'),'notificaciones conectadas al motor');
+assert(app.includes('function observeSavings'),'ahorro animado y visible en scroll');
+assert(data.includes('crunchyroll-mega-fan'),'Crunchyroll Mega Fan con tarifa independiente');
+assert(!html.includes('id="gxn-notice-menu"'),'no existe dropdown provisional');
+assert(notifyCSS.includes('rgba(21,25,32,.9)'),'cristal neutro en notificaciones');
 assert(!html.includes('assets/css/ayuda.css'),'el diseño viejo no se carga');
 assert(!html.includes('01e-client-dashboard'),'no hay renderizadores antiguos');
 assert(!html.includes('mirror.js'),'no hay adaptador del espejo');
