@@ -74,6 +74,24 @@ async function run(browserType,label){
     throw e;
    }
    await page.locator('#gxs-list .gxs-card').first().waitFor({state:'visible',timeout:10000});
+   await page.locator('#gx-v2-handoff').waitFor({state:'attached'});
+   assert.equal(await page.locator('#gx-v2-handoff').isVisible(),false,label+'/'+width+' movimiento reducido sin pantalla extra');
+   await page.evaluate(()=>{
+    if(!document.getElementById('gx-client-notif-sheet')){
+     const s=document.createElement('section');s.id='gx-client-notif-sheet';
+     s.innerHTML='<button type="button" class="gx-client-notif-close" aria-label="Cerrar"><svg viewBox="0 0 24 24"><path d="M6 6 18 18M18 6 6 18"></path></svg></button>';
+     document.body.appendChild(s);
+    }
+   });
+   await page.locator('#gx-client-notif-sheet .gx-v2-notif-cross').waitFor({state:'attached',timeout:3000});
+   const cross=await page.evaluate(()=>{
+    const el=document.querySelector('.gx-v2-notif-cross');
+    const a=getComputedStyle(el,'::before'),b=getComputedStyle(el,'::after');
+    return {w:a.width,h:a.height,w2:b.width,h2:b.height,angleA:a.transform,angleB:b.transform};
+   });
+   assert.equal(cross.w,cross.w2,label+'/'+width+' brazos iguales');
+   assert.equal(cross.h,cross.h2,label+'/'+width+' grosor de brazos igual');
+   assert.notEqual(cross.angleA,cross.angleB,label+'/'+width+' diagonales inversas');
    assert.equal(await page.locator('#focus').evaluate(e=>e.tagName),'DIV',label+'/'+width+' hero no pulsable');
    assert.equal(await page.locator('#focus-action').evaluate(e=>e.tagName),'BUTTON',label+'/'+width+' solo CTA pulsable');
    await page.locator('#focus').click({position:{x:12,y:12}});

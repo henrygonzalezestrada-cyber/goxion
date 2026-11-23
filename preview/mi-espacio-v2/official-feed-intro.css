@@ -1,0 +1,51 @@
+/* Identidad visual de carga. Solo se ejecuta tras confirmar sesión en Mi Espacio. */
+#gx-v2-handoff[hidden]{display:none!important}
+#gx-v2-handoff{
+ position:fixed;inset:0;z-index:10005;display:grid;place-items:center;
+ background:#030305;color:#a9c9d5;pointer-events:auto
+}
+#gx-v2-handoff::before{
+ content:"";position:absolute;inset:0;pointer-events:none;
+ background:radial-gradient(circle at 50% 43%,rgba(62,169,203,.075),transparent 38%),#030305;
+ opacity:1;transition:opacity .4s ease
+}
+#gx-v2-handoff.is-flying{pointer-events:none;background:transparent}
+#gx-v2-handoff.is-flying::before{opacity:0}
+#gx-v2-handoff .gx-v2-handoff-center{
+ position:relative;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:20px
+}
+#gx-v2-handoff .gx-v2-handoff-mark{
+ display:block;width:140px;height:110px;object-fit:contain;
+ filter:drop-shadow(0 0 27px rgba(0,242,254,.23));
+ will-change:transform,opacity
+}
+#gx-v2-handoff .gx-v2-handoff-wait{display:flex;flex-direction:column;gap:12px;align-items:center}
+#gx-v2-handoff .gx-v2-handoff-wait[hidden]{display:none!important}
+#gx-v2-handoff .gx-v2-handoff-track{
+ position:relative;overflow:hidden;display:block;width:106px;height:2px;
+ border-radius:10px;background:rgba(172,218,231,.13)
+}
+#gx-v2-handoff .gx-v2-handoff-track>span{
+ position:absolute;top:0;left:0;width:36%;height:100%;
+ border-radius:inherit;background:#71dfe9;
+ animation:gxV2HandoffProgress 1.15s cubic-bezier(.38,.02,.62,.98) infinite alternate
+}
+#gx-v2-handoff .gx-v2-handoff-copy{font:600 10px/1.45 Poppins,system-ui,sans-serif;letter-spacing:.04em;color:#94b7c5}
+@keyframes gxV2HandoffProgress{from{transform:translateX(-115%)}to{transform:translateX(300%)}}
+body.gx-v2-handoff-active #gx-v2-shared-header .gxn-wordmark{opacity:0!important}
+#gx-v2-shared-header .gxn-wordmark{transition:opacity .22s ease-out}
+@media(prefers-reduced-motion:reduce){
+ #gx-v2-handoff,#gx-v2-handoff::before,#gx-v2-shared-header .gxn-wordmark{transition:none!important}
+ #gx-v2-handoff .gx-v2-handoff-track>span{animation:none!important}
+}
+/* X de notificaciones: dos barras idénticas, sin icono SVG deformable en Safari. */
+.gx-client-notif-close .gx-v2-notif-cross{
+ position:relative;display:block;width:18px;height:18px;pointer-events:none
+}
+.gx-client-notif-close .gx-v2-notif-cross::before,
+.gx-client-notif-close .gx-v2-notif-cross::after{
+ content:"";position:absolute;top:8px;left:0;width:18px;height:2px;
+ border-radius:999px;background:currentColor;transform-origin:50% 50%
+}
+.gx-client-notif-close .gx-v2-notif-cross::before{transform:rotate(45deg)}
+.gx-client-notif-close .gx-v2-notif-cross::after{transform:rotate(-45deg)}
