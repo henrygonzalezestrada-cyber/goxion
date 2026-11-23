@@ -665,12 +665,12 @@ function renderSavings(){
   const p=document.createElement('p');details.append(summary,p);
   card.insertAdjacentElement('afterend',details);
  }
- $('gxv-context').textContent='Estimación · '+sum.covered+' de '+sum.total+' '+(sum.total===1?'servicio comparable':'servicios comparables');
+ $('gxv-context').textContent='Frente a suscripciones directas'+(sum.covered<sum.total?' · '+sum.covered+' de '+sum.total+' servicios incluidos':'');
  card.setAttribute('aria-label','Ahorro estimado de '+savingsMoney(savingTarget)+' al mes entre '+sum.covered+' servicios comparables. Las imágenes representan las plataformas contratadas.');
  if(details){
   details.hidden=false;
   const newest=sum.entries.map(e=>e.reference.revisado_el).filter(Boolean).sort().at(-1)||'';
-  details.querySelector('p').textContent='Los iconos muestran tus plataformas contratadas; el importe solo incluye servicios con un precio público comparable. Comparación orientativa con tarifas mensuales individuales públicas, sin ofertas ni anualidades. Algunos accesos GOXION son perfiles o invitaciones, no cuentas completas equivalentes. Tarifas revisadas: '+(newest||'fecha no disponible')+'.';
+  details.querySelector('p').textContent='Comparamos el precio mensual de contratación directa con lo que pagas en GOXION por los servicios con referencia disponible. Los perfiles, invitaciones y almacenamiento compartido pueden diferir de una suscripción completa; Google One usa como referencia la oferta pública de 2 TB con AI Plus, sin implicar que tu acceso incluya IA. No se incluyen promociones ni anualidades. Tarifas revisadas: '+(newest||'fecha no disponible')+'.';
  }
  if(!savingObserver){showSavingAmount(savingTarget);observeSavings();}
  else if(card.classList.contains('is-visible')&&savingSeen&&Math.abs(savingTarget-savingCurrent)>.01)animateSavings(savingTarget);
