@@ -7,6 +7,14 @@
 
 > **Leer esto primero en otra sesión.** En caso de contradicción entre textos antiguos de continuidad y este corte, este expediente es el **índice de estado e integración más reciente**. Para medidas y microcomportamientos, consultar los **contratos específicos enlazados abajo**; no reemplazarlos con resúmenes. Cada edición futura debe actualizar este expediente junto con su contrato de componente. No suponer que una captura de laboratorio prueba una conexión real.
 
+## Última corrección V4.2 · aire proporcional con saludo (22/nov/2026)
+
+La cápsula V4.1 estaba aprobada salvo por **el espacio inferior excesivo**. Se restauró simetría: margen superior **9px**, inferior **9px**, sin alterar el saludo aprobado ni su reserva de dos líneas. CSS commit `1c5a45cf869c5c8927d9382d9904b2d568cdb853`; caché de HTML `56c6d11aa6f93b6420f8ec9dfdd6862b2e29c8bb`. En compacto se compensa margen: 29px normal / 27px <=355px, manteniendo espacio total sin saltos. Ver [contrato de navegación](GOXION_NAV_SUPERIOR_ANALISIS_CONCEPTO_2026-11-22.md), V4.2. **Solo laboratorio**, sin edición de `ayuda.html`.
+
+**Vista:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=56c6d11
+
+---
+
 ## Último pulido V4.1 · cápsula compacta y emojis (22/nov/2026)
 
 V4 centrada y sticky conservada. **Aplicado al laboratorio** (HTML `65b6ad03d87b7c5a029c91a9f5ad6ed699796dd4`): compacta **160×56px** o **158×56px** en <=320px, botones **44×44px**, emojis **19px** centrados en cuadro fijo 24×24px (sin fila fantasma de etiqueta), activo con microhalo cian muy tenue, separación con saludo +4px y margen compensatorio para que el feed no salte. CSS final `adaptive-top-nav.css` commit `03fa1c8d7afbfea2ed615498e475f50e241e80a1`. Solo laboratorio; **no modifica navegación JS, Goxy, feed o versión oficial**. Detalle en [contrato de navegación](GOXION_NAV_SUPERIOR_ANALISIS_CONCEPTO_2026-11-22.md), sección V4.1. QA visual iPhone pendiente.
