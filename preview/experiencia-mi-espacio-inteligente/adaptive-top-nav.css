@@ -23,6 +23,15 @@
 .gxn-avatar.gxn-robot-ready .gxn-goxy-fallback{opacity:0}
 .gxn-avatar-photo{position:absolute;inset:0;z-index:3;width:100%;height:100%;object-fit:cover;border-radius:50%}
 .gxn-avatar-photo[hidden]{display:none!important}
+/* Goxy: un solo círculo visual; el botón conserva área táctil de 44px.
+   Solo se retira la cápsula exterior, no el avatar ni su menú. */
+.gxn-profile-trigger,
+.gxn-profile-trigger[aria-expanded="true"]{
+ border:0;background:transparent;box-shadow:none;
+ -webkit-backdrop-filter:none;backdrop-filter:none;
+}
+.gxn-profile-trigger .gxn-avatar{width:42px;height:42px}
+
 
 /* Single sticky nav. Native document flow provides its original position;
    the browser holds it centered at the top without a teleport animation. */
