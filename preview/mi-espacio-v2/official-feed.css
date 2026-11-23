@@ -1393,3 +1393,13 @@ html.gx-notif-open{overflow:hidden;overscroll-behavior:none}
 /* Mismo morph sin saltos de ancho al alternar Inicio, Catálogo y Soporte. */
 #gx-v2-shared-nav .gxn-tab{min-height:44px;min-width:44px;will-change:flex-grow}
 @media(prefers-reduced-motion:reduce){#gx-v2-shared-nav .gxn-tab{will-change:auto}}
+
+/* Paridad del movimiento de ahorro del laboratorio. Registro no encapsulado
+   para evitar diferencias de resolución de @keyframes en WebKit. */
+@keyframes gxV2SavingsFloat{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(0,var(--float),0) scale(1.012)}}
+#gx-v2-feed .gxv-savings.is-visible:not([data-motion-paused="true"]) .gxv-slot{
+ animation-name:gxV2SavingsFloat;animation-duration:var(--duration,7.5s);
+ animation-timing-function:ease-in-out;animation-iteration-count:infinite;
+ animation-delay:var(--delay,0s);animation-play-state:running
+}
+@media(prefers-reduced-motion:reduce){#gx-v2-feed .gxv-slot{animation:none!important;transform:none!important}}
