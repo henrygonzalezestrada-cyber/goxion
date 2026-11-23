@@ -1,0 +1,23 @@
+name: Mi Espacio espejo · contrato de integridad
+on:
+  push:
+    paths:
+      - 'preview/mi-espacio-espejo/**'
+      - 'scripts/mi-espacio-espejo-smoke.mjs'
+      - '.github/workflows/mi-espacio-espejo.yml'
+  pull_request:
+    paths:
+      - 'preview/mi-espacio-espejo/**'
+      - 'scripts/mi-espacio-espejo-smoke.mjs'
+jobs:
+  espejo:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Contrato de espejo y ausencia de fixtures
+        run: node scripts/mi-espacio-espejo-smoke.mjs
