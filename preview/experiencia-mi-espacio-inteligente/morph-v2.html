@@ -52,10 +52,11 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 
 
 
-/* Movimiento semántico recurrente (no solo on-mount).
-   La manecilla del reloj conserva exactamente los 6 s de Index.
-   Los demás símbolos tienen ciclos lentos con un gesto breve por repetición;
-   se dibujan partes internas, NO se agita el contorno completo. */
+
+/* GOXION · movimiento intencional del hero:
+   solo el reloj en curso se anima continuamente, igual que el Index.
+   Los otros iconos ejecutan un gesto único al cambiar de estado.
+   No modifica el morph del icono, hero ni su diseño aprobado. */
 .focus-icon .gx-focus-detail{opacity:0;pointer-events:none}
 .focus-icon[data-icon="clock"] .gx-focus-clock-fixed{opacity:1}
 .focus-icon[data-icon="clock"] .gx-focus-clock-hand{
@@ -64,77 +65,54 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 }
 @keyframes gx-focus-clock{to{transform:rotate(360deg)}}
 
-/* Palomita: se traza de nuevo cada 5.8 s, y permanece quieta entre ciclos. */
-.focus-icon[data-icon="check"] #state-path{
- stroke-dasharray:26;stroke-dashoffset:0;
- animation:gx-focus-check-loop 5.8s ease-in-out -.2s infinite;
+/* Animaciones de entrada. La clase se reinicia cuando cambia el estado,
+   incluso si dos estados comparten el mismo icono. Nunca hay loops. */
+.focus-icon.gx-focus-once[data-icon="check"] #state-path{
+ stroke-dasharray:26;
+ animation:gx-focus-draw-once .7s cubic-bezier(.2,.85,.2,1) both;
 }
-@keyframes gx-focus-check-loop{
- 0%,61%,100%{stroke-dashoffset:0;opacity:1}
- 66%{stroke-dashoffset:26;opacity:.42}
- 82%{stroke-dashoffset:0;opacity:1}
+@keyframes gx-focus-draw-once{
+ from{stroke-dashoffset:26;opacity:.6}
+ to{stroke-dashoffset:0;opacity:1}
 }
-
-/* Alerta: solo la exclamación hace dos pequeños latidos; nada de sacudir la tarjeta. */
-.focus-icon[data-icon="alert"] .gx-focus-alert-mark{
- opacity:1;
- animation:gx-focus-alert-loop 6.6s ease-in-out -3.8s infinite;
+.focus-icon[data-icon="alert"] .gx-focus-alert-mark{opacity:1}
+.focus-icon.gx-focus-once[data-icon="alert"] .gx-focus-alert-mark{
+ animation:gx-focus-alert-once .65s ease-out both;
 }
-@keyframes gx-focus-alert-loop{
- 0%,61%,100%{opacity:1;transform:translateY(0)}
- 66%{opacity:.48;transform:translateY(-1px)}
- 72%{opacity:1;transform:translateY(.55px)}
- 78%{opacity:.72;transform:translateY(-.3px)}
- 84%{opacity:1;transform:translateY(0)}
+@keyframes gx-focus-alert-once{
+ 0%{opacity:.35;transform:translateY(-1px)}
+ 55%{opacity:1;transform:translateY(.5px)}
+ 100%{opacity:1;transform:translateY(0)}
 }
-
-/* Calendario: el día se escribe periódicamente dentro de su recuadro. */
-.focus-icon[data-icon="calendar"] .gx-focus-calendar-date{
- opacity:1;stroke-dasharray:26;stroke-dashoffset:0;
- animation:gx-focus-calendar-loop 7.1s ease-in-out -4.6s infinite;
+.focus-icon[data-icon="calendar"] .gx-focus-calendar-date{opacity:1}
+.focus-icon.gx-focus-once[data-icon="calendar"] .gx-focus-calendar-date{
+ stroke-dasharray:26;animation:gx-focus-date-once .8s ease-out both;
 }
-@keyframes gx-focus-calendar-loop{
- 0%,63%,100%{stroke-dashoffset:0;opacity:1}
- 68%{stroke-dashoffset:26;opacity:.3}
- 83%{stroke-dashoffset:0;opacity:1}
+@keyframes gx-focus-date-once{
+ from{stroke-dashoffset:26;opacity:.25}
+ to{stroke-dashoffset:0;opacity:1}
 }
-
-/* Capas: segunda y tercera líneas se dibujan consecutivamente en cada ciclo. */
 .focus-icon[data-icon="layers"] .gx-focus-layer-middle,
-.focus-icon[data-icon="layers"] .gx-focus-layer-low{
- opacity:1;stroke-dasharray:27;stroke-dashoffset:0;
+.focus-icon[data-icon="layers"] .gx-focus-layer-low{opacity:1}
+.focus-icon.gx-focus-once[data-icon="layers"] .gx-focus-layer-middle,
+.focus-icon.gx-focus-once[data-icon="layers"] .gx-focus-layer-low{
+ stroke-dasharray:27;animation:gx-focus-stack-once .7s ease-out both;
 }
-.focus-icon[data-icon="layers"] .gx-focus-layer-middle{
- animation:gx-focus-layer-mid-loop 7.7s ease-in-out -4.8s infinite;
+.focus-icon.gx-focus-once[data-icon="layers"] .gx-focus-layer-middle{animation-delay:.1s}
+.focus-icon.gx-focus-once[data-icon="layers"] .gx-focus-layer-low{animation-delay:.24s}
+@keyframes gx-focus-stack-once{
+ from{stroke-dashoffset:27;opacity:.25}
+ to{stroke-dashoffset:0;opacity:1}
 }
-.focus-icon[data-icon="layers"] .gx-focus-layer-low{
- animation:gx-focus-layer-low-loop 7.7s ease-in-out -4.8s infinite;
-}
-@keyframes gx-focus-layer-mid-loop{
- 0%,58%,100%{stroke-dashoffset:0;opacity:1}
- 63%{stroke-dashoffset:27;opacity:.22}
- 78%{stroke-dashoffset:0;opacity:1}
-}
-@keyframes gx-focus-layer-low-loop{
- 0%,65%,100%{stroke-dashoffset:0;opacity:1}
- 70%{stroke-dashoffset:27;opacity:.22}
- 85%{stroke-dashoffset:0;opacity:1}
-}
-
-/* Destello: la forma brilla y rota apenas, nunca sale de su lugar. */
-.focus-icon[data-icon="spark"] #state-path{
+.focus-icon.gx-focus-once[data-icon="spark"] #state-path{
  transform-box:fill-box;transform-origin:center;
- animation:gx-focus-spark-loop 7.3s ease-in-out -4.8s infinite;
+ animation:gx-focus-spark-once .72s ease-out both;
 }
-@keyframes gx-focus-spark-loop{
- 0%,64%,100%{opacity:1;transform:scale(1) rotate(0deg);filter:drop-shadow(0 0 0 transparent)}
- 70%{opacity:.9;transform:scale(.96) rotate(-3deg);filter:drop-shadow(0 0 2px currentColor)}
- 78%{opacity:1;transform:scale(1.045) rotate(3deg);filter:drop-shadow(0 0 5px currentColor)}
- 86%{opacity:1;transform:scale(1) rotate(0deg);filter:drop-shadow(0 0 0 transparent)}
+@keyframes gx-focus-spark-once{
+ 0%{opacity:.65;transform:scale(.94)}
+ 62%{opacity:1;transform:scale(1.035)}
+ 100%{opacity:1;transform:scale(1)}
 }
-
-/* Detener inmediatamente al dejar la página visible, igual que Index.
-   Las animaciones son ornamentales; el estado textual siempre permanece. */
 .focus-icon[data-motion-paused="true"] #state-path,
 .focus-icon[data-motion-paused="true"] .gx-focus-detail{animation-play-state:paused!important}
 @media(prefers-reduced-motion:reduce){
@@ -964,8 +942,15 @@ function transitionText(next){
   {duration:570,easing:'cubic-bezier(.18,.85,.2,1)'});
  }
 }
-function setIcon(next){
- $('focus-icon').dataset.icon=next;
+function setIcon(next,changed){
+ const icon=$('focus-icon');
+ // El reloj no se reinicia innecesariamente; solo cambia su estado.
+ icon.dataset.icon=next;
+ if(changed && !reduced()){
+  icon.classList.remove('gx-focus-once');
+  void icon.offsetWidth;
+  icon.classList.add('gx-focus-once');
+ }
  const path=$('state-path');
  const shape=paths[next]||paths.check;
  if(iconHandle){try{iconHandle.morphTo(shape,'smooth');return;}catch(_){}}
@@ -978,6 +963,7 @@ function render(scenario,first){
  const code=classify(snapshots[scenario]||snapshots.clear);
  const data=states[code];
  const card=$('focus');
+ const stateChanged=active!==code || card.dataset.state!==code;
  active=code;
  card.dataset.tone=data.tone;
  card.dataset.state=code;
@@ -985,7 +971,7 @@ function render(scenario,first){
  $('focus-meta').textContent=data.meta;
  $('focus-action').textContent=data.action;
  transitionText(data.title);
- setIcon(data.icon);
+ setIcon(data.icon,stateChanged);
  if(!first && !reduced() && card.animate){
    card.animate([{transform:'scale(.993)',opacity:.96},{transform:'scale(1)',opacity:1}],
     {duration:540,easing:'cubic-bezier(.2,.84,.2,1)'});
