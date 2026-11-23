@@ -40,7 +40,21 @@ async function run(browserType,label){
      document.getElementById(id)?.classList.toggle('active',id==='view-dashboard');
     window.dispatchEvent(new Event('goxion:client-ready'));
    });
-   await page.locator('#gx-v2-feed').waitFor({state:'visible',timeout:14000});
+   try{await page.locator('#gx-v2-feed').waitFor({state:'visible',timeout:14000})}
+   catch(e){
+    const diag=await page.evaluate(()=>({
+     token:!!localStorage.getItem(window.GOXION_CORE?.STORAGE?.CLIENT_TOKEN),
+     identity:typeof getCurrentClientKey==='function'?getCurrentClientKey():'unavailable',
+     mirrorData:!!window.GOXION_V2_DATA,
+     root:!!document.getElementById('gx-v2-feed'),
+     active:document.getElementById('view-dashboard')?.className,
+     feedReady:document.getElementById('gxi-shell')?.hidden,
+     oldAvailable:!!document.getElementById('dash-services'),
+     runtimeScript:[...document.scripts].some(x=>x.src.includes('official-feed-runtime.js'))
+    }));
+    console.error('ROOT QA DIAGNOSTIC',JSON.stringify({diag,failures}));
+    throw e;
+   }
    await page.locator('#gxs-list .gxs-card').first().waitFor({state:'visible',timeout:10000});
    const v=await page.evaluate(()=>{
     const hero=document.getElementById('focus'),surface=document.querySelector('#gx-v2-feed .gxc-surface');
