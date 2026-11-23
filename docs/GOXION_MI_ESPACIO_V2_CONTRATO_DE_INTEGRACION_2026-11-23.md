@@ -19,6 +19,18 @@
 
 La oficial `ayuda.html` se conserva intacta. Este espejo es una **base técnica de integración progresiva**, no la build definitiva que se publicará sin rehacer.
 
+## Correcciones del recorrido real · grabación 23/nov/2026 (15:18, ~99 s)
+
+Se revisó el video del espejo oficial-root que muestra Mi Espacio, servicios YouTube/Crunchyroll, notificaciones y cambio a Catálogo/Soporte. Las decisiones y correcciones aplicadas son:
+
+- **Navegación privada persistente:** trasladar el **mismo nodo** `#gxn-nav` y la cabecera `#gxn-stage` a hosts compartidos `#gx-v2-shared-nav` y `#gx-v2-shared-header` dentro del documento oficial-root, fuera de `#view-dashboard`. Las tres vistas siguen usando `switchTab` oficial; solo cambia `aria-current` y la vista, sin recrear la cápsula ni mostrar `#goxion-main-nav` antigua mientras hay cliente autenticado. Los estilos del laboratorio se limitan a `@scope (#gx-v2-feed, #gx-v2-shared-header, #gx-v2-shared-nav)`. La portada invitado no se toca.
+- **Notificaciones:** conservar `assets/js/ayuda/04-client-notifications-realtime.js` íntegro, con slide-in, confirmar lectura, borrar, swipe, undo y feedback. Cambiar únicamente hoja cristal neutra en sesión privada, manteniendo material legible, y la X homogénea de disco 35px / trazo 16px / diana 44px. El icono de la campana con badge degradado se refleja desde la instancia oficial, sin segundo sistema.
+- **Opciones servicio:** `.gxs-more[hidden]{display:none!important}` para que Gestionar cancelación nunca aparezca accidentalmente sin pulsar «Más opciones». La acción real de cancelación/retención **todavía no está integrada** en las tarjetas V2 y NO debe declararse lista ni escribir en datos reales en este espejo.
+- **Final del feed:** el relleno de `#gx-v2-feed .shell` pasa de 110px a 18px (más safe area); Documentos mantiene su contenido oficial. No introducir un spacer de laboratorio debajo del historial.
+- **QA que protege el cambio:** el mismo elemento `#gxn-nav` debe sobrevivir a las tres pestañas (`===` referencia DOM); `#gxn-bell` único; X y desenfoque neutro; opciones de cancelación inicialmente ocultas; portada y Catálogo/Soporte sin alterar. Pruebas Chromium/WebKit 390/320px en la rama de integración.
+
+**Regla:** no convertir la cápsula en tres componentes ni cargar el motor de notificaciones dos veces. La integración definitiva requiere extraer el HTML legacy antes de promover `ayuda.html`. Esta revisión se limita al espejo.
+
 ## A. Tres fuentes, tres responsabilidades (NO mezclar)
 
 1. **Oficial funcional:** ayuda.html, assets/css/ayuda.css y scripts oficiales assets/js/ayuda/**. Fuente de verdad de lógica comercial, autorización, backend, flujos y todo lo que está fuera del feed privado.
