@@ -17,10 +17,11 @@ button,select{font:inherit}
 button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offset:4px}
 [hidden]{display:none!important}
-.ambient{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:radial-gradient(circle at 18% 12%,rgba(124,77,255,.055),transparent 34rem),radial-gradient(circle at 88% 78%,rgba(0,242,254,.045),transparent 36rem),#030305}
-.ambient .gx-wave-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:.96;filter:saturate(1.08);transform:translateZ(0)}
-.ambient:after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,rgba(3,3,5,.08),rgba(3,3,5,.22) 46%,rgba(3,3,5,.42)),radial-gradient(circle at center,transparent 20%,rgba(3,3,5,.18) 82%,rgba(3,3,5,.42) 100%);pointer-events:none}
-.ambient.gx-wave-fallback:before{content:"";position:absolute;inset:-20%;background:linear-gradient(147deg,transparent 41%,rgba(71,79,239,.2) 49%,rgba(24,216,232,.43) 50%,transparent 56%);filter:blur(14px)}
+/* Fondo oficial: mismo motor WebGL assets/js/ayuda/06-wave-background.js */
+.bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:radial-gradient(circle at 18% 12%,rgba(124,77,255,.055),transparent 34rem),radial-gradient(circle at 88% 78%,rgba(0,242,254,.045),transparent 36rem),#030305}
+.bg .gx-wave-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:.96;filter:saturate(1.08);transform:translateZ(0)}
+.bg::after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,rgba(3,3,5,.08),rgba(3,3,5,.22) 46%,rgba(3,3,5,.42)),radial-gradient(circle at center,transparent 20%,rgba(3,3,5,.18) 82%,rgba(3,3,5,.42) 100%);pointer-events:none}
+@media(prefers-reduced-motion:reduce){.gx-wave-canvas{opacity:.78}}
 .shell{position:relative;z-index:1;width:min(100%,580px);margin:0 auto;padding:calc(22px + env(safe-area-inset-top,0px)) 18px calc(110px + env(safe-area-inset-bottom,0px))}
 /* Navegación superior GOXION: estilos aislados en adaptive-top-nav.css. */
 /* Saludo ligado al hero. Reserva dos líneas y ancla el texto abajo para evitar huecos. */
@@ -177,13 +178,6 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 .focus[data-tone="due"]{--accent:#5cdaeb}
 .focus[data-tone="muted"]{--accent:#bfc9dc}
 .glass-stage{position:relative;isolation:isolate;margin:-20px -9px;padding:20px 9px}
-.glass-underlay{position:absolute;inset:-2px -1px;overflow:hidden;z-index:0;border-radius:36px;pointer-events:none}
-.glass-beam{position:absolute;left:-59%;top:22%;width:57%;height:56%;transform:rotate(-14deg);transform-origin:50% 50%;border-radius:60%;background:linear-gradient(90deg,transparent 0%,rgba(103,71,255,.03) 12%,rgba(81,75,252,.34) 43%,rgba(109,224,250,.75) 53%,rgba(75,118,252,.25) 66%,transparent 100%);filter:blur(12px);opacity:.8;animation:gx-glass-passage 10s ease-in-out infinite alternate}
-.glass-beam:after{content:"";position:absolute;left:42%;top:-8%;width:13%;height:116%;border-radius:50%;background:rgba(138,249,252,.48);filter:blur(7px)}
-.glass-underlay.manual .glass-beam{animation:none}
-.glass-orb{position:absolute;top:12%;left:55%;width:46%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 45% 48%,rgba(104,174,253,.36),rgba(106,70,232,.23) 35%,transparent 72%);filter:blur(13px);animation:gx-glass-orbit 13s ease-in-out infinite alternate}
-@keyframes gx-glass-passage{0%{left:-59%}100%{left:104%}}
-@keyframes gx-glass-orbit{0%{transform:translate(-35%,14%) scale(.8)}100%{transform:translate(28%,-14%) scale(1.12)}}
 .glass-stage .focus{display:grid}
 .glass-test-label{display:flex;align-items:center;gap:7px;color:#9fbbcb;font-size:10px;font-weight:500;letter-spacing:.01em;margin:18px 7px 0}
 .glass-test-label:before{content:"";width:6px;height:6px;background:#62dfe7;border-radius:50%;box-shadow:0 0 11px rgba(87,225,239,.44)}
@@ -256,8 +250,6 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
 @media(prefers-reduced-motion:reduce){
  *,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
  .greeting .word{will-change:auto}
- .glass-beam,.glass-orb,.glass-glyph{animation:none!important}
- .glass-beam{left:20%!important}
 }
 
 /* Vista de coherencia visual: muestras con datos ficticios; la geometría del
@@ -569,7 +561,7 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
 <body>
 <section class="gxi-loading" id="gxi-loading" role="status" aria-live="polite"><img src="../../logo2.PNG" alt="GOXION"><span class="gxi-loading-line" aria-hidden="true"></span><span class="gxi-loading-text">Conectando tu espacio…</span></section>
 <section class="gxi-auth" id="gxi-auth" hidden aria-label="Acceso seguro a Mi Espacio"><div class="gxi-auth-card gxc-surface"><img src="../../logo2.PNG" alt="GOXION" class="gxi-auth-brand"><h1>Tu espacio, a tu manera.</h1><p>Ingresa con las credenciales habituales de GOXION.</p><form id="gxi-login-form" autocomplete="on"><label for="gxi-user">Usuario o nombre de acceso</label><input id="gxi-user" name="username" autocomplete="username" required maxlength="100"><label for="gxi-pin">PIN de acceso</label><input id="gxi-pin" name="password" inputmode="numeric" type="password" autocomplete="current-password" maxlength="4" required><button type="submit" id="gxi-login-button">Entrar a Mi Espacio</button><p id="gxi-login-error" class="gxi-auth-error" role="alert" hidden></p></form></div></section>
-<div class="ambient bg" aria-hidden="true"><canvas class="gx-wave-canvas" id="gx-wave-canvas"></canvas></div>
+<div class="bg" aria-hidden="true"><canvas class="gx-wave-canvas" id="gx-wave-canvas"></canvas></div>
 <main class="shell" id="gxi-shell" hidden>
 <!-- Adaptive Top Capsule LAB · one DOM navigation, no official handlers duplicated -->
 <div class="gxn-stage" id="gxn-stage">
@@ -622,10 +614,7 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
 <section id="gxi-space" aria-label="Resumen contextual de cliente">
 <div class="greeting"><h1 id="greeting" aria-label="Hola"><span class="greeting-line">Hola</span></h1></div>
 <div class="glass-stage" id="glass-stage">
-<div class="glass-underlay" id="glass-underlay" aria-hidden="true">
-  <span class="glass-beam" id="glass-beam"></span>
-  <span class="glass-orb"></span>
-</div>
+<!-- No copiar la luz experimental del laboratorio; onda oficial como fondo. -->
 <button class="focus" id="focus" type="button" data-tone="muted" data-glass="on" data-material="neutral" data-layout="compact" aria-describedby="focus-meta">
  <div class="focus-copy"><div class="focus-title" id="focus-title" aria-live="polite">Consultando tu estado</div><span class="focus-meta" id="focus-meta">Sincronizando datos</span></div>
  <span class="focus-icon" id="focus-icon" aria-hidden="true">
