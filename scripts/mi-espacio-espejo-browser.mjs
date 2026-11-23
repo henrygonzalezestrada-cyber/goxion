@@ -65,8 +65,11 @@ async function test(engine,name){
       '<div class="gamif-btn gx-gamif-card gx-gamif-card-mission" data-watermark="🎯" onclick="openGamif(\'coupon\')"><div class="gx-gamif-card-status">Dos completadas</div></div></div>'+
       '<div id="gamif-expanded-referral" class="gamif-expanded-container"></div>'+
       '<div id="gamif-expanded-coupon" class="gamif-expanded-container"></div>';
+    window.dispatchEvent(new CustomEvent("goxion:client-space:updated",{detail:{scope:"ci-fixture"}}));
    });
-   await nap(300);
+   await page.locator("#gx-mirror-loyalty-value").waitFor({state:"attached",timeout:12000});
+   await page.locator("#gamif-grid .gxb-live-visual").first().waitFor({state:"attached",timeout:12000});
+   await nap(100);
    const review=await page.evaluate(()=>({
     title:document.getElementById("gx-mirror-priority-title").textContent,
     clock:document.getElementById("gx-mirror-priority-icon").dataset.icon,
