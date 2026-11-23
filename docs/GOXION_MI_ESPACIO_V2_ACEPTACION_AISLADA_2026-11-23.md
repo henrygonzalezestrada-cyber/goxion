@@ -18,3 +18,40 @@
 7. Mantener producción intacta; retirar legado sólo tras paridad certificada.
 
 **No autorizado para lanzamiento.** El proyecto restaurándose es un bloqueo de infraestructura, no una aprobación funcional.
+
+## Actualización de continuidad · 23/nov/2026, 17:31–17:35 (hora de México)
+
+**Estado vigente: fase de conexiones oficiales / preparación de aceptación.** Sustituye el estado COMING_UP de la primera anotación, que queda como histórico. Supabase de aceptación `nsvybyvvdpdgbgtvydfb` está ACTIVE_HEALTHY; consulta SQL de lectura comprobada a las 17:29. Producción `hmpevcwodcgbkviarfic` no se ha modificado en esta revisión.
+
+- 59 tablas base públicas en aceptación; 10 Edge Functions activas. Comparación de metadatos de columnas de clientes, gamificación, referidos, prórrogas, cargos B2 y sesiones: 79 columnas coinciden en nombre y tipo. Comparación amplia: faltan siete relaciones públicas, incluida la tabla de precios de referencia, y la columna `trato_justo_compensaciones.incidencia_id`. No interpretar coincidencia parcial como paridad completa.
+- Ocho clientes preexistentes; siete tienen identificadores de prueba reconocibles por patrón, ninguno tiene teléfono normalizado ni vínculo Auth. El octavo no está confirmado. No usar, borrar ni modificar registros preexistentes sin verificar identidad; preferir cuentas sintéticas nuevas. Sin copia de datos/secretos de producción.
+- Sin extensión pg_cron instalada en aceptación; hay triggers locales de notificaciones y cuatro rutinas con referencias externas que deben clasificarse antes de escribir datos. No habilitar envíos externos, Discord, cobros, ni reutilizar el bridge temporal como entrada pública.
+- Comparación de 11 endpoints necesarios:
+
+| Endpoint | Aceptación | Versión oficial observada |
+|---|---:|---:|
+| login-goxion | Ausente | 10 |
+| mi-espacio | Ausente | 20 |
+| estado-cuenta-beta | Ausente | 4 |
+| estado-financiero-b2-beta | 5 | 13 |
+| acciones-financieras-b2-beta | 6 | 16 |
+| comprobantes-b2-beta | 2 | 6 |
+| cancelaciones-cliente | Ausente | 6 |
+| notificaciones-cliente | Ausente | 8 |
+| credenciales-cliente | Ausente | 6 |
+| novedades-cliente | Ausente | 3 |
+| accesos-cliente-beta | Ausente | 5 |
+
+Se inspeccionaron los fuentes de login, Mi Espacio, estado de cuenta y notificaciones: usan variables Supabase del proyecto de ejecución; no se identificó fetch externo literal en esos cuatro archivos. Esto NO sustituye la revisión de RPC/triggers, autorización y dependencias de esquema. No se desplegaron funciones ni se crearon clientes en esta revisión.
+
+### Siguiente entrega, en este orden
+1. Verificar aislamiento y dependencias de login/Mi Espacio/notificaciones/estado de cuenta; actualizar sólo funciones necesarias del entorno QA. Revisar llamadas a integraciones y bloquearlas; conservar seguridad real.
+2. Preparar cuentas QA nuevas y ruta de aceptación del **mismo código aprobado**, con sesión y host aislados, sin botones de escenarios. Confirmar login + lectura y persistencia contra QA y comprobar que no hay tráfico a producción. Entregar acceso únicamente cuando esto funcione; nunca guardar PIN/token en el repositorio.
+3. Primer bloque de validación de usuario: al corriente, próximo vencimiento, vencido/suspendido, comprobante en revisión/rechazo/acreditación y prórroga. Preparar condiciones y ejecutar controladores reales, no cambiar banderas para fingir una transición. Segundo bloque: dos fechas B2 y cancelación/retención. Tercero: misiones, referidos, lealtad, cupón, confeti y corazón roto. Finalmente notificaciones, accesos, historial y regresión de Catálogo/Soporte.
+4. Registrar por escenario: preparado, lectura, operación confirmada, persistencia, UI y validación Safari. Ningún escenario real de aceptación se declara aprobado todavía. Los 30 contratos de presentación aprobados son una comprobación distinta.
+
+### Reglas de continuidad
+- Espejo actual aprobado visualmente: `ayuda-espejo-feed-v2.html`; laboratorio de referencia `preview/experiencia-mi-espacio-inteligente/morph-v2.html`. No reconstruir ni reinterpretar su diseño. La futura oficial se promueve desde el código probado.
+- `ayuda.html`, portada/login, Catálogo y Soporte oficiales no se modifican durante aceptación. Cápsula única compartida, cristal neutro, estados dinámicos y animaciones aprobadas; conservar funciones reales. Mantener escritura V2 deshabilitada en espejo público. No alterar clientes reales ni protecciones de prórroga.
+- El usuario quiere rapidez y validar la experiencia sin preparar fechas/comprobantes manualmente. Entregar bloques utilizables y resultados verificados, no largas rondas de diagnóstico o supuestas pruebas reales.
+- Consultar auditoría de paridad, contrato técnico y plan de pruebas existentes en `docs/`. Leer primero este registro y confirmar estado actual de Supabase antes de retomar.
