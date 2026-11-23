@@ -4,6 +4,12 @@
 **Estado:** laboratorio interactivo actualizado, pendiente de validación visual final en iPhone/Safari y de aprobación del usuario. **NO integrado en producción.**  
 **Repositorio:** `henrygonzalezestrada-cyber/goxion`.
 
+## Contrato adicional para integración · microinteracciones oficiales (23/nov/2026)
+
+El usuario preguntó si persistirían el **confeti al completar misiones**, la **campana con contador**, y otras microinteracciones funcionales en el lanzamiento conjunto. **Respuesta:** sí son parte del contrato que se debe conservar; no están todas conectadas en laboratorio. Se inspeccionaron handlers/estilos oficiales de `01c-rewards-referrals.js`, `01d-experience-session.js`, `04-client-notifications-realtime.js`, `05-gamification-shared-morph-js.js`, `07-production-interactions-js.js`, dashboard, Catálogo, Soporte y asistente Goxy. Documento de aceptación específico: [`GOXION_MI_ESPACIO_CONTRATO_INTERACCIONES_OFICIALES_2026-11-22.md`](GOXION_MI_ESPACIO_CONTRATO_INTERACCIONES_OFICIALES_2026-11-22.md). Toda función real debe reconectarse y probarse, incluso si el efecto visual se moderniza. **No se ha cambiado código oficial ni laboratorio en esta auditoría.**
+
+---
+
 ## Navegación V4 vigente · cápsula centrada y sticky (22/nov/2026)
 
 Después de restaurar la V3 previa a Muse, el usuario reconsideró las complejidades del desplazamiento lateral y solicitó **simplificar**: la cápsula principal del estilo oficial permanece **centrada** y, con `position:sticky`, se fija en la parte superior. Al avanzar se compacta; al deslizar de regreso se amplía sin regresar al inicio. **Ninguna segunda barra ni traslado a una esquina**. Logo, campana y Goxy permanecen en el encabezado normal y salen de la vista con scroll.
