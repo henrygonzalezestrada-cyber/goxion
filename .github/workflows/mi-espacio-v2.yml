@@ -1,0 +1,55 @@
+name: Mi Espacio V2 · Laboratorio fuente unica
+on:
+  push:
+    branches:
+      - feat/mi-espacio-v2-lab-first-20261123
+    paths:
+      - 'preview/mi-espacio-v2/**'
+      - 'ayuda-espejo-feed-v2.html'
+      - 'scripts/mi-espacio-v2-official-shell-browser.mjs'
+      - 'scripts/mi-espacio-v2-intro-browser.mjs'
+      - '.github/workflows/mi-espacio-v2.yml'
+  pull_request:
+    paths:
+      - 'preview/mi-espacio-v2/**'
+      - 'ayuda-espejo-feed-v2.html'
+      - 'scripts/mi-espacio-v2-official-shell-smoke.mjs'
+      - 'scripts/mi-espacio-v2-official-shell-browser.mjs'
+      - 'scripts/mi-espacio-v2-smoke.mjs'
+      - 'scripts/mi-espacio-v2-browser.mjs'
+      - '.github/workflows/mi-espacio-v2.yml'
+  workflow_dispatch:
+jobs:
+  pureza:
+    name: Integridad de fuente y seguridad
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node scripts/mi-espacio-v2-smoke.mjs
+      - run: node scripts/mi-espacio-v2-official-shell-smoke.mjs
+  navegadores:
+    name: UI realista con datos aislados
+    needs: pureza
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-save playwright@1.56.1
+      - run: npx playwright install --with-deps chromium webkit
+      - name: Validar 390, 320, 280 px en Chromium/WebKit
+        run: node scripts/mi-espacio-v2-browser.mjs
+      - name: Validar espejo V2 montado dentro de ayuda oficial
+        run: node scripts/mi-espacio-v2-official-shell-browser.mjs
+      - name: Validar transferencia de logo y X geométrica en WebKit y Chromium
+        run: node scripts/mi-espacio-v2-intro-browser.mjs
+      - name: Validar espejo integral y morph de campana en móvil
+        run: node scripts/mi-espacio-v2-integral-browser.mjs
