@@ -50,7 +50,8 @@ async function run(browserType,label){
      active:document.getElementById('view-dashboard')?.className,
      feedReady:document.getElementById('gxi-shell')?.hidden,
      oldAvailable:!!document.getElementById('dash-services'),
-     runtimeScript:[...document.scripts].some(x=>x.src.includes('official-feed-runtime.js'))
+     runtimeScript:[...document.scripts].some(x=>x.src.includes('official-feed-runtime.js')),
+     integration:window.__GOXION_INTEGRATION_TEST||null
     }));
     console.error('ROOT QA DIAGNOSTIC',JSON.stringify({diag,failures}));
     throw e;
