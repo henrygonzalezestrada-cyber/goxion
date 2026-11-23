@@ -3,6 +3,8 @@ on:
   pull_request:
     paths:
       - 'preview/mi-espacio-v2/**'
+      - 'ayuda-espejo-feed-v2.html'
+      - 'scripts/mi-espacio-v2-official-shell-smoke.mjs'
       - 'scripts/mi-espacio-v2-smoke.mjs'
       - 'scripts/mi-espacio-v2-browser.mjs'
       - '.github/workflows/mi-espacio-v2.yml'
@@ -19,6 +21,7 @@ jobs:
         with:
           node-version: '22'
       - run: node scripts/mi-espacio-v2-smoke.mjs
+      - run: node scripts/mi-espacio-v2-official-shell-smoke.mjs
   navegadores:
     name: UI realista con datos aislados
     needs: pureza

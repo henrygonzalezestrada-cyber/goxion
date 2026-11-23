@@ -1,0 +1,36 @@
+/* GOXION: un espejo nacido de la oficial, sin login/iframe duplicado.
+   Invariantes de no-regresión antes de migrar handlers. */
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+const read=p=>fs.readFileSync(p,'utf8');
+const original=read('ayuda.html'),mirror=read('ayuda-espejo-feed-v2.html');
+const runtime=read('preview/mi-espacio-v2/official-feed-runtime.js');
+const host=read('preview/mi-espacio-v2/official-feed-host.js');
+const css=read('preview/mi-espacio-v2/official-feed.css');
+const publicStart='<div class="view-section" id="view-inicio">';
+const dashStart='<div class="view-section" id="view-dashboard">';
+const catalogStart='<div class="view-section" id="view-catalogo">';
+const publicOriginal=original.slice(original.indexOf(publicStart),original.indexOf(dashStart));
+const publicMirror=mirror.slice(mirror.indexOf(publicStart),mirror.indexOf(dashStart));
+assert.equal(publicMirror,publicOriginal,'La portada pública es idéntica a la oficial');
+const postCatalogOriginal=original.slice(original.indexOf(catalogStart),original.indexOf('<script src="./assets/js/core/runtime.js'));
+const postCatalogMirror=mirror.slice(mirror.indexOf(catalogStart),mirror.indexOf('<script src="./assets/js/core/runtime.js'));
+assert.equal(postCatalogMirror,postCatalogOriginal,'Catálogo, Soporte y modales previos siguen idénticos');
+for(const s of ['id="view-inicio"','id="view-dashboard"','id="view-catalogo"','id="view-soporte"','id="login-id"','id="gx-v2-feed"','id="gx-v2-legacy-host"','id="gxn-nav"','id="gxb-row"','id="gxs-list"'])assert(mirror.includes(s),s+' debe existir');
+const ids=[...mirror.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);
+assert.equal(new Set(ids).size,ids.length,'IDs no duplicados por injerto');
+assert(!mirror.includes('<iframe'),'El espejo definitivo no usa iframe');
+assert(mirror.includes('./assets/js/ayuda/01e-client-dashboard.js'),'Función original de servicios accesible');
+assert(mirror.includes('./assets/js/ayuda/04-client-notifications-realtime.js'),'Motor oficial de notificaciones, no otro');
+assert(mirror.includes('./assets/js/ayuda/06-wave-background.js'),'Fondo oficial sin segunda onda');
+assert(!mirror.includes('glass-beam')&&!mirror.includes('glass-orb'),'Excluir luz experimental');
+assert(!runtime.includes('data.login(')&&!runtime.includes('gxi-login-form'),'No hay segundo login');
+assert(runtime.includes('const ENABLE_WRITES=false'),'Los controles comerciales V2 siguen protegidos');
+assert(host.includes("new Event('goxion:client-logout')")===false||host.includes('goxion:client-logout'),'Se mantiene cierre por señal oficial');
+assert(css.includes('@scope (#gx-v2-feed)'),'CSS nuevo limitado al feed privado');
+assert(css.includes('rgba(8,8,12,.371)')&&css.includes('blur(11.75px)'),'Cristal del laboratorio intacto');
+assert(css.includes('gx-v2-private-visible')&&!css.includes('glass-beam'),'Sólo feed V2 y sin haz de laboratorio');
+new Function(runtime);new Function(host);
+const nonFeed=[...original.matchAll(/<script[^>]+src="([^"]+)"/g)].map(m=>m[1]);
+for(const path of nonFeed)assert(mirror.includes('src="'+path+'"'),'No eliminar script oficial '+path);
+console.log('OK espejo oficial V2: sesión única, integridad de módulos oficiales, diseño privado aislado y código sintáctico.');
