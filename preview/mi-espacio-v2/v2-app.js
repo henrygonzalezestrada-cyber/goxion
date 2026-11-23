@@ -9,6 +9,8 @@ const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const clean=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
 const reduced=()=>data.motionReduced();
 const state={view:null,prices:[],savings:null,notificationItems:[],tab:'space',lastState:'',activeFilter:'all',showAllHistory:false,openHistory:null,refreshing:false};
+// Preview protegida: no ejecuta mutaciones comerciales hasta completar la paridad funcional.
+const ENABLE_WRITES=false;
 const spinner=$('gxi-auth'),shell=$('gxi-shell');
 let iconHandle=null;
 function firstName(){return String(state.view?.cliente?.nombre||'Cliente').trim().split(/\s+/)[0]||'Cliente'}
@@ -340,6 +342,7 @@ function setupBenefits(){
   if(current==='referral'){
    if(d.phase==='claimed'){navigate('space');$('gxm-history').scrollIntoView({behavior:reduced()?'auto':'smooth'});return}
    if(d.phase==='ready'){
+    if(!ENABLE_WRITES){feedback.textContent='La solicitud estará disponible después de validar la migración.';return}
     if(!confirm('¿Deseas reclamar el mes gratis disponible?'))return;
     action.disabled=true;
     try{await data.post('mi-espacio',{modo:'reclamar_mes_referido'},TOKEN());await refreshClient();feedback.textContent='Solicitud registrada correctamente.'}
@@ -356,6 +359,7 @@ function setupBenefits(){
    const mi=missionInfo(state.view);
    if(mi.claimed){$('gxm-history').scrollIntoView({behavior:reduced()?'auto':'smooth'});return}
    if(mi.ready){
+    if(!ENABLE_WRITES){feedback.textContent='La recompensa se habilitará cuando termine la validación de la V2.';return}
     if(!confirm('¿Deseas aplicar el cupón de '+mi.discount+'%?'))return;
     action.disabled=true;
     try{await data.post('mi-espacio',{modo:'reclamar_cupon'},TOKEN());await refreshClient();feedback.textContent='Cupón registrado.'}
@@ -378,7 +382,7 @@ function setupBenefits(){
    if(key.startsWith('compartir')){
     const message='Conoce GOXION. Invitado por '+state.view.cliente.nombre+' (folio '+state.view.cliente.folio+').';
     try{if(navigator.share)await navigator.share({text:message});else await navigator.clipboard.writeText(message);
-      await data.post('mi-espacio',{modo:'completar_mision',mision_index:pending},TOKEN());await refreshClient();
+      if(ENABLE_WRITES){await data.post('mi-espacio',{modo:'completar_mision',mision_index:pending},TOKEN());await refreshClient()}
     }catch(e){feedback.textContent='No se pudo completar la actividad.'}
     return;
    }
@@ -571,6 +575,7 @@ function renderNotifications(){
   if(item.leida!==true){
    const button=document.createElement('button');button.type='button';button.textContent='Marcar como leída';
    button.addEventListener('click',async()=>{
+    if(!ENABLE_WRITES){button.textContent='Disponible al finalizar integración';return}
     try{await data.post('notificaciones-cliente',{accion:'marcar_leida',datos:{id:item.id,source:item.source||'general'}},TOKEN());item.leida=true;renderNotifications()}
     catch(_){button.textContent='Intenta de nuevo'}
    });block.append(button);
