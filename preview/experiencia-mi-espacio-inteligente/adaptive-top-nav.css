@@ -69,7 +69,8 @@
  flex:0 0 44px;min-width:44px;max-width:44px;
  width:44px;height:44px;min-height:44px;
  aspect-ratio:1;border-radius:50%;
- display:grid;place-items:center;padding:0;
+ display:inline-flex;align-items:center;justify-content:center;
+ gap:0;padding:0;
 }
 .gxn-nav[data-mode="compact"] .gxn-tab[aria-current="page"]{
  flex:0 0 44px;min-width:44px;max-width:44px;
@@ -80,6 +81,7 @@
  box-shadow:0 0 12px rgba(94,220,240,.085);
 }
 .gxn-nav[data-mode="compact"] .gxn-tab-label{
+ flex:0 0 0;min-width:0;width:0;margin:0;
  max-width:0!important;opacity:0!important;
  transform:translate3d(-8px,0,0)!important;
 }
