@@ -359,6 +359,17 @@
    });
   }
  }
+ function watchOfficialBenefitSource(card){
+  if(!card)return;
+  for(const node of card.querySelectorAll(".gx-gamif-card-status,.gx-gamif-progress")){
+   if(node.dataset.gxMirrorObserved==="1")continue;
+   node.dataset.gxMirrorObserved="1";
+   new MutationObserver(queueRefresh).observe(node,{
+    subtree:true,childList:true,characterData:true,attributes:true,
+    attributeFilter:["style","data-progress"]
+   });
+  }
+ }
  function refreshBenefits(client,grid){
   // Los nodos auténticos conservan su identidad, onclick y la fuente de recompensas.
   const referral=grid.querySelector(".gx-gamif-card-ref");
@@ -369,6 +380,7 @@
    const claimed=ref?.beneficio_reclamado===true;
    const ready=Boolean(ref&&services>=2&&months>=3&&!claimed);
    benefitVisual(referral,"referral",ref?months+"/3":"Invita",claimed?"💝":ready?"🎁":"🫂",ref?"meses válidos":"sin referidos",months/3*100,Boolean(ref&&months>0),ready);
+   watchOfficialBenefitSource(referral);
   }
   const mission=grid.querySelector(".gx-gamif-card-mission");
   if(mission){
@@ -380,6 +392,7 @@
    const claimed=(Number(g.cupon_reclamado_ciclo)||0)>=(Math.max(1,Number(g.cupon_ciclo)||1));
    const ready=total>0&&count===total&&!claimed;
    benefitVisual(mission,"mission",total?count+"/"+total:"Sin tareas",claimed?"✅":ready?"🏆":"🎯",total?"completadas":"sin misiones",total?count/total*100:0,total>0,ready);
+   watchOfficialBenefitSource(mission);
   }
  }
 
@@ -452,7 +465,12 @@
    if(icon)icon.style.animationPlayState=document.hidden?"paused":"running";
   });
   // Los renderizadores oficiales pueden finalizar tras login/realtime.
-  window.addEventListener("goxion:client-logout",queueRefresh);
+  window.addEventListener("goxion:client-logout",()=>{
+   clearInterval(greetingTimer);greetingTimer=0;greetingSignature="";
+   $("gx-mirror-profile-menu")?.setAttribute("hidden","");
+   $("gx-mirror-goxy")?.setAttribute("aria-expanded","false");
+   queueRefresh();
+  });
   setTimeout(queueRefresh,350);
   setTimeout(queueRefresh,1500);
  }
