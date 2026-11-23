@@ -401,3 +401,147 @@ html[data-gx-mirror="client"] .gamif-expanded-container .btn-primary{background:
  html[data-gx-mirror="client"] #gx-mirror-priority.focus *{animation:none!important;transition:none!important}
  html[data-gx-mirror="client"] #gamif-grid .gxb-emoji{animation:none!important}
 }
+
+
+/* Servicios: adaptar la estructura auténtica al contrato gxs del laboratorio.
+   Los nodos de acceso, PIN, copia, actualización y cancelación no se reconstruyen. */
+html[data-gx-mirror="client"] #dash-services{
+ display:grid;grid-template-columns:minmax(0,1fr);gap:9px;margin:0 2px!important
+}
+html[data-gx-mirror="client"] #dash-services .gx-service-manage-card{
+ min-width:0;overflow:hidden;border-radius:22px!important;
+ border:1px solid rgba(255,255,255,.035)!important;
+ background:rgba(8,8,12,.371)!important;
+ -webkit-backdrop-filter:blur(11.75px) saturate(1)!important;
+ backdrop-filter:blur(11.75px) saturate(1)!important;
+ box-shadow:0 15px 36px rgba(0,0,0,.23),inset 0 1px rgba(255,255,255,.05)!important;
+ transition:background-color .3s,border-color .3s,box-shadow .3s!important
+}
+html[data-gx-mirror="client"] #dash-services .gx-service-manage-card.expanded{
+ border-color:rgba(166,226,240,.11)!important;
+ box-shadow:0 15px 35px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.055)!important;
+ background:rgba(8,8,12,.371)!important
+}
+html[data-gx-mirror="client"] #dash-services .gx-service-summary{
+ display:grid!important;grid-template-columns:47px minmax(0,1fr) 44px!important;
+ align-items:center!important;gap:12px!important;width:100%;min-height:78px!important;
+ padding:12px 13px!important;border:0!important;background:transparent!important;
+ color:#f4f9ff!important;text-align:left!important
+}
+html[data-gx-mirror="client"] #dash-services .gx-service-summary>span:nth-child(2){
+ min-width:0;display:grid;gap:5px
+}
+html[data-gx-mirror="client"] #dash-services .gx-service-logo-img{
+ width:47px!important;height:47px!important;min-width:47px!important;flex:0 0 47px!important;
+ display:block;object-fit:cover;border-radius:13px!important;
+ background:rgba(255,255,255,.04)!important;filter:drop-shadow(0 5px 9px rgba(0,0,0,.25))
+}
+html[data-gx-mirror="client"] #dash-services .gx-service-name{
+ font-size:14px!important;font-weight:700!important;letter-spacing:-.014em!important;
+ line-height:1.25!important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap
+}
+html[data-gx-mirror="client"] #dash-services .gx-service-state-line{
+ display:flex!important;align-items:center;gap:7px;min-width:0;margin:0!important;flex-wrap:wrap
+}
+html[data-gx-mirror="client"] #dash-services .gx-service-state{
+ display:inline-flex;align-items:center;gap:7px;margin:0!important;
+ font-size:10.5px!important;font-weight:600!important;line-height:1.4!important;
+ color:#65d3a2!important
+}
+html[data-gx-mirror="client"] #dash-services .gx-service-state.gx-service-interrupted{color:#e7c66a!important}
+html[data-gx-mirror="client"] #dash-services .gx-service-state::before{
+ width:6px!important;height:6px!important;flex:0 0 6px;border-radius:50%;background:currentColor;box-shadow:none!important
+}
+html[data-gx-mirror="client"] #dash-services .gx-service-expand-icon{
+ position:relative!important;display:grid!important;place-items:center!important;flex:0 0 44px!important;
+ min-width:44px!important;width:44px!important;height:44px!important;max-width:44px!important;
+ justify-self:end;margin:0!important;padding:0!important;border:0!important;border-radius:50%!important;
+ background:transparent!important;box-shadow:none!important;color:#b3c9d9!important
+}
+html[data-gx-mirror="client"] #dash-services .gx-service-expand-icon:before{
+ content:"";position:absolute;inset:4.5px;border-radius:50%;background:transparent
+}
+html[data-gx-mirror="client"] #dash-services .gx-service-expand-icon .gx-chevron-svg{
+ position:relative;display:block;width:14px!important;height:14px!important;
+ fill:none!important;stroke:currentColor!important;stroke-width:2!important
+}
+html[data-gx-mirror="client"] #dash-services .gx-service-manage-card.expanded .gx-service-expand-icon{
+ color:#071c29!important;background:transparent!important
+}
+html[data-gx-mirror="client"] #dash-services .gx-service-manage-card.expanded .gx-service-expand-icon:before{
+ background:#79e6fc
+}
+html[data-gx-mirror="client"] #dash-services .gx-service-manage-card.expanded .gx-service-expand-icon .gx-chevron-svg{
+ display:none!important
+}
+html[data-gx-mirror="client"] #dash-services .gx-service-manage-card.expanded .gx-service-expand-icon:after{
+ content:"×";position:relative;font:600 20px/1 Poppins,system-ui;z-index:2
+}
+html[data-gx-mirror="client"] #dash-services .gx-service-divider{
+ display:none!important
+}
+html[data-gx-mirror="client"] #dash-services .gx-service-expanded{
+ padding:0 13px 15px!important
+}
+html[data-gx-mirror="client"] #view-dashboard .gx-dashboard-section-head:has(+ #dash-services) .gx-dashboard-section-subtitle{
+ display:none!important
+}
+/* Historial: conservar la lista financiera oficial y su fecha/importe/estado,
+   pero adoptar el ritmo sobrio de las filas del laboratorio, sin pagos inventados. */
+html[data-gx-mirror="client"] #dash-history .gx-payment-history-card{
+ background:rgba(8,8,12,.371)!important;border:1px solid rgba(255,255,255,.035)!important;
+ -webkit-backdrop-filter:blur(11.75px) saturate(1)!important;
+ backdrop-filter:blur(11.75px) saturate(1)!important;
+ border-radius:22px!important;box-shadow:0 15px 36px rgba(0,0,0,.23)!important;
+ padding:0!important;overflow:hidden
+}
+html[data-gx-mirror="client"] #dash-history .gx-payment-history-row{
+ position:relative;display:grid!important;grid-template-columns:24px minmax(0,1fr) auto!important;
+ align-items:center!important;gap:10px!important;min-height:76px!important;
+ padding:13px 14px!important;box-shadow:none!important;margin:0!important;
+ border-radius:0!important;border:0!important;background:transparent!important
+}
+html[data-gx-mirror="client"] #dash-history .gx-payment-history-row+.gx-payment-history-row:before{
+ content:"";position:absolute;top:0;left:50px;right:14px;height:1px;background:rgba(225,239,250,.07)
+}
+html[data-gx-mirror="client"] #dash-history .gx-payment-history-dot{
+ width:10px!important;height:10px!important;margin:auto!important;
+ border-radius:50%!important;background:#71cebb!important;box-shadow:0 0 12px rgba(113,206,187,.12)!important
+}
+html[data-gx-mirror="client"] #dash-history .gx-payment-history-main{min-width:0!important}
+html[data-gx-mirror="client"] #dash-history .gx-payment-history-date{
+ color:#f1f7ff!important;font-size:12px!important;line-height:1.35!important;
+ font-weight:650!important;letter-spacing:-.015em!important
+}
+html[data-gx-mirror="client"] #dash-history .gx-payment-history-meta{
+ gap:6px!important;margin-top:5px!important;flex-wrap:wrap
+}
+html[data-gx-mirror="client"] #dash-history .gx-payment-history-badge,
+html[data-gx-mirror="client"] #dash-history .gx-payment-history-loyalty{
+ padding:0!important;margin:0!important;border:0!important;border-radius:0!important;
+ background:transparent!important;box-shadow:none!important;font-size:9.5px!important;line-height:1.45!important;
+ font-weight:550!important
+}
+html[data-gx-mirror="client"] #dash-history .gx-payment-history-amount{
+ color:#e5f1fc!important;white-space:nowrap!important;font-size:12px!important;
+ font-weight:700!important;font-variant-numeric:tabular-nums
+}
+html[data-gx-mirror="client"] #dash-history .gx-payment-history-status{
+ color:#9eb2c3!important;font-size:10px!important;margin-top:5px;text-align:right
+}
+@media(max-width:380px){
+ html[data-gx-mirror="client"] #dash-services .gx-service-summary{
+  grid-template-columns:43px minmax(0,1fr) 44px!important;gap:10px!important;padding:11px!important;min-height:75px!important
+ }
+ html[data-gx-mirror="client"] #dash-services .gx-service-logo-img{
+  width:43px!important;height:43px!important;min-width:43px!important
+ }
+ html[data-gx-mirror="client"] #dash-services .gx-service-name{font-size:13.5px!important}
+ html[data-gx-mirror="client"] #dash-history .gx-payment-history-row{gap:6px!important;padding:11px 8px 11px 12px!important}
+}
+@media(max-width:315px){
+ html[data-gx-mirror="client"] #dash-services .gx-service-summary{gap:8px!important}
+ html[data-gx-mirror="client"] #dash-services .gx-service-name{font-size:12.5px!important}
+ html[data-gx-mirror="client"] #dash-history .gx-payment-history-row{gap:5px!important;padding:10px 6px 10px 10px!important}
+ html[data-gx-mirror="client"] #dash-history .gx-payment-history-amount{font-size:11px!important}
+}
