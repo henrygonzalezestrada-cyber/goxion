@@ -1,3 +1,9 @@
+.greeting{height:clamp(88px,23vw,102px);min-height:0;display:flex;align-items:flex-end;padding:0 9px 17px;overflow:hidden}
+.greeting h1{margin:0;height:2.32em;flex:0 0 100%;display:flex;align-items:center;font-weight:700;font-size:clamp(28px,7vw,35px);letter-spacing:-.045em;line-height:1.16;max-width:100%;overflow:clip}
+.greeting-line{display:block;width:100%;max-height:2.32em;overflow:clip;text-wrap:balance}
+.greeting .word{display:inline-block;will-change:transform,filter,opacity;white-space:normal}
+.greeting .name{color:#42e4e8}
+
 /* GOXION · fuentes visuales aprobadas. Extraído literalmente del 
    laboratorio morph-v2.html (mismo commit de referencia 7ffca65d9c0a9f2846437791da56d8e3698ca28e).
    No importar HTML de laboratorio, fixtures, controladores de escenarios ni motores financieros. */
@@ -545,3 +551,24 @@ html[data-gx-mirror="client"] #dash-history .gx-payment-history-status{
  html[data-gx-mirror="client"] #dash-history .gx-payment-history-row{gap:5px!important;padding:10px 6px 10px 10px!important}
  html[data-gx-mirror="client"] #dash-history .gx-payment-history-amount{font-size:11px!important}
 }
+
+/* Anclar el saludo exactamente como el laboratorio reciente. El original 
+   de sesión sigue ejecutándose pero queda oculto en el espejo. */
+html[data-gx-mirror="client"] #dash-greeting-container.greeting{
+ height:clamp(88px,23vw,102px)!important;min-height:0!important;
+ display:flex!important;align-items:flex-end!important;padding:0 9px 17px!important;
+ margin:0!important;overflow:hidden;text-align:left!important
+}
+html[data-gx-mirror="client"] #dash-greeting-container #dynamic-greeting-text[hidden]{display:none!important}
+html[data-gx-mirror="client"] #gx-mirror-greeting{
+ margin:0!important;height:2.32em!important;display:flex!important;
+ align-items:center!important;flex:0 0 100%;font-size:clamp(28px,7vw,35px)!important;
+ letter-spacing:-.045em!important;font-weight:700!important;line-height:1.16!important;
+ max-width:100%;overflow:clip
+}
+html[data-gx-mirror="client"] #gx-mirror-greeting .name{color:#42e4e8!important}
+@media(max-width:380px){
+ html[data-gx-mirror="client"] #dash-greeting-container.greeting{height:86px!important;padding-bottom:14px!important}
+ html[data-gx-mirror="client"] #gx-mirror-greeting{font-size:clamp(24px,6.45vw,28px)!important}
+}
+@media(prefers-reduced-motion:reduce){html[data-gx-mirror="client"] #gx-mirror-greeting .word{will-change:auto;animation:none!important}}
