@@ -92,6 +92,20 @@ Reubicar toda la cápsula expandida justo **sobre** el texto en el encabezado, d
 
 ---
 
+## V4.2 · Corrección de separación proporcional cápsula / saludo (22/nov/2026)
+
+El usuario revisó V4.1 y confirmó que la nueva cápsula y sus emojis le gustan, pero **rechazó el aire extra bajo la navegación**: el saludo quedó visualmente demasiado abajo. La nueva regla es **margen proporcional y mínimo**, respetando la reserva de 2 líneas del saludo.
+
+**Aplicado solo al laboratorio:** nav CSS `adaptive-top-nav.css` commit `1c5a45cf869c5c8927d9382d9904b2d568cdb853`; HTML cache-bust `morph-v2.html` commit `56c6d11aa6f93b6420f8ec9dfdd6862b2e29c8bb`.
+
+- Cápsula expandida `margin:9px auto 9px` (**antes 9px arriba / 19px abajo**). No se modificó `.greeting`, `h1`, ni sus tamaños y reserva para dos líneas.
+- En compacto se compensó **únicamente** el margen inferior, de `39→29px` y en <=355px `37→27px`. La suma alto+margen permanece constante: **76+9 = 56+29 = 85px** (normal), **74+9 = 56+27 = 83px** (estrecho). Al plegar no debería empujar el resto del feed.
+- No se cambian los botones de 44px, emojis, cristal, luces, comportamiento sticky ni la cabeza/avatar de Goxy; la corrección es de **10px menos de aire debajo de la navegación**, no un rediseño del hero.
+- Verificaciones de código y cálculos de altura realizadas. **Safari físico sin verificar**: pendiente revisión visual para un saludo de una y dos líneas.
+
+**Vista actual:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=56c6d11
+
+---
 ## V4.1 · Pulido de cápsula compacta, geometría y emojis (22/nov/2026)
 
 El usuario validó la **V4 centrada y sticky** en captura de iPhone y pidió un pulido contenido: cápsula **un poco más pequeña**, centrado óptico de los emojis, discreto distintivo de selección y mejor ritmo con el saludo. **No rediseñar ni cambiar navegación/scroll, Goxy o tarjetas aprobadas.**
