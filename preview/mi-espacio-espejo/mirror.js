@@ -8,6 +8,7 @@
  const reduce=()=>window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches||false;
  const schedule=fn=>window.requestAnimationFrame?requestAnimationFrame(fn):setTimeout(fn,0);
  let stateKind="",refreshQueued=false,loyaltyTile=null,loyaltyExpanded=null,hero=null;
+ let greetingTimer=0,greetingSignature="",greetingIndex=0;
  const iconPaths={
   check:'<path d="M4 12l5 5L20 6"/>',
   clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5"/><path class="gx-focus-clock-hand" d="M12 12l3 2"/>',
@@ -65,6 +66,59 @@
   new MutationObserver(syncNavigation).observe(nav,{attributes:true,attributeFilter:["class"],subtree:true});
   syncNavigation();
  }
+ function createGreeting(){
+  const container=$("dash-greeting-container");
+  const original=$("dynamic-greeting-text");
+  if(!container||!original)return;
+  container.classList.add("greeting");
+  original.hidden=true;
+  original.setAttribute("aria-hidden","true");
+  if(!$("gx-mirror-greeting")){
+   const text=create("h1");
+   text.id="gx-mirror-greeting";
+   container.append(text);
+  }
+ }
+ function drawGreeting(text,first){
+  const element=$("gx-mirror-greeting");
+  if(!element)return;
+  let line=element.querySelector(".greeting-line");
+  if(!line){line=create("span","greeting-line");element.append(line);}
+  line.replaceChildren();
+  for(const part of text.split(/(\s+)/)){
+   if(!part)continue;
+   if(!part.trim()){line.append(document.createTextNode(part));continue;}
+   const word=create("span","word",part);
+   if(first&&part.includes(first))word.classList.add("name");
+   line.append(word);
+   if(!reduce()&&word.animate){
+    const i=line.querySelectorAll(".word").length;
+    word.animate([{transform:"translateY(70%)",filter:"blur(9px)",opacity:0},
+     {transform:"translateY(0)",filter:"blur(0)",opacity:1}],
+     {duration:640,delay:Math.min(i*50,310),easing:"cubic-bezier(.16,1,.3,1)",fill:"both"});
+   }
+  }
+  element.setAttribute("aria-label",text);
+ }
+ function syncGreeting(client,kind){
+  createGreeting();
+  if(!client)return;
+  const name=String(client.nombre||"Cliente").trim().split(/\s+/)[0]||"Cliente";
+  const urgent=kind==="alert"||kind==="clock";
+  const signature=name+"|"+(urgent?"urgent":"normal");
+  if(signature===greetingSignature)return;
+  greetingSignature=signature;
+  clearInterval(greetingTimer);greetingTimer=0;greetingIndex=0;
+  const phrases=["Hola, "+name,"Qué gusto, "+name,"Bienvenido, "+name];
+  drawGreeting(phrases[0],name);
+  if(urgent||reduce())return;
+  greetingTimer=setInterval(()=>{
+   if(document.hidden||!officialClient())return;
+   greetingIndex=(greetingIndex+1)%phrases.length;
+   drawGreeting(phrases[greetingIndex],name);
+  },13000);
+ }
+
  function createHero(){
   const original=$("dash-billing-card");
   const alert=$("dash-payment-review-alert");
@@ -126,6 +180,7 @@
   hero.hidden=hide;
   if(hide)return;
   const next=classify(client);
+  syncGreeting(client,next.kind);
   hero.dataset.tone=next.tone;
   hero.dataset.state=next.kind==="check"?"clear":next.kind==="clock"?"review":next.kind==="calendar"?"soon":"correction";
   const title=$("gx-mirror-priority-title");
@@ -212,6 +267,7 @@
   if(!card)return;
   card.classList.add("gxb-tile","gxc-surface");
   card.dataset.gxb=kind;
+  card.dataset.watermark=emoji;
   card.dataset.phase=showMeter?"active":"none";
   card.dataset.ready=ready?"true":"false";
   let visual=card.querySelector(".gxb-live-visual");
@@ -320,7 +376,7 @@
  }
  function boot(){
   if(!$("view-dashboard")||!$("goxion-main-nav"))return;
-  initNav();createHero();createLoyalty();syncRealSources();
+  initNav();createGreeting();createHero();createLoyalty();syncRealSources();
   hideLiteralEscapedNewline();
   refresh();
   window.addEventListener("pageshow",queueRefresh);
