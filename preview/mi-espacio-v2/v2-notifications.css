@@ -5,6 +5,8 @@
 .gxn-bell.gx-has-new .gx-client-notif-badge{display:inline}
 .gxn-bell.gx-ringing .gx-client-notif-bell{animation:gxBellRing .9s ease-out}
 .gxn-bell.gx-ringing .gx-client-notif-clapper{animation:gxBellClapper .9s ease-out}
+@keyframes gxBellRing{0%,100%{transform:rotate(0)}18%,54%{transform:rotate(-13deg)}36%,72%{transform:rotate(12deg)}}
+@keyframes gxBellClapper{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(2px)}40%,80%{transform:translateX(-2px)}}
 html.gx-notif-open{overflow:hidden;overscroll-behavior:none}
 /* Notification sheet · iOS-safe, low-noise GOXION */
 .gx-client-notif-overlay{
