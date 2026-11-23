@@ -41,6 +41,7 @@ async function showClient(view){
  state.showAllHistory=false;
  state.openHistory=null;
  state.openService=null;state.serviceDigest='';
+  savingSeen=false;savingSignature='';savingCurrent=0;savingTarget=0;stopSavingsMotion();
  window.GOXION_V2_RESET_BENEFITS?.();
  state.notificationItems=[];
  $('gxi-notice-list').replaceChildren();
@@ -558,23 +559,72 @@ async function loadPrices(){
  try{state.prices=await data.getPriceReferences();renderSavings()}
  catch(_){$('gxv-savings').hidden=true}
 }
+/* Ahorro · misma animación y distribución adaptativa del laboratorio aprobado. */
+const savingsMoney=value=>new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN',minimumFractionDigits:Number.isInteger(value)?0:2,maximumFractionDigits:Number.isInteger(value)?0:2}).format(value);
+let savingCurrent=0,savingTarget=0,savingFrame=0,savingSeen=false,savingObserver=null,savingSignature='';
+function stopSavingsMotion(){if(savingFrame){cancelAnimationFrame(savingFrame);savingFrame=0}}
+function showSavingAmount(value){
+ const node=$('gxv-amount');node.textContent=savingsMoney(value);
+ node.dataset.long=String(node.textContent.length>7);
+}
+function animateSavings(next,initial=false){
+ stopSavingsMotion();
+ const start=initial?0:savingCurrent,change=next-start;
+ if(reduced()||document.hidden||Math.abs(change)<.01){savingCurrent=next;showSavingAmount(next);return}
+ const startTime=performance.now(),duration=initial?1050:760;
+ function frame(now){
+  const p=Math.min(1,Math.max(0,(now-startTime)/duration));
+  const ease=p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2;
+  savingCurrent=Math.round((start+change*ease)*100)/100;
+  showSavingAmount(savingCurrent);
+  if(p<1)savingFrame=requestAnimationFrame(frame);else{savingFrame=0;savingCurrent=next;showSavingAmount(next)}
+ }
+ savingCurrent=start;showSavingAmount(start);
+ savingFrame=requestAnimationFrame(frame);
+}
+function observeSavings(){
+ const card=$('gxv-savings');
+ if(savingObserver||!('IntersectionObserver' in window)){card.classList.add('is-visible');animateSavings(savingTarget,!savingSeen);savingSeen=true;return}
+ savingObserver=new IntersectionObserver(entries=>{
+  const visible=entries.some(entry=>entry.isIntersecting);
+  card.classList.toggle('is-visible',visible);
+  if(visible){if(!savingSeen||Math.abs(savingTarget-savingCurrent)>.01){animateSavings(savingTarget,!savingSeen);savingSeen=true}}
+ },{threshold:.15});
+ savingObserver.observe(card);
+}
 function renderSavings(){
  const sum=data.savings(state.view,state.prices);state.savings=sum;
- const card=$('gxv-savings'),oldNote=$('gxi-saving-note');
- if(!sum||sum.difference<=0){card.hidden=true;if(oldNote)oldNote.hidden=true;return}
- card.hidden=false;card.classList.add('is-visible');
- const amount=data.money(sum.difference);$('gxv-amount').textContent=amount;
- $('gxv-amount').dataset.long=String(amount.length>7);
+ const card=$('gxv-savings'),details=$('gxi-saving-note');
+ if(!sum||sum.difference<=0){card.hidden=true;if(details)details.hidden=true;stopSavingsMotion();savingSeen=false;return}
+ card.hidden=false;
+ savingTarget=sum.difference;
+ const signatures=sum.entries.map(e=>String(e.service.id||e.service.nombre)+':'+String(e.reference.clave)).join('|');
+ if(signatures!==savingSignature){
+  savingSignature=signatures;
+  const logos=$('gxv-logos');logos.replaceChildren();logos.dataset.count=String(Math.min(4,sum.entries.length));
+  sum.entries.slice(0,4).forEach(e=>{
+   const slot=document.createElement('span');slot.className='gxv-slot';
+   const img=document.createElement('img');img.src=logo(e.service.nombre);img.alt=e.service.nombre;img.loading='lazy';img.decoding='async';
+   slot.append(img);logos.append(slot);
+  });
+  if(sum.entries.length>4){const more=document.createElement('span');more.className='gxv-more';more.textContent='+'+(sum.entries.length-4);more.setAttribute('aria-label','y '+(sum.entries.length-4)+' plataformas más');logos.append(more)}
+ }
  $('gxv-context').textContent='Estimación · '+sum.covered+' de '+sum.total+' '+(sum.total===1?'servicio comparable':'servicios comparables');
- const logos=$('gxv-logos');logos.replaceChildren();logos.dataset.count=String(Math.min(4,sum.entries.length));
- sum.entries.slice(0,4).forEach(e=>{const slot=document.createElement('span');slot.className='gxv-slot';const img=document.createElement('img');img.src=logo(e.service.nombre);img.alt=e.service.nombre;img.loading='lazy';slot.append(img);logos.append(slot)});
- if(sum.entries.length>4){const more=document.createElement('span');more.className='gxv-more';more.textContent='+'+(sum.entries.length-4);logos.append(more)}
- let details=oldNote;
- if(!details){details=document.createElement('details');details.id='gxi-saving-note';details.className='gxi-saving-note';const summary=document.createElement('summary');summary.textContent='Cómo calculamos el ahorro';const p=document.createElement('p');details.append(summary,p);card.insertAdjacentElement('afterend',details)}
- details.hidden=false;
- const newest=sum.entries.map(e=>e.reference.revisado_el).filter(Boolean).sort().at(-1)||'';
- details.querySelector('p').textContent='Comparación orientativa con tarifas mensuales individuales públicas, sin ofertas ni anualidades. Algunos accesos de GOXION son perfiles o invitaciones y no equivalen a una suscripción individual completa. Tarifas revisadas: '+(newest||'fecha no disponible')+'.';
+ card.setAttribute('aria-label','Ahorro estimado de '+savingsMoney(savingTarget)+' al mes entre '+sum.covered+' servicios comparables.');
+ if(details){
+  details.hidden=false;
+  const newest=sum.entries.map(e=>e.reference.revisado_el).filter(Boolean).sort().at(-1)||'';
+  details.querySelector('p').textContent='Comparación orientativa con tarifas mensuales individuales públicas, sin ofertas ni anualidades. Algunos accesos GOXION son perfiles o invitaciones, no cuentas completas equivalentes. Tarifas revisadas: '+(newest||'fecha no disponible')+'.';
+ }
+ if(!savingObserver)observeSavings();
+ else if(card.classList.contains('is-visible')&&savingSeen&&Math.abs(savingTarget-savingCurrent)>.01)animateSavings(savingTarget);
+ else if(!savingSeen)showSavingAmount(savingTarget);
 }
+document.addEventListener('visibilitychange',()=>{
+ const card=$('gxv-savings');if(!card)return;
+ card.dataset.motionPaused=String(document.hidden);
+ if(document.hidden){stopSavingsMotion();savingCurrent=savingTarget;showSavingAmount(savingTarget)}
+});
 async function loadNotifications(){
  if(!state.view)return;
  try{
