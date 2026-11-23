@@ -60,12 +60,16 @@ async function test(engine,name){
     document.getElementById("loyalty-count").textContent="3/4 Pagos";
     document.getElementById("loyalty-msg").textContent="Acumula 4 pagos consecutivos.";
     document.getElementById("referral-section-container").innerHTML=
-      '<div id="gamif-grid" class="gamification-grid"></div>';
+      '<div id="gamif-grid" class="gamification-grid">'+
+      '<div class="gamif-btn gx-gamif-card gx-gamif-card-ref" data-watermark="🎁" onclick="openGamif(\'referral\')"><div class="gx-gamif-card-status">En progreso</div></div>'+
+      '<div class="gamif-btn gx-gamif-card gx-gamif-card-mission" data-watermark="🎯" onclick="openGamif(\'coupon\')"><div class="gx-gamif-card-status">Dos completadas</div></div></div>'+
+      '<div id="gamif-expanded-referral" class="gamif-expanded-container"></div>'+
+      '<div id="gamif-expanded-coupon" class="gamif-expanded-container"></div>';
    });
    await nap(300);
    const review=await page.evaluate(()=>({
     title:document.getElementById("gx-mirror-priority-title").textContent,
-    clock:document.getElementById("gx-mirror-priority-icon").dataset.kind,
+    clock:document.getElementById("gx-mirror-priority-icon").dataset.icon,
     loyalty:document.getElementById("gx-mirror-loyalty-value").textContent,
     emoji:document.getElementById("gx-mirror-loyalty-emoji").textContent,
     realBadgeCount:document.querySelectorAll("#gx-client-notif-badge").length
@@ -73,11 +77,27 @@ async function test(engine,name){
    assert.equal(review.title,"Estamos revisando tu comprobante",name+"/"+width+" review title");
    assert.equal(review.clock,"clock",name+"/"+width+" clock");
    assert.equal(review.loyalty,"3/4",name+"/"+width+" loyalty");
+   assert.equal(await page.locator("#gamif-grid .gxb-tile").count(),3,name+"/"+width+" compactas aprobadas");
+   assert.equal(await page.locator("#gamif-grid .gxb-live-visual").count(),2,name+"/"+width+" cards oficiales estilizadas");
+   const clean=await page.evaluate(()=>{
+    const root=document.getElementById("gamif-grid");
+    const a=root.querySelector(".gx-gamif-card-ref");
+    const b=root.querySelector(".gx-gamif-card-mission");
+    const old=a.querySelector(".gx-gamif-card-status");
+    return {refSize:a.getBoundingClientRect().height,
+      missionSize:b.getBoundingClientRect().height,
+      originalHidden:getComputedStyle(old).display==="none",
+      noOverflow:document.documentElement.scrollWidth<=innerWidth+1};
+   });
+   assert(clean.originalHidden,name+"/"+width+" sin textos legados visibles");
+   assert(clean.noOverflow,name+"/"+width+" desbordamiento horizontal");
+   assert(clean.refSize>=120&&clean.refSize<180,name+"/"+width+" altura de tarjeta compacta");
+   assert(clean.missionSize>=120&&clean.missionSize<180,name+"/"+width+" altura de Misiones");
    assert.equal(review.emoji,"⭐",name+"/"+width+" star");
    assert(review.realBadgeCount<=1,name+"/"+width+" duplicate notification badge");
    await page.locator("#gx-mirror-loyalty").click();
    assert.equal(await page.locator("#gx-mirror-loyalty-expanded").isVisible(),true,name+"/"+width+" loyalty detail");
-   await page.locator(".gx-mirror-close").click();
+   await page.locator("#gx-mirror-loyalty-expanded .gxb-dismiss").click();
    await page.evaluate(()=>{
     globalClientesData.qa.estado_cuenta.estado="pagado";
     globalClientesData.qa.estado_cuenta.lealtad.racha_reiniciada_virtual=true;
@@ -86,7 +106,7 @@ async function test(engine,name){
     document.getElementById("loyalty-count").textContent="0/4 Pagos";
    });
    await nap(250);
-   assert.equal(await page.locator("#gx-mirror-priority-icon").getAttribute("data-kind"),"check",name+"/"+width+" confirmation");
+   assert.equal(await page.locator("#gx-mirror-priority-icon").getAttribute("data-icon"),"check",name+"/"+width+" confirmation");
    assert.equal(await page.locator("#gx-mirror-loyalty-emoji").textContent(),"💔",name+"/"+width+" lost streak");
    await page.evaluate(()=>{
     const filler=document.createElement("div");filler.style.height="2400px";document.body.append(filler);
