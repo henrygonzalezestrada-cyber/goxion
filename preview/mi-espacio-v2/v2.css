@@ -23,7 +23,10 @@
 .gxi-account h2{font-size:15px;letter-spacing:-.035em;margin:0 0 8px;color:#edfaff}
 .gxi-account p{margin:0;color:#b6c9da;font-size:11px;line-height:1.7}
 .gxi-note{font-size:10px;color:#9dbac8;line-height:1.55}
-.gxi-saving-note{margin:10px 3px 0;color:#94adba;font-size:9px;line-height:1.5}
+.gxi-saving-note{margin:6px 9px 0;color:#abc3d0;font-size:11px;line-height:1.55;max-width:100%}
+.gxi-saving-note summary{cursor:pointer;min-height:38px;display:flex;align-items:center;color:#9dc5d2;font-weight:500;list-style-position:inside}
+.gxi-saving-note summary:focus-visible{outline:2px solid #74ebf4;outline-offset:3px;border-radius:7px}
+.gxi-saving-note p{margin:1px 0 12px;padding:0 2px;color:#a8becb;font-size:11px;line-height:1.65}
 #gxi-catalog,#gxi-support{margin-top:22px}
 #gxi-catalog-list{grid-auto-flow:row;grid-auto-columns:auto;grid-template-columns:repeat(2,minmax(0,1fr));display:grid}
 .gxi-support-card{border-radius:22px;padding:19px;color:#d2e0e8;font-size:12px}

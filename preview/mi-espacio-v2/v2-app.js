@@ -8,7 +8,7 @@ const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const clean=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
 const reduced=()=>data.motionReduced();
-const state={view:null,prices:[],savings:null,notificationItems:[],tab:'space',lastState:'',activeFilter:'all',showAllHistory:false,openHistory:null,refreshing:false};
+const state={view:null,prices:[],savings:null,notificationItems:[],tab:'space',lastState:'',activeFilter:'all',showAllHistory:false,openHistory:null,refreshing:false,openService:null,serviceDigest:''};
 // Preview protegida: no ejecuta mutaciones comerciales hasta completar la paridad funcional.
 const ENABLE_WRITES=false;
 const spinner=$('gxi-auth'),shell=$('gxi-shell'),loading=$('gxi-loading');
@@ -40,6 +40,7 @@ async function showClient(view){
  state.activeFilter='all';
  state.showAllHistory=false;
  state.openHistory=null;
+ state.openService=null;state.serviceDigest='';
  window.GOXION_V2_RESET_BENEFITS?.();
  state.notificationItems=[];
  $('gxi-notice-list').replaceChildren();
@@ -429,8 +430,15 @@ function accessRow(label,value,action,dataValue){
  const buttons=action?'<button type="button" class="gxs-rowbutton" data-gxi-action="'+esc(action)+'">'+(action==='pin'?'Mostrar':'Copiar')+'</button>':'';
  return '<div class="gxs-accessrow"><span class="gxs-copy"><small>'+esc(label)+'</small><strong'+dataAttribute+'>'+esc(value)+'</strong></span>'+buttons+'</div>';
 }
+function invitationLabel(value){
+ const raw=String(value||'').trim(),key=clean(raw).replace(/[\s-]+/g,'_');
+ const labels={sin_verificar:'Pendiente de verificación',pendiente:'Pendiente',pendiente_aceptacion:'Pendiente de aceptación',pendiente_verificacion:'Pendiente de verificación',verificado:'Verificada',aceptada:'Aceptada',activo:'Activa',activa:'Activa',rechazada:'Rechazada',expirada:'Caducada'};
+ return labels[key]||(raw?raw.replace(/[_-]+/g,' ').replace(/^./,m=>m.toUpperCase()):'Pendiente de verificación');
+}
 function renderServices(){
- const v=state.view,services=v.servicios||[];const host=$('gxs-list');host.replaceChildren();
+ const v=state.view,services=v.servicios||[];
+ const digest=JSON.stringify(services);if(state.serviceDigest===digest)return;
+ state.serviceDigest=digest;const host=$('gxs-list');host.replaceChildren();
  $('gxs-count').textContent=services.length+' '+(services.length===1?'plataforma':'plataformas');
  if(!services.length){host.innerHTML='<div class="gxm-empty">Todavía no tienes servicios activos.</div>';return}
  services.forEach((s,index)=>{
@@ -443,7 +451,7 @@ function renderServices(){
   const access=(email?accessRow(isInvite?'Correo personal':'Correo',email,'copy',email):'')+
     (profile?accessRow('Perfil',profile):'')+
     (pin?accessRow('PIN de perfil','••••','pin',''):'')+
-    (isInvite&&a.estado_invitacion?accessRow('Invitación',String(a.estado_invitacion)):'');
+    (isInvite&&a.estado_invitacion?accessRow('Invitación',invitationLabel(a.estado_invitacion)):'');
   let note='';
   if(s.cancelacion&&['solicitada','aprobada','rechazada'].includes(clean(s.cancelacion.estado)))
    note='<p class="gxs-notice">'+esc(status[0])+' · Tu acceso continúa sujeto a la resolución oficial.</p>';
@@ -455,9 +463,11 @@ function renderServices(){
    '<span class="gxs-icon" aria-hidden="true"><svg class="gxs-chevron" viewBox="0 0 24 24"><path d="m5 9 7 7 7-7"/></svg><svg class="gxs-x" viewBox="0 0 24 24"><path d="M6 6 18 18M18 6 6 18"/></svg></span></button>'+
    '<div class="gxs-reveal" id="'+id+'"><div class="gxs-reveal-inner" inert aria-hidden="true"><div class="gxs-body">'+note+
    '<div class="gxs-subtitle">'+(isInvite?'Tu invitación':'Tus accesos')+'</div><div class="gxs-accesslist">'+(access||'<p class="gxi-note">Sin datos de acceso disponibles.</p>')+'</div>'+
-   '<div class="gxs-actions"><button class="gxs-pill" type="button" data-gxi-action="support">Soporte</button>'+
-   '<button class="gxs-ghost" type="button" data-gxi-action="cancel">Gestionar cancelación</button></div>'+
+   '<div class="gxs-actions"><button class="gxs-pill" type="button" data-gxi-action="options" aria-expanded="false">Más opciones</button>'+
+   '<button class="gxs-ghost" type="button" data-gxi-action="support">Soporte</button></div>'+
+   '<div class="gxs-more" hidden><button type="button" data-gxi-action="cancel">Gestionar cancelación</button></div>'+
    '<span class="gxs-feedback" role="status" aria-live="polite"></span></div></div></div>';
+  if(state.openService===article.dataset.service){article.classList.add('is-open');article.querySelector('.gxs-trigger').setAttribute('aria-expanded','true');const panel=article.querySelector('.gxs-reveal-inner');panel.inert=false;panel.setAttribute('aria-hidden','false')}
   host.append(article);
  });
 }
@@ -465,7 +475,7 @@ $('gxs-list').addEventListener('click',event=>{
  const tile=event.target.closest('.gxs-card');if(!tile)return;
  const toggle=event.target.closest('[data-gxi-toggle]');
  if(toggle){
-  const isOpen=tile.classList.contains('is-open');
+  const isOpen=tile.classList.contains('is-open');state.openService=isOpen?null:tile.dataset.service;
   $('gxs-list').querySelectorAll('.gxs-card').forEach(el=>{
    const active=el===tile&&!isOpen;
    el.classList.toggle('is-open',active);
@@ -489,6 +499,7 @@ $('gxs-list').addEventListener('click',event=>{
    const isHidden=node.textContent==='••••';node.textContent=isHidden?secret:'••••';
    action.textContent=isHidden?'Ocultar':'Mostrar';return
   }
+ if(kind==='options'){const more=tile.querySelector('.gxs-more');more.hidden=!more.hidden;action.setAttribute('aria-expanded',String(!more.hidden));return}
  if(kind==='support'){navigate('support');return}
  if(kind==='cancel'){
   const s=state.view.servicios[Number(tile.dataset.index)];
@@ -548,17 +559,21 @@ async function loadPrices(){
  catch(_){$('gxv-savings').hidden=true}
 }
 function renderSavings(){
- const sum=data.savings(state.view,state.prices);state.savings=sum;const card=$('gxv-savings');
- if(!sum||sum.difference<=0){card.hidden=true;return}
- card.hidden=false;
- $('gxv-amount').textContent=data.money(sum.difference);
+ const sum=data.savings(state.view,state.prices);state.savings=sum;
+ const card=$('gxv-savings'),oldNote=$('gxi-saving-note');
+ if(!sum||sum.difference<=0){card.hidden=true;if(oldNote)oldNote.hidden=true;return}
+ card.hidden=false;card.classList.add('is-visible');
+ const amount=data.money(sum.difference);$('gxv-amount').textContent=amount;
+ $('gxv-amount').dataset.long=String(amount.length>7);
  $('gxv-context').textContent='Estimación · '+sum.covered+' de '+sum.total+' '+(sum.total===1?'servicio comparable':'servicios comparables');
- const logos=$('gxv-logos');logos.replaceChildren();
+ const logos=$('gxv-logos');logos.replaceChildren();logos.dataset.count=String(Math.min(4,sum.entries.length));
  sum.entries.slice(0,4).forEach(e=>{const slot=document.createElement('span');slot.className='gxv-slot';const img=document.createElement('img');img.src=logo(e.service.nombre);img.alt=e.service.nombre;img.loading='lazy';slot.append(img);logos.append(slot)});
  if(sum.entries.length>4){const more=document.createElement('span');more.className='gxv-more';more.textContent='+'+(sum.entries.length-4);logos.append(more)}
- let note=card.querySelector('.gxi-saving-note');if(!note){note=document.createElement('p');note.className='gxi-saving-note';card.append(note)}
+ let details=oldNote;
+ if(!details){details=document.createElement('details');details.id='gxi-saving-note';details.className='gxi-saving-note';const summary=document.createElement('summary');summary.textContent='Cómo calculamos el ahorro';const p=document.createElement('p');details.append(summary,p);card.insertAdjacentElement('afterend',details)}
+ details.hidden=false;
  const newest=sum.entries.map(e=>e.reference.revisado_el).filter(Boolean).sort().at(-1)||'';
- note.textContent='Estimación contra tarifas mensuales individuales públicas, sin ofertas ni anualidades. GOXION puede ofrecer perfiles o invitaciones. Fuentes revisadas: '+(newest||'fecha no disponible')+'.';
+ details.querySelector('p').textContent='Comparación orientativa con tarifas mensuales individuales públicas, sin ofertas ni anualidades. Algunos accesos de GOXION son perfiles o invitaciones y no equivalen a una suscripción individual completa. Tarifas revisadas: '+(newest||'fecha no disponible')+'.';
 }
 async function loadNotifications(){
  if(!state.view)return;
@@ -594,32 +609,17 @@ function renderNotifications(){
   host.append(block);
  });
 }
-function renderCatalog(){
- const host=$('gxi-catalog-list');host.replaceChildren();
- const arr=(state.view?.catalogo||[]).filter(x=>x.activo!==false);
- if(!arr.length){host.textContent='No hay servicios disponibles por ahora.';return}
- arr.forEach(s=>{
-  const link=document.createElement('button');link.className='gxc-mini gxc-surface';link.type='button';
-  link.innerHTML='<img class="gxc-mini-icon" src="'+esc(logo(s.nombre))+'" alt="" style="object-fit:contain">'+
-  '<span class="gxc-mini-copy"><strong>'+esc(s.nombre)+'</strong><small>'+esc(data.money(s.precio))+' · Consultar</small></span><span class="gxc-mini-arrow">›</span>';
-  link.addEventListener('click',()=>{
-   const wa='https://wa.me/'+window.GOXION_CORE.BUSINESS.WHATSAPP+'?text='+encodeURIComponent('Hola, quisiera consultar disponibilidad de '+s.nombre+' en GOXION.');
-   window.open(wa,'_blank','noopener,noreferrer');
-  });host.append(link);
- });
-}
 function navigate(name,skipScroll){
- const valid=['space','catalog','support'];if(!valid.includes(name))return;
- state.tab=name;
- $('gxi-space').hidden=name!=='space';$('gxi-catalog').hidden=name!=='catalog';$('gxi-support').hidden=name!=='support';
+ if(!['space','catalog','support'].includes(name))return;
+ if(name!=='space'){window.location.assign(new URL('../../ayuda.html',window.location.href).href);return}
+ state.tab='space';$('gxi-space').hidden=false;
  document.querySelectorAll('#gxn-nav .gxn-tab').forEach(b=>{
-  if(b.dataset.gxnTarget===name)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');
+  if(b.dataset.gxnTarget==='space')b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');
  });
  $('gxn-profile-menu').hidden=true;$('gxn-notice-menu').hidden=true;
  if(!skipScroll)window.scrollTo({top:0,behavior:reduced()?'instant':'smooth'});
 }
 document.querySelectorAll('#gxn-nav [data-gxn-target]').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.gxnTarget)));
-$('gxi-whatsapp').href='https://wa.me/'+window.GOXION_CORE.BUSINESS.WHATSAPP;
 $('gxn-profile-trigger').addEventListener('click',()=>{
  const menu=$('gxn-profile-menu'),next=menu.hidden;$('gxn-notice-menu').hidden=true;menu.hidden=!next;
  $('gxn-profile-trigger').setAttribute('aria-expanded',String(next));
@@ -656,7 +656,7 @@ function mountGoxy(){
  if(window.GOXY_ROBOT?.mount){mount();return}
  const s=document.createElement('script');s.async=true;s.src='../goxion-ai/goxy-heads.bundle.js';s.onload=mount;document.head.append(s);
 }
-function renderClient(){renderHero();renderBenefits();renderServices();drawHistory();renderCatalog();renderSavings()}
+function renderClient(){renderHero();renderBenefits();renderServices();drawHistory();renderSavings()}
 async function refreshClient(){
  if(state.refreshing||!state.view||document.hidden)return;
  state.refreshing=true;const current=TOKEN();const id=state.view.cliente.id;
