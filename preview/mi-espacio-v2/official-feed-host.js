@@ -4,9 +4,11 @@
 (function(){
 'use strict';
 const dash=document.getElementById('view-dashboard');
+const catalog=document.getElementById('view-catalogo'),support=document.getElementById('view-soporte');
 const feed=document.getElementById('gx-v2-feed');
-const bell=document.getElementById('gxn-bell');
-if(!dash||!feed||!bell)return;
+const headerHost=document.getElementById('gx-v2-shared-header'),navHost=document.getElementById('gx-v2-shared-nav');
+const nav=document.getElementById('gxn-nav'),bell=document.getElementById('gxn-bell');
+if(!dash||!catalog||!support||!feed||!headerHost||!navHost||!nav||!bell)return;
 let authorized=false,rendered=false,accountKey='';
 const veil=document.createElement('div');
 veil.id='gx-v2-sync';
@@ -30,6 +32,7 @@ function mirrorBell(){
  counter.textContent=unread?(badge?.textContent||'1'):'0';
  bell.disabled=!original||original.disabled;
  bell.setAttribute('aria-label',unread?'Notificaciones sin leer '+counter.textContent:'Notificaciones');
+ bell.setAttribute('aria-expanded',String(!!document.getElementById('gx-client-notif-sheet')?.classList.contains('show')));
 }
 bell.addEventListener('click',()=>document.getElementById('gx-client-notif-launch')?.click());
 let watched=null;
@@ -46,11 +49,18 @@ const header=document.querySelector('.app-header');
 if(header)new MutationObserver(watchBell).observe(header,{childList:true,subtree:true});
 document.addEventListener('DOMContentLoaded',watchBell);
 function syncView(){
- const active=authorized&&dash.classList.contains('active');
- document.body.classList.toggle('gx-v2-private-visible',active);
+ const atSpace=dash.classList.contains('active'),atCatalog=catalog.classList.contains('active'),atSupport=support.classList.contains('active');
+ const sessionActive=authorized&&(atSpace||atCatalog||atSupport);
+ const feedActive=authorized&&atSpace;
+ document.body.classList.toggle('gx-v2-client-session',sessionActive);
+ document.body.classList.toggle('gx-v2-private-visible',feedActive);
  dash.classList.toggle('gx-v2-rendered',authorized);
- feed.hidden=!authorized;
- if(active)watchBell();
+ feed.hidden=!authorized;headerHost.hidden=!sessionActive;navHost.hidden=!sessionActive;
+ const current=atSpace?'space':atCatalog?'catalog':atSupport?'support':'';
+ for(const button of nav.querySelectorAll('.gxn-tab')){
+  if(button.dataset.gxnTarget===current)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current')
+ }
+ if(sessionActive)watchBell();
  veil.hidden=rendered;
 }
 function onOfficialReady(){
@@ -84,9 +94,11 @@ window.addEventListener('goxion:v2-feed:error',event=>{
 window.addEventListener('goxion:client-logout',()=>{
  clearTimeout(syncTimeout);
  authorized=false;rendered=false;accountKey='';feed.hidden=true;
- document.body.classList.remove('gx-v2-private-visible');dash.classList.remove('gx-v2-rendered');
+ document.body.classList.remove('gx-v2-private-visible','gx-v2-client-session');
+ headerHost.hidden=true;navHost.hidden=true;dash.classList.remove('gx-v2-rendered');
 });
-new MutationObserver(syncView).observe(dash,{attributes:true,attributeFilter:['class']});
+const viewObserver=new MutationObserver(syncView);
+[dash,catalog,support].forEach(view=>viewObserver.observe(view,{attributes:true,attributeFilter:['class']}));
 onOfficialReady();
 syncView();
 })();

@@ -46,7 +46,7 @@
 <link rel="stylesheet" href="./assets/css/goxion-legal-v2.css?v=purple-cyan-5">
 <link rel="stylesheet" href="./assets/css/goxion-legal-access.css?v=legal-general-1">
 <meta name="robots" content="noindex,nofollow">
-<link rel="stylesheet" href="./preview/mi-espacio-v2/official-feed.css?v=int-1">
+<link rel="stylesheet" href="./preview/mi-espacio-v2/official-feed.css?v=single-capsule-3">
 </head>
 <body class="no-scroll">
 <div id="splash-screen">
@@ -219,6 +219,50 @@
 <span class="gx-nav-label">Soporte</span>
 </button>
 </div>
+<!-- Cápsula única para vistas autenticadas: no se recrea al cambiar secciones. -->
+<div id="gx-v2-shared-header" hidden><div class="gxn-stage" id="gxn-stage">
+ <div class="gxn-top" id="gxn-top">
+  <div class="gxn-header">
+   <span class="gxn-brand" aria-label="GOXION">
+    <img class="gxn-wordmark" src="./logo2.PNG" alt="GOXION">
+    <img class="gxn-brand-mark" src="./Logo individual.png" alt="" aria-hidden="true">
+   </span>
+   <div class="gxn-actions">
+    <button class="gxn-bell" id="gxn-bell" type="button" aria-label="Notificaciones" aria-expanded="false" aria-controls="gx-client-notif-sheet">
+     <span class="gx-client-notif-icon" aria-hidden="true"><svg class="gx-client-notif-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path class="gx-client-notif-clapper" d="M10 21h4"/></svg></span>
+    </button>
+    <button class="gxn-profile-trigger" id="gxn-profile-trigger" type="button" aria-label="Abrir menú de perfil, avatar Goxy" aria-expanded="false" aria-controls="gxn-profile-menu">
+     <span class="gxn-avatar" id="gxn-avatar" aria-hidden="true">
+      <span class="gxn-goxy-fallback">
+       <svg viewBox="0 0 52 52" focusable="false" aria-hidden="true">
+        <defs><linearGradient id="gxn-robot-case" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#5873cc"/><stop offset="1" stop-color="#233e85"/></linearGradient></defs>
+        <rect x="5.5" y="9" width="41" height="35" rx="12" fill="url(#gxn-robot-case)" stroke="#a9bce5" stroke-width="1.5"/>
+        <rect x="10.5" y="14.5" width="31" height="25" rx="8" fill="#eaf8ff"/>
+        <rect x="16.5" y="24" width="7.5" height="6.5" rx="3.1" fill="#2c438c"/>
+        <rect x="28" y="24" width="7.5" height="6.5" rx="3.1" fill="#2c438c"/>
+        <path d="M21 34q5 3 10 0" fill="none" stroke="#8ca9d9" stroke-width="1.8" stroke-linecap="round"/>
+       </svg>
+      </span>
+      <span class="gxn-goxy-real"><span class="gxai-avatar"><span id="gxn-goxy-slot" class="gxai-canvas-slot" data-mood="idle"></span></span></span>
+      <img class="gxn-avatar-photo" id="gxn-avatar-photo" alt="" hidden>
+     </span>
+    </button>
+   </div>
+  </div>
+  <div class="gxn-menu gxn-profile-menu" id="gxn-profile-menu" hidden>
+   <div class="gxn-menu-head"><strong id="gxi-account-name">Mi Espacio</strong><small>Sesión verificada</small></div>
+   
+   
+   <div class="gxn-menu-rule"></div>
+   <button type="button" class="gxn-logout" id="gxn-logout"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4H5v16h4M12 12h9m-4-4 4 4-4 4"/></svg>Salir</button>
+  </div>
+  </div>
+</div></div>
+<div id="gx-v2-shared-nav" hidden><nav class="gxn-nav" id="gxn-nav" data-mode="expanded" aria-label="Navegación principal">
+   <button type="button" class="gxn-tab" data-gxn-target="space" aria-label="Mi Espacio" aria-current="page"><span class="gxn-emoji" aria-hidden="true">👤</span><span class="gxn-tab-label">Mi Espacio</span></button>
+   <button type="button" class="gxn-tab" data-gxn-target="catalog" aria-label="Abrir Catálogo oficial" title="Abrir Catálogo oficial"><span class="gxn-emoji" aria-hidden="true">🛒</span><span class="gxn-tab-label">Catálogo</span></button>
+   <button type="button" class="gxn-tab" data-gxn-target="support" aria-label="Abrir Soporte oficial" title="Abrir Soporte oficial"><span class="gxn-emoji" aria-hidden="true">🛠️</span><span class="gxn-tab-label">Soporte</span></button>
+  </nav></div>
 <div class="view-section" id="view-inicio">
 <div class="reveal" style="text-align: center; margin-top: 10px;">
 <h2 class="hero-title">Tus apps premium<br/><span>al mejor precio</span></h2>
@@ -381,49 +425,7 @@
 <div class="view-section" id="view-dashboard">
 <!-- Feed privado V2, único lugar con diseño nuevo -->
 <div id="gx-v2-feed" hidden><div id="gxi-shell" class="shell">
-<div class="gxn-stage" id="gxn-stage">
- <div class="gxn-top" id="gxn-top">
-  <div class="gxn-header">
-   <span class="gxn-brand" aria-label="GOXION">
-    <img class="gxn-wordmark" src="./logo2.PNG" alt="GOXION">
-    <img class="gxn-brand-mark" src="./Logo individual.png" alt="" aria-hidden="true">
-   </span>
-   <div class="gxn-actions">
-    <button class="gxn-bell" id="gxn-bell" type="button" aria-label="Notificaciones" aria-expanded="false" aria-controls="gx-client-notif-sheet">
-     <span class="gx-client-notif-icon" aria-hidden="true"><svg class="gx-client-notif-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path class="gx-client-notif-clapper" d="M10 21h4"/></svg></span>
-    </button>
-    <button class="gxn-profile-trigger" id="gxn-profile-trigger" type="button" aria-label="Abrir menú de perfil, avatar Goxy" aria-expanded="false" aria-controls="gxn-profile-menu">
-     <span class="gxn-avatar" id="gxn-avatar" aria-hidden="true">
-      <span class="gxn-goxy-fallback">
-       <svg viewBox="0 0 52 52" focusable="false" aria-hidden="true">
-        <defs><linearGradient id="gxn-robot-case" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#5873cc"/><stop offset="1" stop-color="#233e85"/></linearGradient></defs>
-        <rect x="5.5" y="9" width="41" height="35" rx="12" fill="url(#gxn-robot-case)" stroke="#a9bce5" stroke-width="1.5"/>
-        <rect x="10.5" y="14.5" width="31" height="25" rx="8" fill="#eaf8ff"/>
-        <rect x="16.5" y="24" width="7.5" height="6.5" rx="3.1" fill="#2c438c"/>
-        <rect x="28" y="24" width="7.5" height="6.5" rx="3.1" fill="#2c438c"/>
-        <path d="M21 34q5 3 10 0" fill="none" stroke="#8ca9d9" stroke-width="1.8" stroke-linecap="round"/>
-       </svg>
-      </span>
-      <span class="gxn-goxy-real"><span class="gxai-avatar"><span id="gxn-goxy-slot" class="gxai-canvas-slot" data-mood="idle"></span></span></span>
-      <img class="gxn-avatar-photo" id="gxn-avatar-photo" alt="" hidden>
-     </span>
-    </button>
-   </div>
-  </div>
-  <div class="gxn-menu gxn-profile-menu" id="gxn-profile-menu" hidden>
-   <div class="gxn-menu-head"><strong id="gxi-account-name">Mi Espacio</strong><small>Sesión verificada</small></div>
-   
-   
-   <div class="gxn-menu-rule"></div>
-   <button type="button" class="gxn-logout" id="gxn-logout"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4H5v16h4M12 12h9m-4-4 4 4-4 4"/></svg>Salir</button>
-  </div>
-  </div>
-</div>
-<nav class="gxn-nav" id="gxn-nav" data-mode="expanded" aria-label="Navegación principal">
-   <button type="button" class="gxn-tab" data-gxn-target="space" aria-label="Mi Espacio" aria-current="page"><span class="gxn-emoji" aria-hidden="true">👤</span><span class="gxn-tab-label">Mi Espacio</span></button>
-   <button type="button" class="gxn-tab" data-gxn-target="catalog" aria-label="Abrir Catálogo oficial" title="Abrir Catálogo oficial"><span class="gxn-emoji" aria-hidden="true">🛒</span><span class="gxn-tab-label">Catálogo</span></button>
-   <button type="button" class="gxn-tab" data-gxn-target="support" aria-label="Abrir Soporte oficial" title="Abrir Soporte oficial"><span class="gxn-emoji" aria-hidden="true">🛠️</span><span class="gxn-tab-label">Soporte</span></button>
-  </nav>
+
 
 
 
@@ -1026,8 +1028,8 @@
 <script id="goxion-release-launch" src="./assets/js/ayuda/20-release-announcement.js?v=oficial-v2-todos"></script>
 <script id="goxion-legal-v2" src="./assets/js/ayuda/21-legal-v2-documents.js?v=cola-v1"></script>
 <script src="./assets/js/ayuda/22-legal-access.js?v=legal-general-1"></script>
-<script src="./preview/mi-espacio-v2/v2-data.js?v=int-1"></script>
-<script src="./preview/mi-espacio-v2/official-feed-runtime.js?v=int-1"></script>
-<script src="./preview/mi-espacio-v2/official-feed-host.js?v=int-1"></script>
+<script src="./preview/mi-espacio-v2/v2-data.js?v=feed-mount-20261123b"></script>
+<script src="./preview/mi-espacio-v2/official-feed-runtime.js?v=single-capsule-3"></script>
+<script src="./preview/mi-espacio-v2/official-feed-host.js?v=single-capsule-3"></script>
 </body>
 </html>

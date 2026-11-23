@@ -75,21 +75,34 @@ async function run(browserType,label){
     const hero=document.getElementById('focus'),surface=document.querySelector('#gx-v2-feed .gxc-surface');
     return {old:!!document.getElementById('dash-services'),oldHidden:getComputedStyle(document.getElementById('gx-v2-legacy-host')).display,
       catalog:!!document.getElementById('view-catalogo'),support:!!document.getElementById('view-soporte'),
-      glass:getComputedStyle(surface).backdropFilter,logoSrc:document.querySelector('#gx-v2-feed .gxn-wordmark')?.getAttribute('src'),
-      hero:hero?.querySelector('.focus-title')?.textContent,live:document.body.classList.contains('gx-v2-private-visible')};
+      glass:getComputedStyle(surface).backdropFilter,logoSrc:document.querySelector('#gx-v2-shared-header .gxn-wordmark')?.getAttribute('src'),
+      hero:hero?.querySelector('.focus-title')?.textContent,live:document.body.classList.contains('gx-v2-private-visible'),sharedNav:document.querySelector('#gx-v2-shared-nav .gxn-nav')?.getBoundingClientRect().width,navChildren:document.querySelectorAll('#gxn-nav .gxn-tab').length,padding:getComputedStyle(document.querySelector('#gx-v2-feed .shell')).paddingBottom};
    });
    assert(v.old&&v.catalog&&v.support,label+'/'+width+' otros módulos oficiales presentes');
    assert.equal(v.oldHidden,'none',label+'/'+width+' dashboard viejo invisible, handlers conservados');
    assert(v.glass.includes('11.75px'),label+'/'+width+' material neutral aprobado: '+v.glass);
    assert.equal(v.logoSrc,'./logo2.PNG',label+'/'+width+' recurso raíz correcto');
    assert(v.live,label+'/'+width+' header original oculto solo en el feed');
+   assert.equal(v.navChildren,3,label+'/'+width+' la única cápsula contiene tres botones');
+   assert(v.sharedNav>0,label+'/'+width+' cápsula compartida visible');
+   assert(parseFloat(v.padding)<40,label+'/'+width+' sin hueco inferior heredado: '+v.padding);
+   assert.equal(await page.locator('#gxs-list .gxs-more:visible').count(),0,label+'/'+width+' gestionar cancelación no se adelanta');
+   await page.evaluate(()=>window.__qaMainNav=document.getElementById('gxn-nav'));
    await page.locator('#gxn-nav [data-gxn-target=catalog]').click();
    await page.locator('#view-catalogo.active').waitFor({state:'visible',timeout:5000});
-   assert.equal(await page.locator('body').evaluate(el=>el.classList.contains('gx-v2-private-visible')),false,label+'/'+width+' volver al shell oficial');
+   assert.equal(await page.locator('body').evaluate(el=>el.classList.contains('gx-v2-private-visible')),false,label+'/'+width+' sale del feed privado');
+   assert.equal(await page.locator('#gx-v2-shared-nav').isVisible(),true,label+'/'+width+' misma cápsula en Catálogo');
+   assert.equal(await page.locator('#gxn-nav [data-gxn-target=catalog]').getAttribute('aria-current'),'page',label+'/'+width+' catálogo activo');
+   assert(await page.evaluate(()=>window.__qaMainNav===document.getElementById('gxn-nav')),label+'/'+width+' cápsula idéntica, sin recrear DOM');
    await page.evaluate(()=>window.switchTab('soporte'));
    await page.locator('#view-soporte.active').waitFor({state:'visible',timeout:5000});
+   assert.equal(await page.locator('#gx-v2-shared-nav').isVisible(),true,label+'/'+width+' misma cápsula en Soporte');
+   assert.equal(await page.locator('#gxn-nav [data-gxn-target=support]').getAttribute('aria-current'),'page',label+'/'+width+' soporte activo');
+   assert(await page.evaluate(()=>window.__qaMainNav===document.getElementById('gxn-nav')),label+'/'+width+' misma referencia DOM en Soporte');
    await page.evaluate(()=>window.switchTab('inicio'));
    await page.locator('#gx-v2-feed').waitFor({state:'visible',timeout:5000});
+   assert(await page.evaluate(()=>window.__qaMainNav===document.getElementById('gxn-nav')),label+'/'+width+' misma cápsula al volver');
+   assert.equal(await page.locator('#gxn-nav [data-gxn-target=space]').getAttribute('aria-current'),'page',label+'/'+width+' Mi Espacio activo');
    assert.equal(await page.locator('#gx-v2-feed .gxb-tile').count(),3,label+'/'+width+' beneficios nuevos intactos');
    const v2Errors=failures.filter(x=>/official-feed-runtime|official-feed-host|Cannot read properties of null.*gxn|Unexpected token.*scope/i.test(x));
    assert.deepEqual(v2Errors,[],label+'/'+width+' excepciones propias del injerto');

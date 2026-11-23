@@ -503,7 +503,7 @@ $('gxs-list').addEventListener('click',event=>{
  if(kind==='support'){navigate('support');return}
  if(kind==='cancel'){
   const s=state.view.servicios[Number(tile.dataset.index)];
-  feedback.textContent='La gestión de cancelaciones sigue disponible en el sistema oficial. Este flujo requiere conexión y validación antes de habilitarse en V2.';
+  feedback.textContent='Esta gestión continúa en integración en el espejo. No se ha enviado ninguna solicitud.';
  }
 });
 function dateLabel(raw){

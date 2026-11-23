@@ -27,7 +27,15 @@ assert(!mirror.includes('glass-beam')&&!mirror.includes('glass-orb'),'Excluir lu
 assert(!runtime.includes('data.login(')&&!runtime.includes('gxi-login-form'),'No hay segundo login');
 assert(runtime.includes('const ENABLE_WRITES=false'),'Los controles comerciales V2 siguen protegidos');
 assert(host.includes("new Event('goxion:client-logout')")===false||host.includes('goxion:client-logout'),'Se mantiene cierre por señal oficial');
-assert(css.includes('@scope (#gx-v2-feed)'),'CSS nuevo limitado al feed privado');
+assert(css.includes('@scope (#gx-v2-feed, #gx-v2-shared-header, #gx-v2-shared-nav)'),'CSS nuevo sólo en feed y cápsula compartida');
+assert.equal((mirror.match(/id="gxn-nav"/g)||[]).length,1,'Una sola cápsula real en todas las secciones');
+assert.equal((mirror.match(/id="gxn-bell"/g)||[]).length,1,'Una sola campana');
+assert(mirror.indexOf('id="gx-v2-shared-nav"')<mirror.indexOf('id="view-inicio"'),'La cápsula no debe estar encerrada en el dashboard');
+assert(host.includes('[dash,catalog,support].forEach'),'La navegación escucha las tres vistas oficiales');
+assert(css.includes('.gxs-more[hidden]{display:none!important}'),'No enseñar acciones de cancelación fuera de Más opciones');
+assert(css.includes('rgba(8,8,12,.74)')&&css.includes('11.75px'),'Material neutral de notificaciones');
+assert(css.includes('gx-client-notif-close::before')&&css.includes('inset:4.5px'),'Círculo X de 35px en las notificaciones');
+assert(css.includes('calc(18px + env(safe-area-inset-bottom,0px))'),'Sin hueco inferior del laboratorio');
 assert(css.includes('rgba(8,8,12,.371)')&&css.includes('blur(11.75px)'),'Cristal del laboratorio intacto');
 assert(css.includes('gx-v2-private-visible')&&!css.includes('glass-beam'),'Sólo feed V2 y sin haz de laboratorio');
 new Function(runtime);new Function(host);
