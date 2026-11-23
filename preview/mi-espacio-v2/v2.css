@@ -36,3 +36,15 @@
 .gxs-reveal-inner [hidden]{display:none!important}
 .gxi-offline{color:#fec6c9}
 @media(prefers-reduced-motion:reduce){.gxi-auth form button{transition:none!important}}
+
+/* Espejo integral: el laboratorio V2 sigue puro; Catálogo y Soporte no se reescriben. */
+.gxi-official-portal{position:relative;width:calc(100% + 36px);margin:0 -18px;min-height:calc(100dvh - 170px);isolation:isolate}
+.gxi-official-portal[hidden],.gxi-official-portal iframe[hidden]{display:none!important}
+.gxi-official-portal iframe{display:block;width:100%;height:max(525px,calc(100dvh - 158px));border:0;background:#030305}
+.gxi-portal-loading{display:flex;align-items:center;justify-content:center;gap:12px;min-height:240px;color:#c4d4df;font-size:12px;font-weight:500}
+.gxi-portal-loading[hidden],.gxi-portal-error[hidden]{display:none!important}
+.gxi-portal-spinner{width:19px;height:19px;border-radius:50%;border:2px solid rgba(225,237,246,.12);border-top-color:#b5d9e1;animation:gxi-portal-spin .95s linear infinite}
+@keyframes gxi-portal-spin{to{transform:rotate(1turn)}}
+.gxi-portal-error{margin:20px;text-align:center;font-size:11px;line-height:1.7;color:#b7c9d6}
+.gxi-portal-error a{color:#9bd8e3}
+@media(prefers-reduced-motion:reduce){.gxi-portal-spinner{animation:none!important}}
