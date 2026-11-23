@@ -126,14 +126,14 @@ function missionInfo(view){
  const g=view.gamificacion||{};
  const tasks=String(g.tareas||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
  const version=Number(g.misiones_version||1);
- const doneSet=new Set((view.misiones_progreso||[]).filter(x=>Number(x.misiones_version||1)===version).map(x=>Number(x.mision_index)));
+ const doneSet=new Set((view.misiones_progreso||[]).filter(x=>x.misiones_version==null||Number(x.misiones_version)===version).map(x=>Number(x.mision_index)));
  const done=tasks.filter((x,i)=>doneSet.has(i)).length;
  const claimed=Number(g.cupon_reclamado_ciclo||0)>=Math.max(1,Number(g.cupon_ciclo||1))||g.cupon_reclamado===true;
  return {tasks,doneSet,done,total:tasks.length,ready:tasks.length>0&&done>=tasks.length,claimed,discount:Number(g.descuento||0)};
 }
 function benefitState(key){
  const v=state.view,c=v.cliente,mi=missionInfo(v),ref=v.referidos?.[0]||null;
- const streak=Math.max(0,Number(c.pagos_puntuales)||0);
+ const streak=Math.max(0,Number(v.estado_cuenta?.lealtad?.pagos_efectivos??c.pagos_puntuales)||0);
  const lost=c.racha_reiniciada_virtual===true||v.gamificacion?.racha_reiniciada_virtual===true;
  if(key==='loyalty'){
   const target=streak<4?4:9,shown=Math.min(streak,target);
@@ -144,7 +144,7 @@ function benefitState(key){
  }
  if(key==='referral'){
   const months=Math.max(0,Math.min(3,Number(ref?.meses_efectivos??ref?.meses_override??ref?.meses??0)||0));
-  const count=Array.isArray(ref?.servicios)?ref.servicios.length:Number(ref?.plataformas||0);
+  const count=Number(ref?.plataformas??(Array.isArray(ref?.servicios)?ref.servicios.length:0))||0;
   const claimed=ref?.beneficio_reclamado===true,ready=!!ref&&!claimed&&count>=2&&months>=3;
   return {label:'Referidos',num:ref?months+'/3':'Invita',unit:ref?'meses válidos':'sin referidos',pct:months/3*100,meter:!!ref&&months>0,
    emoji:claimed?'💝':ready?'🎁':ref?'🎁':'🫂',title:claimed?'Beneficio aplicado':ready?'¡Beneficio desbloqueado!':ref?'Tu invitado avanza':'Invita y gana',
