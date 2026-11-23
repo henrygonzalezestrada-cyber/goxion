@@ -5,6 +5,7 @@ on:
       - 'preview/mi-espacio-v2/**'
       - 'ayuda-espejo-feed-v2.html'
       - 'scripts/mi-espacio-v2-official-shell-smoke.mjs'
+      - 'scripts/mi-espacio-v2-official-shell-browser.mjs'
       - 'scripts/mi-espacio-v2-smoke.mjs'
       - 'scripts/mi-espacio-v2-browser.mjs'
       - '.github/workflows/mi-espacio-v2.yml'
