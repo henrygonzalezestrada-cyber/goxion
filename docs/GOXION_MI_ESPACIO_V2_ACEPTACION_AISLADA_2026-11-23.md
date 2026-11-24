@@ -152,3 +152,10 @@ Por indicación del usuario, separar el punto decimal (línea base, .65em) de lo
 ## Ahorro · formato monetario uniforme · 24/nov/2026
 
 Decisión posterior del usuario: mantener pesos y centavos al mismo tamaño y línea base, como Index. Se retiran spans y estilos de centavos elevados; se conservan dos decimales, contador, ajuste de importes largos y formato es-MX/MXN. Se actualiza manual. Solo espejo y arnés; Index y ayuda.html intactos.
+
+
+## Fase 4 · sincronización de aceptación · 24 nov 2026
+- Ruta ayuda-aceptacion-v2.html regenerada desde candidato actual: mismos archivos y versiones de renderer, CSS, introducción y PulsoIcon; adaptadores exclusivos de sesión, datos, navegación y red QA conservados. Se incorpora historial a data.js de QA. CSP y guard v4 limitan tráfico al proyecto aislado; WhatsApp, compras y comunicaciones externas no habilitados.
+- Aplicadas en QA las dos migraciones versionadas de calificaciones/reportes y aviso atómico. Instalados historial-cliente, experiencia-servicio, experiencia-servicio-admin y opiniones-goxion; comprobación de fuente: 4/4 activas e idénticas al repositorio.
+- RLS activo, lectura anónima denegada para ambas tablas nuevas, trigger instalado, 18/18 columnas B2 requeridas presentes, sin pg_cron. Contratos de presentación 35/35. No se modificaron cuentas ni datos de producción.
+- Aceptación todavía parcial: falta credenciales-cliente (bloqueo de despliegue/vault anterior), validar sesión administrativa QA y rutas HTTP autenticadas. No certificar escrituras, compensaciones o Safari con sólo inspección estática. Próximo: pruebas integrales agrupadas y corrección exclusiva de fallos reproducidos; no sustituir ayuda.html hasta superar puertas de aceptación.
