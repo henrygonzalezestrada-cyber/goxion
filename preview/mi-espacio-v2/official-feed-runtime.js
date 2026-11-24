@@ -193,7 +193,7 @@ function benefitState(key){
    accent:claimed?'reclamado':ready?'desbloqueado!':ref?'avanza':'gana',
    copy:ref?String(count)+' servicios · '+months+' meses validados.':'Comparte GOXION para comenzar a obtener beneficios.',
    note:'Para acceder al mes gratis se requieren al menos 2 servicios durante 3 meses válidos.',
-   progress:months+' de 3 meses',action:claimed?'Ver historial':ready?'Reclamar mes gratis':'Compartir GOXION',
+   progress:months+' de 3 meses',action:claimed?'Ver historial':ready?'Reclamar mes gratis':'Compartir invitación',
    phase:claimed?'claimed':ready?'ready':ref?'active':'none'};
  }
  return {label:'Misiones',num:mi.total?mi.done+'/'+mi.total:'—',unit:mi.total?'completadas':'sin tareas',pct:mi.total?100*mi.done/mi.total:0,meter:mi.total>0,
@@ -201,7 +201,7 @@ function benefitState(key){
    accent:mi.claimed?'reclamado':mi.ready?'disponible!':mi.total?'continúa':'activas',
    copy:mi.total?'Has completado '+mi.done+' de '+mi.total+' actividades.':'Vuelve pronto para descubrir nuevas actividades.',
    note:'Las misiones solo se acreditan al validarse. El descuento aprobado es '+mi.discount+'%.',
-   progress:mi.done+' de '+mi.total+' misiones',action:mi.claimed?'Ver historial':mi.ready?'Aplicar cupón':'Ver actividades',
+   progress:mi.done+' de '+mi.total+' misiones',action:mi.claimed?'Ver historial':mi.ready?'Aplicar cupón':'Continuar misión',
    tasks:mi,phase:mi.claimed?'claimed':mi.ready?'ready':'active'};
 }
 function updateMini(tile,detail){
@@ -275,10 +275,10 @@ function setBenefitPanel(detail,key){
    const done=detail.tasks.doneSet.has(index);
    const label=String(raw).replace(/\[[^\]]+\]/g,'').trim();
    const icon=done?'<svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg>':'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>';
-   return '<li data-status="'+(done?'done':'pending')+'"><span class="gxb-task-main"><span class="gxb-task-check" aria-hidden="true">'+icon+'</span><span>'+esc(label)+'</span></span>'+(done?'<small>Completada</small>':'<button type="button" class="gxb-task-action" data-gxb-mission="'+index+'" aria-label="Realizar '+esc(label)+'">Realizar</button>')+'</li>';
+   const row='<span class="gxb-task-main"><span class="gxb-task-check" aria-hidden="true">'+icon+'</span><span>'+esc(label)+'</span></span><small>'+(done?'Completada':'Pendiente')+'</small>';
+   return '<li data-status="'+(done?'done':'pending')+'">'+(done?row:'<button type="button" class="gxb-task-row" data-gxb-mission="'+index+'" aria-label="Realizar '+esc(label)+'">'+row+'</button>')+'</li>';
   }).join('')+'</ul>';
  }
- if(key==='referral'&&['none','active'].includes(detail.phase))html+='<button type="button" class="gxb-copy-invite" data-gxb-copy-invite>Copiar enlace de invitación</button>';
  html+='<p class="gxb-note">'+esc(detail.note)+'</p>';
  content.innerHTML=html;
  $('gxb-panel-emoji').textContent=detail.emoji;
@@ -455,11 +455,12 @@ function setupBenefits(){
   const msg='Hola, quiero unirme a GOXION. Vengo invitado por el cliente '+client.nombre+' ('+client.folio+').';
   return 'https://wa.me/'+phone+'?text='+encodeURIComponent(msg);
  }
- async function shareInvitation(copy=false){
+ async function shareInvitation(){
   const token=TOKEN(),url=invitation();if(!url){feedback.textContent='No se pudo preparar la invitación.';return}
   try{
-   if(copy||!navigator.share){await navigator.clipboard.writeText(url);feedback.textContent='Enlace copiado.'}
-   else await navigator.share({text:'Conoce GOXION y sus servicios.',url});
+   const payload={text:'Conoce GOXION y sus servicios.',url};
+   if(typeof navigator.share==='function'&&(!navigator.canShare||navigator.canShare(payload)))await navigator.share(payload);
+   else{await navigator.clipboard.writeText(url);feedback.textContent='Enlace copiado.'}
    if(ENABLE_WRITES&&TOKEN()===token&&window.goxionMissionAPI){await window.goxionMissionAPI.completeType('compartir');if(TOKEN()===token)await window.goxionMissionAPI.completeType('referidos')}
   }catch(e){if(e?.name!=='AbortError'&&TOKEN()===token)feedback.textContent='No fue posible completar la acción.'}
  }
@@ -483,7 +484,7 @@ function setupBenefits(){
   }catch(e){if(TOKEN()===token)feedback.textContent=e.message||'No fue posible completar la actividad.'}
   finally{missionBusy=false}
  }
- $('gxb-content').addEventListener('click',event=>{const task=event.target.closest('[data-gxb-mission]');if(task){void runMission(Number(task.dataset.gxbMission));return}if(event.target.closest('[data-gxb-copy-invite]'))void shareInvitation(true)});
+ $('gxb-content').addEventListener('click',event=>{const task=event.target.closest('[data-gxb-mission]');if(task)void runMission(Number(task.dataset.gxbMission))});
  tiles.forEach(tile=>tile.addEventListener('click',()=>open(tile.dataset.gxb)));
  close.addEventListener('click',collapse);
  panel.addEventListener('keydown',event=>{if(event.key==='Escape'){event.preventDefault();collapse()}});
