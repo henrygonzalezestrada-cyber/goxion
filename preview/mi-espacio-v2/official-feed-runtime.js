@@ -929,19 +929,33 @@ function historyRows(){
  }
  for(const c of view.cancelaciones||[]){
   const st=clean(c.estado);if(!['solicitada','efectiva','efectuada','completada','aprobada','rechazada'].includes(st)||!c.id)continue;
-  items.push({id:'c-'+c.id,date:c.resuelta_at||c.updated_at||c.created_at||'',title:st==='solicitada'?'Cancelación solicitada':st==='aprobada'?'Cancelación aprobada':st==='rechazada'?'Cancelación no autorizada':'Baja de servicio registrada',subject:String(c.servicio_nombre||c.nombre||'Servicio'),amount:'',detail:'Estado confirmado: '+String(c.estado),kind:'cancellation'});
+  items.push({id:'c-'+c.id,date:['efectiva','efectuada','completada'].includes(st)?(c.efectiva_at||c.fecha_efectiva||c.resuelta_at||''):st==='solicitada'?(c.solicitada_at||c.created_at||''):(c.resuelta_at||c.updated_at||''),title:st==='solicitada'?'Cancelación solicitada':st==='aprobada'?'Cancelación aprobada':st==='rechazada'?'Cancelación no autorizada':'Baja de servicio registrada',subject:String(c.servicio_nombre||c.nombre||'Servicio'),amount:'',detail:['efectiva','efectuada','completada'].includes(st)?'La baja del servicio se hizo efectiva.':st==='aprobada'&&c.fecha_efectiva?'Baja programada para '+dateLabel(c.fecha_efectiva)+'.':'Estado confirmado: '+String(c.estado),kind:'cancellation'});
  }
- // Solo altas respaldadas por una fecha explícita de contratación/activación del servidor.
- // No copiar los datos ilustrativos del laboratorio ni inferir fechas desde el catálogo.
- for(const service of view.servicios||[]){
-  const date=service.fecha_alta||service.fecha_contratacion||service.fecha_activacion||service.activated_at||'';
-  if(!/^\d{4}-\d{2}-\d{2}/.test(String(date))||!service.id)continue;
-  items.push({id:'a-'+service.id,date,title:String(service.nombre||service.servicio_nombre||'Servicio')+' agregado',
-   subject:'',amount:'',detail:'Servicio incorporado a tu cuenta.',kind:'acquisition'});
+ // Registro de alta, no una afirmación de activación o renovación.
+ for(const service of view.historial?.altas||[]){
+  const date=service.created_at;
+  if(!service.id||!/^\d{4}-\d{2}-\d{2}/.test(String(date||'')))continue;
+  items.push({id:'a-'+service.id,date,title:'Servicio registrado',subject:String(service.nombre||'Servicio'),amount:'',detail:'Registro de incorporación del servicio a tu cuenta.',kind:'acquisition'});
+ }
+ // Beneficios reservados: el origen y su referencia distinguen ciclos y reclamos.
+ const benefits=view.historial?.beneficios||[];
+ for(const b of benefits){
+  if(!b.id||!b.created_at||!['misiones','referidos'].includes(b.origen))continue;
+  const mission=b.origen==='misiones',cycle=String(b.origen_ref||'').match(/:ciclo:(\d+)$/)?.[1];
+  const ref=String(b.origen_ref||'').split(':reclamo:')[0];
+  const id=mission&&cycle?'coupon-'+cycle:!mission&&ref?'ref-'+ref+'-'+b.id:'benefit-'+b.id;
+  items.push({id,date:b.created_at,title:mission?'Cupón reclamado':'Recompensa reclamada',subject:mission?'Misiones':'Referidos',amount:'',detail:'Beneficio registrado para su aplicación conforme al cobro oficial.',kind:'benefit'});
  }
  const g=view.gamificacion;
- if(g?.cupon_reclamado_at&&missionInfo(view).claimed)items.push({id:'coupon-'+String(g.cupon_reclamado_ciclo||g.cupon_ciclo||1),date:g.cupon_reclamado_at,title:'Cupón reclamado',subject:'Misiones',amount:'',detail:'Recompensa registrada; su aplicación depende del cobro oficial.',kind:'benefit'});
- for(const r of view.referidos||[])if(r.id&&r.beneficio_reclamado===true&&r.beneficio_reclamado_at)items.push({id:'ref-'+r.id,date:r.beneficio_reclamado_at,title:'Recompensa reclamada',subject:'Referidos',amount:'',detail:'Mes gratis reclamado. Su aplicación depende del cobro oficial.',kind:'benefit'});
+ const cycle=String(g?.cupon_reclamado_ciclo||g?.cupon_ciclo||1);
+ if(g?.cupon_reclamado_at&&Number(g.cupon_reclamado_ciclo||0)>0&&!benefits.some(b=>b.origen==='misiones'&&String(b.origen_ref||'').endsWith(':ciclo:'+cycle)))items.push({id:'coupon-'+cycle,date:g.cupon_reclamado_at,title:'Cupón reclamado',subject:'Misiones',amount:'',detail:'Recompensa registrada; su aplicación depende del cobro oficial.',kind:'benefit'});
+ for(const r of view.referidos||[])if(r.id&&r.beneficio_reclamado===true&&r.beneficio_reclamado_at&&!benefits.some(b=>b.origen==='referidos'&&String(b.origen_ref||'').startsWith(String(r.id)+':reclamo:')))items.push({id:'ref-'+r.id,date:r.beneficio_reclamado_at,title:'Recompensa reclamada',subject:'Referidos',amount:'',detail:'Mes gratis reclamado. Su aplicación depende del cobro oficial.',kind:'benefit'});
+ for(const a of view.historial?.aplicaciones||[]){
+  if(!a.id||!a.created_at||a.estado!=='consumido'||a.monto_aplicado==null||!Number.isFinite(Number(a.monto_aplicado))||Number(a.monto_aplicado)<=0)continue;
+  const b=benefits.find(x=>x.id===a.beneficio_id);
+  items.push({id:'applied-'+a.id,date:a.created_at,title:'Beneficio aplicado',subject:b?.origen==='misiones'?'Misiones':b?.origen==='referidos'?'Referidos':'Descuento',amount:data.money(a.monto_aplicado),detail:'Descuento aplicado al periodo '+String(a.periodo||'registrado')+'.',kind:'benefit'});
+ }
+ // Renovaciones: no se deducen de pagos ni de ciclos financieros.
  return [...new Map(items.filter(x=>x.id).map(x=>[x.id,x])).values()].sort((a,b)=>String(b.date).localeCompare(String(a.date)));
 }
 function drawHistory(){
@@ -976,6 +990,7 @@ function drawHistory(){
   });
   row.append(b,detail);list.append(row);
  });
+ const foot=document.querySelector('#gxm-history .gxm-footnote');if(foot)foot.textContent=state.view.lecturas?.historial===false||state.view.lecturas?.cancelaciones===false?'Algunos movimientos están pendientes de sincronización.':state.view.historial?.limitado?'Mostramos los movimientos más recientes.':'Movimientos registrados en GOXION.';
  const more=$('gxm-more');more.hidden=records.length<=3;more.textContent=state.showAllHistory?'Mostrar menos':'Ver '+Math.max(0,records.length-3)+' '+(records.length===4?'movimiento':'movimientos')+' más';
 }
 $('gxm-more').addEventListener('click',()=>{state.showAllHistory=!state.showAllHistory;drawHistory()});
