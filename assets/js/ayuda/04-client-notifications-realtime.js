@@ -545,7 +545,9 @@
     const action=button?.dataset?.gxNotifAction||"";
     const ref=button?.dataset?.gxNotifRef||"";
 
+    const actionToken=token(),actionEpoch=state.sessionEpoch;
     if(id)await markOne(id,source);
+    if(actionToken!==token()||actionEpoch!==state.sessionEpoch)return;
     closeSheet();
 
     if(action==="legal"){
@@ -571,6 +573,8 @@
       return;
     }
 
+    // El candidato V2 resuelve sus propios destinos sin abrir nodos legacy ocultos.
+    if(window.GOXION_V2_NOTIFICATION_DESTINATION?.(action,ref)===true)return;
     showDashboard();
     setTimeout(()=>{
       if(action==="referral"&&typeof window.openGamif==="function"){
