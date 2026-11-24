@@ -582,20 +582,20 @@ function morphServiceStage(tile,mutate,animate=true){
  if(!animate||reduced()||!body.animate||!tile.classList.contains('is-open')||!before||!after)return;
  const motion=body.animate([{height:before+'px',overflow:'hidden'},{height:after+'px',overflow:'hidden'}],{duration:300,easing:'cubic-bezier(.22,.82,.24,1)'});
  body._gxStageMotion=motion;
- const visible=body.querySelector('.gxs-detail-stage:not([hidden]),.gxs-more:not([hidden]),.gxs-cancel-panel:not([hidden])');
+ const visible=body.querySelector('.gxs-detail-stage:not([hidden]),.gxs-more:not([hidden]),.gxs-cancel-panel:not([hidden]),.gxs-experience:not([hidden])');
  visible?.animate?.([{opacity:0,transform:'translateY(5px)'},{opacity:1,transform:'translateY(0)'}],{duration:240,easing:'cubic-bezier(.22,.82,.24,1)'});
 }
 function setServiceStage(tile,stage,animate=true,focus=false){
  if(!tile)return;
- const detail=tile.querySelector('.gxs-detail-stage'),options=tile.querySelector('.gxs-more'),cancel=tile.querySelector('.gxs-cancel-panel');
+ const detail=tile.querySelector('.gxs-detail-stage'),options=tile.querySelector('.gxs-more'),cancel=tile.querySelector('.gxs-cancel-panel'),report=tile.querySelector('.gxs-report'),rating=tile.querySelector('.gxs-rating');
  if(!detail||!options||!cancel)return;
  if(tile.dataset.stage===stage)return;
  if(stage!=='detail'&&animate)wipeServiceSecrets();
  morphServiceStage(tile,()=>{
-  tile.dataset.stage=stage;detail.hidden=stage!=='detail';options.hidden=stage!=='options';cancel.hidden=stage!=='cancel';
+  tile.dataset.stage=stage;detail.hidden=stage!=='detail';options.hidden=stage!=='options';cancel.hidden=stage!=='cancel';if(report)report.hidden=stage!=='report';if(rating)rating.hidden=stage!=='rating';
   detail.querySelector('[data-gxi-action="options"]')?.setAttribute('aria-expanded',String(stage==='options'));
  },animate);
- if(focus){const target=(stage==='detail'?detail:stage==='options'?options:cancel).querySelector('[data-gxs-stage-heading],button:not([disabled])');target?.focus({preventScroll:true})}
+ if(focus){const target=(stage==='detail'?detail:stage==='options'?options:stage==='report'?report:stage==='rating'?rating:cancel)?.querySelector('[data-gxs-stage-heading],button:not([disabled])');target?.focus({preventScroll:true})}
 }
 function replaceCancelContent(tile,markup,animate=true){
  const panel=tile.querySelector('.gxs-cancel-panel');
@@ -648,6 +648,66 @@ function credentialPanel(s){
  if(!s.credencial_pendiente?.id)return '';
  return '<section class="gxs-credential-panel" hidden><p class="gxi-note">Consulta única. Ingresa tu PIN de GOXION; no el PIN del perfil.</p><label class="gxi-note">PIN de GOXION<input class="gxs-pin-input" type="password" inputmode="numeric" maxlength="4" autocomplete="off" aria-label="PIN de GOXION"></label><button type="button" class="gxs-pill" data-gxi-action="credential-reveal">Ver contraseña</button><div class="gxs-credential-result" hidden><strong class="gxs-secret"></strong><button type="button" class="gxs-pill" data-gxi-action="credential-copy">Copiar contraseña</button><button type="button" class="gxs-ghost" data-gxi-action="credential-close">Terminar</button></div><p class="gxs-feedback" role="status" aria-live="polite"></p></section>';
 }
+
+const experienceReasons={interrumpido:'Servicio interrumpido',frecuente:'Fallas frecuentes',sin_acceso:'Sin acceso a la plataforma',otro:'Otra afectación'};
+const starLabels=['Selecciona una calificación','Muy mala','Mala','Regular','Buena','Excelente'];
+const experienceBack='<button type="button" class="gxs-ghost gxs-stage-back" data-gxi-action="experience-back">Volver a más opciones</button>';
+function localDay(){const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Mexico_City',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());return ['year','month','day'].map(k=>parts.find(p=>p.type===k)?.value).join('-')}
+function experiencePanels(s){
+ const date=localDay();
+ const shield='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 6v6c0 5 4 8 8 9 4-1 8-4 8-9V6l-8-3Z"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg>';
+ const star='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 3.1 6.4 7.1 1-5.1 5 .9 7.1-6-3.3-6 3.3.9-7.1-5.1-5 7.1-1Z"/></svg>';
+ return '<section class="gxs-experience gxs-report" hidden><span class="gxs-experience-symbol">'+shield+'</span><h3 tabindex="-1" data-gxs-stage-heading>Tu servicio importa.</h3><p class="gxi-note">Cuéntanos qué ocurrió con '+esc(s.nombre)+'. Revisaremos tu caso conforme a nuestra política de trato justo.</p><div class="gxs-experience-fields"><label>Tipo de afectación<select class="gxs-report-reason"><option value="">Seleccionar</option>'+Object.entries(experienceReasons).map(([k,v])=>'<option value="'+k+'">'+v+'</option>').join('')+'</select></label><label>¿Desde cuándo?<input class="gxs-report-day" type="date" value="'+date+'" max="'+date+'"></label><label>Detalles (opcional)<textarea class="gxs-report-comment" maxlength="500" rows="3" placeholder="Cuéntanos qué ocurrió"></textarea></label><small>No incluyas contraseñas, PIN ni datos de acceso.</small></div><button type="button" class="gxs-pill gxs-experience-submit" data-gxi-action="report-submit">Registrar reporte</button><p class="gxs-feedback" role="status" aria-live="polite"></p><div class="gxs-report-receipt" hidden><a class="gxs-pill gxs-experience-submit gxs-wa-link" target="_blank" rel="noopener noreferrer">Continuar a WhatsApp</a><p class="gxi-note">Pulsa Enviar en WhatsApp para compartirlo con GOXION.</p></div>'+experienceBack+'</section>'+
+ '<section class="gxs-experience gxs-rating" hidden><h3 tabindex="-1" data-gxs-stage-heading>¿Qué tal tu experiencia?</h3><p class="gxi-note">Califica tu experiencia con '+esc(s.nombre)+'. Tu opinión es privada.</p><div class="gxs-stars" role="group" aria-label="Calificación de una a cinco estrellas">'+[1,2,3,4,5].map(n=>'<button type="button" data-gxi-action="rating-star" data-rating="'+n+'" aria-label="'+n+' '+(n===1?'estrella':'estrellas')+'" aria-pressed="false">'+star+'</button>').join('')+'</div><span class="gxs-rating-label">'+starLabels[0]+'</span><div class="gxs-experience-fields"><label>Comentario (opcional)<textarea class="gxs-rating-comment" maxlength="500" rows="3" placeholder="Cuéntanos más"></textarea></label><small>No incluyas datos de acceso.</small></div><button type="button" class="gxs-pill gxs-experience-submit" data-gxi-action="rating-submit" disabled>Guardar calificación</button><p class="gxs-feedback" role="status" aria-live="polite"></p>'+experienceBack+'</section>';
+}
+function setStars(panel,n,animate=false){
+ panel.dataset.rating=String(n);panel.querySelector('.gxs-rating-label').textContent=starLabels[n]||starLabels[0];
+ panel.querySelectorAll('[data-rating]').forEach(b=>{const selected=Number(b.dataset.rating)<=n;b.classList.toggle('is-selected',selected);b.setAttribute('aria-pressed',String(Number(b.dataset.rating)===n));if(animate&&Number(b.dataset.rating)===n&&!reduced())b.animate?.([{transform:'scale(.86)'},{transform:'scale(1.12)'},{transform:'scale(1)'}],{duration:300,easing:'cubic-bezier(.2,.8,.2,1)'})});
+ panel.querySelector('[data-gxi-action="rating-submit"]').disabled=!n||panel.dataset.busy==='true';
+}
+async function loadRating(tile,s){
+ const panel=tile.querySelector('.gxs-rating');if(panel.dataset.loaded==='true'||panel.dataset.busy==='true')return;
+ const token=TOKEN(),out=panel.querySelector('.gxs-feedback');panel.dataset.busy='true';out.textContent='Consultando tu calificación…';
+ panel.querySelectorAll('button:not([data-gxi-action="experience-back"]),textarea').forEach(b=>b.disabled=true);
+ try{const res=await data.post('experiencia-servicio',{accion:'consultar',datos:{cliente_servicio_id:s.id}},token);if(TOKEN()!==token||!panel.isConnected)return;
+ const prev=res.calificacion;panel.dataset.loaded='true';panel.querySelector('.gxs-rating-comment').value=prev?.comentario||'';setStars(panel,Number(prev?.calificacion)||0);out.textContent=prev?'Puedes actualizar tu calificación.':'';
+ }catch(e){if(panel.isConnected&&TOKEN()===token)out.textContent='No pudimos consultar tu opinión. Puedes reintentar al volver.'}
+ finally{if(panel.isConnected&&TOKEN()===token){panel.dataset.busy='false';panel.querySelectorAll('[data-rating],textarea').forEach(b=>b.disabled=panel.dataset.loaded!=='true');setStars(panel,Number(panel.dataset.rating)||0)}}
+}
+async function submitExperience(tile,s,kind,button){
+ if(!ENABLE_WRITES||!s?.id||!TOKEN()||serviceOperation)return;
+ const isReport=kind==='report-submit',panel=tile.querySelector(isReport?'.gxs-report':'.gxs-rating'),out=panel.querySelector('.gxs-feedback'),token=TOKEN();
+ let datos={cliente_servicio_id:s.id};
+ if(isReport){
+  const motivo=panel.querySelector('.gxs-report-reason').value,day=panel.querySelector('.gxs-report-day').value,descripcion=panel.querySelector('.gxs-report-comment').value.trim();
+  if(!experienceReasons[motivo]||!day||day>localDay()){out.textContent='Selecciona el motivo y una fecha válida.';return}
+  if(!panel._gxReportId){if(!crypto.randomUUID){out.textContent='Actualiza tu navegador para registrar el reporte.';return}panel._gxReportId=crypto.randomUUID()}
+  datos={...datos,id:panel._gxReportId,motivo,afectacion_desde:day,descripcion};
+ }else{
+  const calificacion=Number(panel.dataset.rating),comentario=panel.querySelector('.gxs-rating-comment').value.trim();
+  if(panel.dataset.loaded!=='true'||!Number.isInteger(calificacion)||calificacion<1||calificacion>5)return;
+  datos={...datos,calificacion,comentario};
+ }
+ panel.dataset.busy='true';serviceOperation=String(s.id);beginFeedBusy(button,isReport?'Registrando reporte…':'Guardando calificación…');
+ panel.querySelectorAll('button,textarea,select,input').forEach(b=>b.disabled=true);out.textContent='';
+ try{
+  const res=await data.post('experiencia-servicio',{accion:isReport?'reportar':'calificar',datos},token);
+  if(TOKEN()!==token||!panel.isConnected)return;
+  if(isReport){
+   const r=res.reporte;if(!r?.id)throw Error('No recibimos la confirmación del reporte.');
+   const phone=String(window.GOXION_CORE?.BUSINESS?.WHATSAPP||(typeof NUMERO_GOXION!=='undefined'?NUMERO_GOXION:'')).replace(/\D/g,'');
+   out.textContent='Reporte registrado. Pendiente de revisión.';
+   panel.dataset.reported='true';button.hidden=true;panel.querySelector('.gxs-experience-fields').hidden=true;
+   const receipt=panel.querySelector('.gxs-report-receipt'),link=receipt.querySelector('a');
+   if(/^\d{10,15}$/.test(phone)){
+    const message=['Hola GOXION, quiero compartir un reporte de trato justo.','Referencia: '+r.id,'GOXION ID: '+String(res.folio||'No disponible'),'Plataforma: '+r.plataforma,'Afectación: '+experienceReasons[r.motivo],'Desde: '+r.afectacion_desde,r.descripcion?'Detalles: '+r.descripcion:''].filter(Boolean).join('\n');
+    link.href='https://wa.me/'+phone+'?text='+encodeURIComponent(message);receipt.hidden=false;
+   }else out.textContent='Reporte registrado. No se pudo preparar el enlace de WhatsApp.';
+  }else{if(!res.calificacion)throw Error('No recibimos confirmación.');out.textContent='¡Gracias! Tu calificación quedó guardada.';button.querySelector('.gx-action-label')?.remove();}
+ }catch(e){if(panel.isConnected&&TOKEN()===token)out.textContent=e.message||'No pudimos guardar. Intenta nuevamente.'}
+ finally{endFeedBusy(button);serviceOperation=null;if(panel.isConnected&&TOKEN()===token){panel.dataset.busy='false';panel.querySelectorAll('button,textarea,select,input').forEach(b=>b.disabled=false);if(!isReport)setStars(panel,Number(panel.dataset.rating)||0)}}
+}
+
 function renderServices(){
  const v=state.view,services=v.servicios||[];
  const digest=JSON.stringify(services);if(state.serviceDigest===digest)return;
@@ -658,6 +718,7 @@ function renderServices(){
  const previous=[...host.querySelectorAll('.gxs-card')].find(el=>el.dataset.service===state.openService);
  const keepStage=previous?.dataset.stage||'detail';
  const priorOffer=previous?._gxOffer,priorRetained=previous?.dataset.retained==='true';
+ const priorExperience=keepStage==='report'||keepStage==='rating'?previous?.querySelector('.gxs-'+keepStage):null;
  const priorPanel=(priorOffer||priorRetained)?previous.querySelector('.gxs-cancel-panel'):null;
  const infoOpen=previous?.querySelector('.gxs-stage-info')?.open;
  const activeAction=previous?.contains(document.activeElement)?document.activeElement?.dataset.gxiAction:null;
@@ -690,8 +751,8 @@ function renderServices(){
    '<div class="gxs-actions"><button class="gxs-pill" type="button" data-gxi-action="'+(cancellationPending(s)?'cancel':'options')+'"'+(cancellationPending(s)?'':' aria-expanded="false"')+'>'+(cancellationPending(s)?'Ver seguimiento':'Más opciones')+'</button>'+
    '<button class="gxs-ghost" type="button" data-gxi-action="support">Soporte</button></div>'+
    '<span class="gxs-feedback" role="status" aria-live="polite"></span></section>'+
-   '<section class="gxs-more" hidden><button type="button" class="gxs-stage-option" data-gxi-action="cancel">'+(clean(s.cancelacion?.estado)==='rechazada'?'Ver cancelación':'Solicitar cancelación')+'</button>'+cancelBack('Volver a mis accesos')+'</section>'+
-   '<section class="gxs-cancel-panel gx-service-view" hidden>'+cancellationPanel(s)+'</section></div></div></div>';
+   '<section class="gxs-more" hidden><button type="button" class="gxs-stage-option" data-gxi-action="report">Reportar un fallo</button><button type="button" class="gxs-stage-option" data-gxi-action="rating">Calificar plataforma</button><button type="button" class="gxs-stage-option" data-gxi-action="cancel">'+(clean(s.cancelacion?.estado)==='rechazada'?'Ver cancelación':'Solicitar cancelación')+'</button>'+cancelBack('Volver a mis accesos')+'</section>'+
+   '<section class="gxs-cancel-panel gx-service-view" hidden>'+cancellationPanel(s)+'</section>'+experiencePanels(s)+'</div></div></div>';
   if(state.openService===article.dataset.service){
    article.classList.add('is-open');article.querySelector('.gxs-trigger').setAttribute('aria-expanded','true');const panel=article.querySelector('.gxs-reveal-inner');panel.inert=false;panel.setAttribute('aria-hidden','false');
    if(keepStage==='cancel'&&priorPanel&&!cancellationPending(s)){
@@ -699,6 +760,7 @@ function renderServices(){
     if(priorRetained)article.dataset.retained='true';
     article.querySelector('.gxs-cancel-panel').replaceWith(priorPanel);
    }
+   if(priorExperience){article.querySelector('.gxs-'+keepStage)?.replaceWith(priorExperience)}
    setServiceStage(article,keepStage==='options'&&cancellationPending(s)?'cancel':keepStage,false);
    if(infoOpen){const info=article.querySelector('.gxs-stage-info');if(info)info.open=true}
   }
@@ -800,6 +862,10 @@ $('gxs-list').addEventListener('click',async event=>{
  if(kind==='service-back'){if(serviceOperation)return;if(tile.dataset.retained==='true'){delete tile.dataset.retained;const s=serviceById(tile.dataset.service);if(s)replaceCancelContent(tile,cancellationPanel(s),false)}setServiceStage(tile,'detail',true,true);void refreshClient();return}
  const service=serviceById(tile.dataset.service);
  if(kind==='support'){wipeServiceSecrets();navigate('support');setTimeout(()=>{if(!service||typeof gxSupportButtonForService!=='function')return;const b=gxSupportButtonForService(service.nombre);if(b&&typeof selectPlatform==='function')selectPlatform(service.nombre,b,null)},420);return}
+ if(kind==='experience-back'){if(!serviceOperation)setServiceStage(tile,'options',true,true);return}
+ if(kind==='report'||kind==='rating'){if(!serviceOperation&&service?.id){setServiceStage(tile,kind,true,true);if(kind==='rating')void loadRating(tile,service)}return}
+ if(kind==='rating-star'){const panel=tile.querySelector('.gxs-rating');if(panel.dataset.busy!=='true'){setStars(panel,Number(action.dataset.rating),true);panel.querySelector('.gxs-feedback').textContent=''}return}
+ if(kind==='report-submit'||kind==='rating-submit'){await submitExperience(tile,service,kind,action);return}
  if(kind==='cancel'){if(!serviceOperation)setServiceStage(tile,'cancel',true,true);return}
  if(['cancel-submit','retention-accept','retention-decline'].includes(kind)){await cancellationAction(tile,kind,action,service);return}
  const credential=tile.querySelector('.gxs-credential-panel');
