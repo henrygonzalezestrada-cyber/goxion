@@ -1,4 +1,4 @@
-/* Única pantalla de arranque del espejo; viaje del logo solo en sesión privada. */
+/* Única pantalla de arranque del espejo; mismo viaje del logo público y privado. */
 #gx-v2-handoff[hidden]{display:none!important}
 #gx-v2-handoff{
  position:fixed;inset:0;z-index:10005;display:grid;place-items:center;
@@ -32,10 +32,11 @@
 }
 #gx-v2-handoff .gx-v2-handoff-copy{font:600 10px/1.45 Poppins,system-ui,sans-serif;letter-spacing:.04em;color:#94b7c5}
 @keyframes gxV2HandoffProgress{from{transform:translateX(-115%)}to{transform:translateX(300%)}}
-body.gx-v2-handoff-active #gx-v2-shared-header .gxn-wordmark{opacity:0!important}
-#gx-v2-shared-header .gxn-wordmark{transition:opacity .22s ease-out}
+body.gx-v2-handoff-active #gx-v2-shared-header .gxn-wordmark,
+body.gx-v2-handoff-active .app-header>.app-logo{opacity:0!important}
+#gx-v2-shared-header .gxn-wordmark,.app-header>.app-logo{transition:opacity .22s ease-out}
 @media(prefers-reduced-motion:reduce){
- #gx-v2-handoff,#gx-v2-handoff::before,#gx-v2-shared-header .gxn-wordmark{transition:none!important}
+ #gx-v2-handoff,#gx-v2-handoff::before,#gx-v2-shared-header .gxn-wordmark,.app-header>.app-logo{transition:none!important}
  #gx-v2-handoff .gx-v2-handoff-track>span{animation:none!important}
 }
 
