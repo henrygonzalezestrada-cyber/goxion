@@ -117,3 +117,8 @@ Usuario confirma comportamiento general del espejo, accesos y cancelación; cons
 ## Cierre visual de cancelaciones · candidato único (23/nov/2026)
 
 Aprobada por el usuario la transformación dentro de la tarjeta: accesos, opciones y cancelación son etapas excluyentes. Se mantienen los endpoints y el morph original, oferta opcional, condiciones, reintento y seguimiento real. La nota administrativa queda en información desplegable; los estados no se duplican. Se conserva el panel de oferta/beneficio durante refresco, se limpian secretos al salir de accesos y se permite consultar accesos durante revisión. Se respeta movimiento reducido. La tarjeta principal abre directamente el seguimiento. Se actualiza el mismo espejo y su arnés de aceptación, sin promover ayuda.html ni cambiar Index/Admin/backend. Pendiente validar con navegador y cuenta controlada.
+
+
+## Pulido posterior a prueba del usuario · cancelación y oferta
+
+Se compacta la confirmación eliminando los márgenes heredados y se adopta el botón cápsula cristal/cian; se reserva el rojo para errores. La oferta usa una composición tipográfica con porcentaje, precio final, precio previo derivado de montos reales y ahorro. Luz ambiental suave y pausables, entrada escalonada y movimiento reducido. Se elimina la barra y espera artificial durante la consulta de elegibilidad; la confirmación de operaciones reales conserva su morph. Las condiciones y la opción de continuar cancelando permanecen visibles. Sin cambios de endpoints ni de páginas oficiales. Pendiente revisión visual en iPhone.

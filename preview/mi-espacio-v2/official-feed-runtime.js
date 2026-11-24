@@ -572,6 +572,12 @@ function cancelSymbol(type){
  const paths={confirm:'<circle cx="12" cy="12" r="9"/><path d="M8 12h8"/>',pending:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',approved:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4m10-4v4M3 10h18m-13 5 3 3 5-5"/>',rejected:'<circle cx="12" cy="12" r="9"/><path d="M12 8v5m0 3h.01"/>',retained:'<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>'};
  return '<span class="gxs-stage-symbol" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">'+paths[type]+'</svg></span>';
 }
+// Promoción: protagonismo del ahorro, sin superficies anidadas ni cifras simuladas.
+function retentionOfferMarkup(offer,s){
+ const final=Number(offer.monto_final),saving=Number(offer.monto_descuento);
+ const original=offer.monto_final!=null&&offer.monto_descuento!=null&&Number.isFinite(final)&&Number.isFinite(saving)&&saving>0&&final>=0?'<s>'+esc(data.money(final+saving))+'</s>':'';
+ return '<section class="gxs-stage-offer"><div class="gxs-offer-hero"><div class="gxs-offer-light" aria-hidden="true"></div><div class="gxs-offer-intro"><span class="gxs-offer-kicker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m12 2 2.5 7.5L22 12l-7.5 2.5L12 22l-2.5-7.5L2 12l7.5-2.5z"/></svg> Beneficio especial</span><button type="button" class="gxs-offer-motion" data-gxi-action="offer-motion" aria-label="Pausar animación de la oferta" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M9 6v12m6-12v12"/></svg></button></div><h3 tabindex="-1" data-gxs-stage-heading>Quédate con '+esc(offer.servicio_nombre||s.nombre)+'</h3><div class="gxs-offer-discount"><strong>−'+esc(offer.porcentaje)+'<span>%</span></strong><small>en tu próximo pago</small></div><div class="gxs-offer-price"><span class="gxs-offer-price-label">Pagarías</span><div>'+original+'<strong>'+esc(data.money(offer.monto_final))+'</strong></div><span class="gxs-offer-saving">Ahorras '+esc(data.money(offer.monto_descuento))+'</span></div></div><p class="gxs-offer-terms">Válido una vez por cuenta, solo en este servicio y durante un periodo.</p><div class="gxs-offer-actions"><button type="button" class="gx-retention-accept gx-action-morph" data-gxi-action="retention-accept"><span class="gx-action-label">Aceptar beneficio</span></button><button type="button" class="gxs-ghost gxs-offer-decline" data-gxi-action="retention-decline">Continuar con la cancelación</button></div><p class="gxs-feedback" role="status" aria-live="polite"></p></section>';
+}
 function cancellationPanel(s){
  const c=s.cancelacion,st=clean(c?.estado),pending=cancellationPending(s),approved=st==='aprobada',rejected=st==='rechazada';
  const kind=approved?'approved':pending?'pending':rejected?'rejected':'confirm';
@@ -662,12 +668,12 @@ async function cancellationAction(tile,kind,button,s){
   if(kind==='cancel-submit'){
    if(s.lecturas?.cancelaciones===false)throw Error('No se pudo comprobar el estado de la solicitud. Reintenta al sincronizar.');
    if(['solicitada','aprobada'].includes(clean(s.cancelacion?.estado)))return;
-   morph(button,'loading');status().textContent='Revisando beneficios disponibles…';
-   const [evaluation]=await Promise.all([api('evaluar_retencion',{cliente_servicio_id:s.id}),wait(650)]);
+   button.disabled=true;button.setAttribute('aria-busy','true');button.querySelector('.gx-action-label').textContent='Consultando…';status().textContent='';
+   const evaluation=await api('evaluar_retencion',{cliente_servicio_id:s.id});
    if(!valid())return;
    if(evaluation.elegible===true&&evaluation.oferta?.id){
     const offer=evaluation.oferta;tile._gxOffer=offer;
-    replaceCancelContent(tile,'<div class="gx-retention-stage gxs-stage-offer"><h3 tabindex="-1" data-gxs-stage-heading>Quédate con un beneficio</h3><p class="gxi-note">Beneficio único para tu próximo pago de '+esc(offer.servicio_nombre||s.nombre)+'.</p><div class="gx-retention-value"><div class="gx-retention-percent">-'+esc(offer.porcentaje)+'%</div><div class="gx-retention-price"><span>Próximo pago</span><strong>'+esc(data.money(offer.monto_final))+'</strong><small>Ahorras '+esc(data.money(offer.monto_descuento))+'</small></div></div><p class="gxi-note">Solo puede aceptarse una vez en toda tu cuenta y se aplica únicamente a este servicio durante un periodo.</p><div class="gx-retention-actions"><button type="button" class="gx-retention-accept gx-action-morph" data-gxi-action="retention-accept"><span class="gx-action-label">Aceptar beneficio</span></button><button type="button" class="gx-retention-decline" data-gxi-action="retention-decline">Continuar con la cancelación</button></div><p class="gxs-feedback" role="status" aria-live="polite"></p></div>');
+    replaceCancelContent(tile,retentionOfferMarkup(offer,s));
     panel.querySelector('[data-gxs-stage-heading]')?.focus({preventScroll:true});
     return;
    }
@@ -687,6 +693,7 @@ async function cancellationAction(tile,kind,button,s){
    if(!button)throw Error('La solicitud ya está abierta.');
    morph(button,'loading');
   }
+  button.removeAttribute('aria-busy');if(!button.classList.contains('gx-action-loading'))morph(button,'loading');
   status().textContent='Registrando solicitud…';
   const [receipt]=await Promise.all([api('crear',{cliente_servicio_id:s.id,motivo:'Solicitud desde Mi Espacio'}),wait(900)]);
   if(!valid())return;
@@ -698,7 +705,7 @@ async function cancellationAction(tile,kind,button,s){
   renderHero();drawHistory();
   await wait(900);
   if(valid()){replaceCancelContent(tile,cancellationPanel(current));tile.dataset.tone=serviceDetail(current)[1];tile.querySelector('.gxs-status').textContent=serviceDetail(current)[0];const mainAction=tile.querySelector('.gxs-actions [data-gxi-action="options"]');if(mainAction){mainAction.dataset.gxiAction='cancel';mainAction.textContent='Ver seguimiento';mainAction.removeAttribute('aria-expanded')}panel.querySelector('[data-gxs-stage-heading]')?.focus({preventScroll:true})}
- }catch(e){if(valid()){panel.querySelectorAll('button').forEach(b=>b.disabled=false);if(button?.isConnected&&button.classList.contains('gx-action-morph'))morph(button,'error','Reintentar');const out=status();if(out)out.textContent=e.message||'No pudimos completar la operación.'}}
+ }catch(e){if(valid()){panel.querySelectorAll('button').forEach(b=>b.disabled=false);if(button?.isConnected&&button.classList.contains('gx-action-morph')){button.removeAttribute('aria-busy');morph(button,'error','Reintentar');}const out=status();if(out)out.textContent=e.message||'No pudimos completar la operación.'}}
  finally{serviceOperation=null;void refreshClient()}
 }
 $('gxs-list').addEventListener('click',async event=>{
@@ -734,6 +741,7 @@ $('gxs-list').addEventListener('click',async event=>{
    const isHidden=node.textContent==='••••';node.textContent=isHidden?secret:'••••';
    action.textContent=isHidden?'Ocultar':'Mostrar';return
   }
+ if(kind==='offer-motion'){const hero=action.closest('.gxs-offer-hero');if(!hero)return;const paused=hero.classList.toggle('is-paused');action.setAttribute('aria-pressed',String(paused));action.setAttribute('aria-label',paused?'Reanudar animación de la oferta':'Pausar animación de la oferta');action.querySelector('path').setAttribute('d',paused?'m9 5 10 7-10 7z':'M9 6v12m6-12v12');return}
  if(kind==='options'){if(!serviceOperation)setServiceStage(tile,'options',true,true);return}
  if(kind==='service-back'){if(serviceOperation)return;if(tile.dataset.retained==='true'){delete tile.dataset.retained;const s=serviceById(tile.dataset.service);if(s)replaceCancelContent(tile,cancellationPanel(s),false)}setServiceStage(tile,'detail',true,true);void refreshClient();return}
  const service=serviceById(tile.dataset.service);
