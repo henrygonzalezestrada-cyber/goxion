@@ -2,10 +2,16 @@
   const ROOT_ID='gx-promo-showcase';
   const GXCORE=window.GOXION_CORE;
   if(!GXCORE) return;
+  // Opt-in exclusivo del candidato; la oficial conserva su comportamiento C1.
+  const v3=document.documentElement.hasAttribute('data-gx-catalog-v3');
+  if(v3){const variant=new URLSearchParams(location.search).get('promo');document.documentElement.dataset.gxPromoVariant=['base','a','b','c'].includes(variant)?variant:'a';}
 
   const state={
     promotions:[],
     active:0,
+    direction:1,
+    renderedPromotions:[],
+    reloadPending:false,
     timer:null,
     pointerStart:null,
     latestData:null,
@@ -217,7 +223,7 @@
   async function loadPromotions(force=false){
     const token=clientToken();
     if(!force&&state.lastToken===token&&state.promotions.length) return;
-    if(state.loading) return;
+    if(state.loading){if(v3)state.reloadPending=true;return;}
     state.loading=true;
     state.lastToken=token;
     try{
@@ -232,6 +238,7 @@
       });
       const data=await response.json().catch(()=>({}));
       if(!response.ok||data?.ok!==true) throw new Error(data?.error||'No fue posible cargar promociones.');
+      if(v3&&clientToken()!==token){state.reloadPending=true;return;}
       state.promotions=(data.promociones||[]).map(p=>normalizedPromo(p,data.autenticado));
       maybePreviewPromotions();
       renderPromotions();
@@ -243,6 +250,7 @@
       renderPromotions();
     }finally{
       state.loading=false;
+      if(v3&&(state.reloadPending||clientToken()!==token)){state.reloadPending=false;void loadPromotions(true);}
     }
   }
 
@@ -284,7 +292,7 @@
   }
 
   function maybePreviewPromotions(){
-    if(state.promotions.length) return;
+    if(v3||state.promotions.length) return;
     const preview=new URLSearchParams(location.search).get('promoPreview')==='1';
     if(!preview) return;
     const entries=catalogEntries().filter(x=>x.minPrice>0).slice(0,5);
@@ -328,10 +336,11 @@
 
   function selectedPromotions(){
     const list=[...state.promotions].sort((a,b)=>
+      (v3?Number(promoContractState(b).enabled)-Number(promoContractState(a).enabled):0) ||
       Number(b?.destacada===true)-Number(a?.destacada===true) ||
       Number(b?.prioridad||0)-Number(a?.prioridad||0)
     );
-    return list.slice(0,3);
+    return v3?list:list.slice(0,3);
   }
 
   function logosHtml(p,large=false){
@@ -417,10 +426,18 @@
     const list=selectedPromotions();
     stopAuto();
 
+    if(v3){
+      const activeId=state.renderedPromotions[state.active]?.id;
+      const nextIndex=list.findIndex(p=>p.id===activeId);
+      state.active=nextIndex>=0?nextIndex:0;
+      state.renderedPromotions=list;
+      deck.dataset.gxPromoCount=String(list.length);
+    }
     if(!list.length){
       root.hidden=true;
       deck.innerHTML='';
       controls.hidden=true;
+      if(v3){dots.innerHTML='';const status=$('gx-promo-deck-status');if(status)status.textContent='';}
       return;
     }
 
@@ -445,6 +462,7 @@
       const previous=(state.active-1+cards.length)%cards.length;
       const next=(state.active+1)%cards.length;
       if(i===state.active) card.classList.add('is-front');
+      else if(v3&&cards.length===2)card.classList.add(state.direction<0?'is-left':'is-right');
       else if(i===previous) card.classList.add('is-left');
       else if(i===next) card.classList.add('is-right');
       else card.classList.add('is-hidden');
@@ -455,18 +473,20 @@
       dot.setAttribute('aria-current',i===state.active?'true':'false');
     });
     const status=$('gx-promo-deck-status');
-    if(status) status.textContent=(state.active+1)+' / '+cards.length;
+    if(status) status.textContent=v3&&cards.length===1?'':(state.active+1)+' / '+cards.length;
   }
 
   function moveDeck(direction){
     const list=selectedPromotions();
-    if(list.length<2) return;
+    if(list.length<2||v3&&state.expandedCard) return;
+    if(v3)state.direction=direction;
     state.active=(state.active+direction+list.length)%list.length;
     applyDeckPositions();
     restartAuto();
   }
 
   async function requestPromotion(p,button){
+    if(v3){p=state.promotions.find(x=>x.id===p?.id);if(!p||state.lastToken!==clientToken())return false;}
     if(!promoContractState(p).enabled || !promoAvailability(p).available) return false;
     const added=window.GOXION_CART?.addPromotion(p);
     if(added && button){
@@ -523,7 +543,7 @@
         const card=button.closest('.gx-promo-deck-card');
         if(!card) return;
         const index=Number(card.dataset.gxPromoIndex||0);
-        const promo=selectedPromotions()[index];
+        const promo=(v3?state.renderedPromotions:selectedPromotions())[index];
 
         if(card.classList.contains('is-expanded')){
           requestPromotion(promo,button);
@@ -580,7 +600,7 @@
       }
       stopAuto();
       setTimeout(()=>{
-        if(!state.expandedCard && card.isConnected) openPromoDetail(selectedPromotions()[index],card);
+        if(!state.expandedCard && card.isConnected) openPromoDetail((v3?state.renderedPromotions:selectedPromotions())[index],card);
       },16);
     });
 
@@ -597,7 +617,7 @@
         }else{
           stopAuto();
           setTimeout(()=>{
-            if(!state.expandedCard && card.isConnected) openPromoDetail(selectedPromotions()[index],card);
+            if(!state.expandedCard && card.isConnected) openPromoDetail((v3?state.renderedPromotions:selectedPromotions())[index],card);
           },16);
         }
       }
@@ -803,7 +823,7 @@
     if(!card||card!==state.expandedCard||card.classList.contains('is-closing')) return;
     const origin=state.expandedOrigin;
     const index=Number(card.dataset.gxPromoIndex||0);
-    const promo=selectedPromotions()[index];
+    const promo=(v3?state.renderedPromotions:selectedPromotions())[index];
     const detail=card.querySelector('.gx-promo-morph-detail');
 
     card.classList.add('is-closing');
@@ -916,7 +936,7 @@
         const name=norm(item?.servicio?.nombre||'');
         return name.includes(key)||key.includes(name);
       });
-      if(!involved)continue;
+      if(!involved||v3&&!promoContractState(p).enabled)continue;
       const normal=Number(p.precio_normal_total||0);
       const saving=Number(p.ahorro_estimado||0);
       if(normal>0&&saving>0) best=Math.max(best,saving/normal);
@@ -1151,6 +1171,7 @@
     function wrapped(data){
       const result=previous.apply(this,arguments);
       state.latestData=data;
+      if(v3&&clientToken()!==state.lastToken){state.promotions=[];if(state.expandedCard)closePromoDetail(state.expandedCard);}
       maybePreviewPromotions();
       renderPromotions();
       renderCurated();
