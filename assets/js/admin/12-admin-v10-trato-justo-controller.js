@@ -16,21 +16,23 @@
         document.getElementById('gx-tj-amount').textContent = '-$' + money(amount);
     }
 
-    window.gxOpenTratoJusto = function(key, serviceIndex){
+    window.gxOpenTratoJusto = function(key, serviceIndex, verified=null){
         const c=clientesDict?.[key], s=c?.servicios?.[serviceIndex];
         if(!c || !s || !(s._id||s.id)) return alert('❌ Este servicio todavía no tiene un ID válido en Supabase.');
-        const period = String(c.periodo_pendiente || new Date().toISOString().slice(0,7)).slice(0,7);
+        const period = String(verified?.periodo || c.periodo_pendiente || new Date().toISOString().slice(0,7)).slice(0,7);
         const rec = (c.trato_justo_compensaciones || []).find(x =>
             String(x.cliente_servicio_id||'') === String(s._id||s.id||'') &&
             String(x.periodo||'').slice(0,7) === period &&
             x.activo !== false
         ) || null;
-        tj={key,serviceIndex,days:Number(rec?.dias_falla||1),record:rec};
+        tj={key,serviceIndex,days:Number(verified?.dias||rec?.dias_falla||1),record:rec,verified:!!verified};
         document.getElementById('gx-tj-service-name').textContent=s.nombre||'Servicio';
         document.getElementById('gx-tj-service-price').textContent='$'+money(s.monto);
         document.getElementById('gx-tj-period').value=period;
-        document.getElementById('gx-tj-reason').value=rec?.motivo || 'Falla técnica';
-        document.getElementById('gx-tj-delete').style.display=rec?.id?'block':'none';
+        document.getElementById('gx-tj-reason').value=verified?.motivo || rec?.motivo || 'Falla técnica';
+        document.getElementById('gx-tj-period').disabled=!!verified;
+        document.querySelectorAll('#gx-tj-overlay .gx-tj-stepper button').forEach(b=>b.disabled=!!verified);
+        document.getElementById('gx-tj-delete').style.display=rec?.id&&!verified?'block':'none';
         document.getElementById('gx-tj-overlay').classList.add('show');
         document.getElementById('gx-tj-overlay').setAttribute('aria-hidden','false');
         document.body.style.overflow='hidden';
@@ -41,7 +43,7 @@
         if(el){el.classList.remove('show');el.setAttribute('aria-hidden','true')}
         document.body.style.overflow='';
     };
-    window.gxTJStep=function(delta){tj.days=Math.max(1,Math.min(10,tj.days+Number(delta||0)));refresh()};
+    window.gxTJStep=function(delta){if(tj.verified)return;tj.days=Math.max(1,Math.min(10,tj.days+Number(delta||0)));refresh()};
 
     window.gxSaveTratoJusto=async function(){
         const c=clientesDict?.[tj.key],s=currentService();
