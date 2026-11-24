@@ -727,7 +727,8 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
 .gxn-tab-label{display:block;max-width:0;min-width:0;overflow:hidden;opacity:0;white-space:nowrap;transform:translate3d(-9px,0,0);color:#eef7fe;font-size:14.5px;font-weight:700;letter-spacing:-.025em;transition:max-width .36s cubic-bezier(.2,.8,.2,1),opacity .23s ease,transform .36s cubic-bezier(.2,.8,.2,1)}
 .gxn-tab[aria-current="page"] .gxn-tab-label{max-width:106px;opacity:1;transform:translate3d(0,0,0)}
 .gxn-menu{position:absolute;right:0;top:57px;min-width:210px;max-width:min(280px,calc(100vw - 32px));padding:8px;border:1px solid rgba(211,227,246,.09);border-radius:19px;background:rgba(15,17,25,.97);box-shadow:0 18px 40px rgba(0,0,0,.37);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);z-index:5}
-.gxn-profile-menu{right:0}
+.gxn-profile-menu{right:0;background:rgba(8,8,12,.62);border-color:rgba(255,255,255,.065);box-shadow:0 15px 36px rgba(0,0,0,.23),inset 0 1px rgba(255,255,255,.055);-webkit-backdrop-filter:blur(17px) saturate(1.12);backdrop-filter:blur(17px) saturate(1.12)}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.gxn-profile-menu{background:rgba(12,14,20,.96)}}
 .gxn-notice-menu{right:51px;width:245px}
 .gxn-menu-head{display:grid;gap:3px;padding:10px 10px 8px}
 .gxn-menu-head strong{font-size:12px;font-weight:700;color:#edf6fc}
