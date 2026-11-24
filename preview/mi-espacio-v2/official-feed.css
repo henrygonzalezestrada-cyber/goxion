@@ -112,7 +112,7 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 
 /* GOXION · movimiento intencional del hero:
    solo el reloj en curso se anima continuamente, igual que el Index.
-   Los otros iconos ejecutan un gesto único al cambiar de estado.
+   Los otros iconos ejecutan un gesto único al tocar directamente el icono.
    No modifica el morph del icono, hero ni su diseño aprobado. */
 .focus-icon .gx-focus-detail{opacity:0;pointer-events:none}
 .focus-icon[data-icon="clock"] .gx-focus-clock-fixed{opacity:1}
@@ -122,8 +122,10 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 }
 @keyframes gx-focus-clock{to{transform:rotate(360deg)}}
 
-/* Animaciones de entrada. La clase se reinicia cuando cambia el estado,
-   incluso si dos estados comparten el mismo icono. Nunca hay loops. */
+/* Gesto expresivo solo por interacción directa (tacto o teclado).
+   Morficons conserva la transición de estado; ningún gesto se reproduce solo. */
+.focus-icon[role="button"]{cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.focus-icon[role="button"]:focus-visible{outline:2px solid currentColor;outline-offset:3px;border-radius:12px}
 .focus-icon.gx-focus-once[data-icon="check"] #state-path{
  stroke-dasharray:26;
  animation:gx-focus-draw-once .7s cubic-bezier(.2,.85,.2,1) both;
