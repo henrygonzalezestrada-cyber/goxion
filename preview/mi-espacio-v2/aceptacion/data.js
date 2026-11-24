@@ -60,7 +60,8 @@
       ['credenciales_entregas','credenciales-cliente',{accion:'listar',datos:{}}],
       ['novedades_servicio','novedades-cliente',{accion:'listar',datos:{}}],
       ['estado_cuenta','estado-cuenta-beta',{accion:'mi_estado',datos:{}}],
-      ['cliente_accesos','accesos-cliente-beta',{accion:'listar',datos:{}}]
+      ['cliente_accesos','accesos-cliente-beta',{accion:'listar',datos:{}}],
+      ['finanzas_b2','estado-financiero-b2-beta',{accion:'mi_estado',datos:{}}]
     ];
     const extra=await Promise.allSettled(reqs.map(r=>post(r[1],r[2],token)));
     const value=(index,key)=>extra[index].status==='fulfilled'&&Array.isArray(extra[index].value?.[key])?extra[index].value[key]:[];
@@ -68,17 +69,19 @@
     const deliveries=value(1,'entregas');
     const news=value(2,'novedades');
     const accesses=value(4,'accesos');
+    const reads=Object.fromEntries(reqs.map((r,i)=>[r[0],extra[i].status==='fulfilled']));
     // El estado de cuenta NO se recalcula desde la suma de servicios.
     const account=extra[3].status==='fulfilled'?extra[3].value.estado_cuenta||null:null;
     const services=(Array.isArray(main.servicios)?main.servicios:[]).filter(s=>s.activo!==false).map(s=>{
       const id=String(s.id||'');
       const cancellation=cancellations.filter(x=>String(x.cliente_servicio_id||'')===id).sort((a,b)=>Date.parse(b.created_at||b.solicitada_at||0)-Date.parse(a.created_at||a.solicitada_at||0));
-      const matchingAccess=accesses.filter(x=>String(x.cliente_servicio_id||'')===id);
+      const matchingAccess=accesses.filter(x=>String(x.cliente_servicio_id||'')===id&&x.activo!==false).sort((a,b)=>String(a.servicio||'').localeCompare(String(b.servicio||''),'es')||Number(a.ordinal||1)-Number(b.ordinal||1));
       return Object.assign({},s,{
         cancelacion:cancellation.find(x=>['solicitada','aprobada'].includes(clean(x.estado)))||cancellation[0]||null,
         novedades:news.filter(x=>String(x.cliente_servicio_id||'')===id),
         credencial_pendiente:deliveries.find(x=>String(x.cliente_servicio_id||'')===id&&clean(x.estado)==='pendiente'&&x.activa!==false)||null,
-        accesos:matchingAccess
+        accesos:matchingAccess,
+        lecturas:reads
       });
     }).filter(s=>!['efectiva','efectuada','completada'].includes(clean(s.cancelacion?.estado)));
     return {
@@ -86,7 +89,7 @@
       gamificacion:main.gamificacion||null,misiones_progreso:Array.isArray(main.misiones_progreso)?main.misiones_progreso:[],
       referidos:Array.isArray(main.referidos)?main.referidos:[],
       cancelaciones:cancellations,estado_cuenta:account,catalogo:Array.isArray(main.catalogo)?main.catalogo:[],
-      novedades:news,loaded_at:new Date().toISOString()
+      novedades:news,lecturas:reads,finanzas_b2:extra[5].status==='fulfilled'?extra[5].value:null,descuentos:Array.isArray(main.descuentos)?main.descuentos:[],loaded_at:new Date().toISOString()
     };
   }
   async function load(){

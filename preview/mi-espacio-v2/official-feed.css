@@ -1407,3 +1407,14 @@ html.gx-notif-open{overflow:hidden;overscroll-behavior:none}
 /* La cápsula comparte el scroll raíz; overflow-x:hidden en body creaba un contenedor sticky falso en Safari. No alterar locks de modales. */
 body.gx-v2-client-session:not(.no-scroll):not(.support-scroll-locked):not(.gx-promo-morph-open){overflow-x:clip;overflow-y:visible}
 body.gx-v2-client-session #gx-v2-shared-nav{position:-webkit-sticky;position:sticky;top:calc(8px + env(safe-area-inset-top,0px));align-self:center;overflow:visible}
+
+/* Cierre de paridad funcional: mismo cristal, controles oficiales y morph de cancelación reutilizado. */
+#gx-v2-feed .gxs-access-group+.gxs-access-group{margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.07)}
+#gx-v2-feed .gxs-cancel-panel,#gx-v2-feed .gxs-credential-panel{margin-top:9px;padding:12px 0 4px;border-top:1px solid rgba(255,255,255,.07)}
+#gx-v2-feed .gxs-credential-notice{margin:6px 0 12px;white-space:normal;text-align:left}
+#gx-v2-feed .gxs-pin-input{display:block;width:min(160px,100%);margin:7px 0 10px;padding:9px;border:1px solid rgba(255,255,255,.16);border-radius:12px;background:rgba(255,255,255,.06);color:#fff;font-size:16px;letter-spacing:5px}
+#gx-v2-feed .gxs-credential-result{margin:10px 0}
+#gx-v2-feed .gxs-secret{display:block;overflow-wrap:anywhere;user-select:text;margin:9px 0;color:#e9f5f9}
+#gx-v2-feed .gxs-credential-result[hidden],#gx-v2-feed .gxs-cancel-panel[hidden],#gx-v2-feed .gxs-credential-panel[hidden]{display:none!important}
+#gx-v2-feed .gxs-cancel-panel .gx-action-morph{margin-inline:auto;text-align:center}
+#gx-v2-feed .gxm-entry[data-kind="benefit"] .gxm-icon{color:#a899f5}

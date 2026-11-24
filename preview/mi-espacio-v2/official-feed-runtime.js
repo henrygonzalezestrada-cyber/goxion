@@ -10,8 +10,9 @@ const clean=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toL
 const reduced=()=>data.motionReduced();
 let benefitRevision=0;
 const state={view:null,prices:[],savings:null,notificationItems:[],tab:'space',lastState:'',activeFilter:'all',showAllHistory:false,openHistory:null,refreshing:false,openService:null,serviceDigest:''};
-// Preview protegida: no ejecuta mutaciones comerciales hasta completar la paridad funcional.
-const ENABLE_WRITES=window.GOXION_QA_ISOLATED===true&&location.pathname.endsWith('/ayuda-aceptacion-v2.html')&&window.GOXION_CORE?.SUPABASE_ORIGIN==='https://nsvybyvvdpdgbgtvydfb.supabase.co';
+// El espejo candidato usa los controladores autenticados reales; QA conserva su aislamiento.
+// El backend valida identidad, permisos, importes y estados. No hay mutaciones al montar.
+const ENABLE_WRITES=(window.GOXION_QA_ISOLATED===true&&location.pathname.endsWith('/ayuda-aceptacion-v2.html')&&window.GOXION_CORE?.SUPABASE_ORIGIN==='https://nsvybyvvdpdgbgtvydfb.supabase.co')||(!window.GOXION_QA_ISOLATED&&/\/(ayuda-espejo-feed-v2|ayuda)\.html$/.test(location.pathname)&&window.GOXION_CORE?.SUPABASE_ORIGIN==='https://hmpevcwodcgbkviarfic.supabase.co');
 const spinner={hidden:true},shell=$('gxi-shell'),loading={hidden:true};
 let iconHandle=null;
 function firstName(){return String(state.view?.cliente?.nombre||'Cliente').trim().split(/\s+/)[0]||'Cliente'}
@@ -57,20 +58,32 @@ async function showClient(view){
 }
 function heroState(view){
  const c=view.cliente,review=clean(c.pago_revision_estado),st=clean(c.estado),account=view.estado_cuenta||{};
- const accountStatus=clean(account.estado||'');
+ const accountStatus=clean(account.estado||''),b2=view.finanzas_b2?.modo==='b2_multifecha'?view.finanzas_b2.calendario_financiero:null;
+ const dateText=x=>/^\d{4}-\d{2}-\d{2}$/.test(String(x||''))?String(x).slice(8,10)+'/'+String(x).slice(5,7):'';
+ const effective=x=>x.prorroga_estado==='aprobada'&&x.fecha_pactada&&Number(x.mora_centavos||0)<=0?x.fecha_pactada:x.vence;
+ const pending=b2?.cobrable===true&&Array.isArray(b2.cargos)?b2.cargos.filter(x=>x.pagado!==true&&Number(x.total_centavos)>0&&dateText(effective(x))).sort((a,b)=>effective(a).localeCompare(effective(b))):null;
+ const next=pending?.[0],serverDay=String(account.fecha_calculo||''),date=next?effective(next):account.fecha_pactada||account.fecha_corte;
+ const when=dateText(date)?'Fecha de pago · '+dateText(date):'Consulta tu estado de cuenta';
  const fresh=clean(c.origen_cliente)==='goxion'&&c.promo_nuevo_elegible===true&&Boolean(String(c.usuario_acceso||'').trim())&&!(view.servicios||[]).length&&!(view.pagos||[]).length;
  if(fresh)return ['new','Tu espacio está listo','Explora tu primer servicio','calm','spark'];
  if(review.includes('rechaz'))return ['correction','Tu comprobante necesita atención','Revisa la observación','attention','alert'];
  if(review.includes('incomplet'))return ['incomplete','Hay un pago incompleto','Revisa el importe faltante','attention','alert'];
  if(st.includes('suspend'))return ['suspended','Tu servicio está suspendido','Consulta tu situación','attention','alert'];
- if((account.acuerdo_cobro?.activo===true||account.prorroga_confirmada===true)&&!accountStatus.includes('vencid')&&!accountStatus.includes('incumpl'))return ['extension','Tu nueva fecha está registrada','Consulta el acuerdo','agreement','calendar'];
- if(st.includes('vencid')||accountStatus.includes('vencid'))return ['overdue','Tienes un pago vencido','Consulta tu estado de cuenta','attention','clock'];
- if(c.pago_en_revision===true||review.includes('revision'))return ['review','Estamos revisando tu comprobante','Ya lo recibimos','review','clock'];
+ if(c.pago_en_revision===true||review.includes('revision')||account.pago_en_revision===true||b2?.comprobante_en_revision===true)return ['review','Estamos revisando tu comprobante','Ya lo recibimos','review','clock'];
+ if(view.finanzas_b2?.modo==='b2_sin_estado_cobrable')return ['incomplete','Tu calendario necesita revisión','Consulta tu estado de cuenta','attention','alert'];
+ if(next){
+  if(Number(next.mora_centavos||0)>0||(serverDay&&effective(next)<serverDay))return ['overdue','Tienes un pago vencido',when,'attention','clock'];
+  if(next.prorroga_estado==='aprobada'&&next.fecha_pactada)return ['extension','Tu nueva fecha está registrada',when,'agreement','calendar'];
+ }else if(!b2){
+  const agreement=account.acuerdo_cobro;
+  const activeAgreement=account.prorroga_confirmada===true||agreement?.activo===true||(['activo','aprobado','aprobada','vigente'].includes(clean(agreement?.estado))&&!!account.fecha_pactada);
+  if(activeAgreement&&!accountStatus.includes('vencid')&&!accountStatus.includes('incumpl')&&(!serverDay||!account.fecha_pactada||account.fecha_pactada>=serverDay))return ['extension','Tu nueva fecha está registrada',when,'agreement','calendar'];
+  if(st.includes('vencid')||accountStatus.includes('vencid')||accountStatus.includes('incumpl'))return ['overdue','Tienes un pago vencido',when,'attention','clock'];
+ }
  
  if((view.servicios||[]).some(x=>['solicitada','aprobada'].includes(clean(x.cancelacion?.estado))))return ['cancellation','Tu cancelación está en proceso','Consulta el seguimiento','review','layers'];
- if(st==='pagado')return ['clear','Todo al corriente','Fecha de pago principal · día '+(Number(c.dia_pago)||15),'calm','check'];
-
- return ['soon','Revisa tu próximo pago','Fecha principal · día '+(Number(c.dia_pago)||15),'due','calendar'];
+ if((pending&&pending.length===0)||(!b2&&(account.esta_pagado_periodo===true||st==='pagado')))return ['clear','Todo al corriente',dateText(account.fecha_corte)?when:'Fecha de pago principal · día '+(Number(c.dia_pago)||15),'calm','check'];
+ return ['soon','Revisa tu próximo pago',dateText(date)?when:'Fecha principal · día '+(Number(c.dia_pago)||15),'due','calendar'];
 }
 const paths={alert:'M12 2 22 20H2L12 2z',clock:'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18',check:'M4 12l5 5L20 6',calendar:'M5 3v4M19 3v4M3 9h18M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2',layers:'M12 3 21 8 12 13 3 8 12 3z',spark:'M12 2v20M2 12h20M5 5l14 14M19 5 5 19'};
 let greetingTimer=0;
@@ -139,7 +152,7 @@ function benefitState(key){
  const effective=v.estado_cuenta?.lealtad?.pagos_efectivos;
  const verified=effective!=null&&Number.isFinite(Number(effective));
  const streak=verified?Math.max(0,Number(effective)):0;
- const lost=v.estado_cuenta?.lealtad?.racha_reiniciada_virtual===true||c.racha_reiniciada_virtual===true||v.gamificacion?.racha_reiniciada_virtual===true||(streak===0&&v.pagos?.some((p,i)=>i===0&&clean(p.lealtad_efecto)==='reinicio'));
+ const lost=v.finanzas_b2?.calendario_financiero?.lealtad_global_perdida===true||v.estado_cuenta?.lealtad?.racha_reiniciada_virtual===true||c.racha_reiniciada_virtual===true||v.gamificacion?.racha_reiniciada_virtual===true||(streak===0&&v.pagos?.some((p,i)=>i===0&&clean(p.lealtad_efecto)==='reinicio'));
  if(key==='loyalty'){
   if(!verified&&!lost)return {label:'Lealtad',num:'—',unit:'por verificar',pct:0,meter:false,emoji:'⭐',title:'Verificando tu racha',accent:'racha',copy:'No pudimos consultar tu avance efectivo. Se sincronizará al recuperar la conexión.',note:'Solo mostramos pagos efectivos confirmados por el motor financiero.',progress:'Pendiente de sincronización',action:'Mis niveles',phase:'unknown'};
   const effectiveStreak=lost?0:streak;
@@ -507,28 +520,52 @@ function invitationLabel(value){
  const labels={sin_verificar:'Pendiente de verificación',pendiente:'Pendiente',pendiente_aceptacion:'Pendiente de aceptación',pendiente_verificacion:'Pendiente de verificación',verificado:'Verificada',aceptada:'Aceptada',activo:'Activa',activa:'Activa',rechazada:'Rechazada',expirada:'Caducada'};
  return labels[key]||(raw?raw.replace(/[_-]+/g,' ').replace(/^./,m=>m.toUpperCase()):'Pendiente de verificación');
 }
+let serviceOperation=null;
+const heldSecrets=new Map();
+function wipeServiceSecrets(){
+ for(const panel of document.querySelectorAll('#gxs-list .gxs-credential-result')){panel.querySelector('.gxs-secret')?.replaceChildren();panel.hidden=true}
+ for(const input of document.querySelectorAll('#gxs-list .gxs-pin-input'))input.value='';
+ for(const row of document.querySelectorAll('#gxs-list [data-gxi-action="pin"]')){const node=row.closest('.gxs-accessrow')?.querySelector('.gxs-copy strong');if(node)node.textContent='••••';row.textContent='Mostrar'}
+ heldSecrets.clear();
+}
+const serviceById=id=>state.view?.servicios?.find(s=>String(s.id)===String(id));
+function cancellationPanel(s){
+ const c=s.cancelacion,st=clean(c?.estado);
+ const title=st==='solicitada'?'Cancelación en revisión':st==='aprobada'?'Cancelación aprobada':st==='rechazada'?'Cancelación no autorizada':'Solicitar cancelación';
+ const note=st==='solicitada'?'Tu solicitud fue recibida. El servicio sigue activo mientras se revisa.':st==='aprobada'?'Tu servicio continúa activo hasta que la baja sea efectiva.':st==='rechazada'?'Puedes solicitar nuevamente la cancelación.':'Los cargos ya generados no cambian. Revisaremos tu solicitud antes de efectuar cualquier baja.';
+ const pending=st==='solicitada'||st==='aprobada';
+ const admin=c?.nota_admin?'<p class="gxs-notice"><strong>Nota de GOXION</strong> · '+esc(c.nota_admin)+'</p>':'';
+ const date=c?.fecha_efectiva?'<p class="gxs-notice">Fecha prevista: '+esc(dateLabel(c.fecha_efectiva))+'</p>':'';
+ return '<h3 class="gxs-subtitle">'+title+'</h3><p class="gxi-note">'+note+'</p>'+date+admin+(pending?'':'<div class="gx-cancel-submit-zone"><button type="button" class="gx-service-cancel-submit gx-action-morph" data-gxi-action="cancel-submit"><span class="gx-action-label">'+(st==='rechazada'?'Enviar nueva solicitud':'Enviar solicitud')+'</span></button></div>')+'<p class="gxs-feedback" role="status" aria-live="polite"></p>';
+}
+function credentialPanel(s){
+ if(!s.credencial_pendiente?.id)return '';
+ return '<section class="gxs-credential-panel" hidden><p class="gxi-note">Consulta única. Ingresa tu PIN de GOXION; no el PIN del perfil.</p><label class="gxi-note">PIN de GOXION<input class="gxs-pin-input" type="password" inputmode="numeric" maxlength="4" autocomplete="off" aria-label="PIN de GOXION"></label><button type="button" class="gxs-pill" data-gxi-action="credential-reveal">Ver contraseña</button><div class="gxs-credential-result" hidden><strong class="gxs-secret"></strong><button type="button" class="gxs-pill" data-gxi-action="credential-copy">Copiar contraseña</button><button type="button" class="gxs-ghost" data-gxi-action="credential-close">Terminar</button></div><p class="gxs-feedback" role="status" aria-live="polite"></p></section>';
+}
 function renderServices(){
  const v=state.view,services=v.servicios||[];
  const digest=JSON.stringify(services);if(state.serviceDigest===digest)return;
+ if(serviceOperation)return;
+ if(heldSecrets.size){if([...heldSecrets.keys()].every(id=>services.some(s=>String(s.id)===id)))return;wipeServiceSecrets()}
+
  state.serviceDigest=digest;const host=$('gxs-list');host.replaceChildren();
  $('gxs-count').textContent=services.length+' '+(services.length===1?'plataforma':'plataformas');
  if(!services.length){host.innerHTML='<div class="gxm-empty">Todavía no tienes servicios activos.</div>';return}
  services.forEach((s,index)=>{
-  const status=serviceDetail(s),a=Array.isArray(s.accesos)&&s.accesos.length?s.accesos[0]:s;
-  const isInvite=clean(a.modo_acceso).includes('invit')||/youtube|microsoft/i.test(s.nombre);
-  const email=String(a.correo||s.correo_login||''),profile=String(a.perfil_nombre||s.perfil_nombre||'');
-  const pin=String(a.perfil_pin||s.perfil_pin||'');
+  const status=serviceDetail(s),accesses=Array.isArray(s.accesos)&&s.accesos.length?s.accesos:[s];
+  const isInvite=accesses.every(a=>clean(a.modo_acceso).includes('invit')||/youtube|microsoft/i.test(a.servicio||s.nombre));
   const id='gxi-service-'+index,article=document.createElement('article');
   article.className='gxs-card gxc-surface';article.dataset.service=String(s.id||index);article.dataset.tone=status[1];article.dataset.index=String(index);
-  const access=(email?accessRow(isInvite?'Correo personal':'Correo',email,'copy',email):'')+
-    (profile?accessRow('Perfil',profile):'')+
-    (pin?accessRow('PIN de perfil','••••','pin',''):'')+
-    (isInvite&&a.estado_invitacion?accessRow('Invitación',invitationLabel(a.estado_invitacion)):'');
-  let note='';
-  if(s.cancelacion&&['solicitada','aprobada','rechazada'].includes(clean(s.cancelacion.estado)))
-   note='<p class="gxs-notice">'+esc(status[0])+' · Tu acceso continúa sujeto a la resolución oficial.</p>';
-  else if(s.credencial_pendiente)note='<p class="gxs-notice">Se registró una nueva contraseña. Para consultarla es necesaria la validación oficial de acceso.</p>';
-  else if((s.novedades||[]).length)note='<p class="gxs-notice">'+esc(String(s.novedades[0].titulo||'Tienes una novedad disponible'))+'</p>';
+  const access=accesses.map((a,i)=>{
+   const invite=clean(a.modo_acceso).includes('invit')||/youtube|microsoft/i.test(a.servicio||s.nombre);
+   const email=String(a.correo||(a===s?s.correo_login:'')||''),profile=String(a.perfil_nombre||''),pin=String(a.perfil_pin||'');
+   return '<div class="gxs-access-group" data-access-index="'+i+'">'+(accesses.length>1?'<p class="gxs-subtitle">'+esc(a.servicio||s.nombre)+' · '+(invite?'Invitación':'Perfil')+' '+esc(a.ordinal||i+1)+'</p>':'')+(email?accessRow(invite?'Correo personal':'Correo',email,'copy',email):'')+(profile?accessRow('Perfil',profile):'')+(pin?accessRow('PIN de perfil','••••','pin',''):'')+(invite&&a.estado_invitacion?accessRow('Invitación',invitationLabel(a.estado_invitacion)):'')+(!email&&!profile&&!pin&&!a.estado_invitacion?'<p class="gxi-note">Sin datos de acceso disponibles.</p>':'')+'</div>';
+  }).join('');
+  const notes=(s.novedades||[]).slice().sort((a,b)=>Number(b.prioridad||0)-Number(a.prioridad||0));
+  let note=notes.map(n=>'<p class="gxs-notice"><strong>'+esc(n.titulo||'Actualización disponible')+'</strong>'+(n.resumen?' · '+esc(n.resumen):'')+'</p>').join('');
+  if(s.cancelacion&&['solicitada','aprobada','rechazada'].includes(clean(s.cancelacion.estado)))note='<p class="gxs-notice">'+esc(status[0])+'</p>'+note;
+  if(s.credencial_pendiente)note+='<button type="button" class="gxs-pill gxs-credential-notice" data-gxi-action="credential-open">Nueva contraseña · Consultar con PIN</button>'+credentialPanel(s);
+  if(s.lecturas?.cliente_accesos===false||s.lecturas?.credenciales_entregas===false||s.lecturas?.novedades_servicio===false)note+='<p class="gxi-note">Algunas novedades o accesos no pudieron sincronizarse.</p>';
   article.innerHTML='<button class="gxs-trigger" type="button" aria-expanded="false" aria-controls="'+id+'" data-gxi-toggle="'+index+'" aria-label="'+esc(s.nombre+', '+status[0])+', abrir detalles">'+
    '<img class="gxs-logo" alt="" src="'+esc(logo(s.nombre))+'" decoding="async" loading="lazy">'+
    '<span class="gxs-summary"><strong class="gxs-name">'+esc(s.nombre)+'</strong><span class="gxs-status">'+esc(status[0])+'</span></span>'+
@@ -537,16 +574,67 @@ function renderServices(){
    '<div class="gxs-subtitle">'+(isInvite?'Tu invitación':'Tus accesos')+'</div><div class="gxs-accesslist">'+(access||'<p class="gxi-note">Sin datos de acceso disponibles.</p>')+'</div>'+
    '<div class="gxs-actions"><button class="gxs-pill" type="button" data-gxi-action="options" aria-expanded="false">Más opciones</button>'+
    '<button class="gxs-ghost" type="button" data-gxi-action="support">Soporte</button></div>'+
-   '<div class="gxs-more" hidden><button type="button" data-gxi-action="cancel">Gestionar cancelación</button></div>'+
+   '<div class="gxs-more" hidden><button type="button" data-gxi-action="cancel">'+(s.cancelacion&&['solicitada','aprobada'].includes(clean(s.cancelacion.estado))?'Ver cancelación':'Solicitar cancelación')+'</button><section class="gxs-cancel-panel gx-service-view" hidden>'+cancellationPanel(s)+'</section></div>'+
    '<span class="gxs-feedback" role="status" aria-live="polite"></span></div></div></div>';
   if(state.openService===article.dataset.service){article.classList.add('is-open');article.querySelector('.gxs-trigger').setAttribute('aria-expanded','true');const panel=article.querySelector('.gxs-reveal-inner');panel.inert=false;panel.setAttribute('aria-hidden','false')}
   host.append(article);
  });
 }
-$('gxs-list').addEventListener('click',event=>{
+async function cancellationAction(tile,kind,button,s){
+ if(!ENABLE_WRITES||!s?.id||!TOKEN()||serviceOperation)return;
+ const token=TOKEN(),id=String(s.id),panel=tile.querySelector('.gxs-cancel-panel');
+ const valid=()=>TOKEN()===token&&serviceById(id)&&tile.isConnected;
+ const status=()=>panel.querySelector('.gxs-feedback');
+ const morph=(b,phase,label)=>{if(typeof gxCancellationActionState==='function')gxCancellationActionState(b,phase,label);else{b.disabled=phase==='loading'||phase==='success';b.classList.remove('gx-action-loading','gx-action-success','gx-action-error');b.classList.add('gx-action-'+phase);b.querySelector('.gx-action-label').textContent=phase==='error'?'Reintentar':'';}};
+ const wait=ms=>new Promise(r=>setTimeout(r,reduced()?0:ms));
+ const api=(accion,datos)=>data.post('cancelaciones-cliente',{accion,datos},token);
+ serviceOperation=id;
+ try{
+  if(kind==='cancel-submit'){
+   if(s.lecturas?.cancelaciones===false)throw Error('No se pudo comprobar el estado de la solicitud. Reintenta al sincronizar.');
+   if(['solicitada','aprobada'].includes(clean(s.cancelacion?.estado)))return;
+   morph(button,'loading');status().textContent='Revisando beneficios disponibles…';
+   const [evaluation]=await Promise.all([api('evaluar_retencion',{cliente_servicio_id:s.id}),wait(650)]);
+   if(!valid())return;
+   if(evaluation.elegible===true&&evaluation.oferta?.id){
+    const offer=evaluation.oferta;tile._gxOffer=offer;
+    panel.innerHTML='<div class="gx-retention-stage"><h3>Nos gustaría que te quedaras</h3><p class="gxi-note">Beneficio único para tu próximo pago de '+esc(offer.servicio_nombre||s.nombre)+'.</p><div class="gx-retention-value"><div class="gx-retention-percent">-'+esc(offer.porcentaje)+'%</div><div class="gx-retention-price"><span>Próximo pago</span><strong>'+esc(data.money(offer.monto_final))+'</strong><small>Ahorras '+esc(data.money(offer.monto_descuento))+'</small></div></div><p class="gxi-note">Solo puede aceptarse una vez en toda tu cuenta y se aplica únicamente a este servicio durante un periodo.</p><div class="gx-retention-actions"><button type="button" class="gx-retention-accept gx-action-morph" data-gxi-action="retention-accept"><span class="gx-action-label">Aceptar beneficio</span></button><button type="button" class="gx-retention-decline" data-gxi-action="retention-decline">Continuar con la cancelación</button></div><p class="gxs-feedback" role="status" aria-live="polite"></p></div>';
+    return;
+   }
+  }else{
+   const offer=tile._gxOffer;if(!offer?.id)throw Error('La oferta ya no está disponible.');
+   panel.querySelectorAll('button').forEach(b=>b.disabled=true);
+   if(kind==='retention-accept'){
+    morph(button,'loading');const [result]=await Promise.all([api('aceptar_retencion',{oferta_id:offer.id}),wait(850)]);
+    if(!valid())return;
+    morph(button,'success');status().textContent='Beneficio confirmado. La cancelación no fue enviada.';delete tile._gxOffer;benefitRevision++;
+    await wait(1100);return;
+   }
+   await api('rechazar_retencion',{oferta_id:offer.id});if(!valid())return;delete tile._gxOffer;
+   panel.innerHTML=cancellationPanel(s);button=panel.querySelector('[data-gxi-action="cancel-submit"]');
+   if(!button)throw Error('La solicitud ya está abierta.');
+   morph(button,'loading');
+  }
+  status().textContent='Registrando solicitud…';
+  const [receipt]=await Promise.all([api('crear',{cliente_servicio_id:s.id,motivo:'Solicitud desde Mi Espacio'}),wait(900)]);
+  if(!valid())return;
+  const confirmed=receipt.solicitud;
+  if(!confirmed?.id||!['solicitada','aprobada'].includes(clean(confirmed.estado)))throw Error('No se recibió confirmación de la solicitud. Consulta su estado.');
+  const current=serviceById(id);current.cancelacion={...confirmed,cliente_servicio_id:id};
+  state.view.cancelaciones=[...(state.view.cancelaciones||[]).filter(c=>c.id!==confirmed.id),current.cancelacion];
+  benefitRevision++;morph(button,'success');status().textContent='Solicitud registrada. Tu servicio sigue activo durante la revisión.';
+  renderHero();drawHistory();
+  await wait(900);
+  if(valid()){panel.innerHTML=cancellationPanel(current);tile.dataset.tone=serviceDetail(current)[1];tile.querySelector('.gxs-status').textContent=serviceDetail(current)[0];tile.querySelector('[data-gxi-action="cancel"]').textContent='Ver cancelación'}
+ }catch(e){if(valid()){panel.querySelectorAll('button').forEach(b=>b.disabled=false);if(button?.isConnected&&button.classList.contains('gx-action-morph'))morph(button,'error','Reintentar');const out=status();if(out)out.textContent=e.message||'No pudimos completar la operación.'}}
+ finally{serviceOperation=null;void refreshClient()}
+}
+$('gxs-list').addEventListener('click',async event=>{
  const tile=event.target.closest('.gxs-card');if(!tile)return;
  const toggle=event.target.closest('[data-gxi-toggle]');
  if(toggle){
+  if(serviceOperation)return;
+  wipeServiceSecrets();
   const isOpen=tile.classList.contains('is-open');state.openService=isOpen?null:tile.dataset.service;
   $('gxs-list').querySelectorAll('.gxs-card').forEach(el=>{
    const active=el===tile&&!isOpen;
@@ -563,19 +651,36 @@ $('gxs-list').addEventListener('click',event=>{
  if(kind==='copy'&&row){const v=row.querySelector('[data-gxs-value]')?.dataset.gxsValue||'';
   navigator.clipboard?.writeText(v).then(()=>feedback.textContent='Correo copiado.',()=>feedback.textContent='No se pudo copiar.');return}
  if(kind==='pin'&&row){
-   const currentService=state.view?.servicios?.[Number(tile.dataset.index)];
-   const currentAccess=currentService?.accesos?.[0]||currentService;
-   const secret=String(currentAccess?.perfil_pin||currentService?.perfil_pin||'');
+   const currentService=serviceById(tile.dataset.service);
+   const ai=Number(row.closest('[data-access-index]')?.dataset.accessIndex||0);
+   const currentAccess=currentService?.accesos?.length?currentService.accesos[ai]:currentService;
+   const secret=String(currentAccess?.perfil_pin||'');
    if(!secret){feedback.textContent='El PIN no está disponible para este acceso.';return}
    const node=row.querySelector('.gxs-copy strong');
    const isHidden=node.textContent==='••••';node.textContent=isHidden?secret:'••••';
    action.textContent=isHidden?'Ocultar':'Mostrar';return
   }
  if(kind==='options'){const more=tile.querySelector('.gxs-more');more.hidden=!more.hidden;action.setAttribute('aria-expanded',String(!more.hidden));return}
- if(kind==='support'){navigate('support');return}
- if(kind==='cancel'){
-  const s=state.view.servicios[Number(tile.dataset.index)];
-  feedback.textContent='Esta gestión continúa en integración en el espejo. No se ha enviado ninguna solicitud.';
+ const service=serviceById(tile.dataset.service);
+ if(kind==='support'){wipeServiceSecrets();navigate('support');setTimeout(()=>{if(!service||typeof gxSupportButtonForService!=='function')return;const b=gxSupportButtonForService(service.nombre);if(b&&typeof selectPlatform==='function')selectPlatform(service.nombre,b,null)},420);return}
+ if(kind==='cancel'){const panel=tile.querySelector('.gxs-cancel-panel');panel.hidden=!panel.hidden;return}
+ if(['cancel-submit','retention-accept','retention-decline'].includes(kind)){await cancellationAction(tile,kind,action,service);return}
+ const credential=tile.querySelector('.gxs-credential-panel');
+ if(kind==='credential-open'&&credential){credential.hidden=!credential.hidden;if(credential.hidden)wipeServiceSecrets();return}
+ if(kind==='credential-close'&&credential){wipeServiceSecrets();credential.hidden=true;state.serviceDigest='';void refreshClient();return}
+ if(kind==='credential-copy'&&credential){const secret=credential.querySelector('.gxs-secret')?.textContent;try{if(secret&&heldSecrets.has(tile.dataset.service)){await navigator.clipboard.writeText(secret);credential.querySelector('.gxs-feedback').textContent='✓ Copiada.'}}catch{credential.querySelector('.gxs-feedback').textContent='Mantén presionada la contraseña para copiarla.'}return}
+ if(kind==='credential-reveal'&&credential&&service?.credencial_pendiente?.id){
+  if(!ENABLE_WRITES||serviceOperation)return;
+  const input=credential.querySelector('.gxs-pin-input'),pin=input.value.trim(),out=credential.querySelector('.gxs-feedback');
+  if(!/^\d{4}$/.test(pin)){out.textContent='Ingresa tu PIN de GOXION de 4 dígitos.';return}
+  const token=TOKEN(),id=tile.dataset.service;serviceOperation=id;action.disabled=true;out.textContent='Validando…';input.value='';
+  try{const reply=await data.post('credenciales-cliente',{accion:'revelar',datos:{entrega_id:service.credencial_pendiente.id,pin}},token);
+   if(!reply.password)throw Error('No se recibió una contraseña autorizada.');
+   if(TOKEN()!==token||!tile.isConnected||document.hidden||state.tab!=='space'||!tile.classList.contains('is-open'))return;
+   heldSecrets.set(id,true);credential.querySelector('.gxs-secret').textContent=String(reply.password);credential.querySelector('.gxs-credential-result').hidden=false;input.disabled=true;action.hidden=true;
+   out.textContent='Consulta única. Al salir de esta tarjeta se ocultará definitivamente.';const current=serviceById(id);if(current)current.credencial_pendiente=null;benefitRevision++;
+  }catch(e){out.textContent=e.message||'No fue posible consultar la contraseña.';action.disabled=false}
+  finally{serviceOperation=null;if(!heldSecrets.size)void refreshClient()}
  }
 });
 function dateLabel(raw){
@@ -586,12 +691,12 @@ function historyRows(){
  const view=state.view,items=[];
  for(const p of view.pagos||[]){
   if(!p.id)continue;
-  const st=clean(p.estado),pending=st.includes('pend')||st.includes('revisi');
-  items.push({id:'p-'+p.id,date:p.fecha||p.created_at||'',title:pending?'Pago en revisión':'Pago registrado',subject:p.periodo||'',amount:data.money(p.monto),detail:String(p.estado||'Registrado'),kind:'payment'});
+  const st=clean(p.estado),pending=st.includes('pend')||st.includes('revisi'),rejected=st.includes('rechaz'),approved=['pagado','acreditado','aprobado'].includes(st);
+  items.push({id:'p-'+p.id,date:p.fecha||p.created_at||'',title:rejected?'Comprobante rechazado':pending?'Pago en revisión':approved?'Pago acreditado':'Pago registrado',subject:p.periodo||'',amount:data.money(p.monto),detail:String(p.estado||'Registrado'),kind:'payment'});
  }
  for(const c of view.cancelaciones||[]){
-  const st=clean(c.estado);if(!['efectiva','efectuada','completada','aprobada','rechazada'].includes(st))continue;
-  items.push({id:'c-'+c.id,date:c.resuelta_at||c.updated_at||c.created_at||'',title:st==='aprobada'?'Cancelación aprobada':st==='rechazada'?'Cancelación no autorizada':'Baja de servicio registrada',subject:String(c.servicio_nombre||c.nombre||'Servicio'),amount:'',detail:'Estado confirmado: '+String(c.estado),kind:'cancellation'});
+  const st=clean(c.estado);if(!['solicitada','efectiva','efectuada','completada','aprobada','rechazada'].includes(st)||!c.id)continue;
+  items.push({id:'c-'+c.id,date:c.resuelta_at||c.updated_at||c.created_at||'',title:st==='solicitada'?'Cancelación solicitada':st==='aprobada'?'Cancelación aprobada':st==='rechazada'?'Cancelación no autorizada':'Baja de servicio registrada',subject:String(c.servicio_nombre||c.nombre||'Servicio'),amount:'',detail:'Estado confirmado: '+String(c.estado),kind:'cancellation'});
  }
  // Solo altas respaldadas por una fecha explícita de contratación/activación del servidor.
  // No copiar los datos ilustrativos del laboratorio ni inferir fechas desde el catálogo.
@@ -601,7 +706,10 @@ function historyRows(){
   items.push({id:'a-'+service.id,date,title:String(service.nombre||service.servicio_nombre||'Servicio')+' agregado',
    subject:'',amount:'',detail:'Servicio incorporado a tu cuenta.',kind:'acquisition'});
  }
- return items.sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+ const g=view.gamificacion;
+ if(g?.cupon_reclamado_at&&missionInfo(view).claimed)items.push({id:'coupon-'+String(g.cupon_reclamado_ciclo||g.cupon_ciclo||1),date:g.cupon_reclamado_at,title:'Cupón reclamado',subject:'Misiones',amount:'',detail:'Recompensa registrada; su aplicación depende del cobro oficial.',kind:'benefit'});
+ for(const r of view.referidos||[])if(r.id&&r.beneficio_reclamado===true&&r.beneficio_reclamado_at)items.push({id:'ref-'+r.id,date:r.beneficio_reclamado_at,title:'Recompensa reclamada',subject:'Referidos',amount:'',detail:'Mes gratis reclamado. Su aplicación depende del cobro oficial.',kind:'benefit'});
+ return [...new Map(items.filter(x=>x.id).map(x=>[x.id,x])).values()].sort((a,b)=>String(b.date).localeCompare(String(a.date)));
 }
 function drawHistory(){
  const list=$('gxm-list');list.replaceChildren();
@@ -612,7 +720,7 @@ function drawHistory(){
   payment:'<path d="M5 12.5 10 17l9-10"/>',
   acquisition:'<path d="M12 5v14M5 12h14"/>',
   renewal:'<path d="M20 11a8 8 0 1 0-2.3 5.7M20 5v6h-6"/>',
-  cancellation:'<path d="M5 12h14"/>'
+  cancellation:'<path d="M5 12h14"/>',benefit:'<path d="M12 3l2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/>'
  };
  shown.forEach((item,i)=>{
   const row=document.createElement('div');row.className='gxm-entry';row.dataset.kind=item.kind;row.dataset.movement=item.id;
@@ -738,6 +846,7 @@ document.addEventListener('visibilitychange',()=>{
  if(document.hidden){stopSavingsMotion();savingCurrent=savingTarget;showSavingAmount(savingTarget)}
 });
 function navigate(name,skipScroll){
+ if(name!=='space')wipeServiceSecrets();
  if(!['space','catalog','support'].includes(name))return;
  state.tab=name;
  if(typeof window.switchTab==='function')window.switchTab(name==='space'?'inicio':name==='catalog'?'catalogo':'soporte');
@@ -749,7 +858,7 @@ function navigate(name,skipScroll){
 }
 window.GOXION_V2_OPEN_OFFICIAL=name=>navigate(name==='catalog'?'catalog':name==='support'?'support':'space');
 window.GOXION_V2_GO_SPACE=()=>navigate('space');
-window.GOXION_V2_SYNC_TAB=name=>{state.tab=name};
+window.GOXION_V2_SYNC_TAB=name=>{if(name!=='space')wipeServiceSecrets();state.tab=name};
 document.querySelectorAll('#gxn-nav [data-gxn-target]').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.gxnTarget)));
 $('gxn-profile-trigger').addEventListener('click',()=>{
  const menu=$('gxn-profile-menu'),next=menu.hidden;
@@ -806,12 +915,12 @@ let realtimeTimer=0;
 window.addEventListener('goxion:realtime',event=>{if(!['account_state','rewards','referrals','client_state','client_access','cancellations','resync'].includes(event.detail?.scope||''))return;clearTimeout(realtimeTimer);realtimeTimer=setTimeout(()=>void refreshClient(),220)});
 window.GOXION_V2_RETRY_FEED=()=>load();
 window.addEventListener('goxion:client-ready',()=>{void load()});
-window.addEventListener('goxion:client-logout',()=>{clearInterval(greetingTimer);greetingTimer=0;stopSavingsMotion();state.view=null;shell.hidden=true;window.GOXION_V2_CLIENT_ID=''});
+window.addEventListener('goxion:client-logout',()=>{wipeServiceSecrets();serviceOperation=null;clearInterval(greetingTimer);greetingTimer=0;stopSavingsMotion();state.view=null;shell.hidden=true;window.GOXION_V2_CLIENT_ID=''});
 if(typeof getCurrentClientKey==='function'&&getCurrentClientKey())void load();
 // Se conserva Morphicons del laboratorio aprobado; icono SVG nativo si no hay red.
 if(!reduced())import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
  if(typeof mod.createMorph==='function')iconHandle=mod.createMorph($('state-path'),paths[$('focus-icon').dataset.icon]||paths.check,{reducedMotion:'user'});
 }).catch(()=>{});
 setInterval(()=>{if(!document.hidden&&state.view){void refreshClient();void window.GOXION_V2_NOTIFICATIONS?.refresh({realtime:true})}},45000);
-document.addEventListener('visibilitychange',()=>{if(!document.hidden&&state.view){void refreshClient();void window.GOXION_V2_NOTIFICATIONS?.refresh({realtime:true})}});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)wipeServiceSecrets();if(!document.hidden&&state.view){void refreshClient();void window.GOXION_V2_NOTIFICATIONS?.refresh({realtime:true})}});
 })();
