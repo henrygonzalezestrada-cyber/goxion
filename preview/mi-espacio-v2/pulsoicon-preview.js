@@ -1,10 +1,15 @@
 /* GOXION · Prueba PulsoIcon 6.2.0 (CityPulso, ISC).
  * Dibujos y parámetros originales: packages/core/src/icons. Adaptación WAAPI
  * de las recetas de packages/core/src/recipes.ts, sin framework ni CDN.
- * Licencias completas: ./pulsoicon-LICENSE.txt. Solo el espejo. */
+ * Licencias completas: ./pulsoicon-LICENSE.txt. Solo historial del espejo.
+ * Dirección de diseño: PulsoIcon complementa Morficons; no sustituir morphs,
+ * emojis, navegación, campana ni controles aprobados. Movimientos semánticos,
+ * puntuales, sin bucles, con reduced-motion. Futuro (no activado aquí): icono
+ * de tarjeta principal solo al tocar directamente el icono; reloj conserva su
+ * animación propia. Mantener transición de estado de Morficons por separado. */
 (function(){
 'use strict';
-const DATA={"bell":{"nodes":[["path",{"d":"M10.268 21a2 2 0 0 0 3.464 0"},{"r":"slide","d":0.08,"x":1,"a":1.5,"o":[12,21.5]}],["path",{"d":"M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"},{"r":"ring","a":16,"o":[12,3]}]]},"calendar-days":{"nodes":[["path",{"d":"M8 2v3"},{"r":"lift","o":[12,3.5]}],["path",{"d":"M16 2v3"},{"r":"lift","d":0.06,"o":[12,3.5]}],["rect",{"x":"3","y":"3","width":"18","height":"18","rx":"2"},{"r":"press","a":0.04,"o":[12,12]}],["path",{"d":"M3 9h18"},{"r":"press","a":0.04,"o":[12,12]}],["path",{"d":"M8 13h.01"},{"r":"pop","d":0.1,"o":[8.005,13]}],["path",{"d":"M12 13h.01"},{"r":"pop","d":0.14,"o":[12.005,13]}],["path",{"d":"M16 13h.01"},{"r":"pop","d":0.18,"o":[16.005,13]}],["path",{"d":"M8 17h.01"},{"r":"pop","d":0.22,"o":[8.005,17]}],["path",{"d":"M12 17h.01"},{"r":"pop","d":0.26,"o":[12.005,17]}],["path",{"d":"M16 17h.01"},{"r":"pop","d":0.3,"o":[16.005,17]}]]},"shopping-cart":{"nodes":[["path",{"d":"m2.05 2.05 1.099-.028a1 1 0 0 1 1.008.815l2.69 14.347A1 1 0 0 0 7.83 18H18"},{"r":"slide","x":1,"a":1.5,"o":[12.025,10.011]}],["path",{"d":"M4.563 5h16.435a1 1 0 0 1 .981 1.204l-1.026 6.226A2 2 0 0 1 18.962 14H6.25"},{"r":"slide","x":1,"a":1.5,"o":[12.025,10.011]}],["circle",{"cx":"18","cy":"20","r":"2"},{"r":"spin","a":360,"o":[18,20]}],["circle",{"cx":"8","cy":"20","r":"2"},{"r":"spin","a":360,"o":[8,20]}]]},"circle-check":{"nodes":[["circle",{"cx":"12","cy":"12","r":"10"},{"r":"press","a":0.05,"o":[12,12]}],["path",{"d":"m16 9-5.5 5.5L8 12"},{"r":"draw","d":0.1,"o":[12,11.75]}]]},"heart-crack":{"nodes":[["path",{"d":"M12.409 5.824c-.702.792-1.15 1.496-1.415 2.166l2.153 2.156a.5.5 0 0 1 0 .707l-2.293 2.293a.5.5 0 0 0 0 .707L12 15"},{"r":"shake","d":0.2,"a":0.8,"o":[12,10.412]}],["path",{"d":"M13.508 20.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5a5.5 5.5 0 0 1 9.591-3.677.6.6 0 0 0 .818.001A5.5 5.5 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5z"},{"r":"beat","o":[12,12.499]}]]}};
+const DATA={"circle-check":{"nodes":[["circle",{"cx":"12","cy":"12","r":"10"},{"r":"press","a":0.05,"o":[12,12]}],["path",{"d":"m16 9-5.5 5.5L8 12"},{"r":"draw","d":0.1,"o":[12,11.75]}]]},"clock":{"nodes":[["circle",{"cx":"12","cy":"12","r":"10"},{"r":"press","a":0.04,"o":[12,12]}],["path",{"d":"M12 6v6l4 2"},{"r":"spin","a":360,"o":[12,12]}]]},"circle-x":{"nodes":[["circle",{"cx":"12","cy":"12","r":"10"},{"r":"spin","a":90,"o":[12,12]}],["path",{"d":"m15 9-6 6"},{"r":"draw","d":0.15,"o":[12,12]}],["path",{"d":"m9 9 6 6"},{"r":"draw","d":0.25,"o":[12,12]}]]},"receipt-text":{"nodes":[["path",{"d":"M13 16H8"},{"r":"growX","d":0.17,"o":[8,12]}],["path",{"d":"M14 8H8"},{"r":"growX","d":0.05,"o":[8,12]}],["path",{"d":"M16 12H8"},{"r":"growX","d":0.11,"o":[8,12]}],["path",{"d":"M4 3a1 1 0 0 1 1-1 1.3 1.3 0 0 1 .7.2l.933.6a1.3 1.3 0 0 0 1.4 0l.934-.6a1.3 1.3 0 0 1 1.4 0l.933.6a1.3 1.3 0 0 0 1.4 0l.933-.6a1.3 1.3 0 0 1 1.4 0l.934.6a1.3 1.3 0 0 0 1.4 0l.933-.6A1.3 1.3 0 0 1 19 2a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1 1.3 1.3 0 0 1-.7-.2l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.934.6a1.3 1.3 0 0 1-1.4 0l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-1.4 0l-.934-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-.7.2 1 1 0 0 1-1-1z"},{"r":"jelly","a":0.05,"o":[12,22]}]]},"circle-minus":{"nodes":[["circle",{"cx":"12","cy":"12","r":"10"},{"r":"press","a":0.06,"o":[12,12]}],["path",{"d":"M8 12h8"},{"r":"growX","d":0.1,"o":[12,12]}]]},"refresh-cw":{"nodes":[["path",{"d":"M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"},{"r":"spin","a":360,"o":[12,12]}],["path",{"d":"M21 3v5h-5"},{"r":"spin","a":360,"o":[12,12]}],["path",{"d":"M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"},{"r":"spin","a":360,"o":[12,12]}],["path",{"d":"M8 16H3v5"},{"r":"spin","a":360,"o":[12,12]}]]},"circle-plus":{"nodes":[["circle",{"cx":"12","cy":"12","r":"10"},{"r":"press","a":0.05,"o":[12,12]}],["path",{"d":"M8 12h8"},{"r":"spin","d":0.1,"a":90,"o":[12,12]}],["path",{"d":"M12 8v8"},{"r":"spin","d":0.1,"a":90,"o":[12,12]}]]},"gift":{"nodes":[["path",{"d":"M12 7v14"},{"r":"press","d":0.1,"a":0.05,"o":[12,21]}],["path",{"d":"M20 11v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8"},{"r":"press","d":0.1,"a":0.05,"o":[12,21]}],["path",{"d":"M7.5 7a1 1 0 0 1 0-5A4.8 8 0 0 1 12 7a4.8 8 0 0 1 4.5-5 1 1 0 0 1 0 5"},{"r":"lift","o":[12,4.5]}],["rect",{"x":"3","y":"7","width":"18","height":"4","rx":"1"},{"r":"lift","d":0.05,"o":[12,9]}]]}};
 const ns='http://www.w3.org/2000/svg', motion=matchMedia('(prefers-reduced-motion: reduce)');
 const active=new WeakMap();
 const recipes={
@@ -16,7 +21,9 @@ const recipes={
  spin:({a=360})=>[800,[0,a].map(v=>({transform:'rotate('+v+'deg)'}))],
  draw:()=>[550,[{strokeDashoffset:1,opacity:0},{strokeDashoffset:0,opacity:1}]],
  beat:({a=.16})=>[650,[1,1+a,1-a*.3,1+a*.6,1].map(v=>({scale:String(v)}))],
- shake:({a=1.5})=>[500,[0,-a,a,-a*.6,a*.6,0].map(v=>({transform:'translateX('+v+'px)'}))]
+ shake:({a=1.5})=>[500,[0,-a,a,-a*.6,a*.6,0].map(v=>({transform:'translateX('+v+'px)'}))],
+ growX:()=>[450,[{transform:'scaleX(0)'},{transform:'scaleX(1)'}]],
+ jelly:({a=.18})=>[700,[1,1+a,1-a*.6,1+a*.3,1].map((x,i)=>({transform:'scale('+x+','+[1,1-a,1+a*.6,1-a*.3,1][i]+')'}))]
 };
 function animate(el,m){
  if(motion.matches||document.hidden||!el?.animate||!m||!recipes[m.r])return;
@@ -41,25 +48,26 @@ function install(host,name){
  return svg;
 }
 function play(svg){if(!svg)return;const name=svg.dataset.gxPulso;DATA[name]?.nodes.forEach((n,i)=>animate(svg.children[i],n[2]))}
-const bell=document.querySelector('#gxn-bell'),bellHost=bell?.querySelector('.gx-client-notif-icon');
-const bellSvg=install(bellHost,'bell');
-if(bellSvg){bellSvg.style.animation='none';bellSvg.querySelectorAll('path').forEach(p=>p.style.animation='none')}
-const cart=document.querySelector('#gx-v2-shared-nav [data-gxn-target="catalog"]');
-const cartSvg=install(cart?.querySelector('.gxn-emoji'),'shopping-cart');
-if(cartSvg){cartSvg.style.width='23px';cartSvg.style.height='23px'}
-function trigger(el,fn){if(!el)return;el.addEventListener('click',fn);el.addEventListener('focusin',e=>{if(el.matches(':focus-visible'))fn()});el.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse')fn()})}
-trigger(bell,()=>play(bellSvg));trigger(cart,()=>play(cartSvg));
-if(bell){let ringing=bell.classList.contains('gx-ringing'),badge=bell.querySelector('.gx-client-notif-badge')?.textContent;new MutationObserver(()=>{const next=bell.classList.contains('gx-ringing'),count=bell.querySelector('.gx-client-notif-badge')?.textContent;if((next&&!ringing)||(bell.classList.contains('gx-has-new')&&Number(count)>Number(badge)))play(bellSvg);ringing=next;badge=count}).observe(bell,{attributes:true,attributeFilter:['class'],childList:true,subtree:true,characterData:true})}
-// No sustituir el SVG de Morficons: usar la receta de los aros del calendario en el detalle existente.
-const focus=document.getElementById('focus-icon'),focusAction=document.getElementById('focus-action');
-function calendar(){if(focus?.dataset.icon==='calendar')animate(focus.querySelector('.gx-focus-calendar-date'),DATA['calendar-days'].nodes[0][2])}
-trigger(focusAction,calendar);
-if(focus){let old=focus.dataset.icon;new MutationObserver(()=>{const next=focus.dataset.icon;if(next!==old&&next==='calendar')calendar();old=next}).observe(focus,{attributes:true,attributeFilter:['data-icon']})}
-// Mantener el emoji de lealtad y su watermark: aplicar el latido PulsoIcon al cambio real de estado.
-const loyalty=document.querySelector('.gxb-tile[data-gxb="loyalty"]');
-if(loyalty){let phase=loyalty.dataset.phase;new MutationObserver(()=>{const next=loyalty.dataset.phase;if(next==='lost'&&phase!==next)animate(loyalty.querySelector('.gxb-emoji'),DATA['heart-crack'].nodes[1][2]);phase=next}).observe(loyalty,{attributes:true,attributeFilter:['data-phase']});trigger(loyalty,()=>{if(loyalty.dataset.phase==='lost')animate(loyalty.querySelector('.gxb-emoji'),DATA['heart-crack'].nodes[1][2])})}
-// Confirmaciones: solo movimientos de pago ya verificados, nunca inferir estados.
+// Únicamente historial: no reemplazar ni escuchar ningún icono fuera de este contenedor.
 const list=document.getElementById('gxm-list');
-function history(){list?.querySelectorAll('.gxm-entry[data-kind="payment"] .gxm-icon').forEach(host=>install(host,'circle-check'))}
-if(list){new MutationObserver(history).observe(list,{childList:true,subtree:true});history();list.addEventListener('click',e=>{const row=e.target.closest('.gxm-entry[data-kind="payment"]');if(row)play(row.querySelector('svg[data-gx-pulso]'))})}
+const byKind={payment:'receipt-text',cancellation:'circle-minus',renewal:'refresh-cw',acquisition:'circle-plus',benefit:'gift'};
+const byPayment={approved:'circle-check',pending:'clock',rejected:'circle-x',registered:'receipt-text'};
+function history(){
+ list?.querySelectorAll('.gxm-entry').forEach(row=>{
+  const host=row.querySelector('.gxm-icon');if(!host)return;
+  const kind=row.dataset.kind,status=row.dataset.movementStatus;
+  const name=kind==='payment'?(byPayment[status]||byKind.payment):byKind[kind];
+  if(!name)return;
+  install(host,name);
+  if(kind==='payment')host.style.color=status==='approved'?'':status==='pending'?'#e7bd7f':status==='rejected'?'#e8a6ad':'#a8d4dd';
+ });
+}
+if(list){
+ new MutationObserver(history).observe(list,{childList:true,subtree:true});
+ history();
+ list.addEventListener('click',e=>{
+  const button=e.target.closest('.gxm-entry-button');
+  if(button?.getAttribute('aria-expanded')==='true')play(button.querySelector('svg[data-gx-pulso]'));
+ });
+}
 })();
