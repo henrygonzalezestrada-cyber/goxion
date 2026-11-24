@@ -12,6 +12,7 @@
     direction:1,
     renderedPromotions:[],
     reloadPending:false,
+    loadedToken:null,
     timer:null,
     pointerStart:null,
     latestData:null,
@@ -240,12 +241,14 @@
       if(!response.ok||data?.ok!==true) throw new Error(data?.error||'No fue posible cargar promociones.');
       if(v3&&clientToken()!==token){state.reloadPending=true;return;}
       state.promotions=(data.promociones||[]).map(p=>normalizedPromo(p,data.autenticado));
+      if(v3)state.loadedToken=token;
       maybePreviewPromotions();
       renderPromotions();
       renderCurated();
     }catch(error){
       console.warn('GOXION Promotions C1:',error);
       state.promotions=[];
+      if(v3)state.loadedToken=null;
       maybePreviewPromotions();
       renderPromotions();
     }finally{
@@ -486,7 +489,7 @@
   }
 
   async function requestPromotion(p,button){
-    if(v3){p=state.promotions.find(x=>x.id===p?.id);if(!p||state.lastToken!==clientToken())return false;}
+    if(v3){p=state.promotions.find(x=>x.id===p?.id);if(!p||state.loadedToken!==clientToken())return false;}
     if(!promoContractState(p).enabled || !promoAvailability(p).available) return false;
     const added=window.GOXION_CART?.addPromotion(p);
     if(added && button){
