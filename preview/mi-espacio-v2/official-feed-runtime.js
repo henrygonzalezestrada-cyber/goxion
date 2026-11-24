@@ -885,14 +885,14 @@ async function loadPrices(){
 /* Ahorro · misma animación y distribución adaptativa del laboratorio aprobado. */
 const savingsFormatter=new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN',minimumFractionDigits:2,maximumFractionDigits:2});
 const savingsMoney=value=>savingsFormatter.format(value);
-function savingsParts(value){const p=savingsFormatter.formatToParts(value),index=p.findIndex(x=>x.type==='decimal');return {major:p.slice(0,index).map(x=>x.value).join(''),minor:p.slice(index).map(x=>x.value).join('')}}
+function savingsParts(value){const p=savingsFormatter.formatToParts(value),index=p.findIndex(x=>x.type==='decimal');return {major:p.slice(0,index).map(x=>x.value).join(''),decimal:p[index]?.value||'.',minor:p.slice(index+1).map(x=>x.value).join('')}}
 let savingCurrent=0,savingTarget=0,savingFrame=0,savingSeen=false,savingObserver=null,savingSignature='';
 function stopSavingsMotion(){if(savingFrame){cancelAnimationFrame(savingFrame);savingFrame=0}}
 function showSavingAmount(value){
  const node=$('gxv-amount'),parts=savingsParts(value);
- let major=node.querySelector('.gxv-major'),minor=node.querySelector('.gxv-minor');
- if(!major||!minor){major=document.createElement('span');major.className='gxv-major';minor=document.createElement('span');minor.className='gxv-minor';node.replaceChildren(major,minor)}
- major.textContent=parts.major;minor.textContent=parts.minor;node.dataset.long=String(parts.major.length>7);
+ let major=node.querySelector('.gxv-major'),point=node.querySelector('.gxv-decimal'),minor=node.querySelector('.gxv-minor');
+ if(!major||!point||!minor){major=document.createElement('span');major.className='gxv-major';point=document.createElement('span');point.className='gxv-decimal';minor=document.createElement('span');minor.className='gxv-minor';node.replaceChildren(major,point,minor)}
+ major.textContent=parts.major;point.textContent=parts.decimal;minor.textContent=parts.minor;node.dataset.long=String(parts.major.length>7);
 }
 function animateSavings(next,initial=false){
  stopSavingsMotion();

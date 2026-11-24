@@ -142,3 +142,8 @@ El usuario aprobó visualmente la composición de la oferta del commit `c7f96a9b
 ## Ajustes de continuidad · centavos, promoción y carga circular
 
 Se retira play/pausa, sustituyendo bucles promocionales por una única secuencia ambiental de 4.6s; el reveal y contraste aprobados permanecen. Ahorro presenta pesos y dos decimales elevados mediante formatToParts durante el contador. Carga circular reutilizable para solicitudes de cancelación/retención, reclamos de beneficios y consulta PIN del feed; conserva confirmación original tras respuesta y restaura acciones ante error. No se cambia negocio, fuentes, Index, Admin ni ayuda.html. Pendiente revisión Safari y operaciones reales.
+
+
+## Refinamiento tipográfico de ahorro · 24/nov/2026
+
+Por indicación del usuario, separar el punto decimal (línea base, .65em) de los dos centavos (.40em, margen superior .48em propio; contenidos en altura de los pesos). Conservar formato es-MX, valor, contador, contraste y alineación de la tarjeta. Actualizar manual; pendiente inspección óptica en iPhone. Sin otros cambios visuales o de negocio.
