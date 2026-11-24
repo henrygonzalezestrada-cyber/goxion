@@ -624,8 +624,9 @@ function replaceCancelContent(tile,markup,animate=true){
 const cancelBack=(label='Consultar mis accesos')=>'<button type="button" class="gxs-ghost gxs-stage-back" data-gxi-action="service-back">'+label+'</button>';
 // PulsoIcon 6.2.0: mismo trazo check de circle-check; reloj con las
 // manecillas separadas de Morficons aprobadas en la tarjeta principal.
+// Revisión: file-search de PulsoIcon (ISC), sin repetir el reloj.
 function cancelStepIcon(kind){
- const paths={check:'<path d="m16 9-5.5 5.5L8 12"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',minus:'<path d="M8 12h8"/>'};
+ const paths={check:'<path d="m16 9-5.5 5.5L8 12"/>',review:'<path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><circle cx="11.5" cy="14.5" r="2.5"/><path d="M13.3 16.3 15 18"/>',minus:'<path d="M8 12h8"/>'};
  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"'+(kind==='check'?' data-gx-pulso="check"':'')+'>'+paths[kind]+'</svg>';
 }
 function cancelSymbol(type){
@@ -664,7 +665,7 @@ function cancellationPanel(s){
  const kind=approved?'approved':pending?'pending':rejected?'rejected':'confirm';
  const title=approved?(c?.fecha_efectiva?'Tu próxima baja':'Baja pendiente'):pending?'Solicitud recibida':rejected?'No se autorizó la baja':'¿Cancelar tu servicio?';
  const note=approved?'Tu servicio continúa activo hasta que la baja sea efectiva.':pending?'Tu servicio sigue activo durante la revisión.':rejected?'Tu servicio continúa activo. Puedes enviar una nueva solicitud.':'Los cargos ya generados se mantienen. Revisaremos tu solicitud antes de efectuar la baja.';
- const progress=pending?'<div class="gxs-stage-timeline" aria-label="'+(approved?'Solicitud y revisión completadas; baja pendiente':'Solicitud recibida; revisión en curso')+'"><span class="gxs-step is-done"><i aria-hidden="true">'+cancelStepIcon('check')+'</i><small>Solicitud</small></span><span class="gxs-step '+(approved?'is-done':'is-current')+'"><i aria-hidden="true">'+cancelStepIcon(approved?'check':'clock')+'</i><small>Revisión</small></span><span class="gxs-step"><i aria-hidden="true">'+cancelStepIcon('minus')+'</i><small>Baja efectiva</small></span></div>':'';
+ const progress=pending?'<div class="gxs-stage-timeline" aria-label="'+(approved?'Solicitud y revisión completadas; baja pendiente':'Solicitud recibida; revisión en curso')+'"><span class="gxs-step is-done"><i aria-hidden="true">'+cancelStepIcon('check')+'</i><small>Solicitud</small></span><span class="gxs-step '+(approved?'is-done':'is-current')+'"><i aria-hidden="true">'+cancelStepIcon(approved?'check':'review')+'</i><small>Revisión</small></span><span class="gxs-step"><i aria-hidden="true">'+cancelStepIcon('minus')+'</i><small>Baja efectiva</small></span></div>':'';
  const effective=approved&&c?.fecha_efectiva?'<strong class="gxs-stage-date">'+esc(dateLabel(c.fecha_efectiva))+'</strong>':'';
  const extra=(c?.fecha_efectiva&&!approved?'<p>Fecha prevista: '+esc(dateLabel(c.fecha_efectiva))+'</p>':'')+(c?.created_at?'<p>Solicitud: '+esc(dateLabel(c.created_at))+'</p>':'')+(c?.nota_admin?'<p><strong>Nota de GOXION:</strong> '+esc(c.nota_admin)+'</p>':'');
  const details=extra?'<details class="gxs-stage-info"><summary>'+(rejected?'Consultar motivo':'Información de la solicitud')+'</summary><div>'+extra+'</div></details>':'';
