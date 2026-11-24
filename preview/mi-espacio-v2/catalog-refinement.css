@@ -68,7 +68,7 @@ html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-price{font-size:15px;font-weig
 html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-line-bottom{margin-top:1px;gap:6px;min-height:40px;display:grid;grid-template-columns:auto minmax(0,1fr) 44px;align-items:center}
 html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-stepper{grid-column:1;grid-row:1;justify-self:start;border-radius:999px;background:rgba(255,255,255,.08);border:0}
 html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-unit-price{grid-column:2;grid-row:1;margin:0;text-align:center;font-size:10px;white-space:nowrap}
-html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-stepper button{width:38px;height:40px;color:#7ee1e7}
+html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-stepper button{width:44px;height:44px;color:#7ee1e7}
 html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-stepper span{min-width:18px;font-size:12px;color:#f5f8ff}
 html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-remove{grid-column:3;grid-row:1;justify-self:end;width:44px;height:44px;color:#dca2af}
 html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-remove svg{width:19px!important;height:19px!important}
