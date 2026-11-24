@@ -121,6 +121,8 @@ Consultar referencias primarias antes de inventar una interacción nueva; estudi
 | [GitHub Primer — Motion and animation](https://primer-docs-preview.github.com/accessibility/design-guidance/motion-and-animation/) | Distinguir movimiento informativo de decorativo |
 | [web.dev — High-performance CSS animations](https://web.dev/articles/animations-guide) | Renderizado, transform/opacity y medición |
 | [WCAG 2.2](https://www.w3.org/TR/WCAG22/) | Contraste, teclado, targets, pausa y accesibilidad |
+| [PulsoIcon](https://github.com/CityPulso/PulsoIcon) | Iconos semánticos con movimiento propio: confirmaciones, estados y acciones puntuales; reutilizar adaptación local ya instalada, no duplicar Morphicons |
+| [Baymard — Product Lists & Filtering](https://baymard.com/research/ecommerce-product-lists) y [Mobile E-Commerce](https://baymard.com/research/mcommerce-usability) | Exploración y comparación de productos: precio, disponibilidad y variante legibles; filtros comprensibles y lista escaneable en móvil |
 
 Estas fuentes son referencias técnicas externas, no pruebas de que GOXION las importe. Si se incorpora una nueva técnica, anotar URL, principio aprendido, aplicación concreta y resultado de prueba. No citar repositorios por popularidad sin estudiar su código/documentación.
 
