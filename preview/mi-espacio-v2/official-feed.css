@@ -1666,3 +1666,17 @@ body.gx-v2-client-session #gx-client-notif-sheet .gx-client-notif-head button{to
 #gx-v2-feed .gxb-note-slot .gxb-note[aria-hidden="true"]{opacity:0;visibility:hidden;pointer-events:none}
 #gx-v2-feed .gxb-note-slot .gxb-note:not([data-gxb-note="summary"]){color:#d3e0eb}
 @media(prefers-reduced-motion:reduce){#gx-v2-feed .gxb-note-slot .gxb-note{transition:none}}
+
+/* Seguimiento de cancelación: iconografía semántica del mismo sistema, sin alterar geometría. */
+#gx-v2-feed .gxs-stage-symbol .gxs-clock-hand{transform-box:view-box;transform-origin:12px 12px;animation:gx-focus-clock 6s linear infinite}
+#gx-v2-feed .gxs-step i svg{display:block;width:16px;height:16px;pointer-events:none}
+#gx-v2-feed .gxs-step.is-current i{color:#e7bd7f}
+#gx-v2-feed .gxs-step.is-current i::before{display:none;animation:none}
+#gx-v2-feed .gxs-step:not(.is-done):not(.is-current) i{color:#647287}
+#gx-v2-feed .gxs-cancel-panel .gx-action-morph.gx-action-success{display:inline-grid!important;place-items:center!important;width:38px!important;min-width:38px!important;max-width:38px!important;height:38px!important;min-height:38px!important;padding:0!important;border:0!important;border-radius:50%!important;background:#82d3b6!important;color:#122c28!important;box-shadow:none!important;transition:none!important;animation:gxCancelConfirmed .28s cubic-bezier(.2,.85,.25,1) both}
+#gx-v2-feed .gxs-cancel-panel .gx-action-morph.gx-action-success::before,#gx-v2-feed .gxs-cancel-panel .gx-action-morph.gx-action-success::after{display:none!important;content:none!important;animation:none!important}
+#gx-v2-feed .gxs-cancel-panel .gx-action-morph.gx-action-success .gx-action-label{display:none}
+#gx-v2-feed .gxs-confirm-mark{display:grid;place-items:center;width:26px;height:26px;pointer-events:none}
+#gx-v2-feed .gxs-confirm-mark svg{width:26px;height:26px;stroke-width:2.3}
+@keyframes gxCancelConfirmed{0%{transform:scale(.94);opacity:.85}60%{transform:scale(1.045);opacity:1}100%{transform:scale(1);opacity:1}}
+@media(prefers-reduced-motion:reduce){#gx-v2-feed .gxs-stage-symbol .gxs-clock-hand,#gx-v2-feed .gxs-cancel-panel .gx-action-morph.gx-action-success{animation:none!important}}
