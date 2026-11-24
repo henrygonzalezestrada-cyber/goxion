@@ -1619,7 +1619,8 @@ body.gx-v2-client-session #gx-client-notif-sheet .gx-client-notif-head button{to
 
 /* Experiencia del servicio: misma etapa expandida, sin tarjetas ni iconos en las opciones. */
 #gx-v2-feed .gxs-experience[hidden],#gx-v2-feed .gxs-experience [hidden]{display:none!important}
-#gx-v2-feed .gxs-more{gap:4px}
+#gx-v2-feed .gxs-more{gap:8px;padding-top:2px;padding-bottom:0}
+#gx-v2-feed .gxs-more .gxs-stage-back{margin:4px 0 0;padding:4px;min-height:38px}
 #gx-v2-feed .gxs-experience{display:grid;grid-template-columns:minmax(0,1fr);justify-items:center;gap:6px;padding:2px 0 0;text-align:center;min-width:0;max-width:100%}
 #gx-v2-feed .gxs-experience h3{font-size:19px;line-height:1.2;letter-spacing:-.035em;margin:2px 0;color:#f2f7fc;font-weight:650}
 #gx-v2-feed .gxs-experience .gxi-note{max-width:310px;margin:0;color:#b6c6d7;line-height:1.55}
@@ -1632,7 +1633,11 @@ body.gx-v2-client-session #gx-client-notif-sheet .gx-client-notif-head button{to
 #gx-v2-feed .gxs-experience-fields input[type=date]{display:block;-webkit-appearance:none;appearance:none;inline-size:100%;min-inline-size:0;max-inline-size:100%;text-align:left}
 #gx-v2-feed .gxs-experience-fields input[type=date]::-webkit-date-and-time-value{min-width:0;max-width:100%;margin:0;text-align:left}
 #gx-v2-feed .gxs-experience-fields input[type=date]::-webkit-datetime-edit{min-width:0;padding:0}
-#gx-v2-feed .gxs-experience .gxs-stage-back{min-height:38px;height:auto;margin:0;padding:4px 4px;font-size:11px;line-height:1.2}
+#gx-v2-feed .gxs-experience .gxs-stage-back{display:flex;align-items:center;justify-content:center;min-height:38px;height:auto;margin:0;padding:0 4px;font-size:11px;line-height:1.2}
+#gx-v2-feed .gxs-rating{row-gap:6px}
+#gx-v2-feed .gxs-rating .gxs-feedback:not(:empty){margin:2px 0 0;line-height:1.4}
+#gx-v2-feed .gxs-rating .gxs-feedback:not(:empty)+.gxs-stage-back{margin-top:2px}
+#gx-v2-feed .gxs-rating .gxs-stage-back{align-self:start}
 #gx-v2-feed .gxs-experience .gxs-experience-submit{margin:0}
 #gx-v2-feed .gxs-report[data-reported=true]{gap:6px;padding-top:4px}
 #gx-v2-feed .gxs-rating-label{margin-top:-3px}
