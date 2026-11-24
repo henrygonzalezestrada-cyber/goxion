@@ -1541,3 +1541,48 @@ body:has(#gx-v2-shared-nav) .app-header>.app-logo{width:var(--gx-v2-logo-width);
 @keyframes gxFeedBusyMorph{from{transform:scaleX(1.22);opacity:.8}to{transform:scaleX(1);opacity:1}}
 @keyframes gxFeedBusySpin{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){#gx-v2-feed button.gx-feed-busy:not(.gx-action-success):not(.gx-action-error),#gx-v2-feed button.gx-feed-busy:not(.gx-action-success):not(.gx-action-error)::after{animation:none!important}}
+
+/* GOXION · cierre de feed y centro de notificaciones; solo espejo. */
+body.gx-v2-private-visible #gx-v2-feed .shell{padding-bottom:6px!important}
+body.gx-v2-private-visible #gx-legal-hub{display:grid;grid-template-columns:minmax(0,1fr);gap:0;margin:13px 0 0;padding:10px 3px 5px;border-top:1px solid rgba(225,239,250,.09)}
+body.gx-v2-private-visible #gx-legal-hub .gx-legal-hub-open{width:100%;justify-content:space-between;min-height:30px;padding:2px 0;color:#d0d9e5;font-weight:550}
+body.gx-v2-private-visible #gx-legal-hub .gx-legal-hub-label{display:flex;align-items:center;gap:7px}
+body.gx-v2-private-visible #gx-legal-hub .gx-legal-status{padding-left:23px;min-height:25px}
+body.gx-v2-private-visible #gx-legal-hub .gx-legal-review{padding:5px 0;font-size:10.5px}
+body.gx-v2-private-visible #gx-legal-hub .gx-legal-review[data-tone="pending"]{color:#dbbb81}
+body.gx-v2-private-visible #gx-legal-hub .gx-legal-review[data-tone="rejected"]{color:#e7a4ad}
+body.gx-v2-private-visible #gx-legal-hub .gx-legal-review[data-tone="accepted"]{color:#89d3b9}
+body.gx-v2-private-visible #gx-legal-hub .gx-legal-review[data-tone]::before{content:"";display:inline-block;width:5px;height:5px;border-radius:50%;background:currentColor;margin-right:5px;vertical-align:2px}
+body.gx-v2-private-visible .footer-info{margin-top:17px;padding-top:12px;border-top:0}
+body.gx-v2-private-visible .footer-info .schedule-title{display:flex;align-items:center;justify-content:center;gap:6px;font-size:14px!important;font-weight:600!important;color:#b39af4!important}
+body.gx-v2-private-visible .footer-info .schedule-time{font-size:11px!important;color:#aab8c8!important}
+body.gx-v2-private-visible .footer-info .gx-v2-copyright{margin-top:11px!important;font-size:10px!important;color:#95a4b7!important}
+body.gx-v2-private-visible .footer-info .goxion-release-version{padding:10px 0 0;color:rgba(149,164,189,.55)}
+body.gx-v2-private-visible .container{padding-bottom:calc(18px + env(safe-area-inset-bottom,0px))}
+body.gx-v2-client-session #gx-client-notif-sheet.gx-v2-resizable{display:flex;flex-direction:column;height:var(--gx-v2-sheet-height,71dvh);max-height:var(--gx-v2-sheet-height,71dvh);box-sizing:border-box}
+body.gx-v2-client-session #gx-client-notif-sheet.gx-v2-resizable.show{transition:height .29s cubic-bezier(.2,.8,.2,1),max-height .29s cubic-bezier(.2,.8,.2,1),transform .34s cubic-bezier(.2,.82,.2,1),opacity .18s ease}
+body.gx-v2-client-session #gx-client-notif-sheet.gx-v2-sheet-dragging{transition:none!important}
+body.gx-v2-client-session #gx-client-notif-sheet .gx-client-notif-handle{position:relative;display:grid;place-items:center;flex:0 0 32px;width:76px;height:32px;min-height:32px;margin:0 auto -3px;background:transparent;touch-action:none;cursor:ns-resize;-webkit-tap-highlight-color:transparent;user-select:none}
+body.gx-v2-client-session #gx-client-notif-sheet .gx-client-notif-handle::after{content:"";width:36px;height:4px;border-radius:999px;background:rgba(255,255,255,.26);transition:background .18s}
+body.gx-v2-client-session #gx-client-notif-sheet.gx-v2-sheet-dragging .gx-client-notif-handle::after{background:#79e6fc}
+body.gx-v2-client-session #gx-client-notif-sheet .gx-client-notif-handle:focus-visible{outline:2px solid #79e6fc;outline-offset:-4px}
+body.gx-v2-client-session #gx-client-notif-sheet .gx-client-notif-head{flex:0 0 auto;min-height:52px;padding-top:1px;padding-bottom:7px}
+body.gx-v2-client-session #gx-client-notif-sheet .gx-client-notif-list{flex:1 1 auto;min-height:0;max-height:none;overflow-y:auto;padding:0 12px 14px;mask-image:none;-webkit-mask-image:none}
+body.gx-v2-client-session #gx-client-notif-sheet .gx-client-notif-toolbar:not(.gx-confirm-read):not(.gx-confirm-clear){border-color:rgba(205,224,236,.12);box-shadow:inset 0 1px rgba(255,255,255,.04)}
+body.gx-v2-client-session #gx-client-notif-sheet .gx-client-notif-toolbar svg[data-gx-pulso] path{animation:none!important;stroke-dasharray:initial}
+body.gx-v2-client-session #gx-client-notif-sheet .gx-client-notif-item{min-height:68px;padding:12px 11px 12px 31px}
+body.gx-v2-client-session #gx-client-notif-sheet .gx-client-notif-item strong{font-size:12px;font-weight:600;line-height:1.4}
+body.gx-v2-client-session #gx-client-notif-sheet .gx-client-notif-time{font-size:9.5px;opacity:.92;color:#a5b4c6}
+body.gx-v2-client-session #gx-client-notif-sheet .gx-client-notif-item p{font-size:11px;line-height:1.5;margin-top:5px}
+body.gx-v2-client-session #gx-client-notif-sheet .gx-client-notif-item-foot{margin-top:5px}
+body.gx-v2-client-session #gx-client-notif-sheet .gx-client-notif-item-action{font-size:10px;min-height:32px;opacity:1}
+body.gx-v2-client-session #gx-client-notif-sheet .gx-client-notif-swipe:not(:last-child)::after{background:rgba(179,201,222,.085);left:31px;right:9px}
+body.gx-v2-client-session #gx-client-notif-sheet .gx-v2-notif-glyph{position:absolute;left:6px;top:13px;width:18px;height:18px;color:#9eb2c5;pointer-events:none}
+body.gx-v2-client-session #gx-client-notif-sheet .gx-v2-notif-glyph svg{width:18px;height:18px}
+body.gx-v2-client-session #gx-client-notif-sheet .gx-v2-notif-glyph[data-tone="green"]{color:#8cdec1}
+body.gx-v2-client-session #gx-client-notif-sheet .gx-v2-notif-glyph[data-tone="purple"]{color:#b5a2f0}
+body.gx-v2-client-session #gx-client-notif-sheet .gx-v2-notif-glyph[data-tone="red"]{color:#e8a6ad}
+body.gx-v2-client-session #gx-client-notif-sheet .gx-v2-notif-glyph[data-tone="amber"]{color:#dfb18e}
+body.gx-v2-client-session #gx-client-notif-sheet .gx-v2-notif-glyph[data-tone="cyan"]{color:#8ad4df}
+body.gx-v2-client-session #gx-client-notif-sheet .gx-client-notif-item.unread::before{left:25px;top:17px;width:4px;height:4px;background:#79e6fc}
+@media(prefers-reduced-motion:reduce){body.gx-v2-client-session #gx-client-notif-sheet.gx-v2-resizable.show{transition:none!important}}
