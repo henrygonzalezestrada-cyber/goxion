@@ -2,12 +2,11 @@
 
 <html data-goxion-version="1.3.0" lang="es">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://esm.sh; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://nsvybyvvdpdgbgtvydfb.supabase.co; connect-src 'self' https://nsvybyvvdpdgbgtvydfb.supabase.co wss://nsvybyvvdpdgbgtvydfb.supabase.co https://esm.sh; object-src 'none'; frame-src 'none'; form-action 'none'; base-uri 'self'">
-<meta name="robots" content="noindex,nofollow">
-<script src="./preview/mi-espacio-v2/aceptacion/guard.js?v=3"></script>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
 <meta content="#030305" name="theme-color"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://esm.sh; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://nsvybyvvdpdgbgtvydfb.supabase.co; connect-src 'self' https://nsvybyvvdpdgbgtvydfb.supabase.co wss://nsvybyvvdpdgbgtvydfb.supabase.co https://esm.sh; object-src 'none'; frame-src 'none'; form-action 'none'; base-uri 'self'">
+<script src="./preview/mi-espacio-v2/aceptacion/guard.js?v=4"></script>
 <title>GOXION · Aceptación aislada</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="./assets/css/ayuda.css">
@@ -49,8 +48,8 @@
 <link rel="stylesheet" href="./assets/css/goxion-legal-v2.css?v=purple-cyan-5">
 <link rel="stylesheet" href="./assets/css/goxion-legal-access.css?v=legal-general-1">
 <meta name="robots" content="noindex,nofollow">
-<link rel="stylesheet" href="./preview/mi-espacio-v2/official-feed.css?v=feed-savings-uniform-20261124">
-<link rel="stylesheet" href="./preview/mi-espacio-v2/official-feed-intro.css?v=lab-parity-20261123">
+<link rel="stylesheet" href="./preview/mi-espacio-v2/official-feed.css?v=feed-benefit-info-visible-20261124">
+<link rel="stylesheet" href="./preview/mi-espacio-v2/official-feed-intro.css?v=shared-logo-20261124">
 </head>
 <body class="no-scroll">
 <!-- Única superficie de carga del espejo: el mismo símbolo desde arranque hasta cabecera. -->
@@ -451,7 +450,7 @@ window.GOXION_V2_BOOT_TIMER=setTimeout(function(){
 <section class="gxb-wrap" aria-label="Tus beneficios">
  <div class="gxb-row" id="gxb-row" role="group" aria-label="Lealtad, Referidos y Misiones">
   <button type="button" class="gxb-tile gxc-surface" data-gxb="loyalty" aria-expanded="false" aria-controls="gxb-panel" aria-label="Lealtad, avance pendiente de sincronizar, abrir detalle">
-   <span class="gxb-label">Lealtad</span><span class="gxb-metric-row"><strong class="gxb-number">—</strong><span class="gxb-emoji" aria-hidden="true">⭐</span></span><span class="gxb-unit">pagos seguidos</span><span class="gxb-mini-progress" aria-hidden="true"><span style="--gxb-pct:0%"></span></span>
+   <span class="gxb-label">Lealtad<span class="gxb-level" hidden></span></span><span class="gxb-metric-row"><strong class="gxb-number">—</strong><span class="gxb-emoji" aria-hidden="true">⭐</span></span><span class="gxb-unit">pagos seguidos</span><span class="gxb-mini-progress" aria-hidden="true"><span style="--gxb-pct:0%"></span></span>
   </button>
   <button type="button" class="gxb-tile gxc-surface" data-gxb="referral" aria-expanded="false" aria-controls="gxb-panel" aria-label="Referidos, avance pendiente de sincronizar, abrir detalle">
    <span class="gxb-label">Referidos</span><span class="gxb-metric-row"><strong class="gxb-number">—</strong><span class="gxb-emoji" aria-hidden="true">🎁</span></span><span class="gxb-unit">meses válidos</span><span class="gxb-mini-progress" aria-hidden="true"><span style="--gxb-pct:0%"></span></span>
@@ -470,9 +469,9 @@ window.GOXION_V2_BOOT_TIMER=setTimeout(function(){
    <div id="gxb-content"></div>
   </div>
   <div class="gxb-foot">
-   <div class="gxb-foot-action"><button type="button" id="gxb-action" class="gxb-action"></button><button type="button" id="gxb-rules" class="gxb-rules" aria-expanded="false" aria-controls="gxb-rule-note" aria-label="Ver condiciones" title="Información del beneficio"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8h.01"></path></svg></button></div>
+   <div class="gxb-foot-action"><button type="button" id="gxb-action" class="gxb-action"></button><button type="button" id="gxb-rules" class="gxb-rules" aria-expanded="false" aria-controls="gxb-inline-conditions" aria-label="Ver condiciones" title="Información del beneficio"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8h.01"></path></svg></button></div>
   </div>
-  <div id="gxb-rule-note" class="gxb-rule-note" hidden></div>
+
   <span class="gxb-panel-emoji" id="gxb-panel-emoji" aria-hidden="true">⭐</span>
   <span id="gxb-feedback" class="gxb-feedback" aria-live="polite"></span>
  </div>
@@ -719,12 +718,15 @@ window.GOXION_V2_BOOT_TIMER=setTimeout(function(){
 </div>
 <div class="footer-info">
 <div class="schedule">
-<div class="schedule-title" style="font-weight: 700; color: var(--neon-purple); margin-bottom: 5px;">🕒 Atención Asistida</div>
+<div class="schedule-title" style="font-weight: 700; color: var(--neon-purple); margin-bottom: 5px;"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/></svg> Atención Asistida</div>
 <div class="schedule-time" style="font-size: 13px; color: var(--text-muted);">Lunes a Sábado • 09:00 AM - 11:00 PM</div>
 </div>
-<div style="font-size: 11px; color: var(--text-muted); margin-top: 15px;">
+<div class="gx-v2-copyright" style="font-size: 11px; color: var(--text-muted); margin-top: 15px;">
                 © 2026 GOXION. Todos los derechos reservados.
             </div>
+<div class="goxion-release-version" aria-label="Versión de GOXION">
+    GOXION · Ayuda · v1.3.0
+</div>
 </div>
 </div>
 <div class="auth-overlay gx-auth-backdrop-only" id="auth-overlay" onclick="closeAuthSheetEvent(event)"></div>
@@ -864,9 +866,7 @@ window.GOXION_V2_BOOT_TIMER=setTimeout(function(){
 <script id="goxion-gamification-shared-morph-js" src="./assets/js/ayuda/05-gamification-shared-morph-js.js"></script>
 <script id="goxion-wave-background" src="./assets/js/ayuda/06-wave-background.js"></script>
 
-<div class="goxion-release-version" aria-label="Versión de GOXION">
-    GOXION · Ayuda · v1.3.0
-</div>
+
 
 <script id="goxion-production-interactions-js" src="./assets/js/ayuda/07-production-interactions-js.js?v=cart2"></script>
 
@@ -999,11 +999,12 @@ window.GOXION_V2_BOOT_TIMER=setTimeout(function(){
 
 
 <script id="goxion-ui-harmony-production-script" src="./assets/js/ayuda/14-ui-harmony-production-script.js"></script>
-<script id="goxion-promotions-catalog-c1" src="./assets/js/ayuda/15-promotions-catalog-c1.js?v=return2"></script>\n
+<script id="goxion-promotions-catalog-c1" src="./assets/js/ayuda/15-promotions-catalog-c1.js?v=return2"></script>
+
 
 <script src="./assets/js/ayuda/16-cart-v2.js?v=glass1"></script>
 <script id="goxion-ayuda-realtime" src="./assets/js/ayuda/03-realtime.js?v=20261008a"></script>
-<script id="goxion-client-notifications-realtime" src="./assets/js/ayuda/04-client-notifications-realtime.js?v=terms-wide-1"></script>
+<script id="goxion-client-notifications-realtime" src="./assets/js/ayuda/04-client-notifications-realtime.js?v=feed-paridad-1-20261124"></script>
 <script src="./assets/js/opiniones/store.js?v=20261009a"></script>
 <script src="./assets/js/opiniones/ayuda.js?v=20261009a"></script>
 <script src="./preview/mi-espacio-v2/official-feed-prorroga.js?v=feed-20261123"></script>
@@ -1022,9 +1023,10 @@ window.GOXION_V2_BOOT_TIMER=setTimeout(function(){
 <script id="goxion-release-launch" src="./assets/js/ayuda/20-release-announcement.js?v=oficial-v2-todos"></script>
 <script id="goxion-legal-v2" src="./assets/js/ayuda/21-legal-v2-documents.js?v=cola-v1"></script>
 <script src="./assets/js/ayuda/22-legal-access.js?v=legal-general-1"></script>
-<script src="./preview/mi-espacio-v2/aceptacion/data.js?v=release-candidate-r2-20261123"></script>
-<script src="./preview/mi-espacio-v2/official-feed-runtime.js?v=feed-savings-uniform-20261124"></script>
+<script src="./preview/mi-espacio-v2/aceptacion/data.js?v=history-20261124"></script>
+<script src="./preview/mi-espacio-v2/official-feed-runtime.js?v=feed-history-b2-20261124"></script>
 <script src="./preview/mi-espacio-v2/official-feed-host.js?v=single-capsule-public-20261123"></script>
-<script src="./preview/mi-espacio-v2/official-feed-intro.js?v=lab-parity-2"></script>
+<script src="./preview/mi-espacio-v2/official-feed-intro.js?v=shared-logo-20261124"></script>
+<script defer src="./preview/mi-espacio-v2/pulsoicon-preview.js?v=6.2.0-notif-stable"></script>
 </body>
 </html>
