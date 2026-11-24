@@ -1531,12 +1531,6 @@ body:has(#gx-v2-shared-nav) .app-header>.app-logo{width:var(--gx-v2-logo-width);
 @media(prefers-reduced-motion:reduce){#gx-v2-feed .gxs-offer-number strong{animation:none!important;background-position:20% 50%}#gx-v2-feed .gxs-offer-spark{display:none}}
 @media(max-width:320px){#gx-v2-feed .gxs-offer-number strong{font-size:clamp(46px,16vw,56px)}#gx-v2-feed .gxs-offer-hero .gxs-offer-title{font-size:15px!important}}
 
-/* Ahorro: pesos protagonistas y centavos elevados, sin modificar el importe. */
-#gx-v2-feed .gxv-amount{display:flex;align-items:baseline;justify-content:center;gap:0;white-space:nowrap}
-#gx-v2-feed .gxv-major{line-height:1.1}
-#gx-v2-feed .gxv-decimal{font-size:.65em;line-height:1;letter-spacing:0;margin-inline:0 1px}
-#gx-v2-feed .gxv-minor{align-self:flex-start;font-size:.40em;line-height:1.15;margin-top:.48em;letter-spacing:-.02em;font-weight:700}
-@media(max-width:320px){#gx-v2-feed .gxv-amount[data-long="true"]{font-size:25px}}
 /* Carga indeterminada compartida, limitada al feed. La cápsula normal no cambia. */
 #gx-v2-feed button.gx-feed-busy:not(.gx-action-success):not(.gx-action-error){position:relative!important;isolation:isolate;display:inline-flex!important;align-items:center!important;justify-content:center!important;flex:0 0 auto!important;width:38px!important;max-width:38px!important;min-width:38px!important;height:38px!important;min-height:38px!important;padding:0!important;border:0!important;border-radius:50%!important;background:rgba(255,255,255,.08)!important;color:transparent!important;font-size:0!important;box-shadow:none!important;opacity:1!important;overflow:hidden!important;pointer-events:none;animation:gxFeedBusyMorph .24s cubic-bezier(.22,.82,.24,1) both}
 #gx-v2-feed button.gx-feed-busy .gx-action-label{opacity:0!important;color:transparent!important}

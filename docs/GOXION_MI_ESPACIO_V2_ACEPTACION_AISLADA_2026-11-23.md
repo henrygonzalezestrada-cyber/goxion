@@ -147,3 +147,8 @@ Se retira play/pausa, sustituyendo bucles promocionales por una única secuencia
 ## Refinamiento tipográfico de ahorro · 24/nov/2026
 
 Por indicación del usuario, separar el punto decimal (línea base, .65em) de los dos centavos (.40em, margen superior .48em propio; contenidos en altura de los pesos). Conservar formato es-MX, valor, contador, contraste y alineación de la tarjeta. Actualizar manual; pendiente inspección óptica en iPhone. Sin otros cambios visuales o de negocio.
+
+
+## Ahorro · formato monetario uniforme · 24/nov/2026
+
+Decisión posterior del usuario: mantener pesos y centavos al mismo tamaño y línea base, como Index. Se retiran spans y estilos de centavos elevados; se conservan dos decimales, contador, ajuste de importes largos y formato es-MX/MXN. Se actualiza manual. Solo espejo y arnés; Index y ayuda.html intactos.
