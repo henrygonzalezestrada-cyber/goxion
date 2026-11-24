@@ -1,6 +1,4 @@
-/* GOXION · Catálogo · base común y comparación temporal A/B/C.
-   Sólo el candidato y aceptación optan por data-gx-catalog-v3.
-   Las variantes son mutuamente excluyentes; no cambian geometría ni morph. */
+/* GOXION · Catálogo · cristal cromático elegido (B). Sólo candidato y aceptación. */
 html[data-gx-catalog-v3] #view-catalogo{
   --gx-catalog-glass:rgba(8,8,12,.371);
   --gx-catalog-ink:#f5f8ff;
@@ -8,7 +6,6 @@ html[data-gx-catalog-v3] #view-catalogo{
   --gx-catalog-button:rgba(255,255,255,.08);
   --gx-catalog-cyan:#7ee1e7;
 }
-html[data-gx-catalog-v3] #view-catalogo :is(.gx-catalog-curated-head,.gx-catalog-all-head,.gx-promo-showcase-head) .gx-promo-kicker{display:none}
 html[data-gx-catalog-v3] #view-catalogo .brand-card{
   background:var(--gx-catalog-glass);
   backdrop-filter:blur(11.75px) saturate(1);
@@ -29,11 +26,6 @@ html[data-gx-catalog-v3] #view-catalogo .qty-btn-large{
   width:38px;height:38px;border:0;border-radius:50%;background:var(--gx-catalog-button);color:var(--gx-catalog-cyan);box-shadow:none;
 }
 html[data-gx-catalog-v3] #view-catalogo .qty-btn-large:hover:not(:disabled){background:rgba(126,225,231,.15);color:#a5f4fa;box-shadow:none}
-html[data-gx-catalog-v3] #view-catalogo .brand-card.expanded .brand-expand-icon.gx-chevron-motion{
-  flex-basis:35px!important;width:35px!important;height:35px!important;min-width:35px!important;min-height:35px!important;
-  border:0!important;border-radius:50%!important;background:#79e6fc!important;color:#071c29!important;box-shadow:none!important;
-}
-html[data-gx-catalog-v3] #view-catalogo .brand-card.expanded .brand-expand-icon.gx-chevron-motion svg{width:16px;height:16px}
 html[data-gx-catalog-v3] #gx-promo-deck-controls[hidden]{display:none!important}
 html[data-gx-catalog-v3] #gx-promo-deck-status:empty{display:none}
 html[data-gx-catalog-v3] #gx-promo-deck[data-gx-promo-count="2"] .is-left{
@@ -68,42 +60,32 @@ html[data-gx-catalog-v3] .gx-promo-deck-card.is-expanded .gx-promo-morph-close{
   width:35px!important;height:35px!important;border:0!important;border-radius:50%!important;background:#79e6fc!important;color:#071c29!important;
   box-shadow:none!important;font-size:19px;line-height:1;
 }
-/* A · Pulido conservador: identidad original, acabado del badge. */
-html[data-gx-promo-variant="a"] .gx-promo-deck-card{
-  background:radial-gradient(ellipse at 84% 10%,color-mix(in srgb,var(--gx-brand-accent) 22%,transparent),transparent 40%),
-  linear-gradient(165deg,color-mix(in srgb,var(--gx-brand) 88%,#11121d) 0%,var(--gx-brand-deep) 78%);
-  border-color:rgba(255,255,255,.085);
-}
-html[data-gx-promo-variant="a"] .gx-promo-card-kind{border:0;background:rgba(255,255,255,.12);color:#fff;letter-spacing:.055em;font-weight:700}
-html[data-gx-promo-variant="a"] .gx-promo-deck-card.is-closed.is-front::after{opacity:.30;box-shadow:inset 0 1px rgba(255,255,255,.12)}
 /* B · Cristal cromático: fondo profundo, luz ambiental y tipografía dirigida. */
-html[data-gx-promo-variant="b"] .gx-promo-deck-card{
+html[data-gx-catalog-v3] .gx-promo-deck-card{
   background:radial-gradient(ellipse at 90% 0%,color-mix(in srgb,var(--gx-brand-accent) 24%,transparent),transparent 54%),
   radial-gradient(ellipse at 0% 66%,color-mix(in srgb,var(--gx-brand) 38%,transparent),transparent 73%),
   linear-gradient(157deg,color-mix(in srgb,var(--gx-brand-deep) 72%,#12141e),#0b0c15 94%);
-  border-color:rgba(255,255,255,.065);
+  border-color:transparent;
 }
-html[data-gx-promo-variant="b"] .gx-promo-card-kind{
+html[data-gx-catalog-v3] .gx-promo-card-kind{
   border:0;background:rgba(255,255,255,.10);color:color-mix(in srgb,var(--gx-brand-accent) 38%,white);
   letter-spacing:.075em;font-weight:750;
 }
-html[data-gx-promo-variant="b"] .gx-promo-offer-title{color:color-mix(in srgb,var(--gx-brand-accent) 28%,white);font-weight:650}
-html[data-gx-promo-variant="b"] .gx-promo-deck-card.is-closed.is-front::after{opacity:.26;box-shadow:inset 0 1px rgba(255,255,255,.13)}
-/* C · Editorial: luz localizada y contraste gráfico; misma paleta de marca. */
-html[data-gx-promo-variant="c"] .gx-promo-deck-card{
-  background:radial-gradient(ellipse at 15% 23%,color-mix(in srgb,var(--gx-brand-accent) 32%,transparent),transparent 47%),
-  radial-gradient(ellipse at 110% 78%,color-mix(in srgb,var(--gx-brand) 64%,transparent),transparent 62%),
-  linear-gradient(142deg,color-mix(in srgb,var(--gx-brand) 65%,#10131d),color-mix(in srgb,var(--gx-brand-deep) 75%,#080912) 68%);
-  border-color:rgba(255,255,255,.09);
+html[data-gx-catalog-v3] .gx-promo-offer-title{color:color-mix(in srgb,var(--gx-brand-accent) 28%,white);font-weight:650}
+html[data-gx-catalog-v3] .gx-promo-deck-card::after{border:0;box-shadow:none!important;opacity:0;}
+html[data-gx-catalog-v3] .gx-promo-deck-card.is-closed.is-front::after{opacity:0;box-shadow:none!important}
+html[data-gx-catalog-v3] .gx-mechanic-combo .gx-promo-card-kind{color:#e2d4ff}
+html[data-gx-catalog-v3] .gx-mechanic-porcentaje .gx-promo-card-kind{color:#b8f6df}
+
+/* Jerarquía única, sin separadores ornamentales. */
+html[data-gx-catalog-v3] #view-catalogo :is(.gx-promo-showcase-head h2,.gx-catalog-curated-head h3,.gx-catalog-all-head h3){
+  font-size:18px;font-weight:700;line-height:1.25;letter-spacing:-.025em;color:#f5f8ff;margin:0;
 }
-html[data-gx-promo-variant="c"] .gx-promo-card-kind{
-  border:0;background:color-mix(in srgb,var(--gx-brand-accent) 22%,rgba(255,255,255,.11));
-  color:#fff;letter-spacing:.10em;font-weight:800;
+html[data-gx-catalog-v3] #view-catalogo :is(.gx-catalog-discover-section,.gx-catalog-all-head){border-top:0}
+html[data-gx-catalog-v3] #view-catalogo .gx-catalog-curated-head{flex-wrap:wrap;row-gap:8px;align-items:center}
+/* Sin alterar el morph de la tarjeta ni la flecha original de plataformas. */
+html[data-gx-catalog-v3] .gx-promo-deck-card.is-expanded .gx-promo-action.is-contract{
+  width:auto;min-width:0;max-width:100%;min-height:38px;padding:8px 15px;border:0;border-radius:999px;
+  background:rgba(255,255,255,.08);box-shadow:none;color:#7ee1e7;font-size:11px;font-weight:600;letter-spacing:normal;
 }
-html[data-gx-promo-variant="c"] .gx-promo-offer-title{color:#f5f8ff;font-weight:700}
-html[data-gx-promo-variant="c"] .gx-promo-deck-card.is-closed.is-front::after{opacity:.34;box-shadow:inset 0 1px rgba(255,255,255,.18)}
-/* Semántica de etiqueta, no cambia texto ni mecánica. */
-html[data-gx-promo-variant="b"] .gx-mechanic-combo .gx-promo-card-kind,
-html[data-gx-promo-variant="c"] .gx-mechanic-combo .gx-promo-card-kind{color:#e2d4ff}
-html[data-gx-promo-variant="b"] .gx-mechanic-porcentaje .gx-promo-card-kind,
-html[data-gx-promo-variant="c"] .gx-mechanic-porcentaje .gx-promo-card-kind{color:#b8f6df}
+html[data-gx-catalog-v3] .gx-promo-deck-card.is-expanded .gx-promo-action.is-contract:disabled{opacity:.65;color:#c1cfe0}
