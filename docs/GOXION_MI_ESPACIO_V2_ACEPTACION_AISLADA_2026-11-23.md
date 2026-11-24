@@ -132,3 +132,8 @@ Se reutiliza la geometría de gxb-action/gxs-pill (38 px mínimos, blanco .08, s
 ## Dirección artística aprobada · oferta de retención
 
 Tras revisión de captura real por el usuario, se recupera un único título principal («¡Tenemos algo para ti!»), se concentra morado iridiscente en el porcentaje, blanco en precio final y verde en ahorro. Dos destellos breves acompañan el reveal existente; el ahorro se revela al final. Reflejo continuo pausado con el mismo control y desactivado con movimiento reducido. Se elimina el rótulo redundante Pagarías, sin ocultar condiciones ni acciones. Se mantiene intacta geometría de botones del laboratorio, sin bordes. Mismo espejo y arnés; sin cambios en ayuda.html, Index, Admin o backend. Pendiente validación visual real.
+
+
+## Aprobación visual y manual de continuidad · 23/nov/2026
+
+El usuario aprobó visualmente la composición de la oferta del commit `c7f96a9bc1d6d9db8b2042ce1c608bb3de724124` («A eso me refería, que bien se ve ✨»). Se congela como referencia artística; no equivale a validación integral de cancelaciones ni CI general. Se establece [manual de diseño y movimiento](GOXION_DESIGN_SYSTEM.md), enlazado desde AGENTS, con tokens, jerarquías, Morphicons, referencias técnicas y puerta QA para nuevas tarjetas y módulos. Este cambio es documental; no modifica HTML/CSS/JS ni publica el candidato a ayuda.html.

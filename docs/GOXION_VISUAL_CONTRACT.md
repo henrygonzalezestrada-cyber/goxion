@@ -2,6 +2,8 @@
 
 **Versión documental:** 11/oct/2026. **Estado:** criterios de continuidad; no sustituye código, capturas aprobadas ni pruebas visuales. Este documento describe las interfaces existentes, no autoriza un rediseño.
 
+> **Complemento vigente 23/nov/2026:** [Sistema de diseño y movimiento GOXION](GOXION_DESIGN_SYSTEM.md) de lectura obligatoria antes de cualquier cambio visual. Los tokens exactos de Mi Espacio y su espejo no se extrapolan a Admin/Index; la identidad de las tres experiencias sigue vigente.
+
 ## 1. Identidad matriz
 
 | | Admin | Ayuda / Mi Espacio | Index / Estado de cuenta |

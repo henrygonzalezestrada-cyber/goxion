@@ -1,5 +1,7 @@
 # GOXION · Guía para cualquier asistente que trabaje en el repositorio
 
+> **ESTÁNDAR DE DISEÑO OBLIGATORIO · 23/NOV/2026:** antes de crear o modificar cualquier tarjeta, módulo, botón, cierre X, icono o microinteracción, leer [Manual de diseño y movimiento GOXION](docs/GOXION_DESIGN_SYSTEM.md). Consolida medidas exactas del laboratorio (X 35/16/44, cápsula 38px/.08/sin borde), contraste, divulgación progresiva, patrones por componente, Morphicons y fuentes de aprendizaje, accesibilidad y puerta QA. El espejo `ayuda-espejo-feed-v2.html` es el único candidato; promoción aprobada visualmente por el usuario en commit `c7f96a9bc1d6d9db8b2042ce1c608bb3de724124`. No reconstruir ni promover a `ayuda.html` sin autorización y pruebas. Esta entrada actualiza el estado histórico de integración descrito más abajo; no sustituye los contratos financieros ni de seguridad.
+
 > **REANUDACIÓN CANÓNICA 23/NOV/2026 — LEER PRIMERO:** [`docs/GOXION_MI_ESPACIO_REANUDACION_2026-11-23.md`](docs/GOXION_MI_ESPACIO_REANUDACION_2026-11-23.md). **V4.3 de navegación aprobada visualmente por el usuario («Mucho mejor»)**, laboratorio `preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=1164984`. Estado: diseño de navegación aprobado, resto del feed con contratos propios, **sin integración oficial**. Esta entrada prevalece sobre medidas, estatus de aprobación y URLs antiguas en párrafos históricos. No perder interacciones reales (misiones/confeti, campana/badge, Goxy, servicios/soporte); ver contrato específico antes de integrar. No cambiar producción sin permiso explícito.
 
 
