@@ -155,3 +155,7 @@ Una sola zona de texto secundario con altura reservada: estado actual por defect
 
 ### Carga y confirmación de acciones · 24 nov 2026
 Un único controlador de carga para el feed: texto → cápsula que se contrae de su ancho medido a 38 px → aro giratorio centrado. El estado normal y los pseudoelementos legacy nunca compiten con el ocupado. Carga perceptible de 320 ms como mínimo (petición inmediata), confirmación de cancelación/retención de 820 ms con trazo PulsoIcon tras respuesta positiva. Sin desplazamientos por texto transitorio; errores restauran el control. Movimiento reducido sin esperas decorativas. No añadir palomitas a acciones cuyo resultado existente es un formulario, acceso o recompensa distinta.
+
+
+### Excepción de Catálogo · 24 nov 2026
+Las tarjetas de plataformas conservan el chevron SVG y su giro originales, sin disco cian ni X: son acordeones, no cierres de diálogos. Promociones: cristal cromático B, sin borde ornamental; conservar levitación y morph. CTA ampliado usa cápsula de cristal común (38px, .08, sin borde/halo). Encabezados únicos sin kicker ni separadores decorativos; conservar información comercial necesaria. Pendiente aprobación visual de la implementación final.
