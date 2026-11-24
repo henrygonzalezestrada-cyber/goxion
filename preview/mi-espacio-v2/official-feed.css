@@ -1662,7 +1662,7 @@ body.gx-v2-client-session #gx-client-notif-sheet .gx-client-notif-head button{to
 
 /* Información contextual en el mismo espacio: la altura se reserva para todos los estados. */
 #gx-v2-feed .gxb-note-slot{display:grid;grid-template-columns:minmax(0,1fr);margin-top:12px}
-#gx-v2-feed .gxb-note-slot .gxb-note{grid-area:1/1;margin:0;align-self:start;opacity:0;visibility:hidden;transition:opacity .2s ease,visibility .2s;pointer-events:none}
-#gx-v2-feed .gxb-note-slot .gxb-note[aria-hidden="false"]{opacity:1;visibility:visible;pointer-events:auto}
+#gx-v2-feed .gxb-note-slot .gxb-note{grid-area:1/1;margin:0;align-self:start;opacity:1;visibility:visible;transition:opacity .2s ease,visibility .2s;pointer-events:auto}
+#gx-v2-feed .gxb-note-slot .gxb-note[aria-hidden="true"]{opacity:0;visibility:hidden;pointer-events:none}
 #gx-v2-feed .gxb-note-slot .gxb-note:not([data-gxb-note="summary"]){color:#d3e0eb}
 @media(prefers-reduced-motion:reduce){#gx-v2-feed .gxb-note-slot .gxb-note{transition:none}}
