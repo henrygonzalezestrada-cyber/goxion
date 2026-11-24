@@ -127,3 +127,8 @@ Se compacta la confirmación eliminando los márgenes heredados y se adopta el b
 ## Revelación de promoción · jerarquía del laboratorio
 
 Se reutiliza la geometría de gxb-action/gxs-pill (38 px mínimos, blanco .08, sin borde, cápsula; secundario transparente). El porcentaje es el único encabezado de la promoción, sin kicker ni repetición del servicio. Revelación de una sola ejecución vía WAAPI: dos capas de luz abren desde el centro, expansión moderada del porcentaje, entrada escalonada del precio. Solo transform y opacity en las capas de revelación; luz ambiental pausables y modo de movimiento reducido. No se añaden librerías ni esperas artificiales; las acciones permanecen disponibles. Referencias: https://motion.dev/docs/animate-view, https://motion.dev/docs/stagger, https://web.dev/articles/animations-guide, https://developer.apple.com/design/human-interface-guidelines/motion. Se actualiza exclusivamente candidato y arnés; pendiente verificación visual Safari.
+
+
+## Dirección artística aprobada · oferta de retención
+
+Tras revisión de captura real por el usuario, se recupera un único título principal («¡Tenemos algo para ti!»), se concentra morado iridiscente en el porcentaje, blanco en precio final y verde en ahorro. Dos destellos breves acompañan el reveal existente; el ahorro se revela al final. Reflejo continuo pausado con el mismo control y desactivado con movimiento reducido. Se elimina el rótulo redundante Pagarías, sin ocultar condiciones ni acciones. Se mantiene intacta geometría de botones del laboratorio, sin bordes. Mismo espejo y arnés; sin cambios en ayuda.html, Index, Admin o backend. Pendiente validación visual real.
