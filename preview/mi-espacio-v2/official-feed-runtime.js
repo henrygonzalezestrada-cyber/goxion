@@ -548,7 +548,12 @@ function renderServices(){
  if(serviceOperation)return;
  if(heldSecrets.size){if([...heldSecrets.keys()].every(id=>services.some(s=>String(s.id)===id)))return;wipeServiceSecrets()}
 
- state.serviceDigest=digest;const host=$('gxs-list');host.replaceChildren();
+ state.serviceDigest=digest;const host=$('gxs-list');
+ const previous=[...host.querySelectorAll('.gxs-card')].find(el=>el.dataset.service===state.openService);
+ const keepOptions=previous?.querySelector('.gxs-more')?.hidden===false;
+ const keepCancel=previous?.querySelector('.gxs-cancel-panel')?.hidden===false;
+ const priorOffer=previous?._gxOffer,priorPanel=priorOffer?previous.querySelector('.gxs-cancel-panel'):null;
+ host.replaceChildren();
  $('gxs-count').textContent=services.length+' '+(services.length===1?'plataforma':'plataformas');
  if(!services.length){host.innerHTML='<div class="gxm-empty">Todavía no tienes servicios activos.</div>';return}
  services.forEach((s,index)=>{
@@ -576,7 +581,13 @@ function renderServices(){
    '<button class="gxs-ghost" type="button" data-gxi-action="support">Soporte</button></div>'+
    '<div class="gxs-more" hidden><button type="button" data-gxi-action="cancel">'+(s.cancelacion&&['solicitada','aprobada'].includes(clean(s.cancelacion.estado))?'Ver cancelación':'Solicitar cancelación')+'</button><section class="gxs-cancel-panel gx-service-view" hidden>'+cancellationPanel(s)+'</section></div>'+
    '<span class="gxs-feedback" role="status" aria-live="polite"></span></div></div></div>';
-  if(state.openService===article.dataset.service){article.classList.add('is-open');article.querySelector('.gxs-trigger').setAttribute('aria-expanded','true');const panel=article.querySelector('.gxs-reveal-inner');panel.inert=false;panel.setAttribute('aria-hidden','false')}
+  if(state.openService===article.dataset.service){
+   article.classList.add('is-open');article.querySelector('.gxs-trigger').setAttribute('aria-expanded','true');const panel=article.querySelector('.gxs-reveal-inner');panel.inert=false;panel.setAttribute('aria-hidden','false');
+   if(keepOptions){article.querySelector('.gxs-more').hidden=false;article.querySelector('[data-gxi-action="options"]').setAttribute('aria-expanded','true')}
+   if(keepCancel){article.querySelector('.gxs-cancel-panel').hidden=false;
+    if(priorOffer&&priorPanel&&!['solicitada','aprobada'].includes(clean(s.cancelacion?.estado))){article._gxOffer=priorOffer;article.querySelector('.gxs-cancel-panel').replaceWith(priorPanel)}
+   }
+  }
   host.append(article);
  });
 }

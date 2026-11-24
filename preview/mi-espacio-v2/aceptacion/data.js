@@ -34,7 +34,7 @@
     try{json=JSON.parse(raw||'{}')}catch(_){}
     if(!res.ok||json.ok!==true){
       const error=new Error(json.error||('Error de conexión: '+res.status));
-      error.status=res.status;throw error;
+      error.status=res.status;error.mode=json.modo||null;throw error;
     }
     return json;
   }
@@ -89,7 +89,7 @@
       gamificacion:main.gamificacion||null,misiones_progreso:Array.isArray(main.misiones_progreso)?main.misiones_progreso:[],
       referidos:Array.isArray(main.referidos)?main.referidos:[],
       cancelaciones:cancellations,estado_cuenta:account,catalogo:Array.isArray(main.catalogo)?main.catalogo:[],
-      novedades:news,lecturas:reads,finanzas_b2:extra[5].status==='fulfilled'?extra[5].value:null,descuentos:Array.isArray(main.descuentos)?main.descuentos:[],loaded_at:new Date().toISOString()
+      novedades:news,lecturas:reads,finanzas_b2:extra[5].status==='fulfilled'?extra[5].value:extra[5].reason?.mode==='b2_sin_estado_cobrable'?{modo:'b2_sin_estado_cobrable'}:null,descuentos:Array.isArray(main.descuentos)?main.descuentos:[],loaded_at:new Date().toISOString()
     };
   }
   async function load(){

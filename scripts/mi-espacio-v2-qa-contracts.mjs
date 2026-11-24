@@ -31,6 +31,7 @@ check('Excluir versión explícitamente antigua',api.missionInfo(view({gamificac
 check('Lealtad toma pagos efectivos de fuente oficial',api.benefit(view({cliente:{pagos_puntuales:6},estado_cuenta:{lealtad:{pagos_efectivos:0}}}),'loyalty').num,'0/4');
 check('Contrato real de QA vencido: cuatro guardados, cero efectivos',api.benefit(view({cliente:{estado:'vencido',pagos_puntuales:4},estado_cuenta:{lealtad:{pagos_guardados:4,pagos_efectivos:0,racha_reiniciada_virtual:true}}}),'loyalty').num,'0/4');
 check('No mostrar racha histórica si falla la lectura financiera',api.benefit({...base,cliente:{estado:'vencido',pagos_puntuales:4},estado_cuenta:null},'loyalty').num,'—');
+check('B2 sin conciliación no ofrece un cobro global',api.heroState(view({finanzas_b2:{modo:'b2_sin_estado_cobrable'}}))[0],'incomplete');
 check('Revisión prevalece sobre vencimiento anterior',api.heroState(view({cliente:{estado:'vencido',pago_en_revision:true}}))[0],'review');
 check('Corazón roto',api.benefit(view({cliente:{pagos_puntuales:0,racha_reiniciada_virtual:true}}),'loyalty').emoji,'💔');
 check('Referidos: total normalizado de servidor',api.benefit(view({referidos:[{meses_efectivos:3,plataformas:2,servicios:[]}]}),'referral').phase,'ready');
