@@ -927,6 +927,20 @@ function historyRows(){
   const effect=clean(p.lealtad_efecto),loyalty=approved?(effect==='sumo'?'Sumó lealtad':effect==='reinicio'?'Racha reiniciada':effect==='sin_cambio'?'Sin cambio de lealtad':p.puntual===true?'Pago en tiempo':p.puntual===false?'No sumó lealtad':''):'';
   items.push({id:'p-'+p.id,date:p.fecha||p.created_at||'',title:rejected?'Comprobante rechazado':pending?'Pago en revisión':approved?'Pago acreditado':'Pago registrado',subject:p.periodo||'',amount:data.money(p.monto),detail:[String(p.estado||'Registrado'),loyalty].filter(Boolean).join(' · '),kind:'payment',movementStatus:rejected?'rejected':pending?'pending':approved?'approved':'registered'});
  }
+ // Los comprobantes B2 son registros separados del pago global anterior.
+ const links=view.historial?.vinculos_b2||[],linked=new Set(links.map(x=>String(x.operation_id)));
+ for(const p of view.historial?.comprobantes_b2||[]){
+  if(!p.id||!p.creado_en)continue;
+  const st=clean(p.estado),approved=st==='aprobado',rejected=st==='rechazado',pending=['pendiente','revision','en_revision','reportado'].includes(st);
+  const allocations=links.filter(x=>String(x.reporte_id)===String(p.id));
+  const cents=approved?allocations.reduce((sum,x)=>sum+Math.max(0,Number(x.monto_centavos)||0),0):Number(p.monto_reportado_centavos);
+  const confirmed=approved&&allocations.length>0&&cents>0;
+  items.push({id:'b2-proof-'+p.id,date:approved?(p.aprobado_en||p.creado_en):p.creado_en,title:confirmed?'Abono acreditado':approved?'Comprobante aprobado':rejected?'Comprobante rechazado':pending?'Pago en revisión':'Comprobante registrado',subject:p.periodo||'',amount:(!approved||confirmed)&&Number.isFinite(cents)&&cents>0?data.money(cents/100):'',detail:confirmed?'Abono aplicado a '+new Set(allocations.map(x=>x.cargo_id)).size+' cargo(s) de tu calendario.':approved?'Aprobación registrada; importe aplicado pendiente de consultar.':rejected?'El comprobante no fue acreditado.':pending?'Pendiente de validación.':'Estado registrado: '+String(p.estado||'Pendiente'),kind:'payment',movementStatus:approved?'approved':rejected?'rejected':pending?'pending':'registered'});
+ }
+ for(const a of view.historial?.abonos_b2||[]){
+  if(!a.operation_id||linked.has(String(a.operation_id))||!a.fecha_aprobacion||!Number.isFinite(Number(a.monto_centavos))||Number(a.monto_centavos)<=0)continue;
+  items.push({id:'b2-credit-'+a.operation_id,date:a.fecha_aprobacion,title:'Abono acreditado',subject:'Calendario de pagos',amount:data.money(Number(a.monto_centavos)/100),detail:'Abono confirmado y aplicado al cargo correspondiente.',kind:'payment',movementStatus:'approved'});
+ }
  for(const c of view.cancelaciones||[]){
   const st=clean(c.estado);if(!['solicitada','efectiva','efectuada','completada','aprobada','rechazada'].includes(st)||!c.id)continue;
   items.push({id:'c-'+c.id,date:['efectiva','efectuada','completada'].includes(st)?(c.efectiva_at||c.fecha_efectiva||c.resuelta_at||''):st==='solicitada'?(c.solicitada_at||c.created_at||''):(c.resuelta_at||c.updated_at||''),title:st==='solicitada'?'Cancelación solicitada':st==='aprobada'?'Cancelación aprobada':st==='rechazada'?'Cancelación no autorizada':'Baja de servicio registrada',subject:String(c.servicio_nombre||c.nombre||'Servicio'),amount:'',detail:['efectiva','efectuada','completada'].includes(st)?'La baja del servicio se hizo efectiva.':st==='aprobada'&&c.fecha_efectiva?'Baja programada para '+dateLabel(c.fecha_efectiva)+'.':'Estado confirmado: '+String(c.estado),kind:'cancellation'});
