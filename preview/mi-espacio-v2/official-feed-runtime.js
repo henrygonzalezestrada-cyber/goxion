@@ -135,10 +135,14 @@ function missionInfo(view){
 }
 function benefitState(key){
  const v=state.view,c=v.cliente,mi=missionInfo(v),ref=v.referidos?.[0]||null;
- const streak=Math.max(0,Number(v.estado_cuenta?.lealtad?.pagos_efectivos??c.pagos_puntuales)||0);
+ const effective=v.estado_cuenta?.lealtad?.pagos_efectivos;
+ const verified=effective!=null&&Number.isFinite(Number(effective));
+ const streak=verified?Math.max(0,Number(effective)):0;
  const lost=v.estado_cuenta?.lealtad?.racha_reiniciada_virtual===true||c.racha_reiniciada_virtual===true||v.gamificacion?.racha_reiniciada_virtual===true||(streak===0&&v.pagos?.some((p,i)=>i===0&&clean(p.lealtad_efecto)==='reinicio'));
  if(key==='loyalty'){
-  const target=streak<4?4:9,shown=Math.min(streak,target);
+  if(!verified&&!lost)return {label:'Lealtad',num:'—',unit:'por verificar',pct:0,meter:false,emoji:'⭐',title:'Verificando tu racha',accent:'racha',copy:'No pudimos consultar tu avance efectivo. Se sincronizará al recuperar la conexión.',note:'Solo mostramos pagos efectivos confirmados por el motor financiero.',progress:'Pendiente de sincronización',action:'Mis niveles',phase:'unknown'};
+  const effectiveStreak=lost?0:streak;
+  const target=effectiveStreak<4?4:9,shown=Math.min(effectiveStreak,target);
   return {label:'Lealtad',num:shown+'/'+target,unit:'pagos seguidos',pct:100*shown/target,meter:true,emoji:lost?'💔':'⭐',
    title:lost?'Tu racha se reinició':'Tu constancia crece',accent:lost?'reinició':'crece',
    copy:lost?'Puedes volver a acumular pagos puntuales para recuperar tu avance.':'Tu constancia se acredita con los pagos confirmados.',

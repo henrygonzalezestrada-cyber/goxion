@@ -85,3 +85,8 @@ Registro posterior: QA Beneficios original conserva 2 misiones, cupón reclamado
 ## Regresión de carga corregida · 23/nov/2026 18:31
 
 El video del usuario muestra splash prolongado y logos gigantes. Causa confirmada: en a051e33d el contenido CSS y JS quedó intercambiado entre official-feed.css y official-feed-runtime.js. Se restituyen al archivo correcto conservando las correcciones de beneficios y cápsula, con cache bust de ambas rutas. Se comprueba sintaxis JS y contenido CSS antes del commit. No se modifican la oficial ni los datos. Pendiente confirmar publicación y prueba visual Safari.
+
+
+## Lealtad: conexión financiera corregida · 23/nov/2026 18:39
+
+QA Vencido mostró 4/9. Consulta RPC real devuelve cuatro pagos guardados, cero efectivos y racha_reiniciada_virtual=true. Logs QA confirmaron 31 respuestas 500 de estado-cuenta-beta y 81 errores de configuración interna en las funciones del intervalo. Causa: tres APIs de lectura/operación financiera de cliente exigían ADMIN_SESSION_SECRET incluso antes de autenticar al cliente. Se reubicó esa comprobación exclusivamente antes de la rama administrativa, que permanece cerrada si no hay secreto. Despliegues sólo QA: estado-cuenta-beta v2, estado-financiero v5, estado-financiero-b2-beta v7. No se alteró producción ni se creó/expuso secreto. El feed ahora muestra estado por verificar si falta lectura efectiva, nunca la racha guardada como si fuera actual; con pérdida confirmada 0/4 y corazón roto. Contratos ejecutados: 32 aprobados. Pendiente validación visual Safari y publicación Pages. Mantener misma cuenta y PIN de QA Vencido.

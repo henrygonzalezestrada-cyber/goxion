@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 const source=fs.readFileSync('preview/mi-espacio-v2/official-feed-runtime.js','utf8');
 function cut(a,b){const i=source.indexOf(a),j=source.indexOf(b,i);assert(i>=0&&j>i,'Falta función '+a);return source.slice(i,j)}
 const api=new Function("const state={view:null}; const clean=x=>String(x??'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase().trim();"+cut("function heroState(view){","const paths=")+cut("function missionInfo(view){","function updateMini(")+cut("function serviceDetail(s){","function accessRow(")+"return {heroState,missionInfo,serviceDetail,benefit:(v,k)=>{state.view=v;return benefitState(k)}}")();
-const base={cliente:{estado:'pagado',dia_pago:15,pagos_puntuales:3},servicios:[{id:'qa',nombre:'Disney+'}],estado_cuenta:{estado:'pagado'},pagos:[],gamificacion:null,misiones_progreso:[],referidos:[]};
+const base={cliente:{estado:'pagado',dia_pago:15,pagos_puntuales:3},servicios:[{id:'qa',nombre:'Disney+'}],estado_cuenta:{estado:'pagado',lealtad:{pagos_efectivos:3}},pagos:[],gamificacion:null,misiones_progreso:[],referidos:[]};
 const view=p=>({...base,...p,cliente:{...base.cliente,...p.cliente},estado_cuenta:{...base.estado_cuenta,...p.estado_cuenta}});
 const results=[];
 function check(name,actual,expected){results.push({name,actual,expected,ok:JSON.stringify(actual)===JSON.stringify(expected)})}
@@ -29,6 +29,8 @@ for(const [name,k,p,expected] of [
 check('Contrato real: API filtra por versión y omite versión en cada fila',api.benefit(view({gamificacion:{tareas:'A\nB',misiones_version:3},misiones_progreso:[{mision_index:0},{mision_index:1}]}),'mission').phase,'ready');
 check('Excluir versión explícitamente antigua',api.missionInfo(view({gamificacion:{tareas:'A\nB',misiones_version:3},misiones_progreso:[{misiones_version:2,mision_index:0},{mision_index:1}]})).done,1);
 check('Lealtad toma pagos efectivos de fuente oficial',api.benefit(view({cliente:{pagos_puntuales:6},estado_cuenta:{lealtad:{pagos_efectivos:0}}}),'loyalty').num,'0/4');
+check('Contrato real de QA vencido: cuatro guardados, cero efectivos',api.benefit(view({cliente:{estado:'vencido',pagos_puntuales:4},estado_cuenta:{lealtad:{pagos_guardados:4,pagos_efectivos:0,racha_reiniciada_virtual:true}}}),'loyalty').num,'0/4');
+check('No mostrar racha histórica si falla la lectura financiera',api.benefit({...base,cliente:{estado:'vencido',pagos_puntuales:4},estado_cuenta:null},'loyalty').num,'—');
 check('Corazón roto',api.benefit(view({cliente:{pagos_puntuales:0,racha_reiniciada_virtual:true}}),'loyalty').emoji,'💔');
 check('Referidos: total normalizado de servidor',api.benefit(view({referidos:[{meses_efectivos:3,plataformas:2,servicios:[]}]}),'referral').phase,'ready');
 for(const [name,s,expected] of [
