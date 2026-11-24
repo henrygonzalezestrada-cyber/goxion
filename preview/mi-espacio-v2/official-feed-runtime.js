@@ -502,7 +502,7 @@ function setupBenefits(){
     if(!ENABLE_WRITES){feedback.textContent='La solicitud estará disponible después de validar la migración.';return}
     if(!confirm('¿Deseas reclamar el mes gratis disponible?'))return;
     beginFeedBusy(action,'Registrando beneficio…');
-    try{const token=TOKEN(),r=await data.post('mi-espacio',{modo:'reclamar_mes_referido'},token);if(TOKEN()!==token)return;
+    try{const token=TOKEN(),r=await data.post('mi-espacio',{modo:'reclamar_mes_referido'},token);if(TOKEN()!==token)return;await settleFeedBusy(action);if(TOKEN()!==token)return;
      if(r.beneficio_reclamado===true&&state.view?.referidos?.[0]){state.view.referidos[0].beneficio_reclamado=true;state.view.referidos[0].beneficio_reclamado_at=r.reclamado_at;benefitRevision++;renderBenefits();if(!r.ya_reclamado)celebrateBenefit()}
      void refreshClient();feedback.textContent='Beneficio reclamado correctamente.'}
     catch(e){feedback.textContent=e.message||'No se pudo registrar el beneficio.'}
@@ -518,7 +518,7 @@ function setupBenefits(){
     if(!ENABLE_WRITES){feedback.textContent='La recompensa se habilitará cuando termine la validación de la V2.';return}
     if(!confirm('¿Deseas aplicar el cupón de '+mi.discount+'%?'))return;
     beginFeedBusy(action,'Registrando cupón…');
-    try{const token=TOKEN(),r=await data.post('mi-espacio',{modo:'reclamar_cupon'},token);if(TOKEN()!==token)return;
+    try{const token=TOKEN(),r=await data.post('mi-espacio',{modo:'reclamar_cupon'},token);if(TOKEN()!==token)return;await settleFeedBusy(action);if(TOKEN()!==token)return;
      if(r.cupon_reclamado===true&&state.view?.gamificacion){const g=state.view.gamificacion;g.cupon_reclamado=true;g.cupon_reclamado_ciclo=Number(r.ciclo??g.cupon_ciclo??1);g.cupon_reclamado_at=r.reclamado_at;benefitRevision++;renderBenefits();if(!r.ya_reclamado)celebrateBenefit()}
      void refreshClient();feedback.textContent='Cupón registrado.'}
     catch(e){feedback.textContent=e.message||'No fue posible aplicar el cupón.'}
@@ -570,15 +570,24 @@ function beginFeedBusy(button,label='Cargando…'){
  if(!button||feedBusyButtons.has(button))return;
  const saved={disabled:button.disabled,aria:button.getAttribute('aria-label'),width:button.getBoundingClientRect().width,started:performance.now()};
  feedBusyButtons.set(button,saved);
- button.style.setProperty('--gx-busy-from',Math.max(38,saved.width)+'px');
+ button.style.setProperty('--gx-busy-width',Math.max(38,saved.width)+'px');
  button.disabled=true;button.setAttribute('aria-busy','true');button.setAttribute('aria-label',label);
  button.classList.add('gx-feed-busy');
+ // Commit the initial width before shrinking; Safari must not interpolate max-content.
+ void button.offsetWidth;
+ button.style.setProperty('--gx-busy-width','38px');
 }
 function endFeedBusy(button){
  const saved=feedBusyButtons.get(button);if(!saved)return;
- button.classList.remove('gx-feed-busy');button.style.removeProperty('--gx-busy-from');
+ button.classList.remove('gx-feed-busy');button.style.removeProperty('--gx-busy-width');
  button.removeAttribute('aria-busy');if(saved.aria===null)button.removeAttribute('aria-label');else button.setAttribute('aria-label',saved.aria);
  button.disabled=saved.disabled;feedBusyButtons.delete(button);
+}
+async function settleFeedBusy(button){
+ const start=feedBusyButtons.get(button)?.started;
+ if(start==null||reduced()||document.hidden)return;
+ const remaining=320-(performance.now()-start);
+ if(remaining>0)await new Promise(r=>setTimeout(r,remaining));
 }
 let serviceOperation=null;
 const heldSecrets=new Map();
@@ -720,6 +729,7 @@ async function submitExperience(tile,s,kind,button){
  try{
   const res=await data.post('experiencia-servicio',{accion:isReport?'reportar':'calificar',datos},token);
   if(TOKEN()!==token||!panel.isConnected)return;
+  await settleFeedBusy(button);if(TOKEN()!==token||!panel.isConnected)return;
   if(isReport){
    const r=res.reporte;if(!r?.id)throw Error('No recibimos la confirmación del reporte.');
    const phone=String(window.GOXION_CORE?.BUSINESS?.WHATSAPP||(typeof NUMERO_GOXION!=='undefined'?NUMERO_GOXION:'')).replace(/\D/g,'');
@@ -806,7 +816,7 @@ async function cancellationAction(tile,kind,button,s){
  const status=()=>panel.querySelector('.gxs-feedback');
  const morph=(b,phase,label)=>{if(typeof gxCancellationActionState==='function')gxCancellationActionState(b,phase,label);else{b.disabled=phase==='loading'||phase==='success';b.classList.remove('gx-action-loading','gx-action-success','gx-action-error');b.classList.add('gx-action-'+phase);b.querySelector('.gx-action-label').textContent=phase==='error'?'Reintentar':'';}};
  const wait=ms=>new Promise(r=>setTimeout(r,reduced()||document.hidden?0:Math.max(0,ms)));
- const settleLoading=async b=>{const started=feedBusyButtons.get(b)?.started;if(started!=null)await wait(260-(performance.now()-started))};
+ const settleLoading=settleFeedBusy;
  const success=async (b,label)=>{
   await settleLoading(b);if(!valid())return false;
   endFeedBusy(b);morph(b,'success');
@@ -849,7 +859,7 @@ async function cancellationAction(tile,kind,button,s){
    if(!button)throw Error('La solicitud ya está abierta.');
   }
   beginFeedBusy(button,'Registrando solicitud…');
-  status().textContent='Registrando solicitud…';
+  status().textContent='';
   const receipt=await api('crear',{cliente_servicio_id:s.id,motivo:'Solicitud desde Mi Espacio'});
   if(!valid())return;
   const confirmed=receipt.solicitud;
@@ -925,6 +935,7 @@ $('gxs-list').addEventListener('click',async event=>{
   try{const reply=await data.post('credenciales-cliente',{accion:'revelar',datos:{entrega_id:service.credencial_pendiente.id,pin}},token);
    if(!reply.password)throw Error('No se recibió una contraseña autorizada.');
    if(TOKEN()!==token||!tile.isConnected)return;
+   await settleFeedBusy(action);if(TOKEN()!==token||!tile.isConnected)return;
    const current=serviceById(id);if(current)current.credencial_pendiente=null;benefitRevision++;
    if(document.hidden||state.tab!=='space'||!tile.classList.contains('is-open')||credential.hidden){credential.hidden=true;credential.previousElementSibling.hidden=true;state.serviceDigest='';return}
    heldSecrets.set(id,true);credential.querySelector('.gxs-secret').textContent=String(reply.password);credential.querySelector('.gxs-credential-result').hidden=false;input.disabled=true;action.hidden=true;
