@@ -408,7 +408,6 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
 .gxb-rules:active::before{background:rgba(255,255,255,.14)}
 .gxb-foot-action{display:inline-flex;flex-direction:row;align-items:center;justify-content:flex-start;flex-wrap:nowrap;gap:8px;width:max-content;max-width:100%;min-width:0}
 .gxb-panel-emoji{position:absolute;z-index:0;bottom:3px;right:3px;display:block;font-size:clamp(136px,38vw,165px);line-height:1;opacity:.68;pointer-events:none;user-select:none;transform:translateY(var(--gxb-info-lock,0px)) rotate(-10deg);transform-origin:center}
-.gxb-rule-note{position:relative;z-index:3;max-width:100%;margin-top:12px;padding:13px 14px;border-radius:15px;border:1px solid rgba(205,224,235,.075);background:rgba(4,7,13,.88);-webkit-backdrop-filter:blur(12px) saturate(1);backdrop-filter:blur(12px) saturate(1);box-shadow:0 9px 23px rgba(0,0,0,.15);color:rgba(241,248,255,.96);font-size:11px;line-height:1.58}
 .gxb-feedback{min-height:15px;display:block;color:#84d7d4;font-size:10px;font-weight:600;line-height:1.5;margin-top:5px}
 .gxb-preview-label{display:block;font-size:10px;line-height:1.4;color:#899eb3;margin:14px 3px 0}
 .gxb-lab-toggle{display:grid;gap:5px;margin:12px 0 5px}
@@ -1660,3 +1659,10 @@ body.gx-v2-client-session #gx-client-notif-sheet .gx-client-notif-head button{to
 #gx-v2-feed .gxb-task-row{display:flex;align-items:center;justify-content:space-between;gap:9px;min-width:0;width:100%;min-height:44px;padding:10px 0;border:0;border-radius:0;background:transparent;box-shadow:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
 #gx-v2-feed .gxb-task-row:focus-visible{outline:2px solid #79e6fc;outline-offset:2px}
 #gx-v2-feed .gxb-action[hidden]{display:none!important}
+
+/* Información contextual en el mismo espacio: la altura se reserva para todos los estados. */
+#gx-v2-feed .gxb-note-slot{display:grid;grid-template-columns:minmax(0,1fr);margin-top:12px}
+#gx-v2-feed .gxb-note-slot .gxb-note{grid-area:1/1;margin:0;align-self:start;opacity:0;visibility:hidden;transition:opacity .2s ease,visibility .2s;pointer-events:none}
+#gx-v2-feed .gxb-note-slot .gxb-note[aria-hidden="false"]{opacity:1;visibility:visible;pointer-events:auto}
+#gx-v2-feed .gxb-note-slot .gxb-note:not([data-gxb-note="summary"]){color:#d3e0eb}
+@media(prefers-reduced-motion:reduce){#gx-v2-feed .gxb-note-slot .gxb-note{transition:none}}
