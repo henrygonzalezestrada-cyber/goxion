@@ -58,7 +58,9 @@ body.gx-v2-client-session .gx-client-notif-overlay{
 #gx-v2-shared-nav{width:min(100%,580px);position:sticky;top:calc(8px + env(safe-area-inset-top,0px));z-index:80;margin:0 auto;isolation:isolate}
 #gx-v2-shared-header[hidden],#gx-v2-shared-nav[hidden]{display:none!important}
 #gx-v2-shared-nav .gxn-nav{position:relative;top:auto}
-body.gx-v2-client-session .app-header,body.gx-v2-client-session #goxion-main-nav,body.gx-v2-client-session #sticky-client-bar{display:none!important}
+body.gx-v2-client-session .app-header,body.gx-v2-client-session #sticky-client-bar{display:none!important}
+/* Única cápsula visible en todas las vistas; IDs antiguos conservados para switchTab. */
+body:has(#gx-v2-shared-nav) #goxion-main-nav{display:none!important}
 body.gx-v2-client-session #gx-v2-shared-header,body.gx-v2-client-session #gx-v2-shared-nav{display:block}
 @scope (#gx-v2-feed, #gx-v2-shared-header, #gx-v2-shared-nav){
 
@@ -617,7 +619,7 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
 .gxn-top{position:absolute;inset:0 0 auto;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:60px;grid-template-areas:"brand actions";gap:8px;min-width:0}
 .gxn-header{display:contents}
 .gxn-brand{grid-area:brand;display:flex;align-items:center;justify-content:flex-start;min-width:0;padding:0 7px}
-.gxn-wordmark{width:132px;max-width:100%;height:36px;object-fit:contain;object-position:left center}
+.gxn-wordmark{width:var(--gx-v2-logo-width,132px);max-width:100%;height:36px;object-fit:contain;object-position:left center}
 .gxn-brand-mark{display:none;width:32px;height:34px;object-fit:contain}
 .gxn-actions{grid-area:actions;display:flex;align-items:center;justify-self:end;gap:7px;position:relative}
 .gxn-bell,.gxn-profile-trigger{width:44px;min-width:44px;max-width:44px;height:44px;min-height:44px;flex:0 0 44px;aspect-ratio:1;display:grid;place-items:center;padding:0;border:1px solid rgba(214,231,246,.085);border-radius:50%;background:rgba(255,255,255,.07);box-shadow:none;color:#d5e4f1;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);transition:transform .22s ease,background-color .22s ease}
@@ -747,14 +749,14 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
 
 /* Geometría: círculos siempre cuadrados, incluso a 280px. */
 @media(max-width:355px){
- .gxn-wordmark{width:118px}
+ .gxn-wordmark{width:var(--gx-v2-logo-width,118px)}
  .gxn-nav{height:74px;padding:9px 7px;gap:5px}
  .gxn-tab{flex-basis:54px;min-width:54px;width:54px;height:54px}
  .gxn-tab[aria-current="page"]{flex:1 1 54px;width:auto}
  .gxn-nav[data-mode="compact"]{height:56px;margin-bottom:27px;padding:5px;gap:5px}
 }
 @media(max-width:320px){
- .gxn-wordmark{width:108px}
+ .gxn-wordmark{width:var(--gx-v2-logo-width,108px)}
  .gxn-actions{gap:5px}
  .gxn-nav[data-mode="compact"]{width:min(158px,100%);padding:5px;gap:5px}
  .gxn-nav[data-mode="compact"] .gxn-tab,
@@ -1405,8 +1407,8 @@ html.gx-notif-open{overflow:hidden;overscroll-behavior:none}
 @media(prefers-reduced-motion:reduce){#gx-v2-feed .gxv-slot{animation:none!important;transform:none!important}}
 
 /* La cápsula comparte el scroll raíz; overflow-x:hidden en body creaba un contenedor sticky falso en Safari. No alterar locks de modales. */
-body.gx-v2-client-session:not(.no-scroll):not(.support-scroll-locked):not(.gx-promo-morph-open){overflow-x:clip;overflow-y:visible}
-body.gx-v2-client-session #gx-v2-shared-nav{position:-webkit-sticky;position:sticky;top:calc(8px + env(safe-area-inset-top,0px));align-self:center;overflow:visible}
+body:has(#gx-v2-shared-nav):not(.no-scroll):not(.support-scroll-locked):not(.gx-promo-morph-open){overflow-x:clip;overflow-y:visible}
+body:has(#gx-v2-shared-nav) #gx-v2-shared-nav{position:-webkit-sticky;position:sticky;top:calc(8px + env(safe-area-inset-top,0px));align-self:center;overflow:visible}
 
 /* Cierre de paridad funcional: mismo cristal, controles oficiales y morph de cancelación reutilizado. */
 #gx-v2-feed .gxs-access-group+.gxs-access-group{margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.07)}
@@ -1422,3 +1424,9 @@ body.gx-v2-client-session #gx-v2-shared-nav{position:-webkit-sticky;position:sti
 /* El morph y el seguimiento usan las clases oficiales de ayuda.css; no se sobreescriben sus botones. */
 #gx-v2-feed .gxs-cancel-panel .gx-cancel-progress{margin:12px 0}
 #gx-v2-feed .gxs-card{scroll-margin-top:86px}
+
+/* Una escala óptica para el mismo archivo de marca, antes y después de autenticar. */
+body:has(#gx-v2-shared-nav){--gx-v2-logo-width:132px}
+body:has(#gx-v2-shared-nav) .app-header>.app-logo{width:var(--gx-v2-logo-width);height:36px;max-height:none;max-width:100%;flex:0 0 auto;object-fit:contain;object-position:left center}
+@media(max-width:355px){body:has(#gx-v2-shared-nav){--gx-v2-logo-width:118px}}
+@media(max-width:320px){body:has(#gx-v2-shared-nav){--gx-v2-logo-width:108px}}

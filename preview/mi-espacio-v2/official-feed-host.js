@@ -1,14 +1,14 @@
-/* GOXION · Espejo preproducción: el feed aprobado ocupa SOLO el dashboard.
+/* GOXION · Espejo candidato: feed privado y cápsula persistente pública/privada.
    La sesión, los módulos ajenos al feed, el fondo y las notificaciones son oficiales.
    No mostrar tarjetas antiguas tras autenticación, ni una segunda autenticación. */
 (function(){
 'use strict';
-const dash=document.getElementById('view-dashboard');
+const dash=document.getElementById('view-dashboard'),home=document.getElementById('view-inicio');
 const catalog=document.getElementById('view-catalogo'),support=document.getElementById('view-soporte');
 const feed=document.getElementById('gx-v2-feed');
 const headerHost=document.getElementById('gx-v2-shared-header'),navHost=document.getElementById('gx-v2-shared-nav');
 const nav=document.getElementById('gxn-nav'),bell=document.getElementById('gxn-bell');
-if(!dash||!catalog||!support||!feed||!headerHost||!navHost||!nav||!bell)return;
+if(!dash||!home||!catalog||!support||!feed||!headerHost||!navHost||!nav||!bell)return;
 let authorized=false,rendered=false,accountKey='';
 const veil=document.createElement('div');
 veil.id='gx-v2-sync';
@@ -49,14 +49,16 @@ const header=document.querySelector('.app-header');
 if(header)new MutationObserver(watchBell).observe(header,{childList:true,subtree:true});
 document.addEventListener('DOMContentLoaded',watchBell);
 function syncView(){
- const atSpace=dash.classList.contains('active'),atCatalog=catalog.classList.contains('active'),atSupport=support.classList.contains('active');
+ const atSpace=dash.classList.contains('active'),atHome=home.classList.contains('active'),atCatalog=catalog.classList.contains('active'),atSupport=support.classList.contains('active');
  const sessionActive=authorized&&(atSpace||atCatalog||atSupport);
  const feedActive=authorized&&atSpace;
  document.body.classList.toggle('gx-v2-client-session',sessionActive);
  document.body.classList.toggle('gx-v2-private-visible',feedActive);
  dash.classList.toggle('gx-v2-rendered',authorized);
- feed.hidden=!authorized;headerHost.hidden=!sessionActive;navHost.hidden=!sessionActive;
- const current=atSpace?'space':atCatalog?'catalog':atSupport?'support':'';
+ feed.hidden=!authorized;headerHost.hidden=!sessionActive;navHost.hidden=false;
+ const first=nav.querySelector('[data-gxn-target="space"]'),label=authorized?'Mi Espacio':'Inicio',emoji=authorized?'👤':'🏠';
+ if(first){const t=first.querySelector('.gxn-tab-label'),e=first.querySelector('.gxn-emoji');if(t.textContent!==label)t.textContent=label;if(e.textContent!==emoji)e.textContent=emoji;first.setAttribute('aria-label',label)}
+ const current=atSpace||atHome?'space':atCatalog?'catalog':atSupport?'support':'space';
  for(const button of nav.querySelectorAll('.gxn-tab')){
   if(button.dataset.gxnTarget===current)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current')
  }
@@ -95,10 +97,10 @@ window.addEventListener('goxion:client-logout',()=>{
  clearTimeout(syncTimeout);
  authorized=false;rendered=false;accountKey='';feed.hidden=true;
  document.body.classList.remove('gx-v2-private-visible','gx-v2-client-session');
- headerHost.hidden=true;navHost.hidden=true;dash.classList.remove('gx-v2-rendered');
+ headerHost.hidden=true;nav.dataset.mode='expanded';dash.classList.remove('gx-v2-rendered');syncView();
 });
 const viewObserver=new MutationObserver(syncView);
-[dash,catalog,support].forEach(view=>viewObserver.observe(view,{attributes:true,attributeFilter:['class']}));
+[dash,home,catalog,support].forEach(view=>viewObserver.observe(view,{attributes:true,attributeFilter:['class']}));
 onOfficialReady();
 syncView();
 })();
