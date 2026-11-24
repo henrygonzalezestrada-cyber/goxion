@@ -29,7 +29,7 @@
   isolated=true;
  }catch(e){console.error('GOXION aceptación: aislamiento de sesión no disponible',e)}
  Object.defineProperty(window,'GOXION_QA_ISOLATED',{value:isolated,writable:false});
- const allowed=new Set(['login-goxion','mi-espacio','estado-cuenta-beta','estado-financiero','estado-financiero-b2-beta','cancelaciones-cliente','notificaciones-cliente','novedades-cliente','accesos-cliente-beta','inventario-publico','periodo-cobro','trato-justo','legal-consent-v2','comprobantes-b2-beta']);
+ const allowed=new Set(['login-goxion','mi-espacio','estado-cuenta-beta','estado-financiero','estado-financiero-b2-beta','cancelaciones-cliente','notificaciones-cliente','novedades-cliente','accesos-cliente-beta','inventario-publico','periodo-cobro','trato-justo','legal-consent-v2','comprobantes-b2-beta','historial-cliente','experiencia-servicio','opiniones-goxion']);
  window.fetch=async function(input,init){
   if(!isolated)return denied();
   const raw=typeof input==='string'||input instanceof URL?String(input):input?.url||'';
