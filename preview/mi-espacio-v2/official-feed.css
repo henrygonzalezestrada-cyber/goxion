@@ -1619,16 +1619,23 @@ body.gx-v2-client-session #gx-client-notif-sheet .gx-client-notif-head button{to
 
 /* Experiencia del servicio: misma etapa expandida, sin tarjetas ni iconos en las opciones. */
 #gx-v2-feed .gxs-experience[hidden],#gx-v2-feed .gxs-experience [hidden]{display:none!important}
-#gx-v2-feed .gxs-more{gap:8px}
-#gx-v2-feed .gxs-experience{display:grid;justify-items:center;gap:10px;padding:10px 0 2px;text-align:center}
+#gx-v2-feed .gxs-more{gap:4px}
+#gx-v2-feed .gxs-experience{display:grid;grid-template-columns:minmax(0,1fr);justify-items:center;gap:6px;padding:2px 0 0;text-align:center;min-width:0;max-width:100%}
 #gx-v2-feed .gxs-experience h3{font-size:19px;line-height:1.2;letter-spacing:-.035em;margin:2px 0;color:#f2f7fc;font-weight:650}
 #gx-v2-feed .gxs-experience .gxi-note{max-width:310px;margin:0;color:#b6c6d7;line-height:1.55}
 #gx-v2-feed .gxs-experience-symbol{width:40px;height:40px;color:#8edfe7;display:grid;place-items:center}
 #gx-v2-feed .gxs-experience-symbol svg{width:35px;height:35px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
-#gx-v2-feed .gxs-experience-fields{width:100%;max-width:340px;display:grid;gap:10px;text-align:left}
-#gx-v2-feed .gxs-experience-fields label{display:grid;gap:5px;font-size:11px;color:#d6e1ee}
-#gx-v2-feed .gxs-experience-fields input,#gx-v2-feed .gxs-experience-fields textarea,#gx-v2-feed .gxs-experience-fields select{width:100%;min-width:0;box-sizing:border-box;min-height:44px;padding:10px 12px;border:1px solid rgba(220,235,250,.1);border-radius:12px;background:rgba(255,255,255,.045);color:#e8f0f8;font:inherit;font-size:16px;color-scheme:dark}
-#gx-v2-feed .gxs-experience-fields textarea{resize:vertical}
+#gx-v2-feed .gxs-experience-fields{width:100%;min-width:0;max-width:340px;display:grid;grid-template-columns:minmax(0,1fr);gap:8px;text-align:left;box-sizing:border-box}
+#gx-v2-feed .gxs-experience-fields label{display:grid;grid-template-columns:minmax(0,1fr);min-width:0;gap:4px;font-size:11px;color:#d6e1ee}
+#gx-v2-feed .gxs-experience-fields input,#gx-v2-feed .gxs-experience-fields textarea,#gx-v2-feed .gxs-experience-fields select{width:100%;min-width:0;max-width:100%;box-sizing:border-box;min-height:44px;padding:8px 12px;border:1px solid rgba(220,235,250,.1);border-radius:12px;background:rgba(255,255,255,.045);color:#e8f0f8;font:inherit;font-size:16px;color-scheme:dark}
+#gx-v2-feed .gxs-experience-fields textarea{resize:vertical;min-height:76px}
+#gx-v2-feed .gxs-experience-fields input[type=date]{display:block;-webkit-appearance:none;appearance:none;inline-size:100%;min-inline-size:0;max-inline-size:100%;text-align:left}
+#gx-v2-feed .gxs-experience-fields input[type=date]::-webkit-date-and-time-value{min-width:0;max-width:100%;margin:0;text-align:left}
+#gx-v2-feed .gxs-experience-fields input[type=date]::-webkit-datetime-edit{min-width:0;padding:0}
+#gx-v2-feed .gxs-experience .gxs-stage-back{min-height:38px;height:auto;margin:0;padding:4px 4px;font-size:11px;line-height:1.2}
+#gx-v2-feed .gxs-experience .gxs-experience-submit{margin:0}
+#gx-v2-feed .gxs-report[data-reported=true]{gap:6px;padding-top:4px}
+#gx-v2-feed .gxs-rating-label{margin-top:-3px}
 #gx-v2-feed .gxs-experience-fields small{font-size:10px;color:#a3b3c5}
 #gx-v2-feed .gxs-experience-submit{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:8px 15px;border-radius:999px;background:rgba(255,255,255,.08);color:#7ee1e7;font-size:11px;font-weight:600;border:0;text-decoration:none}
 #gx-v2-feed .gxs-experience-submit:disabled{opacity:.45}
