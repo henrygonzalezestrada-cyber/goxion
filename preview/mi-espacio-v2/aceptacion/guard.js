@@ -45,7 +45,7 @@
   const m=u.pathname.match(/^\/functions\/v1\/([a-z0-9-]+)$/);
   if(!m||method!=='POST'||!allowed.has(m[1]))return denied();
   let b={};try{if(typeof init?.body==='string')b=JSON.parse(init.body)}catch{return denied()}
-  if(m[1]==='login-goxion'&&!/^qa-v2-(finanzas|beneficios|beneficios-retest|vencido|suspendido|nuevo)$/i.test(String(b.nombre||'')))return denied();
+  if(m[1]==='login-goxion'&&!/^qa-v2-(finanzas|b2|beneficios|beneficios-retest|vencido|suspendido|nuevo)$/i.test(String(b.nombre||'')))return denied();
   // Las únicas escrituras de esta ruta son operaciones de la cuenta sintética
   // en APIs oficiales aisladas. No se admiten compras ni comunicaciones externas.
   return native(input,init);

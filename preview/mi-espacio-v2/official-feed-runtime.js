@@ -63,9 +63,10 @@ function heroState(view){
  if(review.includes('rechaz'))return ['correction','Tu comprobante necesita atención','Revisa la observación','attention','alert'];
  if(review.includes('incomplet'))return ['incomplete','Hay un pago incompleto','Revisa el importe faltante','attention','alert'];
  if(st.includes('suspend'))return ['suspended','Tu servicio está suspendido','Consulta tu situación','attention','alert'];
+ if((account.acuerdo_cobro?.activo===true||account.prorroga_confirmada===true)&&!accountStatus.includes('vencid')&&!accountStatus.includes('incumpl'))return ['extension','Tu nueva fecha está registrada','Consulta el acuerdo','agreement','calendar'];
  if(st.includes('vencid')||accountStatus.includes('vencid'))return ['overdue','Tienes un pago vencido','Consulta tu estado de cuenta','attention','clock'];
  if(c.pago_en_revision===true||review.includes('revision'))return ['review','Estamos revisando tu comprobante','Ya lo recibimos','review','clock'];
- if(account.prorroga_confirmada===true)return ['extension','Tu nueva fecha está registrada','Consulta el acuerdo','agreement','calendar'];
+ 
  if((view.servicios||[]).some(x=>['solicitada','aprobada'].includes(clean(x.cancelacion?.estado))))return ['cancellation','Tu cancelación está en proceso','Consulta el seguimiento','review','layers'];
  if(st==='pagado')return ['clear','Todo al corriente','Fecha de pago principal · día '+(Number(c.dia_pago)||15),'calm','check'];
 
@@ -800,6 +801,7 @@ $('focus-icon').dataset.motionPaused=String(document.hidden);
  document.querySelector('.gxb-wrap').dataset.motionPaused=String(document.hidden);
  $('gxv-savings').dataset.motionPaused=String(document.hidden);
  setupBenefits();bindOfficialMissionReceipts();mountGoxy();
+document.addEventListener('goxion:prorroga-activada',()=>void refreshClient());
 let realtimeTimer=0;
 window.addEventListener('goxion:realtime',event=>{if(!['account_state','rewards','referrals','client_state','client_access','cancellations','resync'].includes(event.detail?.scope||''))return;clearTimeout(realtimeTimer);realtimeTimer=setTimeout(()=>void refreshClient(),220)});
 window.GOXION_V2_RETRY_FEED=()=>load();
