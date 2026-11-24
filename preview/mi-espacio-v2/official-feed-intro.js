@@ -4,42 +4,46 @@
  'use strict';
  const feed=document.getElementById('gx-v2-feed'),dash=document.getElementById('view-dashboard');
  const header=document.getElementById('gx-v2-shared-header'),wordmark=header?.querySelector('.gxn-wordmark');
+ const publicWordmark=document.querySelector('.app-header > .app-logo');
  const root=document.getElementById('gx-v2-handoff');
  if(!feed||!dash||!header||!wordmark||!root)return;
  const mark=root.querySelector('.gx-v2-handoff-mark'),wait=root.querySelector('.gx-v2-handoff-wait');
  const reduced=()=>!!window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
- let completed=false,active=false,sequence=0,delayTimer=0,guardTimer=0,flight=null,fade=null;
+ let completed=false,publicCompleted=false,active=false,mode='',sequence=0,delayTimer=0,guardTimer=0,flight=null,fade=null;
  const inSpace=()=>document.body.classList.contains('gx-v2-private-visible')&&!feed.hidden&&dash.classList.contains('active');
  function clearTimers(){clearTimeout(delayTimer);clearTimeout(guardTimer)}
  function hide(){
-  sequence++;active=false;clearTimers();clearTimeout(window.GOXION_V2_BOOT_TIMER);
+  sequence++;active=false;mode='';clearTimers();clearTimeout(window.GOXION_V2_BOOT_TIMER);
   try{flight?.cancel();fade?.cancel()}catch(_){}flight=null;fade=null;
   root.hidden=true;root.classList.remove('is-flying');
   document.body.classList.remove('gx-v2-handoff-active','no-scroll');
   mark.removeAttribute('style');wait.hidden=true;
  }
- function begin(){
-  if(completed||active||!inSpace())return;
-  if(reduced()){hide();return}
-  active=true;clearTimeout(window.GOXION_V2_BOOT_TIMER);
+ function begin(target='private'){
+  if(target==='private'?(completed||!inSpace()):publicCompleted)return;
+  if(active){if(mode===target)return;hide()}
+  if(reduced()){if(target==='private')completed=true;else publicCompleted=true;hide();return}
+  active=true;mode=target;clearTimeout(window.GOXION_V2_BOOT_TIMER);
   const id=++sequence;
   root.hidden=false;root.classList.remove('is-flying');wait.hidden=true;
   mark.removeAttribute('style');document.body.classList.add('gx-v2-handoff-active');
   clearTimers();
-  delayTimer=setTimeout(()=>{if(id===sequence&&!completed)wait.hidden=false},480);
-  guardTimer=setTimeout(()=>{if(id===sequence){completed=true;hide()}},6800);
+  if(target==='private')delayTimer=setTimeout(()=>{if(id===sequence&&!completed)wait.hidden=false},480);
+  guardTimer=setTimeout(()=>{if(id===sequence){if(target==='private')completed=true;else publicCompleted=true;hide()}},6800);
  }
- async function finish(){
-  if(completed)return;
-  if(!inSpace()){completed=true;hide();return}
-  if(!active)begin();
-  completed=true;
+ async function finish(target='private'){
+  const isPrivate=target==='private';
+  if(isPrivate?completed:publicCompleted)return;
+  if(isPrivate&&!inSpace()){completed=true;hide();return}
+  const destination=isPrivate||!header.hidden?wordmark:publicWordmark;
+  if(!active||mode!==target)begin(target);
+  if(isPrivate)completed=true;else publicCompleted=true;
   if(root.hidden||reduced()||typeof mark.animate!=='function'){hide();return}
   const id=sequence;
   clearTimeout(delayTimer);wait.hidden=true;
   document.body.classList.remove('no-scroll');
-  const source=mark.getBoundingClientRect(),dest=wordmark.getBoundingClientRect();
-  if(!source.width||!source.height||!dest.width){hide();return}
+  const source=mark.getBoundingClientRect(),dest=destination?.getBoundingClientRect();
+  if(!source.width||!source.height||!dest?.width||!dest.height){hide();return}
   const size=34,scale=size/Math.max(source.width,source.height);
   const dy=dest.top+(dest.height-source.height*scale)/2-source.top;
   const dx=dest.left+3-source.left;
@@ -58,13 +62,14 @@
   if(id===sequence)hide();
  }
  // Solo en el espejo: la finalización oficial del arranque libera el mismo elemento.
- // Para una sesión privada se espera su render confirmado, no se dibuja otro splash.
+ // En público se usa el mismo viaje hacia el logo visible; en privado se espera el render confirmado.
  window.hideSplash=function(){
   if(inSpace()&&!completed){
    begin();
    if(document.getElementById('gx-v2-sync')?.hidden)void finish();
    return;
   }
+  if(!inSpace()&&!publicCompleted&&!root.hidden){void finish('public');return}
   if(!active)hide();
  };
  window.addEventListener('goxion:client-ready',()=>requestAnimationFrame(()=>{
@@ -74,10 +79,10 @@
  }));
  window.addEventListener('goxion:v2-feed:rendered',()=>{void finish()});
  window.addEventListener('goxion:v2-feed:error',()=>{completed=true;hide()});
- window.addEventListener('goxion:client-logout',()=>{hide();completed=false});
- window.addEventListener('pageshow',e=>{if(e.persisted){completed=true;hide()}});
- root.addEventListener('click',()=>{if(active){completed=true;hide()}else hide()});
- const viewObserver=new MutationObserver(()=>{if(active&&!inSpace()){completed=true;hide()}});
+ window.addEventListener('goxion:client-logout',()=>{hide();completed=false;publicCompleted=true});
+ window.addEventListener('pageshow',e=>{if(e.persisted){completed=true;publicCompleted=true;hide()}});
+ root.addEventListener('click',()=>{if(mode==='private')completed=true;else publicCompleted=true;hide()});
+ const viewObserver=new MutationObserver(()=>{if(active&&mode==='private'&&!inSpace()){completed=true;hide()}});
  for(const id of ['view-dashboard','view-catalogo','view-soporte']){
   const el=document.getElementById(id);if(el)viewObserver.observe(el,{attributes:true,attributeFilter:['class']});
  }
