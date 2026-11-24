@@ -53,6 +53,8 @@ function install(host,name){
 function play(svg){if(!svg)return;const name=svg.dataset.gxPulso;DATA[name]?.nodes.forEach((n,i)=>animate(svg.children[i],n[2]))}
 // API local acotada a la confirmación de cancelación/retención del candidato.
 window.GOXION_PULSO_CANCEL=Object.freeze({play(svg){if(svg?.dataset.gxPulso==='check')play(svg)}});
+// Confirmación de carrito: sólo la superficie de éxito, tras respuesta positiva.
+window.GOXION_PULSO_CART=Object.freeze({confirm(host){if(host?.matches('#gx-cart-success .gx-cart-check'))play(install(host,'circle-check'));}});
 // Historial: no reemplazar ni escuchar iconos fuera de este contenedor.
 const list=document.getElementById('gxm-list');
 const byKind={payment:'receipt-text',cancellation:'circle-minus',renewal:'refresh-cw',acquisition:'circle-plus',benefit:'gift'};
