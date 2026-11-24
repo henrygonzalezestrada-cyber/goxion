@@ -884,7 +884,7 @@ async function loadPrices(){
 }
 /* Ahorro · misma animación y distribución adaptativa del laboratorio aprobado. */
 const savingsFormatter=new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN',minimumFractionDigits:2,maximumFractionDigits:2});
-const savingsMoney=value=>savingsFormatter.format(value);
+const savingsMoney=value=>savingsFormatter.format(value).replace(/\.00$/, '');
 let savingCurrent=0,savingTarget=0,savingFrame=0,savingSeen=false,savingObserver=null,savingSignature='';
 function stopSavingsMotion(){if(savingFrame){cancelAnimationFrame(savingFrame);savingFrame=0}}
 function showSavingAmount(value){
