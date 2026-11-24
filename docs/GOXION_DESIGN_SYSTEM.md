@@ -141,3 +141,8 @@ Estas fuentes son referencias técnicas externas, no pruebas de que GOXION las i
 ## 10. Mantenimiento
 
 Este manual evoluciona mediante decisiones aprobadas. Ante una excepción, documentar qué componente, por qué, medida exacta y evidencia; no convertir una excepción local en regla global. Registrar cambios en un solo documento canónico y enlazar desde AGENTS y contratos existentes. Evitar manuales paralelos. Estado inicial: promoción y geometría visual aprobadas por el usuario; pruebas generales y promoción oficial siguen pendientes según el expediente de aceptación.
+
+
+### En revisión visual · 24/nov/2026 — centavos y carga
+
+En Ahorro, representar siempre dos decimales mediante Intl.NumberFormat.formatToParts; pesos protagonistas y centavos al .48em elevados, sin perder valor ni contador. La promoción conserva revelación aprobada y elimina play/pausa visual; los efectos ambientales y reflejo se reproducen una vez durante 4.6s y se estabilizan (sin movimiento permanente sin control). Carga indeterminada de acciones remotas del feed: cápsula pasa a círculo 38px con aro cian de 24px, aria-busy, etiqueta accesible, bloqueo de duplicados y salida al resolver o fallar. No usar aro para acciones instantáneas ni afirmar éxito antes de respuesta. Reduced-motion estático. Pendiente validación visual del usuario; no extender a otros módulos hasta aprobar.

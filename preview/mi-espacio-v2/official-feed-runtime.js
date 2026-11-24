@@ -442,12 +442,12 @@ function setupBenefits(){
    if(d.phase==='ready'){
     if(!ENABLE_WRITES){feedback.textContent='La solicitud estará disponible después de validar la migración.';return}
     if(!confirm('¿Deseas reclamar el mes gratis disponible?'))return;
-    action.disabled=true;
+    beginFeedBusy(action,'Registrando beneficio…');
     try{const token=TOKEN(),r=await data.post('mi-espacio',{modo:'reclamar_mes_referido'},token);if(TOKEN()!==token)return;
      if(r.beneficio_reclamado===true&&state.view?.referidos?.[0]){state.view.referidos[0].beneficio_reclamado=true;state.view.referidos[0].beneficio_reclamado_at=r.reclamado_at;benefitRevision++;renderBenefits();if(!r.ya_reclamado)celebrateBenefit()}
      void refreshClient();feedback.textContent='Beneficio reclamado correctamente.'}
     catch(e){feedback.textContent=e.message||'No se pudo registrar el beneficio.'}
-    finally{action.disabled=false}return;
+    finally{endFeedBusy(action)}return;
    }
    const c=state.view.cliente;
    const message='Conoce GOXION. Vengo invitado por '+String(c.nombre||'')+' (folio '+String(c.folio||'')+').';
@@ -461,12 +461,12 @@ function setupBenefits(){
    if(mi.ready){
     if(!ENABLE_WRITES){feedback.textContent='La recompensa se habilitará cuando termine la validación de la V2.';return}
     if(!confirm('¿Deseas aplicar el cupón de '+mi.discount+'%?'))return;
-    action.disabled=true;
+    beginFeedBusy(action,'Registrando cupón…');
     try{const token=TOKEN(),r=await data.post('mi-espacio',{modo:'reclamar_cupon'},token);if(TOKEN()!==token)return;
      if(r.cupon_reclamado===true&&state.view?.gamificacion){const g=state.view.gamificacion;g.cupon_reclamado=true;g.cupon_reclamado_ciclo=Number(r.ciclo??g.cupon_ciclo??1);g.cupon_reclamado_at=r.reclamado_at;benefitRevision++;renderBenefits();if(!r.ya_reclamado)celebrateBenefit()}
      void refreshClient();feedback.textContent='Cupón registrado.'}
     catch(e){feedback.textContent=e.message||'No fue posible aplicar el cupón.'}
-    finally{action.disabled=false}return;
+    finally{endFeedBusy(action)}return;
    }
    const pending=mi.tasks.findIndex((x,i)=>!mi.doneSet.has(i));
    if(pending<0){feedback.textContent='No hay tareas pendientes.';return}
@@ -526,6 +526,22 @@ function invitationLabel(value){
  const labels={sin_verificar:'Pendiente de verificación',pendiente:'Pendiente',pendiente_aceptacion:'Pendiente de aceptación',pendiente_verificacion:'Pendiente de verificación',verificado:'Verificada',aceptada:'Aceptada',activo:'Activa',activa:'Activa',rechazada:'Rechazada',expirada:'Caducada'};
  return labels[key]||(raw?raw.replace(/[_-]+/g,' ').replace(/^./,m=>m.toUpperCase()):'Pendiente de verificación');
 }
+// Estado común de carga indeterminada: no inventa progreso ni bloquea acciones locales.
+const feedBusyButtons=new WeakMap();
+function beginFeedBusy(button,label='Cargando…'){
+ if(!button||feedBusyButtons.has(button))return;
+ const saved={disabled:button.disabled,aria:button.getAttribute('aria-label'),width:button.getBoundingClientRect().width};
+ feedBusyButtons.set(button,saved);
+ button.style.setProperty('--gx-busy-from',Math.max(38,saved.width)+'px');
+ button.disabled=true;button.setAttribute('aria-busy','true');button.setAttribute('aria-label',label);
+ button.classList.add('gx-feed-busy');
+}
+function endFeedBusy(button){
+ const saved=feedBusyButtons.get(button);if(!saved)return;
+ button.classList.remove('gx-feed-busy');button.style.removeProperty('--gx-busy-from');
+ button.removeAttribute('aria-busy');if(saved.aria===null)button.removeAttribute('aria-label');else button.setAttribute('aria-label',saved.aria);
+ button.disabled=saved.disabled;feedBusyButtons.delete(button);
+}
 let serviceOperation=null;
 const heldSecrets=new Map();
 function wipeServiceSecrets(){
@@ -576,7 +592,7 @@ function cancelSymbol(type){
 function retentionOfferMarkup(offer,s){
  const final=Number(offer.monto_final),saving=Number(offer.monto_descuento);
  const original=offer.monto_final!=null&&offer.monto_descuento!=null&&Number.isFinite(final)&&Number.isFinite(saving)&&saving>0&&final>=0?'<s>'+esc(data.money(final+saving))+'</s>':'';
- return '<section class="gxs-stage-offer"><div class="gxs-offer-hero"><div class="gxs-offer-light" aria-hidden="true"></div><div class="gxs-offer-reveal" aria-hidden="true"><i></i><i></i><b></b></div><button type="button" class="gxs-offer-motion" data-gxi-action="offer-motion" aria-label="Pausar animación de la oferta" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M9 6v12m6-12v12"/></svg></button><h3 class="gxs-offer-title" tabindex="-1" data-gxs-stage-heading>¡Tenemos algo para ti!</h3><div class="gxs-offer-discount"><div class="gxs-offer-number"><svg class="gxs-offer-spark gxs-offer-spark-a" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0 15 9 24 12 15 15 12 24 9 15 0 12 9 9Z"/></svg><strong>−'+esc(offer.porcentaje)+'<span>%</span></strong><svg class="gxs-offer-spark gxs-offer-spark-b" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0 15 9 24 12 15 15 12 24 9 15 0 12 9 9Z"/></svg></div><small>en tu próximo pago</small></div><div class="gxs-offer-price"><div>'+original+'<strong>'+esc(data.money(offer.monto_final))+'</strong></div><span class="gxs-offer-saving">Ahorras '+esc(data.money(offer.monto_descuento))+'</span></div></div><p class="gxs-offer-terms">Válido una vez por cuenta, solo en este servicio y durante un periodo.</p><div class="gxs-offer-actions"><button type="button" class="gx-retention-accept gx-action-morph" data-gxi-action="retention-accept"><span class="gx-action-label">Aceptar beneficio</span></button><button type="button" class="gxs-ghost gxs-offer-decline" data-gxi-action="retention-decline">Continuar con la cancelación</button></div><p class="gxs-feedback" role="status" aria-live="polite"></p></section>';
+ return '<section class="gxs-stage-offer"><div class="gxs-offer-hero"><div class="gxs-offer-light" aria-hidden="true"></div><div class="gxs-offer-reveal" aria-hidden="true"><i></i><i></i><b></b></div><h3 class="gxs-offer-title" tabindex="-1" data-gxs-stage-heading>¡Tenemos algo para ti!</h3><div class="gxs-offer-discount"><div class="gxs-offer-number"><svg class="gxs-offer-spark gxs-offer-spark-a" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0 15 9 24 12 15 15 12 24 9 15 0 12 9 9Z"/></svg><strong>−'+esc(offer.porcentaje)+'<span>%</span></strong><svg class="gxs-offer-spark gxs-offer-spark-b" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0 15 9 24 12 15 15 12 24 9 15 0 12 9 9Z"/></svg></div><small>en tu próximo pago</small></div><div class="gxs-offer-price"><div>'+original+'<strong>'+esc(data.money(offer.monto_final))+'</strong></div><span class="gxs-offer-saving">Ahorras '+esc(data.money(offer.monto_descuento))+'</span></div></div><p class="gxs-offer-terms">Válido una vez por cuenta, solo en este servicio y durante un periodo.</p><div class="gxs-offer-actions"><button type="button" class="gx-retention-accept gx-action-morph" data-gxi-action="retention-accept"><span class="gx-action-label">Aceptar beneficio</span></button><button type="button" class="gxs-ghost gxs-offer-decline" data-gxi-action="retention-decline">Continuar con la cancelación</button></div><p class="gxs-feedback" role="status" aria-live="polite"></p></section>';
 }
 // Reveal de una sola ejecución: WAAPI, escalonado y sin ocultar contenido si no está disponible.
 // No se reinicia al reinsertar el panel por sincronización. No se modifica el estado de negocio.
@@ -689,7 +705,7 @@ async function cancellationAction(tile,kind,button,s){
   if(kind==='cancel-submit'){
    if(s.lecturas?.cancelaciones===false)throw Error('No se pudo comprobar el estado de la solicitud. Reintenta al sincronizar.');
    if(['solicitada','aprobada'].includes(clean(s.cancelacion?.estado)))return;
-   button.disabled=true;button.setAttribute('aria-busy','true');button.querySelector('.gx-action-label').textContent='Consultando…';status().textContent='';
+   beginFeedBusy(button,'Consultando beneficios…');status().textContent='';
    const evaluation=await api('evaluar_retencion',{cliente_servicio_id:s.id});
    if(!valid())return;
    if(evaluation.elegible===true&&evaluation.oferta?.id){
@@ -700,34 +716,34 @@ async function cancellationAction(tile,kind,button,s){
    }
   }else{
    const offer=tile._gxOffer;if(!offer?.id)throw Error('La oferta ya no está disponible.');
+   beginFeedBusy(button,kind==='retention-accept'?'Registrando beneficio…':'Registrando solicitud…');
    panel.querySelectorAll('button').forEach(b=>b.disabled=true);
    if(kind==='retention-accept'){
-    morph(button,'loading');const [result]=await Promise.all([api('aceptar_retencion',{oferta_id:offer.id}),wait(850)]);
+    const result=await api('aceptar_retencion',{oferta_id:offer.id});
     if(!valid())return;
-    morph(button,'success');status().textContent='Beneficio confirmado. La cancelación no fue enviada.';delete tile._gxOffer;benefitRevision++;
+    endFeedBusy(button);morph(button,'success');status().textContent='Beneficio confirmado. La cancelación no fue enviada.';delete tile._gxOffer;benefitRevision++;
     await wait(1100);
     if(valid()){tile.dataset.retained='true';replaceCancelContent(tile,'<div class="gxs-stage-copy" data-cancel-tone="retained">'+cancelSymbol('retained')+'<h3 tabindex="-1" data-gxs-stage-heading>Beneficio confirmado</h3><strong class="gxs-stage-date">Ahorras '+esc(data.money(offer.monto_descuento))+'</strong><p class="gxi-note">Tu servicio sigue activo. No se envió una cancelación.</p></div>'+cancelBack('Listo')+'<p class="gxs-feedback" role="status" aria-live="polite"></p>');panel.querySelector('[data-gxs-stage-heading]')?.focus({preventScroll:true})}
     return;
    }
-   await api('rechazar_retencion',{oferta_id:offer.id});if(!valid())return;delete tile._gxOffer;
+   await api('rechazar_retencion',{oferta_id:offer.id});if(!valid())return;endFeedBusy(button);delete tile._gxOffer;
    replaceCancelContent(tile,cancellationPanel(s));button=panel.querySelector('[data-gxi-action="cancel-submit"]');
    if(!button)throw Error('La solicitud ya está abierta.');
-   morph(button,'loading');
   }
-  button.removeAttribute('aria-busy');if(!button.classList.contains('gx-action-loading'))morph(button,'loading');
+  beginFeedBusy(button,'Registrando solicitud…');
   status().textContent='Registrando solicitud…';
-  const [receipt]=await Promise.all([api('crear',{cliente_servicio_id:s.id,motivo:'Solicitud desde Mi Espacio'}),wait(900)]);
+  const receipt=await api('crear',{cliente_servicio_id:s.id,motivo:'Solicitud desde Mi Espacio'});
   if(!valid())return;
   const confirmed=receipt.solicitud;
   if(!confirmed?.id||!['solicitada','aprobada'].includes(clean(confirmed.estado)))throw Error('No se recibió confirmación de la solicitud. Consulta su estado.');
   const current=serviceById(id);current.cancelacion={...confirmed,cliente_servicio_id:id};
   state.view.cancelaciones=[...(state.view.cancelaciones||[]).filter(c=>c.id!==confirmed.id),current.cancelacion];
-  benefitRevision++;morph(button,'success');status().textContent='Solicitud registrada. Tu servicio sigue activo durante la revisión.';
+  benefitRevision++;endFeedBusy(button);morph(button,'success');status().textContent='Solicitud registrada. Tu servicio sigue activo durante la revisión.';
   renderHero();drawHistory();
   await wait(900);
   if(valid()){replaceCancelContent(tile,cancellationPanel(current));tile.dataset.tone=serviceDetail(current)[1];tile.querySelector('.gxs-status').textContent=serviceDetail(current)[0];const mainAction=tile.querySelector('.gxs-actions [data-gxi-action="options"]');if(mainAction){mainAction.dataset.gxiAction='cancel';mainAction.textContent='Ver seguimiento';mainAction.removeAttribute('aria-expanded')}panel.querySelector('[data-gxs-stage-heading]')?.focus({preventScroll:true})}
- }catch(e){if(valid()){panel.querySelectorAll('button').forEach(b=>b.disabled=false);if(button?.isConnected&&button.classList.contains('gx-action-morph')){button.removeAttribute('aria-busy');morph(button,'error','Reintentar');}const out=status();if(out)out.textContent=e.message||'No pudimos completar la operación.'}}
- finally{serviceOperation=null;void refreshClient()}
+ }catch(e){if(valid()){endFeedBusy(button);panel.querySelectorAll('button').forEach(b=>b.disabled=false);if(button?.isConnected&&button.classList.contains('gx-action-morph')){button.removeAttribute('aria-busy');morph(button,'error','Reintentar');}const out=status();if(out)out.textContent=e.message||'No pudimos completar la operación.'}}
+ finally{endFeedBusy(button);serviceOperation=null;void refreshClient()}
 }
 $('gxs-list').addEventListener('click',async event=>{
  const tile=event.target.closest('.gxs-card');if(!tile)return;
@@ -762,7 +778,6 @@ $('gxs-list').addEventListener('click',async event=>{
    const isHidden=node.textContent==='••••';node.textContent=isHidden?secret:'••••';
    action.textContent=isHidden?'Ocultar':'Mostrar';return
   }
- if(kind==='offer-motion'){const hero=action.closest('.gxs-offer-hero');if(!hero)return;const paused=hero.classList.toggle('is-paused');action.setAttribute('aria-pressed',String(paused));action.setAttribute('aria-label',paused?'Reanudar animación de la oferta':'Pausar animación de la oferta');action.querySelector('path').setAttribute('d',paused?'m9 5 10 7-10 7z':'M9 6v12m6-12v12');return}
  if(kind==='options'){if(!serviceOperation)setServiceStage(tile,'options',true,true);return}
  if(kind==='service-back'){if(serviceOperation)return;if(tile.dataset.retained==='true'){delete tile.dataset.retained;const s=serviceById(tile.dataset.service);if(s)replaceCancelContent(tile,cancellationPanel(s),false)}setServiceStage(tile,'detail',true,true);void refreshClient();return}
  const service=serviceById(tile.dataset.service);
@@ -777,7 +792,7 @@ $('gxs-list').addEventListener('click',async event=>{
   if(!ENABLE_WRITES||serviceOperation)return;
   const input=credential.querySelector('.gxs-pin-input'),pin=input.value.trim(),out=credential.querySelector('.gxs-feedback');
   if(!/^\d{4}$/.test(pin)){out.textContent='Ingresa tu PIN de GOXION de 4 dígitos.';return}
-  const token=TOKEN(),id=tile.dataset.service;serviceOperation=id;action.disabled=true;out.textContent='Validando…';input.value='';
+  const token=TOKEN(),id=tile.dataset.service;serviceOperation=id;beginFeedBusy(action,'Validando PIN…');out.textContent='Validando…';input.value='';
   try{const reply=await data.post('credenciales-cliente',{accion:'revelar',datos:{entrega_id:service.credencial_pendiente.id,pin}},token);
    if(!reply.password)throw Error('No se recibió una contraseña autorizada.');
    if(TOKEN()!==token||!tile.isConnected)return;
@@ -786,7 +801,7 @@ $('gxs-list').addEventListener('click',async event=>{
    heldSecrets.set(id,true);credential.querySelector('.gxs-secret').textContent=String(reply.password);credential.querySelector('.gxs-credential-result').hidden=false;input.disabled=true;action.hidden=true;
    out.textContent='Consulta única. Al salir de esta tarjeta se ocultará definitivamente.';
   }catch(e){out.textContent=e.message||'No fue posible consultar la contraseña.';action.disabled=false}
-  finally{serviceOperation=null;if(!heldSecrets.size)void refreshClient()}
+  finally{endFeedBusy(action);serviceOperation=null;if(!heldSecrets.size)void refreshClient()}
  }
 });
 function dateLabel(raw){
@@ -868,12 +883,16 @@ async function loadPrices(){
  catch(_){$('gxv-savings').hidden=true}
 }
 /* Ahorro · misma animación y distribución adaptativa del laboratorio aprobado. */
-const savingsMoney=value=>new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN',minimumFractionDigits:Number.isInteger(value)?0:2,maximumFractionDigits:Number.isInteger(value)?0:2}).format(value);
+const savingsFormatter=new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN',minimumFractionDigits:2,maximumFractionDigits:2});
+const savingsMoney=value=>savingsFormatter.format(value);
+function savingsParts(value){const p=savingsFormatter.formatToParts(value),index=p.findIndex(x=>x.type==='decimal');return {major:p.slice(0,index).map(x=>x.value).join(''),minor:p.slice(index).map(x=>x.value).join('')}}
 let savingCurrent=0,savingTarget=0,savingFrame=0,savingSeen=false,savingObserver=null,savingSignature='';
 function stopSavingsMotion(){if(savingFrame){cancelAnimationFrame(savingFrame);savingFrame=0}}
 function showSavingAmount(value){
- const node=$('gxv-amount');node.textContent=savingsMoney(value);
- node.dataset.long=String(node.textContent.length>7);
+ const node=$('gxv-amount'),parts=savingsParts(value);
+ let major=node.querySelector('.gxv-major'),minor=node.querySelector('.gxv-minor');
+ if(!major||!minor){major=document.createElement('span');major.className='gxv-major';minor=document.createElement('span');minor.className='gxv-minor';node.replaceChildren(major,minor)}
+ major.textContent=parts.major;minor.textContent=parts.minor;node.dataset.long=String(parts.major.length>7);
 }
 function animateSavings(next,initial=false){
  stopSavingsMotion();

@@ -137,3 +137,8 @@ Tras revisión de captura real por el usuario, se recupera un único título pri
 ## Aprobación visual y manual de continuidad · 23/nov/2026
 
 El usuario aprobó visualmente la composición de la oferta del commit `c7f96a9bc1d6d9db8b2042ce1c608bb3de724124` («A eso me refería, que bien se ve ✨»). Se congela como referencia artística; no equivale a validación integral de cancelaciones ni CI general. Se establece [manual de diseño y movimiento](GOXION_DESIGN_SYSTEM.md), enlazado desde AGENTS, con tokens, jerarquías, Morphicons, referencias técnicas y puerta QA para nuevas tarjetas y módulos. Este cambio es documental; no modifica HTML/CSS/JS ni publica el candidato a ayuda.html.
+
+
+## Ajustes de continuidad · centavos, promoción y carga circular
+
+Se retira play/pausa, sustituyendo bucles promocionales por una única secuencia ambiental de 4.6s; el reveal y contraste aprobados permanecen. Ahorro presenta pesos y dos decimales elevados mediante formatToParts durante el contador. Carga circular reutilizable para solicitudes de cancelación/retención, reclamos de beneficios y consulta PIN del feed; conserva confirmación original tras respuesta y restaura acciones ante error. No se cambia negocio, fuentes, Index, Admin ni ayuda.html. Pendiente revisión Safari y operaciones reales.
