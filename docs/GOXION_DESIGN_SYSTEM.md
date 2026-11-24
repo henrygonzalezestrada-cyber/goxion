@@ -23,6 +23,7 @@ Este manual consolida las decisiones aprobadas del laboratorio de Mi Espacio y s
 7. No eliminar efectos aprobados por buscar limpieza. No introducir efectos porque sí. Cada recurso cumple una función, tiene un dueño y una referencia.
 8. Datos reales y controles reales; nunca presentar una simulación, un estado pendiente o un cálculo no confirmado como éxito.
 9. Diseñar y probar sobre la base existente antes de proponer otra interfaz. No rediseñar lo aprobado ni abrir prototipos paralelos innecesarios.
+10. Integrar funciones reutilizando controles existentes: no duplicar acciones, títulos (pequeño/grande), información, subtítulos ni explicaciones. Un CTA puede reunir mecanismos equivalentes (compartir/copiar vía menú nativo y alternativa de portapapeles). Las filas de misión conservan su estado visual y pueden activar su acción sin añadir un botón por fila. Si se necesita un control o estado nuevo, justificarlo y mantener el sistema aprobado.
 
 ## 3. Tokens y componentes base de Mi Espacio
 
