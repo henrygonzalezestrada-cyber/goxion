@@ -91,7 +91,7 @@ function wireSheet(){
  handle.addEventListener('pointerdown',e=>{
   if(!sheet.classList.contains('show')||e.button!==0||drag)return;
   drag={id:e.pointerId,y:e.clientY,height:sheet.getBoundingClientRect().height,moved:false};
-  handle.setPointerCapture?.(e.pointerId);sheet.classList.add('gx-v2-sheet-dragging');
+  try{handle.setPointerCapture?.(e.pointerId)}catch(_){}sheet.classList.add('gx-v2-sheet-dragging');
  });
  handle.addEventListener('pointermove',e=>{
   if(!drag||drag.id!==e.pointerId)return;
@@ -100,14 +100,21 @@ function wireSheet(){
  });
  function end(e,cancel=false){
   if(!drag||drag.id!==e.pointerId)return;
-  const d=drag;drag=null;sheet.classList.remove('gx-v2-sheet-dragging');
+  const d=drag;drag=null;if(handle.hasPointerCapture?.(e.pointerId))try{handle.releasePointerCapture(e.pointerId)}catch(_){}if(sheet.classList.contains('gx-v2-sheet-dragging'))sheet.classList.remove('gx-v2-sheet-dragging');
   if(d.moved&&!cancel){const delta=d.y-e.clientY,now=d.height+delta,s=heights();let n=s.reduce((best,x,i)=>Math.abs(x-now)<Math.abs(s[best]-now)?i:best,0);if(Math.abs(delta)>25&&n===level)n=level+(delta>0?1:-1);snap(n);skipClick=true;setTimeout(()=>{skipClick=false},350)}else snap(level);
  }
  handle.addEventListener('pointerup',e=>end(e));handle.addEventListener('pointercancel',e=>end(e,true));handle.addEventListener('lostpointercapture',e=>end(e,true));
  handle.addEventListener('click',()=>{if(!skipClick)snap(level===2?1:2)});
  handle.addEventListener('keydown',e=>{const n={ArrowUp:level+1,ArrowDown:level-1,Home:0,End:2,Enter:level===2?1:2,' ':level===2?1:2}[e.key];if(n!==undefined){e.preventDefault();snap(n)}});
  const resize=()=>{if(!drag)snap(level)};window.addEventListener('resize',resize,{passive:true});window.visualViewport?.addEventListener('resize',resize,{passive:true});
- new MutationObserver(()=>{if(!sheet.classList.contains('show')){drag=null;sheet.classList.remove('gx-v2-sheet-dragging');snap(1)}}).observe(sheet,{attributes:true,attributeFilter:['class']});
+ let wasOpen=sheet.classList.contains('show');
+ new MutationObserver(()=>{
+  const open=sheet.classList.contains('show');
+  if(open===wasOpen)return; // Never write an observed class unless the open state actually changed.
+  wasOpen=open;
+  if(!open){const id=drag?.id;drag=null;if(id!==undefined&&handle.hasPointerCapture?.(id))try{handle.releasePointerCapture(id)}catch(_){}if(sheet.classList.contains('gx-v2-sheet-dragging'))sheet.classList.remove('gx-v2-sheet-dragging');snap(1)}
+  else hideNudge();
+ }).observe(sheet,{attributes:true,attributeFilter:['class']});
  const read=install(toolbar.querySelector('#gx-client-notif-mark-all'),'check-check'),clear=install(toolbar.querySelector('#gx-client-notif-clear-all'),'trash');
  let armed='';
  new MutationObserver(()=>{const next=toolbar.classList.contains('gx-confirm-read')?'read':toolbar.classList.contains('gx-confirm-clear')?'clear':'';if(next&&next!==armed)play(next==='read'?read:clear);armed=next}).observe(toolbar,{attributes:true,attributeFilter:['class']});
@@ -126,11 +133,54 @@ function wireSheet(){
    const host=document.createElement('span');host.className='gx-v2-notif-glyph';host.dataset.tone=tone;host.setAttribute('aria-hidden','true');item.prepend(host);install(host,name);
   });
  }
- new MutationObserver(decorate).observe(items,{childList:true});decorate();
+ new MutationObserver(()=>{decorate();queueNudge()}).observe(items,{childList:true});decorate();queueNudge();
  items.addEventListener('click',e=>{const item=e.target.closest('.gx-client-notif-item');if(item&&!e.target.closest('button'))play(item.querySelector('.gx-v2-notif-glyph svg'))},true);
+}
+// Smart contextual bell: real unread notifications, at most one cue per account visit.
+// No automatic opening, no changes to read status, no external analytics.
+let nudgeTimer=0,nudgeHideTimer=0,nudgeRingTimer=0,nudgeAccount='',shownVisit=false,nudgeNode=null;
+const seenFallback=new Map();
+function currentAccount(){try{return String(typeof getCurrentClientKey==='function'?getCurrentClientKey()||'':'')}catch(_){return ''}}
+function hideNudge(){clearTimeout(nudgeHideTimer);if(nudgeNode){nudgeNode.remove();nudgeNode=null}const bell=document.getElementById('gxn-bell');bell?.classList.remove('gx-v2-nudge-ring')}
+function accountChanged(){const key=currentAccount();if(key!==nudgeAccount){hideNudge();nudgeAccount=key;shownVisit=false}return key}
+function keyFor(account){let n=2166136261;for(const x of account){n^=x.charCodeAt(0);n=Math.imul(n,16777619)}return 'gx-v2-notif-cues-'+(n>>>0).toString(36)}
+function seenFor(account){try{const a=JSON.parse(localStorage.getItem(keyFor(account))||'[]');if(Array.isArray(a))return a.filter(x=>Array.isArray(x)&&Date.now()-x[1]<14*864e5)}catch(_){}return seenFallback.get(account)||[]}
+function remember(account,id){const a=[...seenFor(account).filter(x=>x[0]!==id),[id,Date.now()]].slice(-40);seenFallback.set(account,a);try{localStorage.setItem(keyFor(account),JSON.stringify(a))}catch(_){}}
+function queueNudge(){clearTimeout(nudgeTimer);nudgeTimer=setTimeout(showNudge,1200)}
+function showNudge(){
+ const account=accountChanged(),bell=document.getElementById('gxn-bell'),sheet=document.getElementById('gx-client-notif-sheet');
+ if(!account||shownVisit||document.hidden||!document.body.classList.contains('gx-v2-private-visible')||document.body.classList.contains('gx-v2-handoff-active')||sheet?.classList.contains('show')||!bell||bell.disabled)return;
+ if(document.querySelector('.modal.show,dialog[open],.gx-legal-consent[open],#gx-legal-access-shell:not([hidden])'))return;
+ const parent=bell.parentElement;if(!parent)return;
+ const seen=new Set(seenFor(account).map(x=>x[0]));
+ const candidates=[...document.querySelectorAll('#gx-client-notif-list .gx-client-notif-item.unread')].map(item=>{
+  const t=item.querySelector('strong')?.textContent||'',title=t.toLowerCase(),date=item.querySelector('.gx-client-notif-time')?.textContent||'',action=item.querySelector('[data-gx-notif-action]');
+  const critical=!!action&&(/rechazad|requiere atención|aclaración|pendiente de decisión|acción requerida|vencid/.test(title)||action.dataset.gxNotifAction==='legal');
+  const relevant= /pago acreditado|pago aprobado|cancelación (completada|aprobada|efectiva)|prórroga (aprobada|rechazada)|solicitud (resuelta|aprobada|rechazada)|renovación confirmada/.test(title);
+  const fresh=date==='ahora'||/^hace \d+ (min|h)$/.test(date)||/^hace [12] d$/.test(date);
+  const id=item.dataset.gxNotifSource+':'+item.dataset.gxNotifId;
+  return {item,action,critical,relevant,fresh,id};
+ }).filter(x=>x.fresh&&(x.critical||x.relevant)&&!seen.has(x.id)&&x.item.dataset.gxNotifId).sort((a,b)=>Number(b.critical)-Number(a.critical));
+ const hit=candidates[0];if(!hit)return;
+ shownVisit=true;remember(account,hit.id);
+ const node=document.createElement('div');node.className='gx-v2-notif-nudge';node.dataset.tone=hit.critical?'attention':'relevant';node.setAttribute('role','group');node.setAttribute('aria-label','Aviso de notificaciones');
+ const title=document.createElement('strong');title.textContent=hit.critical?'Requiere tu atención':'Tienes novedades';
+ const copy=document.createElement('span');copy.textContent=hit.critical?'Hay una actualización de tu cuenta que requiere revisión.':'Hay información nueva sobre tu cuenta.';
+ const action=document.createElement('button');action.type='button';action.className='gx-v2-nudge-action';action.textContent='Revisar ahora ›';
+ const close=document.createElement('button');close.type='button';close.className='gx-v2-nudge-close';close.setAttribute('aria-label','Ocultar aviso');close.textContent='×';
+ action.addEventListener('click',()=>{hideNudge();if(hit.critical){const row=[...document.querySelectorAll('#gx-client-notif-list .gx-client-notif-item')].find(x=>x.dataset.gxNotifSource+':'+x.dataset.gxNotifId===hit.id);const target=row?.querySelector('[data-gx-notif-action]');if(target){target.click();return}}bell.click()});
+ close.addEventListener('click',hideNudge);node.append(title,copy,action,close);parent.append(node);nudgeNode=node;
+ if(!motion.matches){bell.classList.add('gx-v2-nudge-ring');clearTimeout(nudgeRingTimer);nudgeRingTimer=setTimeout(()=>bell.classList.remove('gx-v2-nudge-ring'),900)}
+ nudgeHideTimer=setTimeout(hideNudge,9500);
 }
 wireSheet();
 new MutationObserver(wireSheet).observe(document.body,{childList:true});
+window.addEventListener('goxion:v2-feed:rendered',queueNudge);
+window.addEventListener('goxion:client-ready',()=>{accountChanged();queueNudge()});
+window.addEventListener('goxion:client-logout',()=>{clearTimeout(nudgeTimer);hideNudge();nudgeAccount='';shownVisit=false});
+document.getElementById('gxn-bell')?.addEventListener('click',hideNudge);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)hideNudge();else queueNudge()});
+new MutationObserver(()=>{if(!document.body.classList.contains('gx-v2-private-visible'))hideNudge();else if(!document.body.classList.contains('gx-v2-handoff-active')&&!shownVisit)queueNudge()}).observe(document.body,{attributes:true,attributeFilter:['class']});
 // Estado legal: solo presentación de la etiqueta existente, sin alterar su acción.
 const legal=document.getElementById('view-dashboard');
 function footerStatus(){const status=document.querySelector('#gx-legal-status .gx-legal-review');if(status){const t=status.textContent.toLowerCase();status.dataset.tone=t.includes('pendiente')?'pending':t.includes('rechazado')?'rejected':t.includes('aceptado')?'accepted':'neutral'}}
