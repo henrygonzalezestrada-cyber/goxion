@@ -61,7 +61,8 @@
       ['novedades_servicio','novedades-cliente',{accion:'listar',datos:{}}],
       ['estado_cuenta','estado-cuenta-beta',{accion:'mi_estado',datos:{}}],
       ['cliente_accesos','accesos-cliente-beta',{accion:'listar',datos:{}}],
-      ['finanzas_b2','estado-financiero-b2-beta',{accion:'mi_estado',datos:{}}]
+      ['finanzas_b2','estado-financiero-b2-beta',{accion:'mi_estado',datos:{}}],
+      ['historial','historial-cliente',{}]
     ];
     const extra=await Promise.allSettled(reqs.map(r=>post(r[1],r[2],token)));
     const value=(index,key)=>extra[index].status==='fulfilled'&&Array.isArray(extra[index].value?.[key])?extra[index].value[key]:[];
@@ -88,7 +89,7 @@
       cliente:main.cliente,servicios:services,pagos:Array.isArray(main.pagos)?main.pagos:[],
       gamificacion:main.gamificacion||null,misiones_progreso:Array.isArray(main.misiones_progreso)?main.misiones_progreso:[],
       referidos:Array.isArray(main.referidos)?main.referidos:[],
-      cancelaciones:cancellations,estado_cuenta:account,catalogo:Array.isArray(main.catalogo)?main.catalogo:[],
+      cancelaciones:cancellations,historial:extra[6].status==='fulfilled'?extra[6].value:null,estado_cuenta:account,catalogo:Array.isArray(main.catalogo)?main.catalogo:[],
       novedades:news,lecturas:reads,finanzas_b2:extra[5].status==='fulfilled'?extra[5].value:extra[5].reason?.mode==='b2_sin_estado_cobrable'?{modo:'b2_sin_estado_cobrable'}:null,descuentos:Array.isArray(main.descuentos)?main.descuentos:[],loaded_at:new Date().toISOString()
     };
   }
