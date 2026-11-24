@@ -576,7 +576,24 @@ function cancelSymbol(type){
 function retentionOfferMarkup(offer,s){
  const final=Number(offer.monto_final),saving=Number(offer.monto_descuento);
  const original=offer.monto_final!=null&&offer.monto_descuento!=null&&Number.isFinite(final)&&Number.isFinite(saving)&&saving>0&&final>=0?'<s>'+esc(data.money(final+saving))+'</s>':'';
- return '<section class="gxs-stage-offer"><div class="gxs-offer-hero"><div class="gxs-offer-light" aria-hidden="true"></div><div class="gxs-offer-intro"><span class="gxs-offer-kicker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m12 2 2.5 7.5L22 12l-7.5 2.5L12 22l-2.5-7.5L2 12l7.5-2.5z"/></svg> Beneficio especial</span><button type="button" class="gxs-offer-motion" data-gxi-action="offer-motion" aria-label="Pausar animación de la oferta" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M9 6v12m6-12v12"/></svg></button></div><h3 tabindex="-1" data-gxs-stage-heading>Quédate con '+esc(offer.servicio_nombre||s.nombre)+'</h3><div class="gxs-offer-discount"><strong>−'+esc(offer.porcentaje)+'<span>%</span></strong><small>en tu próximo pago</small></div><div class="gxs-offer-price"><span class="gxs-offer-price-label">Pagarías</span><div>'+original+'<strong>'+esc(data.money(offer.monto_final))+'</strong></div><span class="gxs-offer-saving">Ahorras '+esc(data.money(offer.monto_descuento))+'</span></div></div><p class="gxs-offer-terms">Válido una vez por cuenta, solo en este servicio y durante un periodo.</p><div class="gxs-offer-actions"><button type="button" class="gx-retention-accept gx-action-morph" data-gxi-action="retention-accept"><span class="gx-action-label">Aceptar beneficio</span></button><button type="button" class="gxs-ghost gxs-offer-decline" data-gxi-action="retention-decline">Continuar con la cancelación</button></div><p class="gxs-feedback" role="status" aria-live="polite"></p></section>';
+ return '<section class="gxs-stage-offer"><div class="gxs-offer-hero"><div class="gxs-offer-light" aria-hidden="true"></div><div class="gxs-offer-reveal" aria-hidden="true"><i></i><i></i><b></b></div><button type="button" class="gxs-offer-motion" data-gxi-action="offer-motion" aria-label="Pausar animación de la oferta" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M9 6v12m6-12v12"/></svg></button><h3 class="gxs-offer-discount" tabindex="-1" data-gxs-stage-heading><strong>−'+esc(offer.porcentaje)+'<span>%</span></strong><small>en tu próximo pago</small></h3><div class="gxs-offer-price"><span class="gxs-offer-price-label">Pagarías</span><div>'+original+'<strong>'+esc(data.money(offer.monto_final))+'</strong></div><span class="gxs-offer-saving">Ahorras '+esc(data.money(offer.monto_descuento))+'</span></div></div><p class="gxs-offer-terms">Válido una vez por cuenta, solo en este servicio y durante un periodo.</p><div class="gxs-offer-actions"><button type="button" class="gx-retention-accept gx-action-morph" data-gxi-action="retention-accept"><span class="gx-action-label">Aceptar beneficio</span></button><button type="button" class="gxs-ghost gxs-offer-decline" data-gxi-action="retention-decline">Continuar con la cancelación</button></div><p class="gxs-feedback" role="status" aria-live="polite"></p></section>';
+}
+// Reveal de una sola ejecución: WAAPI, escalonado y sin ocultar contenido si no está disponible.
+// No se reinicia al reinsertar el panel por sincronización. No se modifica el estado de negocio.
+function playRetentionReveal(tile){
+ const stage=tile.querySelector('.gxs-stage-offer');
+ if(!stage||stage.dataset.revealed==='true')return;
+ stage.dataset.revealed='true';
+ if(reduced()||typeof stage.animate!=='function')return;
+ const play=(selector,frames,duration,delay=0,easing='cubic-bezier(.2,.8,.2,1)')=>{
+  const node=stage.querySelector(selector);if(!node)return;
+  node.animate(frames,{duration,delay,easing,fill:'backwards'});
+ };
+ play('.gxs-offer-reveal i:first-child',[{transform:'translateX(0) scaleX(.45)',opacity:0},{transform:'translateX(0) scaleX(1)',opacity:.65,offset:.22},{transform:'translateX(-115%) scaleX(.65)',opacity:0}],590);
+ play('.gxs-offer-reveal i:nth-child(2)',[{transform:'translateX(0) scaleX(.45)',opacity:0},{transform:'translateX(0) scaleX(1)',opacity:.65,offset:.22},{transform:'translateX(115%) scaleX(.65)',opacity:0}],590);
+ play('.gxs-offer-reveal b',[{transform:'scale(.14)',opacity:0},{transform:'scale(.72)',opacity:.65,offset:.36},{transform:'scale(1.25)',opacity:0}],620);
+ play('.gxs-offer-discount',[{transform:'translateY(10px) scale(.65)',opacity:0},{transform:'translateY(-2px) scale(1.045)',opacity:1,offset:.76},{transform:'translateY(0) scale(1)',opacity:1}],550,110);
+ play('.gxs-offer-price',[{transform:'translateY(8px)',opacity:0},{transform:'translateY(0)',opacity:1}],330,310);
 }
 function cancellationPanel(s){
  const c=s.cancelacion,st=clean(c?.estado),pending=cancellationPending(s),approved=st==='aprobada',rejected=st==='rechazada';
@@ -673,7 +690,7 @@ async function cancellationAction(tile,kind,button,s){
    if(!valid())return;
    if(evaluation.elegible===true&&evaluation.oferta?.id){
     const offer=evaluation.oferta;tile._gxOffer=offer;
-    replaceCancelContent(tile,retentionOfferMarkup(offer,s));
+    replaceCancelContent(tile,retentionOfferMarkup(offer,s));playRetentionReveal(tile);
     panel.querySelector('[data-gxs-stage-heading]')?.focus({preventScroll:true});
     return;
    }

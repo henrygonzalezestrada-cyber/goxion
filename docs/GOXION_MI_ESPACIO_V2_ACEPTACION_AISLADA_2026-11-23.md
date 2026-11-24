@@ -122,3 +122,8 @@ Aprobada por el usuario la transformación dentro de la tarjeta: accesos, opcion
 ## Pulido posterior a prueba del usuario · cancelación y oferta
 
 Se compacta la confirmación eliminando los márgenes heredados y se adopta el botón cápsula cristal/cian; se reserva el rojo para errores. La oferta usa una composición tipográfica con porcentaje, precio final, precio previo derivado de montos reales y ahorro. Luz ambiental suave y pausables, entrada escalonada y movimiento reducido. Se elimina la barra y espera artificial durante la consulta de elegibilidad; la confirmación de operaciones reales conserva su morph. Las condiciones y la opción de continuar cancelando permanecen visibles. Sin cambios de endpoints ni de páginas oficiales. Pendiente revisión visual en iPhone.
+
+
+## Revelación de promoción · jerarquía del laboratorio
+
+Se reutiliza la geometría de gxb-action/gxs-pill (38 px mínimos, blanco .08, sin borde, cápsula; secundario transparente). El porcentaje es el único encabezado de la promoción, sin kicker ni repetición del servicio. Revelación de una sola ejecución vía WAAPI: dos capas de luz abren desde el centro, expansión moderada del porcentaje, entrada escalonada del precio. Solo transform y opacity en las capas de revelación; luz ambiental pausables y modo de movimiento reducido. No se añaden librerías ni esperas artificiales; las acciones permanecen disponibles. Referencias: https://motion.dev/docs/animate-view, https://motion.dev/docs/stagger, https://web.dev/articles/animations-guide, https://developer.apple.com/design/human-interface-guidelines/motion. Se actualiza exclusivamente candidato y arnés; pendiente verificación visual Safari.
