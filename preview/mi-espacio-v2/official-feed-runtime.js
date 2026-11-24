@@ -109,6 +109,21 @@ function updateGreeting(name,code){
   i=(i+1)%phrases.length;greeting(name,phrases[i]);
  },13000);
 }
+// Gesto expresivo, independiente de la transición Morficons y del CTA.
+const heroIcon=$('focus-icon');
+const heroGestures=new Set(['check','alert','calendar','layers','spark']);
+function replayHeroGesture(event){
+ if(!heroGestures.has(heroIcon.dataset.icon)||reduced()||document.hidden)return;
+ event.stopPropagation();
+ heroIcon.classList.remove('gx-focus-once');
+ void heroIcon.offsetWidth;
+ heroIcon.classList.add('gx-focus-once');
+}
+heroIcon.addEventListener('click',replayHeroGesture);
+heroIcon.addEventListener('keydown',event=>{
+ if(!['Enter',' '].includes(event.key)||event.repeat||!heroGestures.has(heroIcon.dataset.icon))return;
+ event.preventDefault();replayHeroGesture(event);
+});
 function renderHero(){
  const s=heroState(state.view),prev=state.lastState;state.lastState=s[0];
  const card=$('focus');card.dataset.state=s[0];card.dataset.tone=s[3];
@@ -117,10 +132,12 @@ function renderHero(){
   if(!reduced()&&title.animate)title.animate([{opacity:0,filter:'blur(10px)',transform:'translateY(20px)'},{opacity:1,filter:'blur(0)',transform:'translateY(0)'}],{duration:560,easing:'cubic-bezier(.18,.85,.2,1)'});
  }
  $('focus-meta').textContent=s[2];$('focus-action').textContent=s[0]==='new'?'Ver catálogo':s[0]==='cancellation'?'Ver seguimiento':'Ver mi cuenta';$('focus-action').setAttribute('aria-label',s[0]==='new'?'Abrir catálogo oficial':s[0]==='cancellation'?'Consultar la solicitud de cancelación':'Abrir mi estado de cuenta oficial');
- const icon=$('focus-icon');icon.dataset.icon=s[4];
+ const icon=heroIcon;if(prev!==s[0])icon.classList.remove('gx-focus-once');icon.dataset.icon=s[4];
+ const interactive=heroGestures.has(s[4])&&!reduced();
+ if(interactive){icon.removeAttribute('aria-hidden');icon.setAttribute('role','button');icon.setAttribute('tabindex','0');icon.setAttribute('aria-label','Reproducir animación del icono de estado')}
+ else{icon.setAttribute('aria-hidden','true');icon.removeAttribute('role');icon.removeAttribute('tabindex');icon.removeAttribute('aria-label')}
  const path=$('state-path'),shape=paths[s[4]]||paths.check;
  if(prev!==s[0]||path.getAttribute('d')!==shape){if(iconHandle){try{iconHandle.morphTo(shape,'smooth')}catch(_){path.setAttribute('d',shape)}}else path.setAttribute('d',shape);}
- if(prev!==s[0]&&!reduced()){icon.classList.remove('gx-focus-once');void icon.offsetWidth;icon.classList.add('gx-focus-once')}
  if(!prev||prev!==s[0])updateGreeting(firstName(),s[0]);
  const c=state.view.cliente,account=state.view.estado_cuenta;
  $('gxi-account-info').textContent=account?.publicable===true && Number.isFinite(Number(account.total_actual))
