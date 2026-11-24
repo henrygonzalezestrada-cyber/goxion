@@ -31,30 +31,82 @@ html[data-gx-catalog-v3] #gx-promo-deck-status:empty{display:none}
 html[data-gx-catalog-v3] #gx-promo-deck[data-gx-promo-count="2"] .is-left{
   opacity:.46;filter:saturate(.82) brightness(.72) blur(.25px);
 }
+/* Carrito 3 · una superficie, resumen fijo, controles táctiles; morph y datos originales. */
 html[data-gx-catalog-v3] #floating-cart{
-  background:rgba(8,8,12,.72);border:1px solid rgba(255,255,255,.035);box-shadow:0 15px 36px rgba(0,0,0,.34);
+  background:rgba(8,8,12,.72);border:1px solid transparent;box-shadow:0 15px 36px rgba(0,0,0,.34);
   backdrop-filter:blur(11.75px);-webkit-backdrop-filter:blur(11.75px);
 }
 html[data-gx-catalog-v3] #floating-cart .cart-btn{
   min-height:38px;padding:8px 15px;background:rgba(255,255,255,.08);border:0;border-radius:999px;color:#7ee1e7;box-shadow:none;font-size:11px;font-weight:600;
 }
+html[data-gx-catalog-v3] #floating-cart .cart-total{color:#f5f8ff;font-variant-numeric:tabular-nums;letter-spacing:-.03em}
 html[data-gx-catalog-v3] #gx-cart-dialog{
-  background:rgba(14,15,20,.97);border:1px solid rgba(255,255,255,.035);box-shadow:0 30px 90px #0009;
+  background:radial-gradient(ellipse at 15% 0%,rgba(127,137,192,.075),transparent 42%),#101115;
+  border:1px solid transparent;box-shadow:0 26px 70px #0009;
+  width:min(460px,calc(100vw - 24px));max-height:84dvh;
 }
 html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-shell::before{display:none}
-html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-shell footer{background:rgba(14,15,20,.98);box-shadow:0 -10px 22px rgba(0,0,0,.16)}
+html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-shell header{padding:18px 17px 10px}
+html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-heading{gap:9px}
+html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-heading h2{font-size:19px;font-weight:700;letter-spacing:-.035em;color:#f5f8ff}
+html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-bag{color:#a9bcd2}
+html[data-gx-catalog-v3] #gx-cart-count{background:rgba(255,255,255,.08);color:#c1cfe0}
 html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-close{
-  width:35px;height:35px;background:#79e6fc;color:#071c29;border:0;box-shadow:none;
+  width:35px;height:35px;background:#79e6fc;color:#071c29;border:0;box-shadow:none;position:relative;
 }
+html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-close::after{content:"";position:absolute;inset:-4.5px}
 html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-close svg{width:16px;height:16px;stroke-width:2.5}
-html[data-gx-catalog-v3] #gx-cart-dialog :is(.gx-cart-stepper,.gx-cart-contact input){background:rgba(255,255,255,.08);border:0}
-html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-stepper{border-radius:999px}
+html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-scroll{padding:0 17px}
+html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-line{
+  grid-template-columns:42px minmax(0,1fr) auto;column-gap:10px;row-gap:2px;
+  padding:12px 0 7px;border:0;align-items:center;
+}
+html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-logo{width:42px;height:42px;border-radius:11px;filter:none}
+html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-copy h3{font-size:14px;line-height:1.3;color:#f5f8ff;font-weight:650}
+html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-copy p{font-size:10.5px;color:#a8b5c9}
+html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-price{font-size:15px;font-weight:650;color:#f5f8ff;align-self:start}
+html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-line-bottom{margin-top:0;gap:6px;min-height:44px}
+html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-stepper{border-radius:999px;background:rgba(255,255,255,.08);border:0}
+html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-stepper button{width:44px;height:44px;color:#7ee1e7}
+html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-stepper span{min-width:18px;font-size:12px;color:#f5f8ff}
+html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-remove{width:44px;height:44px;color:#a8b5c9}
+html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-remove:active{color:#f4acb9}
+html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-contact{padding:9px 0 5px;border:0}
+html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-contact label{font-size:12px;color:#f5f8ff;font-weight:600;margin-bottom:7px}
+html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-contact input{background:rgba(255,255,255,.08);border:0;border-radius:13px;color:#f5f8ff}
+html[data-gx-catalog-v3] #gx-cart-dialog :is(.gx-cart-contact p,.gx-cart-unit-price,#gx-cart-member,.gx-cart-caption){color:#a8b5c9}
+html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-shell footer{
+  background:transparent;box-shadow:none;padding:12px 17px max(16px,env(safe-area-inset-bottom));text-align:left;
+}
+html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-trust{margin-bottom:10px;color:#a8b5c9;font-size:11px}
+html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-total>span{color:#f5f8ff;font-weight:600}
+html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-total small{color:#a8b5c9}
+html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-total strong{font-size:28px;font-weight:700;line-height:1.2;color:#f5f8ff}
 html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-submit{
-  min-height:44px;background:rgba(126,225,231,.14);color:#a5f4fa;border:0;border-radius:999px;box-shadow:none;
+  min-height:44px;width:100%;padding:8px 15px;background:rgba(255,255,255,.08);color:#7ee1e7;border:0;border-radius:999px;box-shadow:none;
+  font-size:12px!important;font-weight:600!important;margin:12px auto 0;
+  transition:width .24s cubic-bezier(.2,.82,.2,1),background .18s ease,transform .18s ease;
 }
 html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-submit::before{display:none}
-html[data-gx-catalog-v3] #gx-cart-dialog :is(.gx-cart-line,.gx-cart-contact){border-top:0}
-html[data-gx-catalog-v3] #gx-cart-dialog :is(.gx-cart-copy p,.gx-cart-unit-price,.gx-cart-contact p,.gx-cart-caption,.gx-cart-trust){color:#a8b5c9}
+html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-send-icon{display:none}
+html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-submit.is-sending{
+  width:44px;height:44px;padding:0;opacity:1;overflow:hidden;
+}
+html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-submit.is-sending .gx-cart-submit-label{
+  position:absolute;clip-path:inset(50%);white-space:nowrap;width:1px;height:1px;overflow:hidden;
+}
+html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-submit.is-sending .gx-cart-send-icon{display:flex;color:#7ee1e7}
+html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-submit.is-sending .gx-cart-send-icon svg{width:24px!important;height:24px!important}
+html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-check{width:64px;height:64px;color:#91e7bd;background:rgba(145,231,189,.08);border:0;box-shadow:none}
+html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-check svg{width:36px!important;height:36px!important}
+html[data-gx-catalog-v3] #gx-cart-success h3{font-size:22px;color:#f5f8ff}
+html[data-gx-catalog-v3] #gx-cart-success p{color:#a8b5c9}
+@media(max-width:340px){
+ html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-line{grid-template-columns:34px minmax(0,1fr) auto;column-gap:8px}
+ html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-logo{width:34px;height:34px}
+ html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-copy h3{font-size:12px}
+ html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-line-bottom{grid-column:1/-1}
+}
 /* Cierre estándar del diálogo promocional; se conserva el morph. */
 html[data-gx-catalog-v3] .gx-promo-deck-card.is-expanded .gx-promo-morph-close{
   width:35px!important;height:35px!important;border:0!important;border-radius:50%!important;background:#79e6fc!important;color:#071c29!important;
