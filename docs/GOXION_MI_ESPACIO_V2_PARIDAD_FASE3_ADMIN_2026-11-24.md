@@ -1,0 +1,6 @@
+# GOXION · Fase 3: conexión Admin · 24 nov 2026
+- Trato Justo: reportes pendientes/en revisión dentro de Gestión → Beneficios → Trato Justo; la campana dirige a ese expediente de revisión. Los reportes anteriores aparecen en la lista sin avisos retroactivos.
+- La revisión usa goxion_garantia_incidencias con el mismo ID del reporte. Se exige comprobación del origen GOXION, evidencia, fechas y días completos antes de abrir el formulario existente. No se genera una compensación al recibir o validar el reporte. Vincular y cerrar exige una compensación activa coincidente con servicio, cliente, periodo y días verificados, que no esté ligada a otro caso.
+- Experiencia → Opiniones → Plataformas: calificaciones privadas, agrupadas por plataforma, promedio, cantidad y comentarios. No se mezcla con opiniones generales ni se ofrece publicación.
+- Endpoint experiencia-servicio-admin v1 desplegado; autentica el token administrativo. Verificados permisos de lectura y privacidad, sintaxis JS y rutas estáticas. No se probaron escrituras autenticadas ni compensaciones reales; reservar para entorno aislado. Las nuevas funciones no se han desplegado en aceptación todavía.
+- Admin oficial actualizado solo para conectar sus módulos existentes. Ayuda oficial y espejo visual no modificados. Próximo: entorno de aceptación y regresión integral.
