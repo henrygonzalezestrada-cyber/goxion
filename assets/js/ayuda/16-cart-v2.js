@@ -45,7 +45,7 @@
   const dialog = document.createElement('dialog');
   dialog.id = 'gx-cart-dialog';
   dialog.setAttribute('aria-labelledby', 'gx-cart-title');
-  dialog.innerHTML = `<div class="gx-cart-shell"><header><div class="gx-cart-heading"><span class="gx-cart-bag">${svg('bag')}</span><h2 id="gx-cart-title" tabindex="-1" autofocus>Tu carrito</h2><span id="gx-cart-count"></span></div><button type="button" class="gx-cart-close" aria-label="Cerrar carrito">${svg('close')}</button></header><form id="gx-cart-form"><div class="gx-cart-scroll"><div id="gx-cart-lines"></div><section class="gx-cart-contact"><label for="gx-cart-phone">WhatsApp para tus accesos</label><input id="gx-cart-phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" placeholder="+52 961 123 4567" aria-describedby="gx-cart-phone-help"><p id="gx-cart-phone-help">México: 10 dígitos. Otro país: incluye + y código.</p></section><p id="gx-cart-member" hidden>Recibirás tus credenciales en breve.</p></div><footer><div class="gx-cart-trust">${svg('shield')}<span>En GOXION, primero tu acceso; después tu pago.</span></div><div class="gx-cart-total"><span>Total <small>MXN</small></span><strong id="gx-cart-total" aria-live="polite"></strong></div><p class="gx-cart-caption">Paquetes completos y servicios mensuales.</p><p id="gx-cart-error" role="alert"></p><button type="submit" class="gx-cart-submit"><span class="gx-cart-submit-label">Enviar solicitud</span><span class="gx-cart-send-icon">${svg('send')}</span></button></footer></form><section id="gx-cart-success" hidden tabindex="-1"><div class="gx-cart-check">${svg('check')}</div><h3>¡Todo listo!</h3><p id="gx-cart-success-text"></p><p>Pagas cuando tengas acceso.</p><button type="button" class="gx-cart-submit gx-cart-done">Seguir explorando ${refined ? '' : svg('send')}</button></section></div>`;
+  dialog.innerHTML = `<div class="gx-cart-shell"><header><div class="gx-cart-heading"><span class="gx-cart-bag">${svg('bag')}</span><h2 id="gx-cart-title" tabindex="-1" autofocus>Tu carrito</h2><span id="gx-cart-count"></span></div><button type="button" class="gx-cart-close" aria-label="Cerrar carrito">${refined ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6L18 18"/><path d="M18 6L6 18"/></svg>' : svg('close')}</button></header><form id="gx-cart-form"><div class="gx-cart-scroll"><div id="gx-cart-lines"></div><section class="gx-cart-contact"><label for="gx-cart-phone">WhatsApp para tus accesos</label><input id="gx-cart-phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" placeholder="+52 961 123 4567" aria-describedby="gx-cart-phone-help"><p id="gx-cart-phone-help">México: 10 dígitos. Otro país: incluye + y código.</p></section><p id="gx-cart-member" hidden>${refined ? '' : 'Recibirás tus credenciales en breve.'}</p></div><footer><div class="gx-cart-trust">${svg('shield')}<span>${refined ? 'Primero tu acceso, después tu pago.' : 'En GOXION, primero tu acceso; después tu pago.'}</span></div><div class="gx-cart-total"><span>Total <small>MXN</small></span><strong id="gx-cart-total" aria-live="polite"></strong></div>${refined ? '' : '<p class="gx-cart-caption">Paquetes completos y servicios mensuales.</p>'}<p id="gx-cart-error" role="alert"></p><button type="submit" class="gx-cart-submit"><span class="gx-cart-submit-label">Enviar solicitud</span><span class="gx-cart-send-icon">${svg('send')}</span></button></footer></form><section id="gx-cart-success" hidden tabindex="-1"><div class="gx-cart-check">${svg('check')}</div><h3>¡Todo listo!</h3><p id="gx-cart-success-text"></p><p>Pagas cuando tengas acceso.</p><button type="button" class="gx-cart-submit gx-cart-done">Seguir explorando ${refined ? '' : svg('send')}</button></section></div>`;
   document.body.append(dialog);
   const $ = id => document.getElementById(id);
   function showError(message) { $('gx-cart-error').textContent = message; }
@@ -74,11 +74,12 @@
       const description = x.promotion
         ? (x.summary || x.detail)
         : 'Mensual';
-      const markup = `<img class="gx-cart-logo" src="${logo(x.title)}" alt=""><div class="gx-cart-copy"><h3>${escape(x.title)}</h3><p>${escape(x.qty + ' ' + (x.qty > 1 ? x.unitPlural : x.unit))} · ${escape(description)}</p></div><strong class="gx-cart-price">${money(x.cents*x.qty)}</strong><div class="gx-cart-line-bottom"><span class="gx-cart-unit-price">${x.qty > 1 ? money(x.cents) + ' c/u' : ''}</span><div class="gx-cart-stepper"><button type="button" data-key="${escape(key)}" data-delta="-1" aria-label="Quitar uno de ${escape(x.title)}">${svg('minus')}</button><span>${x.qty}</span><button type="button" data-key="${escape(key)}" data-delta="1" ${x.qty >= x.max ? 'disabled' : ''} aria-label="Agregar uno de ${escape(x.title)}">${svg('plus')}</button></div><button class="gx-cart-remove" type="button" data-key="${escape(key)}" data-remove aria-label="Eliminar ${escape(x.title)}">${svg('trash')}</button></div>`;
+      const markup = `<img class="gx-cart-logo" src="${logo(x.title)}" alt=""><div class="gx-cart-copy"><h3>${escape(x.title)}</h3><p>${escape(refined ? (x.qty > 1 ? x.unitPlural : x.unit) : x.qty + ' ' + (x.qty > 1 ? x.unitPlural : x.unit))} · ${escape(description)}</p></div><strong class="gx-cart-price">${money(x.cents*x.qty)}</strong><div class="gx-cart-line-bottom"><span class="gx-cart-unit-price">${x.qty > 1 ? money(x.cents) + ' c/u' : ''}</span><div class="gx-cart-stepper"><button type="button" data-key="${escape(key)}" data-delta="-1" aria-label="Quitar uno de ${escape(x.title)}">${svg('minus')}</button><span>${x.qty}</span><button type="button" data-key="${escape(key)}" data-delta="1" ${x.qty >= x.max ? 'disabled' : ''} aria-label="Agregar uno de ${escape(x.title)}">${svg('plus')}</button></div><button class="gx-cart-remove" type="button" data-key="${escape(key)}" data-remove aria-label="Eliminar ${escape(x.title)}">${svg('trash')}</button></div>`;
       if (row._markup !== markup) {
         row.innerHTML = markup; row._markup = markup;
         if (!fresh && !reduced()) for (const node of row.querySelectorAll('.gx-cart-price,.gx-cart-stepper span')) node.animate([{opacity:.3,transform:'translateY(6px)'},{opacity:1,transform:'translateY(0)'}],{duration:260,easing:'cubic-bezier(.16,1,.3,1)'});
       }
+      if(refined) window.GOXION_PULSO_CART?.prepareTrash(row.querySelector('.gx-cart-remove'));
       row.style.setProperty('--row-delay', index * 45 + 'ms');
       list.append(row);
     }
@@ -117,8 +118,7 @@
     dialog.querySelector('.gx-cart-scroll').scrollTop = 0;
     render();
     $('gx-cart-title').focus({preventScroll:true});
-    iconTo(dialog.querySelector('.gx-cart-bag'), 'bag');
-    iconTo(dialog.querySelector('.gx-cart-close'), 'close');
+    if(!refined){iconTo(dialog.querySelector('.gx-cart-bag'), 'bag');iconTo(dialog.querySelector('.gx-cart-close'), 'close');}
     if (!reduced()) {
       motion = dialog.animate([{transform:originTransform(),opacity:.35,borderRadius:'36px'},{transform:'none',opacity:1,borderRadius:'26px'}],{duration:480,easing:'cubic-bezier(.16,1,.3,1)'});
       motion.finished.catch(()=>{}).then(()=>dialog.classList.remove('is-opening'));
@@ -128,7 +128,7 @@
     if (busy || closing || !dialog.open) return;
     closing = true; motion?.cancel();
     dialog.classList.remove('is-opening'); dialog.classList.add('is-closing');
-    iconTo(dialog.querySelector('.gx-cart-close'), 'bag');
+    if(!refined) iconTo(dialog.querySelector('.gx-cart-close'), 'bag');
     if (!reduced()) {
       motion = dialog.animate([{transform:'none',opacity:1},{transform:originTransform(),opacity:0,borderRadius:'36px'}],{duration:320,easing:'cubic-bezier(.4,0,.6,1)'});
       // WebKit puede dejar motion.finished pendiente si cambia el contexto del
@@ -193,8 +193,12 @@
     if (removing && !reduced()) {
       editing = true;
       const row = btn.closest('.gx-cart-line');
-      iconTo(btn, 'close');
-      await row.animate([{opacity:1,transform:'translateX(0)'},{opacity:0,transform:'translateX(35px) scale(.96)'}],{duration:200,easing:'ease-in',fill:'forwards'}).finished.catch(()=>{});
+      if(refined && btn.hasAttribute('data-remove')){
+        window.GOXION_PULSO_CART?.playTrash(btn);
+        await new Promise(resolve=>setTimeout(resolve,240));
+      }else if(!refined)iconTo(btn, 'close');
+      const removal=row.animate([{opacity:1,transform:'translateX(0)'},{opacity:0,transform:'translateX(24px) scale(.97)'}],{duration:200,easing:'ease-in',fill:'forwards'});
+      await Promise.race([removal.finished.catch(()=>{}),new Promise(resolve=>setTimeout(resolve,280))]);
       editing = false;
     }
     if (btn.hasAttribute('data-remove')) item.qty = 0;
