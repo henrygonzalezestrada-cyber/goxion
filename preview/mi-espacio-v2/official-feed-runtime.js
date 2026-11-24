@@ -179,7 +179,7 @@ function benefitState(key){
   if(!verified&&!lost)return {label:'Lealtad',num:'—',unit:'por verificar',pct:0,meter:false,emoji:'⭐',title:'Verificando tu racha',accent:'racha',copy:'No pudimos consultar tu avance efectivo. Se sincronizará al recuperar la conexión.',note:'Solo mostramos pagos efectivos confirmados por el motor financiero.',progress:'Pendiente de sincronización',action:'Mis niveles',phase:'unknown'};
   const effectiveStreak=lost?0:streak;
   const target=effectiveStreak<4?4:9,shown=Math.min(effectiveStreak,target);
-  return {label:'Lealtad',num:shown+'/'+target,unit:'pagos seguidos',pct:100*shown/target,meter:true,emoji:lost?'💔':'⭐',
+  return {label:'Lealtad',level:lost?0:(v.estado_cuenta?.lealtad?.nivel!=null&&[0,1,2].includes(Number(v.estado_cuenta.lealtad.nivel))?Number(v.estado_cuenta.lealtad.nivel):effectiveStreak>=9?2:effectiveStreak>=4?1:0),num:shown+'/'+target,unit:'pagos seguidos',pct:100*shown/target,meter:true,emoji:lost?'💔':'⭐',
    title:lost?'Tu racha se reinició':'Tu constancia crece',accent:lost?'reinició':'crece',
    copy:lost?'Puedes volver a acumular pagos puntuales para recuperar tu avance.':'Tu constancia se acredita con los pagos confirmados.',
    note:'La racha y sus niveles dependen del estado oficial de lealtad.',progress:shown+' de '+target+' pagos',action:'Mis niveles',phase:lost?'lost':'active'};
@@ -209,9 +209,10 @@ function updateMini(tile,detail){
  tile.querySelector('.gxb-number').textContent=detail.num;
  tile.querySelector('.gxb-emoji').textContent=detail.emoji;
  tile.querySelector('.gxb-unit').textContent=detail.unit;
+ const level=tile.querySelector('.gxb-level');if(level){level.hidden=!(detail.level>0);level.textContent=detail.level>0?'Nivel '+detail.level:'';}
  const progress=tile.querySelector('.gxb-mini-progress');
  progress.hidden=!detail.meter;progress.firstElementChild.style.setProperty('--gxb-pct',Math.max(0,Math.min(100,detail.pct))+'%');
- tile.setAttribute('aria-label',detail.label+', '+detail.num+' '+detail.unit+', abrir detalle');
+ tile.setAttribute('aria-label',detail.label+(detail.level>0?', Nivel '+detail.level:'')+', '+detail.num+' '+detail.unit+', abrir detalle');
 }
 // La respuesta confirmada por la API de misiones es la fuente inmediata.
 function celebrateBenefit(mission=false){
@@ -904,8 +905,9 @@ const savingsFormatter=new Intl.NumberFormat('es-MX',{style:'currency',currency:
 const savingsMoney=value=>savingsFormatter.format(value).replace(/\.00$/, '');
 let savingCurrent=0,savingTarget=0,savingFrame=0,savingSeen=false,savingObserver=null,savingSignature='';
 function stopSavingsMotion(){if(savingFrame){cancelAnimationFrame(savingFrame);savingFrame=0}}
-function showSavingAmount(value){
- const node=$('gxv-amount'),amount=savingsMoney(value);
+const savingsWholeFormatter=new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN',minimumFractionDigits:0,maximumFractionDigits:0});
+function showSavingAmount(value,animated=false){
+ const node=$('gxv-amount'),amount=animated?savingsWholeFormatter.format(Math.floor(Math.max(0,value)+1e-8)):savingsMoney(value);
  node.textContent=amount;node.dataset.long=String(amount.length>7);
 }
 function animateSavings(next,initial=false){
@@ -917,10 +919,10 @@ function animateSavings(next,initial=false){
   const p=Math.min(1,Math.max(0,(now-startTime)/duration));
   const ease=p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2;
   savingCurrent=Math.round((start+change*ease)*100)/100;
-  showSavingAmount(savingCurrent);
+  if(p<1)showSavingAmount(savingCurrent,true);
   if(p<1)savingFrame=requestAnimationFrame(frame);else{savingFrame=0;savingCurrent=next;showSavingAmount(next)}
  }
- savingCurrent=start;showSavingAmount(start);
+ savingCurrent=start;showSavingAmount(start,true);
  savingFrame=requestAnimationFrame(frame);
 }
 function observeSavings(){
