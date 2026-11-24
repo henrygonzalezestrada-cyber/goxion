@@ -1570,19 +1570,36 @@ body.gx-v2-client-session #gx-client-notif-sheet .gx-client-notif-head{flex:0 0 
 body.gx-v2-client-session #gx-client-notif-sheet .gx-client-notif-list{flex:1 1 auto;min-height:0;max-height:none;overflow-y:auto;padding:0 12px 14px;mask-image:none;-webkit-mask-image:none}
 body.gx-v2-client-session #gx-client-notif-sheet .gx-client-notif-toolbar:not(.gx-confirm-read):not(.gx-confirm-clear){border-color:rgba(205,224,236,.12);box-shadow:inset 0 1px rgba(255,255,255,.04)}
 body.gx-v2-client-session #gx-client-notif-sheet .gx-client-notif-toolbar svg[data-gx-pulso] path{animation:none!important;stroke-dasharray:initial}
-body.gx-v2-client-session #gx-client-notif-sheet .gx-client-notif-item{min-height:68px;padding:12px 11px 12px 31px}
+body.gx-v2-client-session #gx-client-notif-sheet .gx-client-notif-item{min-height:68px;padding:12px 12px 12px 43px}
 body.gx-v2-client-session #gx-client-notif-sheet .gx-client-notif-item strong{font-size:12px;font-weight:600;line-height:1.4}
 body.gx-v2-client-session #gx-client-notif-sheet .gx-client-notif-time{font-size:9.5px;opacity:.92;color:#a5b4c6}
 body.gx-v2-client-session #gx-client-notif-sheet .gx-client-notif-item p{font-size:11px;line-height:1.5;margin-top:5px}
 body.gx-v2-client-session #gx-client-notif-sheet .gx-client-notif-item-foot{margin-top:5px}
 body.gx-v2-client-session #gx-client-notif-sheet .gx-client-notif-item-action{font-size:10px;min-height:32px;opacity:1}
-body.gx-v2-client-session #gx-client-notif-sheet .gx-client-notif-swipe:not(:last-child)::after{background:rgba(179,201,222,.085);left:31px;right:9px}
-body.gx-v2-client-session #gx-client-notif-sheet .gx-v2-notif-glyph{position:absolute;left:6px;top:13px;width:18px;height:18px;color:#9eb2c5;pointer-events:none}
+body.gx-v2-client-session #gx-client-notif-sheet .gx-client-notif-swipe:not(:last-child)::after{background:rgba(179,201,222,.085);left:43px;right:12px}
+body.gx-v2-client-session #gx-client-notif-sheet .gx-v2-notif-glyph{position:absolute;left:9px;top:14px;width:18px;height:18px;color:#9eb2c5;pointer-events:none}
 body.gx-v2-client-session #gx-client-notif-sheet .gx-v2-notif-glyph svg{width:18px;height:18px}
 body.gx-v2-client-session #gx-client-notif-sheet .gx-v2-notif-glyph[data-tone="green"]{color:#8cdec1}
 body.gx-v2-client-session #gx-client-notif-sheet .gx-v2-notif-glyph[data-tone="purple"]{color:#b5a2f0}
 body.gx-v2-client-session #gx-client-notif-sheet .gx-v2-notif-glyph[data-tone="red"]{color:#e8a6ad}
 body.gx-v2-client-session #gx-client-notif-sheet .gx-v2-notif-glyph[data-tone="amber"]{color:#dfb18e}
 body.gx-v2-client-session #gx-client-notif-sheet .gx-v2-notif-glyph[data-tone="cyan"]{color:#8ad4df}
-body.gx-v2-client-session #gx-client-notif-sheet .gx-client-notif-item.unread::before{left:25px;top:17px;width:4px;height:4px;background:#79e6fc}
+body.gx-v2-client-session #gx-client-notif-sheet .gx-client-notif-item.unread::before{left:auto;right:3px;top:7px;width:4px;height:4px;background:#79e6fc}
 @media(prefers-reduced-motion:reduce){body.gx-v2-client-session #gx-client-notif-sheet.gx-v2-resizable.show{transition:none!important}}
+
+/* La superficie visible recibe toques; el asa solo captura su propio gesto. */
+body.gx-v2-client-session #gx-client-notif-sheet.show{pointer-events:auto;touch-action:auto}
+body.gx-v2-client-session #gx-client-notif-sheet .gx-client-notif-list{touch-action:pan-y}
+body.gx-v2-client-session #gx-client-notif-sheet .gx-client-notif-item-top{gap:9px;padding-right:3px}
+body.gx-v2-client-session #gx-client-notif-sheet .gx-client-notif-time{padding-right:3px}
+body.gx-v2-client-session #gx-client-notif-sheet .gx-client-notif-head button{touch-action:manipulation}
+.gxn-actions .gx-v2-notif-nudge{position:absolute;z-index:90;top:calc(100% + 7px);right:0;width:min(246px,calc(100vw - 44px));box-sizing:border-box;display:grid;gap:5px;padding:13px 34px 11px 13px;border:1px solid rgba(128,217,230,.16);border-radius:17px;background:rgba(17,24,35,.96);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);box-shadow:0 12px 26px rgba(0,0,0,.26);color:#e5edf5;animation:gxNudgeIn .28s ease-out both}
+.gx-v2-notif-nudge strong{font-size:12px;font-weight:600;color:#8de0e7;line-height:1.3}
+.gx-v2-notif-nudge[data-tone="attention"] strong{color:#e4c08a}
+.gx-v2-notif-nudge>span{font-size:11px;line-height:1.45;color:#b9c7d5}
+.gx-v2-notif-nudge .gx-v2-nudge-action{justify-self:start;min-height:30px;padding:3px 0;background:none;border:0;color:#8de0e7;font:inherit;font-size:11px;font-weight:600;cursor:pointer}
+.gx-v2-notif-nudge .gx-v2-nudge-close{position:absolute;right:3px;top:3px;width:32px;height:32px;display:grid;place-items:center;padding:0;border:0;border-radius:50%;background:none;color:#aebccb;font-size:18px;cursor:pointer}
+.gxn-bell.gx-v2-nudge-ring .gx-client-notif-bell{animation:gxBellRing .9s ease-out}
+.gxn-bell.gx-v2-nudge-ring .gx-client-notif-clapper{animation:gxBellClapper .9s ease-out}
+@keyframes gxNudgeIn{from{opacity:0;transform:translateY(-5px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(prefers-reduced-motion:reduce){.gxn-actions .gx-v2-notif-nudge,.gxn-bell.gx-v2-nudge-ring svg,.gxn-bell.gx-v2-nudge-ring path{animation:none!important}}
