@@ -159,3 +159,14 @@ Decisión posterior del usuario: mantener pesos y centavos al mismo tamaño y l�
 - Aplicadas en QA las dos migraciones versionadas de calificaciones/reportes y aviso atómico. Instalados historial-cliente, experiencia-servicio, experiencia-servicio-admin y opiniones-goxion; comprobación de fuente: 4/4 activas e idénticas al repositorio.
 - RLS activo, lectura anónima denegada para ambas tablas nuevas, trigger instalado, 18/18 columnas B2 requeridas presentes, sin pg_cron. Contratos de presentación 35/35. No se modificaron cuentas ni datos de producción.
 - Aceptación todavía parcial: falta credenciales-cliente (bloqueo de despliegue/vault anterior), validar sesión administrativa QA y rutas HTTP autenticadas. No certificar escrituras, compensaciones o Safari con sólo inspección estática. Próximo: pruebas integrales agrupadas y corrección exclusiva de fallos reproducidos; no sustituir ayuda.html hasta superar puertas de aceptación.
+
+
+## Fase 5 · regresión agrupada · 24 nov 2026
+- Usuario confirmó en iPhone la corrección de la carga circular y confirmación. No repetir esa validación visual.
+- 35/35 contratos ejecutados contra runtime a23e676dfaf92662860cd3371e23583ffe3526a6; mismos assets visuales en espejo y aceptación.
+- QA real: dos solicitudes de cancelación registradas y ambos servicios activos; un reporte y exactamente un aviso Admin vinculado; una calificación persistida dentro de rango; privacidad RLS activa y lectura anónima denegada. Misiones y referidos tienen reservas activas persistidas, no se afirma aplicación al cobro (0 aplicaciones).
+- RPC real de estado de cuenta confirma nivel 1 con 4 pagos efectivos y racha perdida con 0 efectivos; vencimiento y estados se leen de fuentes oficiales.
+- RPC B2: liquidación de un cargo de QA-V2-B2, segundo cargo continúa pendiente, reintento idempotente, un solo abono y rollback comprobado. RPC prórroga global: confirmación al 28/11/2026, acuerdo activo reconocido por contrato del feed, reintento idempotente y rollback comprobado. Primera aserción de prórroga suponía un campo plano no devuelto; corregida para aceptar el acuerdo anidado real. No hubo cambio de lógica financiera.
+- Historial: 6 movimientos generados desde registros QA, IDs únicos, 2 cancelaciones, sin renovaciones inventadas (prueba del renderer, no HTTP).
+- Pendiente de aceptación final: HTTP autenticado (DNS inaccesible desde entorno de ejecución), credenciales-cliente ausente en QA (bloqueo previo de despliegue/vault, no eludir), comprobantes de extremo a extremo y aplicación de recompensas, revisión/compensación administrativa autenticada. No convertir pruebas de RPC o persistencia en certificación E2E. Fuente independiente de renovaciones aún no identificada.
+- No se cambió diseño, backend productivo ni ayuda.html. No se autoriza publicación todavía. Cerrar únicamente pendientes concretos antes de limpieza y promoción.
