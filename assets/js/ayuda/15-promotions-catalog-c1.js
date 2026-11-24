@@ -4,7 +4,6 @@
   if(!GXCORE) return;
   // Opt-in exclusivo del candidato; la oficial conserva su comportamiento C1.
   const v3=document.documentElement.hasAttribute('data-gx-catalog-v3');
-  if(v3){const variant=new URLSearchParams(location.search).get('promo');document.documentElement.dataset.gxPromoVariant=['base','a','b','c'].includes(variant)?variant:'a';}
 
   const state={
     promotions:[],
