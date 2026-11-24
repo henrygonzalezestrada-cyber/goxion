@@ -814,7 +814,7 @@ function historyRows(){
   if(!p.id)continue;
   const st=clean(p.estado),pending=st.includes('pend')||st.includes('revisi'),rejected=st.includes('rechaz'),approved=['pagado','acreditado','aprobado'].includes(st);
   const effect=clean(p.lealtad_efecto),loyalty=approved?(effect==='sumo'?'Sumó lealtad':effect==='reinicio'?'Racha reiniciada':effect==='sin_cambio'?'Sin cambio de lealtad':p.puntual===true?'Pago en tiempo':p.puntual===false?'No sumó lealtad':''):'';
-  items.push({id:'p-'+p.id,date:p.fecha||p.created_at||'',title:rejected?'Comprobante rechazado':pending?'Pago en revisión':approved?'Pago acreditado':'Pago registrado',subject:p.periodo||'',amount:data.money(p.monto),detail:[String(p.estado||'Registrado'),loyalty].filter(Boolean).join(' · '),kind:'payment'});
+  items.push({id:'p-'+p.id,date:p.fecha||p.created_at||'',title:rejected?'Comprobante rechazado':pending?'Pago en revisión':approved?'Pago acreditado':'Pago registrado',subject:p.periodo||'',amount:data.money(p.monto),detail:[String(p.estado||'Registrado'),loyalty].filter(Boolean).join(' · '),kind:'payment',movementStatus:rejected?'rejected':pending?'pending':approved?'approved':'registered'});
  }
  for(const c of view.cancelaciones||[]){
   const st=clean(c.estado);if(!['solicitada','efectiva','efectuada','completada','aprobada','rechazada'].includes(st)||!c.id)continue;
@@ -845,11 +845,11 @@ function drawHistory(){
   cancellation:'<path d="M5 12h14"/>',benefit:'<path d="M12 3l2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/>'
  };
  shown.forEach((item,i)=>{
-  const row=document.createElement('div');row.className='gxm-entry';row.dataset.kind=item.kind;row.dataset.movement=item.id;
+  const row=document.createElement('div');row.className='gxm-entry';row.dataset.kind=item.kind;row.dataset.movement=item.id;if(item.movementStatus)row.dataset.movementStatus=item.movementStatus;
   const expanded=state.openHistory===item.id;row.classList.toggle('is-open',expanded);
   const b=document.createElement('button');b.type='button';b.className='gxm-entry-button';
   b.setAttribute('aria-expanded',String(expanded));b.setAttribute('aria-controls','gxm-detail-'+i);
-  b.innerHTML='<span class="gxm-icon" aria-hidden="true"><svg viewBox="0 0 24 24">'+(glyph[item.kind]||glyph.acquisition)+'</svg></span>'+
+  b.innerHTML='<span class="gxm-icon" aria-hidden="true"><svg viewBox="0 0 24 24">'+(item.kind==='payment'&&item.movementStatus!=='approved'?(item.movementStatus==='pending'?'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>':item.movementStatus==='rejected'?'<path d="M6 6l12 12M18 6 6 18"/>':'<path d="M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6"/>'):(glyph[item.kind]||glyph.acquisition))+'</svg></span>'+
    '<span class="gxm-entry-copy"><strong>'+esc(item.title)+'</strong><small>'+esc(dateLabel(item.date)+(item.subject?' · '+item.subject:''))+'</small></span>'+
    '<span class="gxm-entry-value">'+esc(item.amount)+'</span>'+
    '<span class="gxm-arrow gxs-icon" aria-hidden="true"><svg class="gxs-chevron" viewBox="0 0 24 24"><path d="m5 9 7 7 7-7"/></svg><svg class="gxs-x" viewBox="0 0 24 24"><path d="M6 6 18 18M18 6 6 18"/></svg></span>';
