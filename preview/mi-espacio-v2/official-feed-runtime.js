@@ -568,7 +568,7 @@ function invitationLabel(value){
 const feedBusyButtons=new WeakMap();
 function beginFeedBusy(button,label='Cargando…'){
  if(!button||feedBusyButtons.has(button))return;
- const saved={disabled:button.disabled,aria:button.getAttribute('aria-label'),width:button.getBoundingClientRect().width};
+ const saved={disabled:button.disabled,aria:button.getAttribute('aria-label'),width:button.getBoundingClientRect().width,started:performance.now()};
  feedBusyButtons.set(button,saved);
  button.style.setProperty('--gx-busy-from',Math.max(38,saved.width)+'px');
  button.disabled=true;button.setAttribute('aria-busy','true');button.setAttribute('aria-label',label);
@@ -622,8 +622,14 @@ function replaceCancelContent(tile,markup,animate=true){
  morphServiceStage(tile,()=>{panel.innerHTML=markup},animate);
 }
 const cancelBack=(label='Consultar mis accesos')=>'<button type="button" class="gxs-ghost gxs-stage-back" data-gxi-action="service-back">'+label+'</button>';
+// PulsoIcon 6.2.0: mismo trazo check de circle-check; reloj con las
+// manecillas separadas de Morficons aprobadas en la tarjeta principal.
+function cancelStepIcon(kind){
+ const paths={check:'<path d="m16 9-5.5 5.5L8 12"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',minus:'<path d="M8 12h8"/>'};
+ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"'+(kind==='check'?' data-gx-pulso="check"':'')+'>'+paths[kind]+'</svg>';
+}
 function cancelSymbol(type){
- const paths={confirm:'<circle cx="12" cy="12" r="9"/><path d="M8 12h8"/>',pending:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',approved:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4m10-4v4M3 10h18m-13 5 3 3 5-5"/>',rejected:'<circle cx="12" cy="12" r="9"/><path d="M12 8v5m0 3h.01"/>',retained:'<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>'};
+ const paths={confirm:'<circle cx="12" cy="12" r="9"/><path d="M8 12h8"/>',pending:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5"/><path class="gxs-clock-hand" d="M12 12l3 2"/>',approved:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4m10-4v4M3 10h18m-13 5 3 3 5-5"/>',rejected:'<circle cx="12" cy="12" r="9"/><path d="M12 8v5m0 3h.01"/>',retained:'<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>'};
  return '<span class="gxs-stage-symbol" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">'+paths[type]+'</svg></span>';
 }
 // Promoción: protagonismo del ahorro, sin superficies anidadas ni cifras simuladas.
@@ -658,7 +664,7 @@ function cancellationPanel(s){
  const kind=approved?'approved':pending?'pending':rejected?'rejected':'confirm';
  const title=approved?(c?.fecha_efectiva?'Tu próxima baja':'Baja pendiente'):pending?'Solicitud recibida':rejected?'No se autorizó la baja':'¿Cancelar tu servicio?';
  const note=approved?'Tu servicio continúa activo hasta que la baja sea efectiva.':pending?'Tu servicio sigue activo durante la revisión.':rejected?'Tu servicio continúa activo. Puedes enviar una nueva solicitud.':'Los cargos ya generados se mantienen. Revisaremos tu solicitud antes de efectuar la baja.';
- const progress=pending?'<div class="gxs-stage-timeline" aria-label="'+(approved?'Solicitud y revisión completadas; baja pendiente':'Solicitud recibida; revisión en curso')+'"><span class="gxs-step is-done"><i>✓</i><small>Solicitud</small></span><span class="gxs-step '+(approved?'is-done':'is-current')+'"><i>'+(approved?'✓':'')+'</i><small>Revisión</small></span><span class="gxs-step"><i></i><small>Baja efectiva</small></span></div>':'';
+ const progress=pending?'<div class="gxs-stage-timeline" aria-label="'+(approved?'Solicitud y revisión completadas; baja pendiente':'Solicitud recibida; revisión en curso')+'"><span class="gxs-step is-done"><i aria-hidden="true">'+cancelStepIcon('check')+'</i><small>Solicitud</small></span><span class="gxs-step '+(approved?'is-done':'is-current')+'"><i aria-hidden="true">'+cancelStepIcon(approved?'check':'clock')+'</i><small>Revisión</small></span><span class="gxs-step"><i aria-hidden="true">'+cancelStepIcon('minus')+'</i><small>Baja efectiva</small></span></div>':'';
  const effective=approved&&c?.fecha_efectiva?'<strong class="gxs-stage-date">'+esc(dateLabel(c.fecha_efectiva))+'</strong>':'';
  const extra=(c?.fecha_efectiva&&!approved?'<p>Fecha prevista: '+esc(dateLabel(c.fecha_efectiva))+'</p>':'')+(c?.created_at?'<p>Solicitud: '+esc(dateLabel(c.created_at))+'</p>':'')+(c?.nota_admin?'<p><strong>Nota de GOXION:</strong> '+esc(c.nota_admin)+'</p>':'');
  const details=extra?'<details class="gxs-stage-info"><summary>'+(rejected?'Consultar motivo':'Información de la solicitud')+'</summary><div>'+extra+'</div></details>':'';
@@ -798,7 +804,17 @@ async function cancellationAction(tile,kind,button,s){
  const valid=()=>TOKEN()===token&&serviceById(id)&&tile.isConnected;
  const status=()=>panel.querySelector('.gxs-feedback');
  const morph=(b,phase,label)=>{if(typeof gxCancellationActionState==='function')gxCancellationActionState(b,phase,label);else{b.disabled=phase==='loading'||phase==='success';b.classList.remove('gx-action-loading','gx-action-success','gx-action-error');b.classList.add('gx-action-'+phase);b.querySelector('.gx-action-label').textContent=phase==='error'?'Reintentar':'';}};
- const wait=ms=>new Promise(r=>setTimeout(r,reduced()?0:ms));
+ const wait=ms=>new Promise(r=>setTimeout(r,reduced()||document.hidden?0:Math.max(0,ms)));
+ const settleLoading=async b=>{const started=feedBusyButtons.get(b)?.started;if(started!=null)await wait(260-(performance.now()-started))};
+ const success=async (b,label)=>{
+  await settleLoading(b);if(!valid())return false;
+  endFeedBusy(b);morph(b,'success');
+  b.setAttribute('aria-label',label);
+  const mark=document.createElement('span');mark.className='gxs-confirm-mark';mark.setAttribute('aria-hidden','true');mark.innerHTML=cancelStepIcon('check');b.append(mark);
+  // Draw after the next paint; independent of the network and server result.
+  if(!reduced()&&!document.hidden){requestAnimationFrame(()=>{if(b.isConnected&&valid())window.GOXION_PULSO_CANCEL?.play(mark.querySelector('svg'))})}
+  return true;
+ };
  const api=(accion,datos)=>data.post('cancelaciones-cliente',{accion,datos},token);
  serviceOperation=id;
  try{
@@ -809,6 +825,7 @@ async function cancellationAction(tile,kind,button,s){
    const evaluation=await api('evaluar_retencion',{cliente_servicio_id:s.id});
    if(!valid())return;
    if(evaluation.elegible===true&&evaluation.oferta?.id){
+    await settleLoading(button);if(!valid())return;
     const offer=evaluation.oferta;tile._gxOffer=offer;
     replaceCancelContent(tile,retentionOfferMarkup(offer,s));playRetentionReveal(tile);
     panel.querySelector('[data-gxs-stage-heading]')?.focus({preventScroll:true});
@@ -821,8 +838,8 @@ async function cancellationAction(tile,kind,button,s){
    if(kind==='retention-accept'){
     const result=await api('aceptar_retencion',{oferta_id:offer.id});
     if(!valid())return;
-    endFeedBusy(button);morph(button,'success');status().textContent='Beneficio confirmado. La cancelación no fue enviada.';delete tile._gxOffer;benefitRevision++;
-    await wait(1100);
+    if(!await success(button,'Beneficio confirmado'))return;status().textContent='Beneficio confirmado. La cancelación no fue enviada.';delete tile._gxOffer;benefitRevision++;
+    await wait(820);
     if(valid()){tile.dataset.retained='true';replaceCancelContent(tile,'<div class="gxs-stage-copy" data-cancel-tone="retained">'+cancelSymbol('retained')+'<h3 tabindex="-1" data-gxs-stage-heading>Beneficio confirmado</h3><strong class="gxs-stage-date">Ahorras '+esc(data.money(offer.monto_descuento))+'</strong><p class="gxi-note">Tu servicio sigue activo. No se envió una cancelación.</p></div>'+cancelBack('Listo')+'<p class="gxs-feedback" role="status" aria-live="polite"></p>');panel.querySelector('[data-gxs-stage-heading]')?.focus({preventScroll:true})}
     return;
    }
@@ -838,9 +855,9 @@ async function cancellationAction(tile,kind,button,s){
   if(!confirmed?.id||!['solicitada','aprobada'].includes(clean(confirmed.estado)))throw Error('No se recibió confirmación de la solicitud. Consulta su estado.');
   const current=serviceById(id);current.cancelacion={...confirmed,cliente_servicio_id:id};
   state.view.cancelaciones=[...(state.view.cancelaciones||[]).filter(c=>c.id!==confirmed.id),current.cancelacion];
-  benefitRevision++;endFeedBusy(button);morph(button,'success');status().textContent='Solicitud registrada. Tu servicio sigue activo durante la revisión.';
+  benefitRevision++;if(!await success(button,'Solicitud registrada'))return;status().textContent='Solicitud registrada. Tu servicio sigue activo durante la revisión.';
   renderHero();drawHistory();
-  await wait(900);
+  await wait(820);
   if(valid()){replaceCancelContent(tile,cancellationPanel(current));tile.dataset.tone=serviceDetail(current)[1];tile.querySelector('.gxs-status').textContent=serviceDetail(current)[0];const mainAction=tile.querySelector('.gxs-actions [data-gxi-action="options"]');if(mainAction){mainAction.dataset.gxiAction='cancel';mainAction.textContent='Ver seguimiento';mainAction.removeAttribute('aria-expanded')}panel.querySelector('[data-gxs-stage-heading]')?.focus({preventScroll:true})}
  }catch(e){if(valid()){endFeedBusy(button);panel.querySelectorAll('button').forEach(b=>b.disabled=false);if(button?.isConnected&&button.classList.contains('gx-action-morph')){button.removeAttribute('aria-busy');morph(button,'error','Reintentar');}const out=status();if(out)out.textContent=e.message||'No pudimos completar la operación.'}}
  finally{endFeedBusy(button);serviceOperation=null;void refreshClient()}
