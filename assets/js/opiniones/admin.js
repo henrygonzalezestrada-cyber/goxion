@@ -4,7 +4,8 @@
   const store=window.GOXION_REVIEWS;
   if(!store||window.__gxOpinionAdmin)return;
   window.__gxOpinionAdmin=true;
-  let filter="pending";
+  let filter="pending",platformRows=[],platformLoading=false,platformError="",platformLimited=false,platformRequest=0;
+  async function loadPlatforms(){const revision=++platformRequest;platformLoading=true;platformRows=[];platformError="";platformLimited=false;render();try{const result=await window.GOXION_ADMIN_EXPERIENCE.request("calificaciones");if(revision!==platformRequest)return;platformRows=result.calificaciones||[];platformLimited=!!result.limitado}catch(e){if(revision===platformRequest)platformError=e.message||"No se pudieron consultar las calificaciones."}finally{if(revision===platformRequest){platformLoading=false;if(!host.hidden)render()}}}
   const host=document.createElement("div");
   host.className="gx-rb-admin-overlay";
   host.id="gx-rb-admin-host";
@@ -23,14 +24,14 @@
       '<button type="button" data-filter="pending" aria-pressed="true">Pendientes</button>'+
       '<button type="button" data-filter="published" aria-pressed="false">Publicadas</button>'+
       '<button type="button" data-filter="private" aria-pressed="false">Privadas</button>'+
-      '<button type="button" data-filter="hidden" aria-pressed="false">Ocultas</button>'+
+      '<button type="button" data-filter="hidden" aria-pressed="false">Ocultas</button><button type="button" data-filter="platforms" aria-pressed="false">Plataformas</button>'+
     '</div>'+
     '<div class="gx-rb-admin-list" id="gx-rb-admin-list" aria-live="polite"></div>'+
     '<div class="gx-rb-admin-message" id="gx-rb-admin-message" aria-live="polite">Solo opiniones verificadas, protegidas y revisadas por GOXION.</div>';
   host.appendChild(root);
   const $=id=>document.getElementById(id);
   const tabs=[...root.querySelectorAll("[data-filter]")];
-  tabs.forEach(btn=>btn.addEventListener("click",()=>{filter=btn.dataset.filter;render()}));
+  tabs.forEach(btn=>btn.addEventListener("click",()=>{filter=btn.dataset.filter;if(filter==="platforms")void loadPlatforms();else render()}));
   function element(tag,cls,content){
     const el=document.createElement(tag);
     if(cls)el.className=cls;
@@ -109,13 +110,29 @@
     tabs.forEach(btn=>btn.setAttribute("aria-pressed",String(btn.dataset.filter===filter)));
     const list=$("gx-rb-admin-list");
     list.replaceChildren();
+    const stats=root.querySelector(".gx-rb-stats");stats.hidden=filter==="platforms";
+    if(filter==="platforms"){
+      $("gx-rb-admin-message").textContent="Calificaciones privadas de plataformas; no se publican."+ (platformLimited?" Se muestran las 500 más recientes.":"");
+      if(platformLoading||platformError||!platformRows.length){list.append(element("div","gx-rb-admin-empty",platformLoading?"Consultando calificaciones…":platformError||"Todavía no hay calificaciones."));return}
+      const groups=new Map();
+      for(const r of platformRows){const k=r.plataforma_clave;const group=groups.get(k)||[];group.push(r);groups.set(k,group)}
+      for(const rows of groups.values()){
+        const section=element("article","gx-rb-admin-card"),head=element("div","gx-rb-admin-card-head");
+        const avg=rows.reduce((sum,r)=>sum+Number(r.calificacion),0)/rows.length;
+        head.append(element("strong","gx-rb-admin-card-title",rows[0].plataforma),element("span","gx-rb-status",avg.toFixed(1)+" / 5 · "+rows.length));section.append(head);
+        const details=element("details","gx-rb-platform-detail");details.append(element("summary","","Ver calificaciones"));
+        for(const r of rows){const item=element("div","gx-rb-platform-entry");item.append(element("div","gx-rb-admin-card-title",[r.clientes?.nombre,r.clientes?.folio].filter(Boolean).join(" · ")||"Cliente"),element("div","gx-rb-admin-card-meta",r.calificacion+" / 5 · "+store.date(r.actualizado_en)));if(r.comentario)item.append(element("p","",r.comentario));details.append(item)}
+        section.append(details);list.append(section);
+      }return;
+    }
+    $("gx-rb-admin-message").textContent="Solo comentarios reales. La publicación exige consentimiento explícito.";
     const rows=all.filter(r=>r.status===filter);
     if(!rows.length){
       list.appendChild(element("div","gx-rb-admin-empty","No hay opiniones en esta categoría."));
     }else rows.forEach(review=>list.appendChild(renderCard(review)));
   }
   function closePanel(){
-    host.hidden=true;
+    host.hidden=true;platformRequest++;platformRows=[];platformLoading=false;platformError="";
     document.body.classList.remove("gx-rb-admin-locked");
   }
   $("gx-rb-admin-close").addEventListener("click",closePanel);
@@ -144,6 +161,6 @@
   };
   store.subscribe(()=>{if(!host.hidden)render()});
   setInterval(()=>{
-    if(!host.hidden&&!document.hidden)store.refreshAdmin().catch(()=>{});
+    if(!host.hidden&&!document.hidden&&filter!=="platforms")store.refreshAdmin().catch(()=>{});
   },45000);
 })();
