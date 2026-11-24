@@ -221,7 +221,7 @@
     busy = true; showError(''); render();
     const submit = dialog.querySelector('button[type=submit]');
     submit.querySelector('.gx-cart-submit-label').textContent = 'Enviando';
-    submit.classList.add('is-sending'); iconTo(submit, 'loading');
+    submit.classList.add('is-sending'); if(refined) submit.querySelector('.gx-cart-send-icon path')?.setAttribute('d',icons.loading); else iconTo(submit, 'loading');
     if (refined) { submit.setAttribute('aria-busy','true'); submit.setAttribute('aria-label','Enviando solicitud'); }
     const token = core.getClientToken?.() || localStorage.getItem(core.STORAGE.CLIENT_TOKEN) || '';
     const headers = {'Content-Type':'application/json', ...(token ? {'X-Client-Token':token} : {})};
@@ -277,7 +277,7 @@
     } catch (error) {
       showError(error.name === 'AbortError' ? 'El servidor tardó en responder. No pudimos confirmar el envío; tu selección se conserva.' : error.message);
     } finally {
-      clearTimeout(timeout); busy = false; submit.classList.remove('is-sending'); if(refined){submit.removeAttribute('aria-busy');submit.removeAttribute('aria-label');} submit.querySelector('.gx-cart-submit-label').textContent = 'Enviar solicitud'; iconTo(submit, 'send'); render();
+      clearTimeout(timeout); busy = false; submit.classList.remove('is-sending'); if(refined){submit.removeAttribute('aria-busy');submit.removeAttribute('aria-label');} submit.querySelector('.gx-cart-submit-label').textContent = 'Enviar solicitud'; if(refined)submit.querySelector('.gx-cart-send-icon path')?.setAttribute('d',icons.send);else iconTo(submit, 'send'); render();
     }
   });
   window.GOXION_CART = {open, render, changeService, addPromotion};
