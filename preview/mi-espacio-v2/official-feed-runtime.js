@@ -116,7 +116,7 @@ function renderHero(){
   title.textContent=s[1];
   if(!reduced()&&title.animate)title.animate([{opacity:0,filter:'blur(10px)',transform:'translateY(20px)'},{opacity:1,filter:'blur(0)',transform:'translateY(0)'}],{duration:560,easing:'cubic-bezier(.18,.85,.2,1)'});
  }
- $('focus-meta').textContent=s[2];$('focus-action').textContent=s[0]==='new'?'Ver catálogo':'Ver mi cuenta';$('focus-action').setAttribute('aria-label',s[0]==='new'?'Abrir catálogo oficial':'Abrir mi estado de cuenta oficial');
+ $('focus-meta').textContent=s[2];$('focus-action').textContent=s[0]==='new'?'Ver catálogo':s[0]==='cancellation'?'Ver seguimiento':'Ver mi cuenta';$('focus-action').setAttribute('aria-label',s[0]==='new'?'Abrir catálogo oficial':s[0]==='cancellation'?'Consultar la solicitud de cancelación':'Abrir mi estado de cuenta oficial');
  const icon=$('focus-icon');icon.dataset.icon=s[4];
  const path=$('state-path'),shape=paths[s[4]]||paths.check;
  if(prev!==s[0]||path.getAttribute('d')!==shape){if(iconHandle){try{iconHandle.morphTo(shape,'smooth')}catch(_){path.setAttribute('d',shape)}}else path.setAttribute('d',shape);}
@@ -131,6 +131,11 @@ function renderHero(){
 $('focus-action').addEventListener('click',event=>{
  event.stopPropagation();
  if(state.lastState==='new'){navigate('catalog');return}
+ if(state.lastState==='cancellation'){
+  const s=state.view?.servicios?.find(x=>['solicitada','aprobada'].includes(clean(x.cancelacion?.estado)));
+  const tile=[...$('gxs-list').querySelectorAll('.gxs-card')].find(el=>el.dataset.service===String(s?.id));
+  if(tile){if(!tile.classList.contains('is-open'))tile.querySelector('.gxs-trigger').click();const options=tile.querySelector('.gxs-more');if(options.hidden)tile.querySelector('[data-gxi-action="options"]').click();const panel=tile.querySelector('.gxs-cancel-panel');if(panel.hidden)tile.querySelector('[data-gxi-action="cancel"]').click();tile.scrollIntoView({behavior:reduced()?'auto':'smooth',block:'start'});return}
+ }
  // Reutiliza la ruta original hacia index.html o B2 multifecha.
  if(typeof window.irAlTicket==='function'){window.irAlTicket();return}
  const toast=$('gxn-toast');
@@ -508,6 +513,7 @@ function serviceDetail(s){
  if(s.credencial_pendiente)return ['Nueva contraseña','notice'];
  if(notice)return ['Actualización disponible','notice'];
  if((s.accesos||[]).some(a=>clean(a.estado_invitacion).includes('pendiente')))return ['Invitación pendiente','pending'];
+ if(typeof gxServiceHasAlert==='function'&&gxServiceHasAlert(s.nombre))return ['Temporalmente inactivo','caution'];
  return ['Activo','active'];
 }
 function accessRow(label,value,action,dataValue){
@@ -523,10 +529,12 @@ function invitationLabel(value){
 let serviceOperation=null;
 const heldSecrets=new Map();
 function wipeServiceSecrets(){
+ const hadSecret=heldSecrets.size>0;
  for(const panel of document.querySelectorAll('#gxs-list .gxs-credential-result')){panel.querySelector('.gxs-secret')?.replaceChildren();panel.hidden=true}
  for(const input of document.querySelectorAll('#gxs-list .gxs-pin-input'))input.value='';
  for(const row of document.querySelectorAll('#gxs-list [data-gxi-action="pin"]')){const node=row.closest('.gxs-accessrow')?.querySelector('.gxs-copy strong');if(node)node.textContent='••••';row.textContent='Mostrar'}
  heldSecrets.clear();
+ if(hadSecret){state.serviceDigest='';for(const panel of document.querySelectorAll('#gxs-list .gxs-credential-panel')){panel.hidden=true;const notice=panel.previousElementSibling;if(notice?.matches('[data-gxi-action="credential-open"]')&&panel.querySelector('.gxs-pin-input')?.disabled)notice.hidden=true}}
 }
 const serviceById=id=>state.view?.servicios?.find(s=>String(s.id)===String(id));
 function cancellationPanel(s){
@@ -534,9 +542,10 @@ function cancellationPanel(s){
  const title=st==='solicitada'?'Cancelación en revisión':st==='aprobada'?'Cancelación aprobada':st==='rechazada'?'Cancelación no autorizada':'Solicitar cancelación';
  const note=st==='solicitada'?'Tu solicitud fue recibida. El servicio sigue activo mientras se revisa.':st==='aprobada'?'Tu servicio continúa activo hasta que la baja sea efectiva.':st==='rechazada'?'Puedes solicitar nuevamente la cancelación.':'Los cargos ya generados no cambian. Revisaremos tu solicitud antes de efectuar cualquier baja.';
  const pending=st==='solicitada'||st==='aprobada';
+ const progress=st==='solicitada'?'<div class="gx-cancel-progress" aria-label="Solicitud recibida, revisión pendiente"><span class="done"></span><i class="done"></i><span class="done"></span><i></i><span></span></div>':st==='aprobada'?'<div class="gx-cancel-progress" aria-label="Solicitud y revisión completadas; baja pendiente"><span class="success"></span><i class="success"></i><span class="success"></span><i class="success"></i><span></span></div>':'';
  const admin=c?.nota_admin?'<p class="gxs-notice"><strong>Nota de GOXION</strong> · '+esc(c.nota_admin)+'</p>':'';
  const date=c?.fecha_efectiva?'<p class="gxs-notice">Fecha prevista: '+esc(dateLabel(c.fecha_efectiva))+'</p>':'';
- return '<h3 class="gxs-subtitle">'+title+'</h3><p class="gxi-note">'+note+'</p>'+date+admin+(pending?'':'<div class="gx-cancel-submit-zone"><button type="button" class="gx-service-cancel-submit gx-action-morph" data-gxi-action="cancel-submit"><span class="gx-action-label">'+(st==='rechazada'?'Enviar nueva solicitud':'Enviar solicitud')+'</span></button></div>')+'<p class="gxs-feedback" role="status" aria-live="polite"></p>';
+ return '<h3 class="gxs-subtitle">'+title+'</h3><p class="gxi-note">'+note+'</p>'+progress+date+admin+(pending?'':'<div class="gx-cancel-submit-zone"><button type="button" class="gx-service-cancel-submit gx-action-morph" data-gxi-action="cancel-submit"><span class="gx-action-label">'+(st==='rechazada'?'Enviar nueva solicitud':'Enviar solicitud')+'</span></button></div>')+'<p class="gxs-feedback" role="status" aria-live="polite"></p>';
 }
 function credentialPanel(s){
  if(!s.credencial_pendiente?.id)return '';
@@ -677,7 +686,7 @@ $('gxs-list').addEventListener('click',async event=>{
  if(kind==='cancel'){const panel=tile.querySelector('.gxs-cancel-panel');panel.hidden=!panel.hidden;return}
  if(['cancel-submit','retention-accept','retention-decline'].includes(kind)){await cancellationAction(tile,kind,action,service);return}
  const credential=tile.querySelector('.gxs-credential-panel');
- if(kind==='credential-open'&&credential){credential.hidden=!credential.hidden;if(credential.hidden)wipeServiceSecrets();return}
+ if(kind==='credential-open'&&credential){if(serviceOperation)return;credential.hidden=!credential.hidden;if(credential.hidden){wipeServiceSecrets();void refreshClient()}return}
  if(kind==='credential-close'&&credential){wipeServiceSecrets();credential.hidden=true;state.serviceDigest='';void refreshClient();return}
  if(kind==='credential-copy'&&credential){const secret=credential.querySelector('.gxs-secret')?.textContent;try{if(secret&&heldSecrets.has(tile.dataset.service)){await navigator.clipboard.writeText(secret);credential.querySelector('.gxs-feedback').textContent='✓ Copiada.'}}catch{credential.querySelector('.gxs-feedback').textContent='Mantén presionada la contraseña para copiarla.'}return}
  if(kind==='credential-reveal'&&credential&&service?.credencial_pendiente?.id){
@@ -687,9 +696,11 @@ $('gxs-list').addEventListener('click',async event=>{
   const token=TOKEN(),id=tile.dataset.service;serviceOperation=id;action.disabled=true;out.textContent='Validando…';input.value='';
   try{const reply=await data.post('credenciales-cliente',{accion:'revelar',datos:{entrega_id:service.credencial_pendiente.id,pin}},token);
    if(!reply.password)throw Error('No se recibió una contraseña autorizada.');
-   if(TOKEN()!==token||!tile.isConnected||document.hidden||state.tab!=='space'||!tile.classList.contains('is-open'))return;
+   if(TOKEN()!==token||!tile.isConnected)return;
+   const current=serviceById(id);if(current)current.credencial_pendiente=null;benefitRevision++;
+   if(document.hidden||state.tab!=='space'||!tile.classList.contains('is-open')||credential.hidden){credential.hidden=true;credential.previousElementSibling.hidden=true;state.serviceDigest='';return}
    heldSecrets.set(id,true);credential.querySelector('.gxs-secret').textContent=String(reply.password);credential.querySelector('.gxs-credential-result').hidden=false;input.disabled=true;action.hidden=true;
-   out.textContent='Consulta única. Al salir de esta tarjeta se ocultará definitivamente.';const current=serviceById(id);if(current)current.credencial_pendiente=null;benefitRevision++;
+   out.textContent='Consulta única. Al salir de esta tarjeta se ocultará definitivamente.';
   }catch(e){out.textContent=e.message||'No fue posible consultar la contraseña.';action.disabled=false}
   finally{serviceOperation=null;if(!heldSecrets.size)void refreshClient()}
  }
@@ -703,7 +714,8 @@ function historyRows(){
  for(const p of view.pagos||[]){
   if(!p.id)continue;
   const st=clean(p.estado),pending=st.includes('pend')||st.includes('revisi'),rejected=st.includes('rechaz'),approved=['pagado','acreditado','aprobado'].includes(st);
-  items.push({id:'p-'+p.id,date:p.fecha||p.created_at||'',title:rejected?'Comprobante rechazado':pending?'Pago en revisión':approved?'Pago acreditado':'Pago registrado',subject:p.periodo||'',amount:data.money(p.monto),detail:String(p.estado||'Registrado'),kind:'payment'});
+  const effect=clean(p.lealtad_efecto),loyalty=approved?(effect==='sumo'?'Sumó lealtad':effect==='reinicio'?'Racha reiniciada':effect==='sin_cambio'?'Sin cambio de lealtad':p.puntual===true?'Pago en tiempo':p.puntual===false?'No sumó lealtad':''):'';
+  items.push({id:'p-'+p.id,date:p.fecha||p.created_at||'',title:rejected?'Comprobante rechazado':pending?'Pago en revisión':approved?'Pago acreditado':'Pago registrado',subject:p.periodo||'',amount:data.money(p.monto),detail:[String(p.estado||'Registrado'),loyalty].filter(Boolean).join(' · '),kind:'payment'});
  }
  for(const c of view.cancelaciones||[]){
   const st=clean(c.estado);if(!['solicitada','efectiva','efectuada','completada','aprobada','rechazada'].includes(st)||!c.id)continue;

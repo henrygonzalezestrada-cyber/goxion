@@ -529,7 +529,7 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
 .gxs-more[hidden]{display:none!important}
 .gxs-more{display:grid;margin-top:11px;padding-top:8px}
 .gxs-more[hidden]{display:none!important}
-.gxs-more button{min-height:42px;padding:9px 0;text-align:left;border:0;background:transparent;color:#bfd0df;font-size:11px}
+.gxs-more > button{min-height:42px;padding:9px 0;text-align:left;border:0;background:transparent;color:#bfd0df;font-size:11px}
 .gxs-feedback{display:block;margin-top:9px;font-size:10.5px;line-height:1.5;color:#7cdbd4}
 .gxs-feedback:empty{display:none}
 .gxs-empty{padding:22px 18px;display:grid;gap:6px;border-radius:22px}
@@ -1418,3 +1418,7 @@ body.gx-v2-client-session #gx-v2-shared-nav{position:-webkit-sticky;position:sti
 #gx-v2-feed .gxs-credential-result[hidden],#gx-v2-feed .gxs-cancel-panel[hidden],#gx-v2-feed .gxs-credential-panel[hidden]{display:none!important}
 #gx-v2-feed .gxs-cancel-panel .gx-action-morph{margin-inline:auto;text-align:center}
 #gx-v2-feed .gxm-entry[data-kind="benefit"] .gxm-icon{color:#a899f5}
+
+/* El morph y el seguimiento usan las clases oficiales de ayuda.css; no se sobreescriben sus botones. */
+#gx-v2-feed .gxs-cancel-panel .gx-cancel-progress{margin:12px 0}
+#gx-v2-feed .gxs-card{scroll-margin-top:86px}

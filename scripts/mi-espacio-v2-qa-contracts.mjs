@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import assert from 'node:assert/strict';
 const source=fs.readFileSync('preview/mi-espacio-v2/official-feed-runtime.js','utf8');
 function cut(a,b){const i=source.indexOf(a),j=source.indexOf(b,i);assert(i>=0&&j>i,'Falta función '+a);return source.slice(i,j)}
-const api=new Function("const state={view:null}; const clean=x=>String(x??'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase().trim();"+cut("function heroState(view){","const paths=")+cut("function missionInfo(view){","function updateMini(")+cut("function serviceDetail(s){","function accessRow(")+"return {heroState,missionInfo,serviceDetail,benefit:(v,k)=>{state.view=v;return benefitState(k)}}")();
+const api=new Function("const state={view:null}; const gxServiceHasAlert=name=>name==='QA Pausado'; const clean=x=>String(x??'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase().trim();"+cut("function heroState(view){","const paths=")+cut("function missionInfo(view){","function updateMini(")+cut("function serviceDetail(s){","function accessRow(")+"return {heroState,missionInfo,serviceDetail,benefit:(v,k)=>{state.view=v;return benefitState(k)}}")();
 const base={cliente:{estado:'pagado',dia_pago:15,pagos_puntuales:3},servicios:[{id:'qa',nombre:'Disney+'}],estado_cuenta:{estado:'pagado',lealtad:{pagos_efectivos:3}},pagos:[],gamificacion:null,misiones_progreso:[],referidos:[]};
 const view=p=>({...base,...p,cliente:{...base.cliente,...p.cliente},estado_cuenta:{...base.estado_cuenta,...p.estado_cuenta}});
 const results=[];
@@ -36,7 +36,7 @@ check('Revisión prevalece sobre vencimiento anterior',api.heroState(view({clien
 check('Corazón roto',api.benefit(view({cliente:{pagos_puntuales:0,racha_reiniciada_virtual:true}}),'loyalty').emoji,'💔');
 check('Referidos: total normalizado de servidor',api.benefit(view({referidos:[{meses_efectivos:3,plataformas:2,servicios:[]}]}),'referral').phase,'ready');
 for(const [name,s,expected] of [
- ['Servicio activo',{},'active'],['Solicitud',{cancelacion:{estado:'solicitada'}},'pending'],['Aprobada',{cancelacion:{estado:'aprobada'}},'caution'],['Rechazada',{cancelacion:{estado:'rechazada'}},'danger'],
+ ['Servicio activo',{},'active'],['Interrupción oficial',{nombre:'QA Pausado'},'caution'],['Solicitud',{cancelacion:{estado:'solicitada'}},'pending'],['Aprobada',{cancelacion:{estado:'aprobada'}},'caution'],['Rechazada',{cancelacion:{estado:'rechazada'}},'danger'],
  ['Invitación',{accesos:[{estado_invitacion:'pendiente'}]},'pending'],['Contraseña nueva',{credencial_pendiente:{id:'qa'}},'notice']
 ])check(name,api.serviceDetail(s)[1],expected);
 console.table(results);
