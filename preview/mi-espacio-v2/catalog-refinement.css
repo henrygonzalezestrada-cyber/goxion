@@ -55,7 +55,7 @@ html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-submit{
 html[data-gx-catalog-v3] #gx-cart-dialog .gx-cart-submit::before{display:none}
 html[data-gx-catalog-v3] #gx-cart-dialog :is(.gx-cart-line,.gx-cart-contact){border-top:0}
 html[data-gx-catalog-v3] #gx-cart-dialog :is(.gx-cart-copy p,.gx-cart-unit-price,.gx-cart-contact p,.gx-cart-caption,.gx-cart-trust){color:#a8b5c9}
-/* Común a las tres propuestas promocionales: cierre estándar; se conserva el morph. */
+/* Cierre estándar del diálogo promocional; se conserva el morph. */
 html[data-gx-catalog-v3] .gx-promo-deck-card.is-expanded .gx-promo-morph-close{
   width:35px!important;height:35px!important;border:0!important;border-radius:50%!important;background:#79e6fc!important;color:#071c29!important;
   box-shadow:none!important;font-size:19px;line-height:1;
@@ -64,16 +64,26 @@ html[data-gx-catalog-v3] .gx-promo-deck-card.is-expanded .gx-promo-morph-close{
 html[data-gx-catalog-v3] .gx-promo-deck-card{
   background:radial-gradient(ellipse at 90% 0%,color-mix(in srgb,var(--gx-brand-accent) 24%,transparent),transparent 54%),
   radial-gradient(ellipse at 0% 66%,color-mix(in srgb,var(--gx-brand) 38%,transparent),transparent 73%),
-  linear-gradient(157deg,color-mix(in srgb,var(--gx-brand-deep) 72%,#12141e),#0b0c15 94%);
-  border-color:transparent;
+  linear-gradient(157deg,color-mix(in srgb,var(--gx-brand-deep) 72%,#12141e) 0%,#0b0c15 68%,#030305 100%);
+  /* Borde transparente conserva la geometría que mide el morph. */
+  border:1px solid transparent;
+  background-clip:padding-box;
+  box-shadow:0 22px 48px rgba(0,0,0,.32);
 }
 html[data-gx-catalog-v3] .gx-promo-card-kind{
   border:0;background:rgba(255,255,255,.10);color:color-mix(in srgb,var(--gx-brand-accent) 38%,white);
   letter-spacing:.075em;font-weight:750;
 }
 html[data-gx-catalog-v3] .gx-promo-offer-title{color:color-mix(in srgb,var(--gx-brand-accent) 28%,white);font-weight:650}
-html[data-gx-catalog-v3] .gx-promo-deck-card::after{border:0;box-shadow:none!important;opacity:0;}
-html[data-gx-catalog-v3] .gx-promo-deck-card.is-closed.is-front::after{opacity:0;box-shadow:none!important}
+/* No queda trazo en pseudoelemento ni reflejo interior de las sombras animadas. */
+html[data-gx-catalog-v3] .gx-promo-deck-card::after{display:none!important;animation:none!important;box-shadow:none!important}
+html[data-gx-catalog-v3] .gx-promo-deck-card.is-expanded{box-shadow:0 24px 58px rgba(0,0,0,.42)!important}
+html[data-gx-catalog-v3] .gx-promo-deck-card.is-closed.is-front{animation-name:gxCatalogChromaticFloat!important}
+@keyframes gxCatalogChromaticFloat{
+  0%,100%{translate:0 0;scale:1;box-shadow:0 32px 62px rgba(0,0,0,.48),0 12px 34px color-mix(in srgb,var(--gx-brand) 16%,transparent)}
+  50%{translate:0 -5px;scale:1.006;box-shadow:0 38px 72px rgba(0,0,0,.52),0 18px 42px color-mix(in srgb,var(--gx-brand) 21%,transparent)}
+}
+@media(prefers-reduced-motion:reduce){html[data-gx-catalog-v3] .gx-promo-deck-card.is-closed.is-front{animation:none!important}}
 html[data-gx-catalog-v3] .gx-mechanic-combo .gx-promo-card-kind{color:#e2d4ff}
 html[data-gx-catalog-v3] .gx-mechanic-porcentaje .gx-promo-card-kind{color:#b8f6df}
 
@@ -83,9 +93,12 @@ html[data-gx-catalog-v3] #view-catalogo :is(.gx-promo-showcase-head h2,.gx-catal
 }
 html[data-gx-catalog-v3] #view-catalogo :is(.gx-catalog-discover-section,.gx-catalog-all-head){border-top:0}
 html[data-gx-catalog-v3] #view-catalogo .gx-catalog-curated-head{flex-wrap:wrap;row-gap:8px;align-items:center}
-/* Sin alterar el morph de la tarjeta ni la flecha original de plataformas. */
+/* Una sola cápsula en todos los estados, incluido retorno del morph. */
+html[data-gx-catalog-v3] .gx-promo-deck-card .gx-promo-action,
+html[data-gx-catalog-v3] .gx-promo-deck-card.is-closed .gx-promo-action,
 html[data-gx-catalog-v3] .gx-promo-deck-card.is-expanded .gx-promo-action.is-contract{
   width:auto;min-width:0;max-width:100%;min-height:38px;padding:8px 15px;border:0;border-radius:999px;
   background:rgba(255,255,255,.08);box-shadow:none;color:#7ee1e7;font-size:11px;font-weight:600;letter-spacing:normal;
 }
-html[data-gx-catalog-v3] .gx-promo-deck-card.is-expanded .gx-promo-action.is-contract:disabled{opacity:.65;color:#c1cfe0}
+html[data-gx-catalog-v3] .gx-promo-deck-card .gx-promo-action:disabled{opacity:.65;color:#c1cfe0}
+html[data-gx-catalog-v3] .gx-promo-deck-card .gx-promo-action:focus-visible{outline:2px solid #7ee1e7;outline-offset:2px}
