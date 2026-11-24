@@ -162,11 +162,11 @@ $('focus-action').addEventListener('click',event=>{
 });
 function missionInfo(view){
  const g=view.gamificacion||{};
- const tasks=String(g.tareas||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+ const tasks=g.misiones_activas===false?[]:String(g.tareas||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
  const version=Number(g.misiones_version||1);
  const doneSet=new Set((view.misiones_progreso||[]).filter(x=>x.misiones_version==null||Number(x.misiones_version)===version).map(x=>Number(x.mision_index)));
  const done=tasks.filter((x,i)=>doneSet.has(i)).length;
- const claimed=Number(g.cupon_reclamado_ciclo||0)>=Math.max(1,Number(g.cupon_ciclo||1))||g.cupon_reclamado===true;
+ const claimed=g.cupon_reclamado_ciclo!=null?Number(g.cupon_reclamado_ciclo)>=Math.max(1,Number(g.cupon_ciclo||1)):g.cupon_reclamado===true;
  return {tasks,doneSet,done,total:tasks.length,ready:tasks.length>0&&done>=tasks.length,claimed,discount:Number(g.descuento||0)};
 }
 function benefitState(key){
@@ -182,7 +182,7 @@ function benefitState(key){
   return {label:'Lealtad',level:lost?0:(v.estado_cuenta?.lealtad?.nivel!=null&&[0,1,2].includes(Number(v.estado_cuenta.lealtad.nivel))?Number(v.estado_cuenta.lealtad.nivel):effectiveStreak>=9?2:effectiveStreak>=4?1:0),num:shown+'/'+target,unit:'pagos seguidos',pct:100*shown/target,meter:true,emoji:lost?'💔':'⭐',
    title:lost?'Tu racha se reinició':'Tu constancia crece',accent:lost?'reinició':'crece',
    copy:lost?'Puedes volver a acumular pagos puntuales para recuperar tu avance.':'Tu constancia se acredita con los pagos confirmados.',
-   note:'La racha y sus niveles dependen del estado oficial de lealtad.',progress:shown+' de '+target+' pagos',action:'Mis niveles',phase:lost?'lost':'active'};
+   note:'Nivel 1: 4 pagos puntuales (3% de descuento). Nivel 2: 9 pagos puntuales (6%). La racha depende del estado oficial de lealtad.',progress:shown+' de '+target+' pagos',action:'Mis niveles',phase:lost?'lost':'active'};
  }
  if(key==='referral'){
   const months=Math.max(0,Math.min(3,Number(ref?.meses_efectivos??ref?.meses_override??ref?.meses??0)||0));
@@ -275,13 +275,14 @@ function setBenefitPanel(detail,key){
    const done=detail.tasks.doneSet.has(index);
    const label=String(raw).replace(/\[[^\]]+\]/g,'').trim();
    const icon=done?'<svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg>':'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>';
-   return '<li data-status="'+(done?'done':'pending')+'"><span class="gxb-task-main"><span class="gxb-task-check" aria-hidden="true">'+icon+'</span><span>'+esc(label)+'</span></span><small>'+(done?'Completada':'Pendiente')+'</small></li>';
+   return '<li data-status="'+(done?'done':'pending')+'"><span class="gxb-task-main"><span class="gxb-task-check" aria-hidden="true">'+icon+'</span><span>'+esc(label)+'</span></span>'+(done?'<small>Completada</small>':'<button type="button" class="gxb-task-action" data-gxb-mission="'+index+'" aria-label="Realizar '+esc(label)+'">Realizar</button>')+'</li>';
   }).join('')+'</ul>';
  }
+ if(key==='referral'&&['none','active'].includes(detail.phase))html+='<button type="button" class="gxb-copy-invite" data-gxb-copy-invite>Copiar enlace de invitación</button>';
  html+='<p class="gxb-note">'+esc(detail.note)+'</p>';
  content.innerHTML=html;
  $('gxb-panel-emoji').textContent=detail.emoji;
- $('gxb-action').textContent=detail.action;
+ $('gxb-action').textContent=detail.action;$('gxb-action').hidden=key==='mission'&&!detail.tasks.total&&!detail.tasks.claimed;
  $('gxb-rule-note').textContent=detail.note;
  $('gxb-rule-note').hidden=true;
  $('gxb-rules').setAttribute('aria-expanded','false');
@@ -294,10 +295,11 @@ function setupBenefits(){
  const tiles=[...row.querySelectorAll('.gxb-tile')],close=$('gxb-dismiss'),action=$('gxb-action'),rules=$('gxb-rules');
  const ruleNote=$('gxb-rule-note'),feedback=$('gxb-feedback'),expandedEmoji=$('gxb-panel-emoji');
  const text=id=>$(id),prefersReduced=reduced;
- let current=null,busy=false;
+ let current=null,busy=false,missionBusy=false;
  const sourceFor=key=>tiles.find(tile=>tile.dataset.gxb===key);
  function updatePanel(key){setBenefitPanel(benefitState(key),key)}
  window.GOXION_V2_UPDATE_PANEL=updatePanel;
+ window.GOXION_V2_OPEN_BENEFIT=async key=>{if(busy)return false;if(current&&current!==key)await collapse();if(!current)await open(key);return current===key};
  window.GOXION_V2_RESET_BENEFITS=()=>{
   current=null;busy=false;
   panel.hidden=true;row.hidden=false;
@@ -446,6 +448,42 @@ function setupBenefits(){
   const keepOffset=offsetBefore+heightBefore-heightAfter;
   expandedEmoji.style.setProperty('--gxb-info-lock',(Math.abs(keepOffset)<.01?0:keepOffset).toFixed(2)+'px');
  }
+ function invitation(){
+  const client=state.view?.cliente;if(!client)return null;
+  const phone=String(window.GOXION_CORE?.BUSINESS?.WHATSAPP||(typeof NUMERO_GOXION!=='undefined'?NUMERO_GOXION:'')).replace(/\D/g,'');
+  if(!/^\d{10,15}$/.test(phone))return null;
+  const msg='Hola, quiero unirme a GOXION. Vengo invitado por el cliente '+client.nombre+' ('+client.folio+').';
+  return 'https://wa.me/'+phone+'?text='+encodeURIComponent(msg);
+ }
+ async function shareInvitation(copy=false){
+  const token=TOKEN(),url=invitation();if(!url){feedback.textContent='No se pudo preparar la invitación.';return}
+  try{
+   if(copy||!navigator.share){await navigator.clipboard.writeText(url);feedback.textContent='Enlace copiado.'}
+   else await navigator.share({text:'Conoce GOXION y sus servicios.',url});
+   if(ENABLE_WRITES&&TOKEN()===token&&window.goxionMissionAPI){await window.goxionMissionAPI.completeType('compartir');if(TOKEN()===token)await window.goxionMissionAPI.completeType('referidos')}
+  }catch(e){if(e?.name!=='AbortError'&&TOKEN()===token)feedback.textContent='No fue posible completar la acción.'}
+ }
+ async function runMission(index){
+  if(missionBusy||!state.view||!ENABLE_WRITES)return;
+  const mi=missionInfo(state.view),raw=mi.tasks[index];if(!raw||mi.doneSet.has(index))return;
+  const tag=(raw.match(/\[([^\]]+)\]/)||[])[1]||'',kind=clean(tag).trim(),token=TOKEN(),version=Number(state.view.gamificacion?.misiones_version||1);
+  missionBusy=true;
+  try{
+   if(kind==='pago'){if(typeof window.irAlTicket==='function')window.irAlTicket();return}
+   if(kind==='catalogo'||kind==='soporte'){await collapse();if(TOKEN()===token)navigate(kind==='catalogo'?'catalog':'support');return}
+   if(kind==='feedback'){window.openFeedbackModal?.(index,state.view.cliente.folio);return}
+   if(kind==='referidos'){await collapse();if(TOKEN()!==token)return;await open('referral');if(TOKEN()===token)await window.goxionMissionAPI.completeType('referidos');return}
+   if(kind==='compartir'){await shareInvitation();return}
+   if(kind.startsWith('link:')){
+    let url=tag.slice(5).trim();if(!/^https?:\/\//i.test(url))url='https://'+url;
+    try{const parsed=new URL(url);if(!['http:','https:'].includes(parsed.protocol)||!parsed.hostname.includes('.'))throw Error();url=parsed.href}catch{feedback.textContent='Enlace no válido.';return}
+    const tab=window.open(url,'_blank');if(!tab){feedback.textContent='Permite abrir el enlace para continuar.';return}try{tab.opener=null}catch{}
+   }else if(kind){feedback.textContent='Esta actividad se valida mediante su acción oficial.';return}
+   if(TOKEN()===token&&Number(state.view?.gamificacion?.misiones_version||1)===version)await window.goxionMissionAPI.completeIndex(index);
+  }catch(e){if(TOKEN()===token)feedback.textContent=e.message||'No fue posible completar la actividad.'}
+  finally{missionBusy=false}
+ }
+ $('gxb-content').addEventListener('click',event=>{const task=event.target.closest('[data-gxb-mission]');if(task){void runMission(Number(task.dataset.gxbMission));return}if(event.target.closest('[data-gxb-copy-invite]'))void shareInvitation(true)});
  tiles.forEach(tile=>tile.addEventListener('click',()=>open(tile.dataset.gxb)));
  close.addEventListener('click',collapse);
  panel.addEventListener('keydown',event=>{if(event.key==='Escape'){event.preventDefault();collapse()}});
@@ -467,10 +505,7 @@ function setupBenefits(){
     catch(e){feedback.textContent=e.message||'No se pudo registrar el beneficio.'}
     finally{endFeedBusy(action)}return;
    }
-   const c=state.view.cliente;
-   const message='Conoce GOXION. Vengo invitado por '+String(c.nombre||'')+' (folio '+String(c.folio||'')+').';
-   try{if(navigator.share)await navigator.share({text:message});else{await navigator.clipboard.writeText(message);feedback.textContent='Invitación copiada.'}}
-   catch(e){if(e?.name!=='AbortError')feedback.textContent='No fue posible compartir.'}
+   await shareInvitation();
    return;
   }
   if(current==='mission'){
@@ -488,25 +523,7 @@ function setupBenefits(){
    }
    const pending=mi.tasks.findIndex((x,i)=>!mi.doneSet.has(i));
    if(pending<0){feedback.textContent='No hay tareas pendientes.';return}
-   const t=String(mi.tasks[pending]);const tag=(t.match(/\[([^\]]+)\]/)||[])[1]||'';
-   const key=clean(tag);
-   if(key.startsWith('catalogo')){await collapse();navigate('catalog');return}
-   if(key.startsWith('soporte')){await collapse();navigate('support');return}
-   if(key.startsWith('referidos')){await collapse();open('referral');return}
-   if(key.startsWith('link:')){
-    const url=tag.slice(5).trim();
-    if(/^https:\/\//i.test(url))window.open(url,'_blank','noopener,noreferrer');
-    else feedback.textContent='Enlace no válido.';
-    return;
-   }
-   if(key.startsWith('compartir')){
-    const message='Conoce GOXION. Invitado por '+state.view.cliente.nombre+' (folio '+state.view.cliente.folio+').';
-    try{if(navigator.share)await navigator.share({text:message});else await navigator.clipboard.writeText(message);
-      if(ENABLE_WRITES){await window.goxionMissionAPI.completeIndex(pending);void refreshClient()}
-    }catch(e){feedback.textContent='No se pudo completar la actividad.'}
-    return;
-   }
-   feedback.textContent='Esta actividad se valida mediante su acción oficial; aún no se puede marcar desde esta versión.';
+   await runMission(pending);
   }
  });
 }
@@ -825,6 +842,13 @@ async function cancellationAction(tile,kind,button,s){
  }catch(e){if(valid()){endFeedBusy(button);panel.querySelectorAll('button').forEach(b=>b.disabled=false);if(button?.isConnected&&button.classList.contains('gx-action-morph')){button.removeAttribute('aria-busy');morph(button,'error','Reintentar');}const out=status();if(out)out.textContent=e.message||'No pudimos completar la operación.'}}
  finally{endFeedBusy(button);serviceOperation=null;void refreshClient()}
 }
+function queueServiceNoticeRead(tile,service){
+ if(!ENABLE_WRITES||!service?.id||!(service.novedades||[]).some(x=>clean(x.tipo)!=='password'))return;
+ const token=TOKEN(),id=String(service.id);
+ setTimeout(async()=>{if(TOKEN()!==token||state.tab!=='space'||state.openService!==id||!tile.isConnected||!tile.classList.contains('is-open'))return;
+  try{await data.post('novedades-cliente',{accion:'marcar_servicio',datos:{cliente_servicio_id:id}},token);if(TOKEN()===token)void refreshClient()}catch(_){}
+ },850);
+}
 $('gxs-list').addEventListener('click',async event=>{
  const tile=event.target.closest('.gxs-card');if(!tile)return;
  const toggle=event.target.closest('[data-gxi-toggle]');
@@ -838,7 +862,7 @@ $('gxs-list').addEventListener('click',async event=>{
    el.querySelector('.gxs-trigger').setAttribute('aria-expanded',String(active));
    const body=el.querySelector('.gxs-reveal-inner');
    body.inert=!active;body.setAttribute('aria-hidden',String(!active));
-   if(active&&cancellationPending(serviceById(el.dataset.service)))setServiceStage(el,'cancel',false);
+   if(active){const service=serviceById(el.dataset.service);if(cancellationPending(service))setServiceStage(el,'cancel',false);queueServiceNoticeRead(el,service)}
    if(!active){if(el.dataset.retained==='true'){delete el.dataset.retained;const service=serviceById(el.dataset.service);if(service)replaceCancelContent(el,cancellationPanel(service),false)}setServiceStage(el,'detail',false)}
   });
   return;
@@ -1066,6 +1090,22 @@ function navigate(name,skipScroll){
 }
 window.GOXION_V2_OPEN_OFFICIAL=name=>navigate(name==='catalog'?'catalog':name==='support'?'support':'space');
 window.GOXION_V2_GO_SPACE=()=>navigate('space');
+window.GOXION_V2_NOTIFICATION_DESTINATION=(action,ref)=>{
+ if(!state.view||!TOKEN()||!['referral','coupon','service'].includes(action))return false;
+ const token=TOKEN();navigate('space',true);
+ void (async()=>{
+  if(action==='referral'||action==='coupon'){
+   await window.GOXION_V2_OPEN_BENEFIT?.(action==='referral'?'referral':'mission');
+   if(TOKEN()===token)$('gxb-panel').scrollIntoView({behavior:reduced()?'auto':'smooth',block:'start'});return
+  }
+  let tile=[...$('gxs-list').querySelectorAll('.gxs-card')].find(el=>el.dataset.service===String(ref));
+  if(!tile){await refreshClient();if(TOKEN()!==token)return;tile=[...$('gxs-list').querySelectorAll('.gxs-card')].find(el=>el.dataset.service===String(ref))}
+  if(TOKEN()!==token)return;
+  if(tile){if(!tile.classList.contains('is-open'))tile.querySelector('.gxs-trigger').click();tile.scrollIntoView({behavior:reduced()?'auto':'smooth',block:'center'})}
+  else $('gxs-list').scrollIntoView({behavior:reduced()?'auto':'smooth',block:'start'});
+ })().catch(()=>{});
+ return true;
+};
 window.GOXION_V2_SYNC_TAB=name=>{if(name!=='space')wipeServiceSecrets();state.tab=name};
 document.querySelectorAll('#gxn-nav [data-gxn-target]').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.gxnTarget)));
 $('gxn-profile-trigger').addEventListener('click',()=>{
