@@ -134,7 +134,7 @@ $('focus-action').addEventListener('click',event=>{
  if(state.lastState==='cancellation'){
   const s=state.view?.servicios?.find(x=>['solicitada','aprobada'].includes(clean(x.cancelacion?.estado)));
   const tile=[...$('gxs-list').querySelectorAll('.gxs-card')].find(el=>el.dataset.service===String(s?.id));
-  if(tile){if(!tile.classList.contains('is-open'))tile.querySelector('.gxs-trigger').click();const options=tile.querySelector('.gxs-more');if(options.hidden)tile.querySelector('[data-gxi-action="options"]').click();const panel=tile.querySelector('.gxs-cancel-panel');if(panel.hidden)tile.querySelector('[data-gxi-action="cancel"]').click();tile.scrollIntoView({behavior:reduced()?'auto':'smooth',block:'start'});return}
+  if(tile){if(serviceOperation)return;if(!tile.classList.contains('is-open'))tile.querySelector('.gxs-trigger').click();setServiceStage(tile,'cancel');tile.scrollIntoView({behavior:reduced()?'auto':'smooth',block:'start'});return}
  }
  // Reutiliza la ruta original hacia index.html o B2 multifecha.
  if(typeof window.irAlTicket==='function'){window.irAlTicket();return}
@@ -537,15 +537,51 @@ function wipeServiceSecrets(){
  if(hadSecret){state.serviceDigest='';for(const panel of document.querySelectorAll('#gxs-list .gxs-credential-panel')){panel.hidden=true;const notice=panel.previousElementSibling;if(notice?.matches('[data-gxi-action="credential-open"]')&&panel.querySelector('.gxs-pin-input')?.disabled)notice.hidden=true}}
 }
 const serviceById=id=>state.view?.servicios?.find(s=>String(s.id)===String(id));
+// Una sola etapa visible por servicio. Los datos de acceso nunca se duplican.
+const cancellationPending=s=>['solicitada','aprobada'].includes(clean(s?.cancelacion?.estado));
+function morphServiceStage(tile,mutate,animate=true){
+ const body=tile.querySelector('.gxs-body');if(!body){mutate();return}
+ body._gxStageMotion?.cancel();
+ const before=body.getBoundingClientRect().height;
+ mutate();
+ const after=body.getBoundingClientRect().height;
+ if(!animate||reduced()||!body.animate||!tile.classList.contains('is-open')||!before||!after)return;
+ const motion=body.animate([{height:before+'px',overflow:'hidden'},{height:after+'px',overflow:'hidden'}],{duration:300,easing:'cubic-bezier(.22,.82,.24,1)'});
+ body._gxStageMotion=motion;
+ const visible=body.querySelector('.gxs-detail-stage:not([hidden]),.gxs-more:not([hidden]),.gxs-cancel-panel:not([hidden])');
+ visible?.animate?.([{opacity:0,transform:'translateY(5px)'},{opacity:1,transform:'translateY(0)'}],{duration:240,easing:'cubic-bezier(.22,.82,.24,1)'});
+}
+function setServiceStage(tile,stage,animate=true,focus=false){
+ if(!tile)return;
+ const detail=tile.querySelector('.gxs-detail-stage'),options=tile.querySelector('.gxs-more'),cancel=tile.querySelector('.gxs-cancel-panel');
+ if(!detail||!options||!cancel)return;
+ if(tile.dataset.stage===stage)return;
+ if(stage!=='detail'&&animate)wipeServiceSecrets();
+ morphServiceStage(tile,()=>{
+  tile.dataset.stage=stage;detail.hidden=stage!=='detail';options.hidden=stage!=='options';cancel.hidden=stage!=='cancel';
+  detail.querySelector('[data-gxi-action="options"]')?.setAttribute('aria-expanded',String(stage==='options'));
+ },animate);
+ if(focus){const target=(stage==='detail'?detail:stage==='options'?options:cancel).querySelector('[data-gxs-stage-heading],button:not([disabled])');target?.focus({preventScroll:true})}
+}
+function replaceCancelContent(tile,markup,animate=true){
+ const panel=tile.querySelector('.gxs-cancel-panel');
+ morphServiceStage(tile,()=>{panel.innerHTML=markup},animate);
+}
+const cancelBack=(label='Consultar mis accesos')=>'<button type="button" class="gxs-ghost gxs-stage-back" data-gxi-action="service-back">'+label+'</button>';
+function cancelSymbol(type){
+ const paths={confirm:'<circle cx="12" cy="12" r="9"/><path d="M8 12h8"/>',pending:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',approved:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4m10-4v4M3 10h18m-13 5 3 3 5-5"/>',rejected:'<circle cx="12" cy="12" r="9"/><path d="M12 8v5m0 3h.01"/>',retained:'<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>'};
+ return '<span class="gxs-stage-symbol" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">'+paths[type]+'</svg></span>';
+}
 function cancellationPanel(s){
- const c=s.cancelacion,st=clean(c?.estado);
- const title=st==='solicitada'?'Cancelación en revisión':st==='aprobada'?'Cancelación aprobada':st==='rechazada'?'Cancelación no autorizada':'Solicitar cancelación';
- const note=st==='solicitada'?'Tu solicitud fue recibida. El servicio sigue activo mientras se revisa.':st==='aprobada'?'Tu servicio continúa activo hasta que la baja sea efectiva.':st==='rechazada'?'Puedes solicitar nuevamente la cancelación.':'Los cargos ya generados no cambian. Revisaremos tu solicitud antes de efectuar cualquier baja.';
- const pending=st==='solicitada'||st==='aprobada';
- const progress=st==='solicitada'?'<div class="gx-cancel-progress" aria-label="Solicitud recibida, revisión pendiente"><span class="done"></span><i class="done"></i><span class="done"></span><i></i><span></span></div>':st==='aprobada'?'<div class="gx-cancel-progress" aria-label="Solicitud y revisión completadas; baja pendiente"><span class="success"></span><i class="success"></i><span class="success"></span><i class="success"></i><span></span></div>':'';
- const admin=c?.nota_admin?'<p class="gxs-notice"><strong>Nota de GOXION</strong> · '+esc(c.nota_admin)+'</p>':'';
- const date=c?.fecha_efectiva?'<p class="gxs-notice">Fecha prevista: '+esc(dateLabel(c.fecha_efectiva))+'</p>':'';
- return '<h3 class="gxs-subtitle">'+title+'</h3><p class="gxi-note">'+note+'</p>'+progress+date+admin+(pending?'':'<div class="gx-cancel-submit-zone"><button type="button" class="gx-service-cancel-submit gx-action-morph" data-gxi-action="cancel-submit"><span class="gx-action-label">'+(st==='rechazada'?'Enviar nueva solicitud':'Enviar solicitud')+'</span></button></div>')+'<p class="gxs-feedback" role="status" aria-live="polite"></p>';
+ const c=s.cancelacion,st=clean(c?.estado),pending=cancellationPending(s),approved=st==='aprobada',rejected=st==='rechazada';
+ const kind=approved?'approved':pending?'pending':rejected?'rejected':'confirm';
+ const title=approved?(c?.fecha_efectiva?'Tu próxima baja':'Baja pendiente'):pending?'Solicitud recibida':rejected?'No se autorizó la baja':'¿Cancelar tu servicio?';
+ const note=approved?'Tu servicio continúa activo hasta que la baja sea efectiva.':pending?'Tu servicio sigue activo durante la revisión.':rejected?'Tu servicio continúa activo. Puedes enviar una nueva solicitud.':'Los cargos ya generados se mantienen. Revisaremos tu solicitud antes de efectuar la baja.';
+ const progress=pending?'<div class="gxs-stage-timeline" aria-label="'+(approved?'Solicitud y revisión completadas; baja pendiente':'Solicitud recibida; revisión en curso')+'"><span class="gxs-step is-done"><i>✓</i><small>Solicitud</small></span><span class="gxs-step '+(approved?'is-done':'is-current')+'"><i>'+(approved?'✓':'')+'</i><small>Revisión</small></span><span class="gxs-step"><i></i><small>Baja efectiva</small></span></div>':'';
+ const effective=approved&&c?.fecha_efectiva?'<strong class="gxs-stage-date">'+esc(dateLabel(c.fecha_efectiva))+'</strong>':'';
+ const extra=(c?.fecha_efectiva&&!approved?'<p>Fecha prevista: '+esc(dateLabel(c.fecha_efectiva))+'</p>':'')+(c?.created_at?'<p>Solicitud: '+esc(dateLabel(c.created_at))+'</p>':'')+(c?.nota_admin?'<p><strong>Nota de GOXION:</strong> '+esc(c.nota_admin)+'</p>':'');
+ const details=extra?'<details class="gxs-stage-info"><summary>'+(rejected?'Consultar motivo':'Información de la solicitud')+'</summary><div>'+extra+'</div></details>':'';
+ return '<div class="gxs-stage-copy" data-cancel-tone="'+kind+'">'+cancelSymbol(kind)+'<h3 tabindex="-1" data-gxs-stage-heading>'+title+'</h3>'+effective+'<p class="gxi-note">'+note+'</p>'+progress+details+'</div>'+(pending?'':'<div class="gx-cancel-submit-zone"><button type="button" class="gx-service-cancel-submit gx-action-morph" data-gxi-action="cancel-submit"><span class="gx-action-label">'+(rejected?'Enviar nueva solicitud':'Solicitar cancelación')+'</span></button></div>')+cancelBack(pending||rejected?'Consultar mis accesos':'Volver')+'<p class="gxs-feedback" role="status" aria-live="polite"></p>';
 }
 function credentialPanel(s){
  if(!s.credencial_pendiente?.id)return '';
@@ -559,17 +595,22 @@ function renderServices(){
 
  state.serviceDigest=digest;const host=$('gxs-list');
  const previous=[...host.querySelectorAll('.gxs-card')].find(el=>el.dataset.service===state.openService);
- const keepOptions=previous?.querySelector('.gxs-more')?.hidden===false;
- const keepCancel=previous?.querySelector('.gxs-cancel-panel')?.hidden===false;
- const priorOffer=previous?._gxOffer,priorPanel=priorOffer?previous.querySelector('.gxs-cancel-panel'):null;
+ const keepStage=previous?.dataset.stage||'detail';
+ const priorOffer=previous?._gxOffer,priorRetained=previous?.dataset.retained==='true';
+ const priorPanel=(priorOffer||priorRetained)?previous.querySelector('.gxs-cancel-panel'):null;
+ const infoOpen=previous?.querySelector('.gxs-stage-info')?.open;
+ const activeAction=previous?.contains(document.activeElement)?document.activeElement?.dataset.gxiAction:null;
+ const oldPositions=new Map([...host.querySelectorAll('.gxs-card')].map(el=>[el.dataset.service,el.getBoundingClientRect().top]));
+ const removed=[...oldPositions.keys()].some(id=>!services.some(s=>String(s.id)===id));
  host.replaceChildren();
+ if(state.openService&&!services.some(s=>String(s.id)===state.openService))state.openService=null;
  $('gxs-count').textContent=services.length+' '+(services.length===1?'plataforma':'plataformas');
  if(!services.length){host.innerHTML='<div class="gxm-empty">Todavía no tienes servicios activos.</div>';return}
  services.forEach((s,index)=>{
   const status=serviceDetail(s),accesses=Array.isArray(s.accesos)&&s.accesos.length?s.accesos:[s];
   const isInvite=accesses.every(a=>clean(a.modo_acceso).includes('invit')||/youtube|microsoft/i.test(a.servicio||s.nombre));
   const id='gxi-service-'+index,article=document.createElement('article');
-  article.className='gxs-card gxc-surface';article.dataset.service=String(s.id||index);article.dataset.tone=status[1];article.dataset.index=String(index);
+  article.className='gxs-card gxc-surface';article.dataset.service=String(s.id||index);article.dataset.tone=status[1];article.dataset.index=String(index);article.dataset.stage='detail';
   const access=accesses.map((a,i)=>{
    const invite=clean(a.modo_acceso).includes('invit')||/youtube|microsoft/i.test(a.servicio||s.nombre);
    const email=String(a.correo||(a===s?s.correo_login:'')||''),profile=String(a.perfil_nombre||''),pin=String(a.perfil_pin||'');
@@ -577,27 +618,35 @@ function renderServices(){
   }).join('');
   const notes=(s.novedades||[]).slice().sort((a,b)=>Number(b.prioridad||0)-Number(a.prioridad||0));
   let note=notes.map(n=>'<p class="gxs-notice"><strong>'+esc(n.titulo||'Actualización disponible')+'</strong>'+(n.resumen?' · '+esc(n.resumen):'')+'</p>').join('');
-  if(s.cancelacion&&['solicitada','aprobada','rechazada'].includes(clean(s.cancelacion.estado)))note='<p class="gxs-notice">'+esc(status[0])+'</p>'+note;
   if(s.credencial_pendiente)note+='<button type="button" class="gxs-pill gxs-credential-notice" data-gxi-action="credential-open">Nueva contraseña · Consultar con PIN</button>'+credentialPanel(s);
   if(s.lecturas?.cliente_accesos===false||s.lecturas?.credenciales_entregas===false||s.lecturas?.novedades_servicio===false)note+='<p class="gxi-note">Algunas novedades o accesos no pudieron sincronizarse.</p>';
   article.innerHTML='<button class="gxs-trigger" type="button" aria-expanded="false" aria-controls="'+id+'" data-gxi-toggle="'+index+'" aria-label="'+esc(s.nombre+', '+status[0])+', abrir detalles">'+
    '<img class="gxs-logo" alt="" src="'+esc(logo(s.nombre))+'" decoding="async" loading="lazy">'+
    '<span class="gxs-summary"><strong class="gxs-name">'+esc(s.nombre)+'</strong><span class="gxs-status">'+esc(status[0])+'</span></span>'+
    '<span class="gxs-icon" aria-hidden="true"><svg class="gxs-chevron" viewBox="0 0 24 24"><path d="m5 9 7 7 7-7"/></svg><svg class="gxs-x" viewBox="0 0 24 24"><path d="M6 6 18 18M18 6 6 18"/></svg></span></button>'+
-   '<div class="gxs-reveal" id="'+id+'"><div class="gxs-reveal-inner" inert aria-hidden="true"><div class="gxs-body">'+note+
+   '<div class="gxs-reveal" id="'+id+'"><div class="gxs-reveal-inner" inert aria-hidden="true"><div class="gxs-body"><section class="gxs-detail-stage">'+note+
    '<div class="gxs-subtitle">'+(isInvite?'Tu invitación':'Tus accesos')+'</div><div class="gxs-accesslist">'+(access||'<p class="gxi-note">Sin datos de acceso disponibles.</p>')+'</div>'+
-   '<div class="gxs-actions"><button class="gxs-pill" type="button" data-gxi-action="options" aria-expanded="false">Más opciones</button>'+
+   '<div class="gxs-actions"><button class="gxs-pill" type="button" data-gxi-action="'+(cancellationPending(s)?'cancel':'options')+'"'+(cancellationPending(s)?'':' aria-expanded="false"')+'>'+(cancellationPending(s)?'Ver seguimiento':'Más opciones')+'</button>'+
    '<button class="gxs-ghost" type="button" data-gxi-action="support">Soporte</button></div>'+
-   '<div class="gxs-more" hidden><button type="button" data-gxi-action="cancel">'+(s.cancelacion&&['solicitada','aprobada'].includes(clean(s.cancelacion.estado))?'Ver cancelación':'Solicitar cancelación')+'</button><section class="gxs-cancel-panel gx-service-view" hidden>'+cancellationPanel(s)+'</section></div>'+
-   '<span class="gxs-feedback" role="status" aria-live="polite"></span></div></div></div>';
+   '<span class="gxs-feedback" role="status" aria-live="polite"></span></section>'+
+   '<section class="gxs-more" hidden><button type="button" class="gxs-stage-option" data-gxi-action="cancel">'+(clean(s.cancelacion?.estado)==='rechazada'?'Ver cancelación':'Solicitar cancelación')+'</button>'+cancelBack('Volver a mis accesos')+'</section>'+
+   '<section class="gxs-cancel-panel gx-service-view" hidden>'+cancellationPanel(s)+'</section></div></div></div>';
   if(state.openService===article.dataset.service){
    article.classList.add('is-open');article.querySelector('.gxs-trigger').setAttribute('aria-expanded','true');const panel=article.querySelector('.gxs-reveal-inner');panel.inert=false;panel.setAttribute('aria-hidden','false');
-   if(keepOptions){article.querySelector('.gxs-more').hidden=false;article.querySelector('[data-gxi-action="options"]').setAttribute('aria-expanded','true')}
-   if(keepCancel){article.querySelector('.gxs-cancel-panel').hidden=false;
-    if(priorOffer&&priorPanel&&!['solicitada','aprobada'].includes(clean(s.cancelacion?.estado))){article._gxOffer=priorOffer;article.querySelector('.gxs-cancel-panel').replaceWith(priorPanel)}
+   if(keepStage==='cancel'&&priorPanel&&!cancellationPending(s)){
+    if(priorOffer)article._gxOffer=priorOffer;
+    if(priorRetained)article.dataset.retained='true';
+    article.querySelector('.gxs-cancel-panel').replaceWith(priorPanel);
    }
+   setServiceStage(article,keepStage==='options'&&cancellationPending(s)?'cancel':keepStage,false);
+   if(infoOpen){const info=article.querySelector('.gxs-stage-info');if(info)info.open=true}
   }
   host.append(article);
+  if(removed&&!reduced()&&article.animate&&oldPositions.has(article.dataset.service)){
+   const dy=oldPositions.get(article.dataset.service)-article.getBoundingClientRect().top;
+   if(Math.abs(dy)>1)article.animate([{transform:'translateY('+dy+'px)'},{transform:'translateY(0)'}],{duration:320,easing:'cubic-bezier(.22,.82,.24,1)'});
+  }
+  if(state.openService===article.dataset.service&&activeAction){const target=[...article.querySelectorAll('[data-gxi-action]')].find(el=>el.dataset.gxiAction===activeAction&&!el.closest('[hidden]')&&!el.disabled);target?.focus({preventScroll:true})}
  });
 }
 async function cancellationAction(tile,kind,button,s){
@@ -618,7 +667,8 @@ async function cancellationAction(tile,kind,button,s){
    if(!valid())return;
    if(evaluation.elegible===true&&evaluation.oferta?.id){
     const offer=evaluation.oferta;tile._gxOffer=offer;
-    panel.innerHTML='<div class="gx-retention-stage"><h3>Nos gustaría que te quedaras</h3><p class="gxi-note">Beneficio único para tu próximo pago de '+esc(offer.servicio_nombre||s.nombre)+'.</p><div class="gx-retention-value"><div class="gx-retention-percent">-'+esc(offer.porcentaje)+'%</div><div class="gx-retention-price"><span>Próximo pago</span><strong>'+esc(data.money(offer.monto_final))+'</strong><small>Ahorras '+esc(data.money(offer.monto_descuento))+'</small></div></div><p class="gxi-note">Solo puede aceptarse una vez en toda tu cuenta y se aplica únicamente a este servicio durante un periodo.</p><div class="gx-retention-actions"><button type="button" class="gx-retention-accept gx-action-morph" data-gxi-action="retention-accept"><span class="gx-action-label">Aceptar beneficio</span></button><button type="button" class="gx-retention-decline" data-gxi-action="retention-decline">Continuar con la cancelación</button></div><p class="gxs-feedback" role="status" aria-live="polite"></p></div>';
+    replaceCancelContent(tile,'<div class="gx-retention-stage gxs-stage-offer"><h3 tabindex="-1" data-gxs-stage-heading>Quédate con un beneficio</h3><p class="gxi-note">Beneficio único para tu próximo pago de '+esc(offer.servicio_nombre||s.nombre)+'.</p><div class="gx-retention-value"><div class="gx-retention-percent">-'+esc(offer.porcentaje)+'%</div><div class="gx-retention-price"><span>Próximo pago</span><strong>'+esc(data.money(offer.monto_final))+'</strong><small>Ahorras '+esc(data.money(offer.monto_descuento))+'</small></div></div><p class="gxi-note">Solo puede aceptarse una vez en toda tu cuenta y se aplica únicamente a este servicio durante un periodo.</p><div class="gx-retention-actions"><button type="button" class="gx-retention-accept gx-action-morph" data-gxi-action="retention-accept"><span class="gx-action-label">Aceptar beneficio</span></button><button type="button" class="gx-retention-decline" data-gxi-action="retention-decline">Continuar con la cancelación</button></div><p class="gxs-feedback" role="status" aria-live="polite"></p></div>');
+    panel.querySelector('[data-gxs-stage-heading]')?.focus({preventScroll:true});
     return;
    }
   }else{
@@ -628,10 +678,12 @@ async function cancellationAction(tile,kind,button,s){
     morph(button,'loading');const [result]=await Promise.all([api('aceptar_retencion',{oferta_id:offer.id}),wait(850)]);
     if(!valid())return;
     morph(button,'success');status().textContent='Beneficio confirmado. La cancelación no fue enviada.';delete tile._gxOffer;benefitRevision++;
-    await wait(1100);return;
+    await wait(1100);
+    if(valid()){tile.dataset.retained='true';replaceCancelContent(tile,'<div class="gxs-stage-copy" data-cancel-tone="retained">'+cancelSymbol('retained')+'<h3 tabindex="-1" data-gxs-stage-heading>Beneficio confirmado</h3><strong class="gxs-stage-date">Ahorras '+esc(data.money(offer.monto_descuento))+'</strong><p class="gxi-note">Tu servicio sigue activo. No se envió una cancelación.</p></div>'+cancelBack('Listo')+'<p class="gxs-feedback" role="status" aria-live="polite"></p>');panel.querySelector('[data-gxs-stage-heading]')?.focus({preventScroll:true})}
+    return;
    }
    await api('rechazar_retencion',{oferta_id:offer.id});if(!valid())return;delete tile._gxOffer;
-   panel.innerHTML=cancellationPanel(s);button=panel.querySelector('[data-gxi-action="cancel-submit"]');
+   replaceCancelContent(tile,cancellationPanel(s));button=panel.querySelector('[data-gxi-action="cancel-submit"]');
    if(!button)throw Error('La solicitud ya está abierta.');
    morph(button,'loading');
   }
@@ -645,7 +697,7 @@ async function cancellationAction(tile,kind,button,s){
   benefitRevision++;morph(button,'success');status().textContent='Solicitud registrada. Tu servicio sigue activo durante la revisión.';
   renderHero();drawHistory();
   await wait(900);
-  if(valid()){panel.innerHTML=cancellationPanel(current);tile.dataset.tone=serviceDetail(current)[1];tile.querySelector('.gxs-status').textContent=serviceDetail(current)[0];tile.querySelector('[data-gxi-action="cancel"]').textContent='Ver cancelación'}
+  if(valid()){replaceCancelContent(tile,cancellationPanel(current));tile.dataset.tone=serviceDetail(current)[1];tile.querySelector('.gxs-status').textContent=serviceDetail(current)[0];const mainAction=tile.querySelector('.gxs-actions [data-gxi-action="options"]');if(mainAction){mainAction.dataset.gxiAction='cancel';mainAction.textContent='Ver seguimiento';mainAction.removeAttribute('aria-expanded')}panel.querySelector('[data-gxs-stage-heading]')?.focus({preventScroll:true})}
  }catch(e){if(valid()){panel.querySelectorAll('button').forEach(b=>b.disabled=false);if(button?.isConnected&&button.classList.contains('gx-action-morph'))morph(button,'error','Reintentar');const out=status();if(out)out.textContent=e.message||'No pudimos completar la operación.'}}
  finally{serviceOperation=null;void refreshClient()}
 }
@@ -662,12 +714,14 @@ $('gxs-list').addEventListener('click',async event=>{
    el.querySelector('.gxs-trigger').setAttribute('aria-expanded',String(active));
    const body=el.querySelector('.gxs-reveal-inner');
    body.inert=!active;body.setAttribute('aria-hidden',String(!active));
+   if(active&&cancellationPending(serviceById(el.dataset.service)))setServiceStage(el,'cancel',false);
+   if(!active){if(el.dataset.retained==='true'){delete el.dataset.retained;const service=serviceById(el.dataset.service);if(service)replaceCancelContent(el,cancellationPanel(service),false)}setServiceStage(el,'detail',false)}
   });
   return;
  }
  const action=event.target.closest('[data-gxi-action]');if(!action)return;
  const kind=action.dataset.gxiAction;
- const feedback=tile.querySelector('.gxs-feedback'),row=action.closest('.gxs-accessrow');
+ const feedback=tile.querySelector('.gxs-detail-stage > .gxs-feedback'),row=action.closest('.gxs-accessrow');
  if(kind==='copy'&&row){const v=row.querySelector('[data-gxs-value]')?.dataset.gxsValue||'';
   navigator.clipboard?.writeText(v).then(()=>feedback.textContent='Correo copiado.',()=>feedback.textContent='No se pudo copiar.');return}
  if(kind==='pin'&&row){
@@ -680,10 +734,11 @@ $('gxs-list').addEventListener('click',async event=>{
    const isHidden=node.textContent==='••••';node.textContent=isHidden?secret:'••••';
    action.textContent=isHidden?'Ocultar':'Mostrar';return
   }
- if(kind==='options'){const more=tile.querySelector('.gxs-more');more.hidden=!more.hidden;action.setAttribute('aria-expanded',String(!more.hidden));return}
+ if(kind==='options'){if(!serviceOperation)setServiceStage(tile,'options',true,true);return}
+ if(kind==='service-back'){if(serviceOperation)return;if(tile.dataset.retained==='true'){delete tile.dataset.retained;const s=serviceById(tile.dataset.service);if(s)replaceCancelContent(tile,cancellationPanel(s),false)}setServiceStage(tile,'detail',true,true);void refreshClient();return}
  const service=serviceById(tile.dataset.service);
  if(kind==='support'){wipeServiceSecrets();navigate('support');setTimeout(()=>{if(!service||typeof gxSupportButtonForService!=='function')return;const b=gxSupportButtonForService(service.nombre);if(b&&typeof selectPlatform==='function')selectPlatform(service.nombre,b,null)},420);return}
- if(kind==='cancel'){const panel=tile.querySelector('.gxs-cancel-panel');panel.hidden=!panel.hidden;return}
+ if(kind==='cancel'){if(!serviceOperation)setServiceStage(tile,'cancel',true,true);return}
  if(['cancel-submit','retention-accept','retention-decline'].includes(kind)){await cancellationAction(tile,kind,action,service);return}
  const credential=tile.querySelector('.gxs-credential-panel');
  if(kind==='credential-open'&&credential){if(serviceOperation)return;credential.hidden=!credential.hidden;if(credential.hidden){wipeServiceSecrets();void refreshClient()}return}
