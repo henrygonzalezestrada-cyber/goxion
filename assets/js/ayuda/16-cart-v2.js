@@ -265,8 +265,8 @@
       $('gx-cart-form').hidden = true;
       $('gx-cart-success').hidden = false;
       $('gx-cart-success-text').textContent = customer ? 'Tus credenciales se te harán llegar en breve.' : 'Te haremos llegar tus credenciales en breve al WhatsApp ' + phone + '.';
-      iconTo(dialog.querySelector('.gx-cart-check'), 'check');
-      if (refined) window.GOXION_PULSO_CART?.confirm(dialog.querySelector('.gx-cart-check'));
+      if (refined && window.GOXION_PULSO_CART) window.GOXION_PULSO_CART.confirm(dialog.querySelector('.gx-cart-check'));
+      else iconTo(dialog.querySelector('.gx-cart-check'), 'check');
       if (!reduced()) $('gx-cart-success').animate([{opacity:0,transform:'translateY(18px) scale(.96)'},{opacity:1,transform:'none'}],{duration:500,easing:'cubic-bezier(.16,1,.3,1)'});
       $('gx-cart-success').focus();
       requestId = '';
