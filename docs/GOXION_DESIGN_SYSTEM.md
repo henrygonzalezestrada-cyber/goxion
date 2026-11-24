@@ -159,3 +159,7 @@ Un único controlador de carga para el feed: texto → cápsula que se contrae d
 
 ### Excepción de Catálogo · 24 nov 2026
 Las tarjetas de plataformas conservan el chevron SVG y su giro originales, sin disco cian ni X: son acordeones, no cierres de diálogos. Promociones: cristal cromático B, sin borde ornamental; conservar levitación y morph. CTA ampliado usa cápsula de cristal común (38px, .08, sin borde/halo). Encabezados únicos sin kicker ni separadores decorativos; conservar información comercial necesaria. Pendiente aprobación visual de la implementación final.
+
+
+### Continuidad visual de promociones · 24 nov 2026
+Tras validación del usuario de B, unificar Ver detalles / Contratar ahora y retorno del morph: 38px, 11px/600, cian, relleno blanco .08, sin borde ni sombra del botón. Mantener habilitación y foco accesible. Eliminar trazo perimetral real, pseudo-borde y reflejos inset de sombras (incluido keyframe de levitación); borde transparente de 1px únicamente para conservar geometría. Gradiente B termina en #030305 para integrarse al fondo, sin aplicar máscara/opacidad al texto; mantener acentos cromáticos, sombras exteriores y movimiento original. Chevrons de plataformas intactos. Revisión visual pendiente en Safari.
