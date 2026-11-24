@@ -150,3 +150,6 @@ En Ahorro, representar siempre dos decimales mediante Intl.NumberFormat es-MX/MX
 
 ### Información contextual de beneficios · 24 nov 2026
 Una sola zona de texto secundario con altura reservada: estado actual por defecto, condiciones al tocar información, niveles al tocar Mis niveles. Sin recuadro adicional ni desplazamiento de botones o emoji. No mostrar recompensas de campañas inactivas como disponibles.
+
+### Carga y confirmación de acciones · 24 nov 2026
+Un único controlador de carga para el feed: texto → cápsula que se contrae de su ancho medido a 38 px → aro giratorio centrado. El estado normal y los pseudoelementos legacy nunca compiten con el ocupado. Carga perceptible de 320 ms como mínimo (petición inmediata), confirmación de cancelación/retención de 820 ms con trazo PulsoIcon tras respuesta positiva. Sin desplazamientos por texto transitorio; errores restauran el control. Movimiento reducido sin esperas decorativas. No añadir palomitas a acciones cuyo resultado existente es un formulario, acceso o recompensa distinta.
