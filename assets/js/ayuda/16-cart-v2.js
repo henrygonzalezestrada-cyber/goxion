@@ -2,6 +2,7 @@
 (function () {
   'use strict';
   const core = window.GOXION_CORE;
+  const refined = document.documentElement.hasAttribute('data-gx-catalog-v3');
   const money = n => new Intl.NumberFormat('es-MX', {style:'currency', currency:'MXN'}).format(n / 100);
   const cents = n => Math.round(Number(n) * 100);
   const escape = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -44,7 +45,7 @@
   const dialog = document.createElement('dialog');
   dialog.id = 'gx-cart-dialog';
   dialog.setAttribute('aria-labelledby', 'gx-cart-title');
-  dialog.innerHTML = `<div class="gx-cart-shell"><header><div class="gx-cart-heading"><span class="gx-cart-bag">${svg('bag')}</span><h2 id="gx-cart-title" tabindex="-1" autofocus>Tu carrito</h2><span id="gx-cart-count"></span></div><button type="button" class="gx-cart-close" aria-label="Cerrar carrito">${svg('close')}</button></header><form id="gx-cart-form"><div class="gx-cart-scroll"><div id="gx-cart-lines"></div><section class="gx-cart-contact"><label for="gx-cart-phone">WhatsApp para tus accesos</label><input id="gx-cart-phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" placeholder="+52 961 123 4567" aria-describedby="gx-cart-phone-help"><p id="gx-cart-phone-help">México: 10 dígitos. Otro país: incluye + y código.</p></section><p id="gx-cart-member" hidden>Recibirás tus credenciales en breve.</p></div><footer><div class="gx-cart-trust">${svg('shield')}<span>En GOXION, primero tu acceso; después tu pago.</span></div><div class="gx-cart-total"><span>Total <small>MXN</small></span><strong id="gx-cart-total" aria-live="polite"></strong></div><p class="gx-cart-caption">Paquetes completos y servicios mensuales.</p><p id="gx-cart-error" role="alert"></p><button type="submit" class="gx-cart-submit"><span class="gx-cart-submit-label">Enviar solicitud</span><span class="gx-cart-send-icon">${svg('send')}</span></button></footer></form><section id="gx-cart-success" hidden tabindex="-1"><div class="gx-cart-check">${svg('check')}</div><h3>¡Todo listo!</h3><p id="gx-cart-success-text"></p><p>Pagas cuando tengas acceso.</p><button type="button" class="gx-cart-submit gx-cart-done">Seguir explorando ${svg('send')}</button></section></div>`;
+  dialog.innerHTML = `<div class="gx-cart-shell"><header><div class="gx-cart-heading"><span class="gx-cart-bag">${svg('bag')}</span><h2 id="gx-cart-title" tabindex="-1" autofocus>Tu carrito</h2><span id="gx-cart-count"></span></div><button type="button" class="gx-cart-close" aria-label="Cerrar carrito">${svg('close')}</button></header><form id="gx-cart-form"><div class="gx-cart-scroll"><div id="gx-cart-lines"></div><section class="gx-cart-contact"><label for="gx-cart-phone">WhatsApp para tus accesos</label><input id="gx-cart-phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" placeholder="+52 961 123 4567" aria-describedby="gx-cart-phone-help"><p id="gx-cart-phone-help">México: 10 dígitos. Otro país: incluye + y código.</p></section><p id="gx-cart-member" hidden>Recibirás tus credenciales en breve.</p></div><footer><div class="gx-cart-trust">${svg('shield')}<span>En GOXION, primero tu acceso; después tu pago.</span></div><div class="gx-cart-total"><span>Total <small>MXN</small></span><strong id="gx-cart-total" aria-live="polite"></strong></div><p class="gx-cart-caption">Paquetes completos y servicios mensuales.</p><p id="gx-cart-error" role="alert"></p><button type="submit" class="gx-cart-submit"><span class="gx-cart-submit-label">Enviar solicitud</span><span class="gx-cart-send-icon">${svg('send')}</span></button></footer></form><section id="gx-cart-success" hidden tabindex="-1"><div class="gx-cart-check">${svg('check')}</div><h3>¡Todo listo!</h3><p id="gx-cart-success-text"></p><p>Pagas cuando tengas acceso.</p><button type="button" class="gx-cart-submit gx-cart-done">Seguir explorando ${refined ? '' : svg('send')}</button></section></div>`;
   document.body.append(dialog);
   const $ = id => document.getElementById(id);
   function showError(message) { $('gx-cart-error').textContent = message; }
@@ -217,6 +218,7 @@
     const submit = dialog.querySelector('button[type=submit]');
     submit.querySelector('.gx-cart-submit-label').textContent = 'Enviando';
     submit.classList.add('is-sending'); iconTo(submit, 'loading');
+    if (refined) { submit.setAttribute('aria-busy','true'); submit.setAttribute('aria-label','Enviando solicitud'); }
     const token = core.getClientToken?.() || localStorage.getItem(core.STORAGE.CLIENT_TOKEN) || '';
     const headers = {'Content-Type':'application/json', ...(token ? {'X-Client-Token':token} : {})};
     const controller = new AbortController();
@@ -264,13 +266,14 @@
       $('gx-cart-success').hidden = false;
       $('gx-cart-success-text').textContent = customer ? 'Tus credenciales se te harán llegar en breve.' : 'Te haremos llegar tus credenciales en breve al WhatsApp ' + phone + '.';
       iconTo(dialog.querySelector('.gx-cart-check'), 'check');
+      if (refined) window.GOXION_PULSO_CART?.confirm(dialog.querySelector('.gx-cart-check'));
       if (!reduced()) $('gx-cart-success').animate([{opacity:0,transform:'translateY(18px) scale(.96)'},{opacity:1,transform:'none'}],{duration:500,easing:'cubic-bezier(.16,1,.3,1)'});
       $('gx-cart-success').focus();
       requestId = '';
     } catch (error) {
       showError(error.name === 'AbortError' ? 'El servidor tardó en responder. No pudimos confirmar el envío; tu selección se conserva.' : error.message);
     } finally {
-      clearTimeout(timeout); busy = false; submit.classList.remove('is-sending'); submit.querySelector('.gx-cart-submit-label').textContent = 'Enviar solicitud'; iconTo(submit, 'send'); render();
+      clearTimeout(timeout); busy = false; submit.classList.remove('is-sending'); if(refined){submit.removeAttribute('aria-busy');submit.removeAttribute('aria-label');} submit.querySelector('.gx-cart-submit-label').textContent = 'Enviar solicitud'; iconTo(submit, 'send'); render();
     }
   });
   window.GOXION_CART = {open, render, changeService, addPromotion};
