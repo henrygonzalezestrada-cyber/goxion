@@ -279,13 +279,19 @@ function setBenefitPanel(detail,key){
    return '<li data-status="'+(done?'done':'pending')+'">'+(done?row:'<button type="button" class="gxb-task-row" data-gxb-mission="'+index+'" aria-label="Realizar '+esc(label)+'">'+row+'</button>')+'</li>';
   }).join('')+'</ul>';
  }
- html+='<p class="gxb-note">'+esc(detail.note)+'</p>';
+ const level=Number(detail.level||0);
+ const summary=key==='loyalty'?(detail.phase==='unknown'?'Avance pendiente de confirmar.':detail.phase==='lost'?'Tu siguiente pago puntual inicia una nueva racha.':level===2?'Nivel 2 alcanzado · 6% de descuento.':level===1?'Nivel 1 alcanzado · 3% de descuento.':'Tu próximo objetivo es alcanzar el Nivel 1.'):key==='referral'?(detail.phase==='claimed'?'Tu beneficio ya fue registrado.':detail.phase==='ready'?'Tu mes gratis está listo para reclamar.':detail.phase==='active'?'Tu invitado sigue acumulando meses válidos.':'Tu recompensa: un mes gratis.'):(detail.tasks.claimed?'Tu cupón ya fue registrado.':detail.tasks.ready?'Cupón disponible: '+detail.tasks.discount+'% de descuento.':detail.tasks.total?'Recompensa al completar tus actividades: '+detail.tasks.discount+'%.':'Las nuevas actividades aparecerán aquí.');
+ const conditions=key==='loyalty'?'Solo cuentan los pagos puntuales confirmados. Si pierdes la racha, puedes comenzar de nuevo.':key==='mission'&&!detail.tasks.total&&!detail.tasks.claimed?'Las actividades y sus recompensas se habilitan cuando hay una campaña activa.':detail.note;
+ const levels='Nivel 1: 4 pagos puntuales · 3%. Nivel 2: 9 pagos puntuales · 6%.';
+ html+='<div class="gxb-note-slot"><p class="gxb-note" data-gxb-note="summary">'+esc(summary)+'</p><p class="gxb-note" id="gxb-inline-conditions" data-gxb-note="conditions" aria-hidden="true">'+esc(conditions)+'</p>'+(key==='loyalty'?'<p class="gxb-note" data-gxb-note="levels" aria-hidden="true">'+esc(levels)+'</p>':'')+'</div>';
  content.innerHTML=html;
  $('gxb-panel-emoji').textContent=detail.emoji;
  $('gxb-action').textContent=detail.action;$('gxb-action').hidden=key==='mission'&&!detail.tasks.total&&!detail.tasks.claimed;
- $('gxb-rule-note').textContent=detail.note;
- $('gxb-rule-note').hidden=true;
+ panel.dataset.infoMode='summary';
  $('gxb-rules').setAttribute('aria-expanded','false');
+ $('gxb-rules').setAttribute('aria-label','Ver condiciones');
+ $('gxb-action').removeAttribute('aria-expanded');
+ if(key==='loyalty')$('gxb-action').setAttribute('aria-expanded','false');
  $('gxb-feedback').textContent='';
  panel.classList.remove('gxb-task-checks-active');
  panel.setAttribute('aria-label',detail.label+' · '+detail.title);
@@ -293,11 +299,11 @@ function setBenefitPanel(detail,key){
 function setupBenefits(){
  const root=document.querySelector('.gxb-wrap'),row=$('gxb-row'),panel=$('gxb-panel');
  const tiles=[...row.querySelectorAll('.gxb-tile')],close=$('gxb-dismiss'),action=$('gxb-action'),rules=$('gxb-rules');
- const ruleNote=$('gxb-rule-note'),feedback=$('gxb-feedback'),expandedEmoji=$('gxb-panel-emoji');
+ const feedback=$('gxb-feedback'),expandedEmoji=$('gxb-panel-emoji');
  const text=id=>$(id),prefersReduced=reduced;
  let current=null,busy=false,missionBusy=false;
  const sourceFor=key=>tiles.find(tile=>tile.dataset.gxb===key);
- function updatePanel(key){setBenefitPanel(benefitState(key),key)}
+ function updatePanel(key){const mode=panel.dataset.benefit===key&&!panel.hidden?panel.dataset.infoMode:'summary';setBenefitPanel(benefitState(key),key);if(mode&&mode!=='summary')setInfoOpen(mode)}
  window.GOXION_V2_UPDATE_PANEL=updatePanel;
  window.GOXION_V2_OPEN_BENEFIT=async key=>{if(busy)return false;if(current&&current!==key)await collapse();if(!current)await open(key);return current===key};
  window.GOXION_V2_RESET_BENEFITS=()=>{
@@ -434,19 +440,15 @@ function setupBenefits(){
    row.style.visibility='';row.style.opacity='';expandedEmoji.style.removeProperty('--gxb-info-lock');busy=false;
   }
  }
- // Keep the large decorative emoji visually stationary while conditions change
- // the panel's natural height. This runs in one event turn, before paint,
- // so no intermediate emoji movement is visible in Safari.
- function setInfoOpen(open,feedbackMessage){
-  const heightBefore=panel.getBoundingClientRect().height;
-  const offsetBefore=parseFloat(expandedEmoji.style.getPropertyValue('--gxb-info-lock'))||0;
-  ruleNote.hidden=!open;
-  rules.setAttribute('aria-expanded',String(open));
-  rules.setAttribute('aria-label',open?'Ocultar condiciones':'Ver condiciones');
-  if(feedbackMessage!==undefined)feedback.textContent=feedbackMessage;
-  const heightAfter=panel.getBoundingClientRect().height;
-  const keepOffset=offsetBefore+heightBefore-heightAfter;
-  expandedEmoji.style.setProperty('--gxb-info-lock',(Math.abs(keepOffset)<.01?0:keepOffset).toFixed(2)+'px');
+ // One reserved text slot; no additional surface or geometry changes.
+ function setInfoOpen(mode){
+  if(!['summary','conditions','levels'].includes(mode))mode='summary';
+  if(mode==='levels'&&current!=='loyalty')mode='summary';
+  panel.dataset.infoMode=mode;
+  panel.querySelectorAll('[data-gxb-note]').forEach(node=>node.setAttribute('aria-hidden',String(node.dataset.gxbNote!==mode)));
+  rules.setAttribute('aria-expanded',String(mode==='conditions'));
+  rules.setAttribute('aria-label',mode==='conditions'?'Ocultar condiciones':'Ver condiciones');
+  if(current==='loyalty')action.setAttribute('aria-expanded',String(mode==='levels'));
  }
  function invitation(){
   const client=state.view?.cliente;if(!client)return null;
@@ -488,12 +490,12 @@ function setupBenefits(){
  tiles.forEach(tile=>tile.addEventListener('click',()=>open(tile.dataset.gxb)));
  close.addEventListener('click',collapse);
  panel.addEventListener('keydown',event=>{if(event.key==='Escape'){event.preventDefault();collapse()}});
- rules.addEventListener('click',()=>setInfoOpen(ruleNote.hidden));
+ rules.addEventListener('click',()=>setInfoOpen(panel.dataset.infoMode==='conditions'?'summary':'conditions'));
 
  action.addEventListener('click',async()=>{
   if(!current||!state.view)return;
   const d=benefitState(current);
-  if(current==='loyalty'){setInfoOpen(true);return}
+  if(current==='loyalty'){setInfoOpen(panel.dataset.infoMode==='levels'?'summary':'levels');return}
   if(current==='referral'){
    if(d.phase==='claimed'){navigate('space');$('gxm-history').scrollIntoView({behavior:reduced()?'auto':'smooth'});return}
    if(d.phase==='ready'){
