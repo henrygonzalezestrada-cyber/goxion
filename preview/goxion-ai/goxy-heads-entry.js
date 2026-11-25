@@ -18,7 +18,7 @@ function mount(host) {
   if (!host || mounts.has(host)) return;
   const avatar = Boolean(host.closest(".gxai-avatar"));
   const root = createRoot(host);
-  const size = avatar ? 46 : 250;
+  const size = avatar ? (host.closest(".gxai-chat") && document.documentElement.hasAttribute("data-gx-support-v3") ? 66 : 46) : 250;
   let prevMood = null;
   const refresh = () => {
     const mood = host.getAttribute("data-mood") || "idle";
