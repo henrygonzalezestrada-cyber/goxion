@@ -456,7 +456,7 @@
       // Mantener el contexto y z-index mientras el avatar vuelve al origen.
       // Los flujos de datos ya se cancelaron, sólo se anima la salida visual.
       layer.classList.add('gxai-closing');
-      closeTimer=setTimeout(finishClose,450);
+      closeTimer=setTimeout(finishClose,300);
       return;
     }
     finishClose();
