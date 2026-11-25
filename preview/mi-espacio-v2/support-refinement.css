@@ -13,11 +13,11 @@ html[data-gx-support-v3] #view-soporte .gxai-open-inner,html[data-gx-support-v3]
 html[data-gx-support-v3] #view-soporte .gxai-open:hover{box-shadow:none;background:rgba(255,255,255,.12)}
 /* Goxy inmersivo · una conversación, no un modal encajonado.
    Mantener las regiones y listeners del motor original y visualViewport iOS. */
-html[data-gx-support-v3].gxai-immersive-open :is(#gx-v2-shared-header,#goxion-main-nav,.app-header){
+html[data-gx-support-v3].gxai-immersive-open:not(.gxai-immersive-closing) :is(#gx-v2-shared-header,#goxion-main-nav,.app-header){
   visibility:hidden!important;pointer-events:none!important;
 }
 html[data-gx-support-v3].gxai-immersive-open .container{z-index:10000}
-html[data-gx-support-v3].gxai-immersive-open #view-soporte{animation:none!important;transform:none!important;opacity:1!important}
+html[data-gx-support-v3].gxai-immersive-open #view-soporte{transform:none!important;opacity:1!important}
 html[data-gx-support-v3] #view-soporte .gxai-chat-layer{
   position:fixed;left:0;right:0;top:var(--gxai-viewport-top,0px);bottom:auto;
   width:100%;height:var(--gxai-viewport-height,100dvh);max-height:none!important;
@@ -116,6 +116,10 @@ html[data-gx-support-v3] #view-soporte .gxai-chat-foot{
   width:100%;max-width:720px;align-self:center;box-sizing:border-box;border:0;
   background:transparent!important;padding:9px max(14px,env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));
 }
+html[data-gx-support-v3] #view-soporte .gxai-composer-row{display:flex;align-items:center;gap:9px;min-width:0;width:100%}
+html[data-gx-support-v3] #view-soporte .gxai-more{width:44px;height:44px;flex:0 0 44px;padding:0;border:0;border-radius:50%;background:rgba(255,255,255,.08);color:#c1cfe0;display:grid;place-items:center;opacity:1;box-shadow:none;-webkit-tap-highlight-color:transparent}
+html[data-gx-support-v3] #view-soporte .gxai-more svg{width:20px;height:20px;display:block}
+html[data-gx-support-v3] #view-soporte .gxai-composer-row .gxai-composer{flex:1;min-width:0;width:auto;margin:0}
 html[data-gx-support-v3] #view-soporte .gxai-composer{
   border:1px solid rgba(255,255,255,.055);background:rgba(255,255,255,.08);min-height:52px;border-radius:999px;
   box-shadow:inset 0 1px rgba(255,255,255,.05);
