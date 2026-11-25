@@ -89,9 +89,9 @@
     '<footer class="gxai-chat-foot">',
     refined ? '<div class="gxai-composer-row"><button class="gxai-more" type="button" aria-label="Más herramientas (próximamente)" disabled><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>' : '',
     '<form class="gxai-composer" aria-label="Conversación con Goxy">',
-    '<input class="gxai-message-input" type="text" placeholder="Cuéntame qué problema tienes…" aria-label="Tu mensaje a Goxy" autocomplete="off" maxlength="240">',
-    '<button class="gxai-send" type="submit" aria-label="Enviar mensaje">',
-    '<svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 14-8-4 16-3-6-7-2Zm7 2 7-10"/></svg>',
+    '<input class="gxai-message-input" type="text" placeholder="'+(refined?'Escríbele a Goxy…':'Cuéntame qué problema tienes…')+'" aria-label="Tu mensaje a Goxy" autocomplete="off" maxlength="240">',
+    refined ? '<button class="gxai-send" type="submit" aria-label="Enviar mensaje" disabled hidden>' : '<button class="gxai-send" type="submit" aria-label="Enviar mensaje">',
+    refined ? '<svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5.5 11.5 12 5l6.5 6.5"/></svg>' : '<svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 14-8-4 16-3-6-7-2Zm7 2 7-10"/></svg>',
     '</button>',
     '</form>',
     refined ? '</div>' : '',
@@ -118,7 +118,15 @@
   const reducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches || false;
   let active = false;
   let closeTimer = null;
-  const syncSend = () => { if(refined) { const ready=Boolean(messageInput.value.trim()); sendButton.classList.toggle('gxai-send-ready',ready); sendButton.disabled=busy||!ready; } };
+  const syncSend = () => {
+    if(!refined)return;
+    const ready=Boolean(messageInput.value.trim());
+    const appearing=ready&&sendButton.hidden;
+    sendButton.hidden=!ready;
+    sendButton.classList.toggle('gxai-send-ready',ready);
+    sendButton.disabled=busy||!ready;
+    if(appearing&&!reducedMotion())sendButton.animate?.([{opacity:0,transform:'scale(.72)'},{opacity:1,transform:'scale(1)'}],{duration:180,easing:'cubic-bezier(.22,.82,.24,1)'});
+  };
   let interactionTimer = null, requestId = 0;
   let activeFlow = 0;
   const flowTimers = new Set();
@@ -604,7 +612,7 @@
     aiMode = false;
     awaitingSymptom = false;
     lastGuide = null;
-    messageInput.placeholder = 'Cuéntame qué problema tienes…';
+    messageInput.placeholder = refined?'Escríbele a Goxy…':'Cuéntame qué problema tienes…';
     const all=knowledge.platforms();
     const mine=myPlatforms.filter(platform=>all.includes(platform));
     if (mine.length) {
@@ -1495,7 +1503,7 @@
     const text = messageInput.value.trim();
     if (!text) return;
     messageInput.value = '';
-    if(refined){syncSend();if(!reducedMotion()){const icon=sendButton.querySelector('svg');icon?.animate?.([{transform:'translate(0,0)',opacity:1},{transform:'translate(7px,-7px)',opacity:0},{transform:'translate(-4px,4px)',opacity:0},{transform:'translate(0,0)',opacity:1}],{duration:340,easing:'ease-in-out'});}}
+    if(refined){syncSend();}
     if(pendingAI&&refined&&(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i.test(text)||/^(?:\d[\s-]?){4,16}$/.test(text))){
       bubble('Por seguridad, no compartas correos, PIN ni códigos en este chat.',false);return;
     }
