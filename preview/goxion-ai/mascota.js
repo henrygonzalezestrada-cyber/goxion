@@ -87,12 +87,14 @@
     '</div>',
     '</div>',
     '<footer class="gxai-chat-foot">',
+    refined ? '<div class="gxai-composer-row"><button class="gxai-more" type="button" aria-label="Más herramientas (próximamente)" disabled><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>' : '',
     '<form class="gxai-composer" aria-label="Conversación con Goxy">',
     '<input class="gxai-message-input" type="text" placeholder="Cuéntame qué problema tienes…" aria-label="Tu mensaje a Goxy" autocomplete="off" maxlength="240">',
     '<button class="gxai-send" type="submit" aria-label="Enviar mensaje">',
     '<svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 14-8-4 16-3-6-7-2Zm7 2 7-10"/></svg>',
     '</button>',
     '</form>',
+    refined ? '</div>' : '',
     refined ? '<div class="gxai-chat-disclaimer">No compartas contraseñas, códigos ni PIN.</div>' : '<div class="gxai-chat-disclaimer">Asistencia GOXION · Nunca compartas contraseñas, códigos ni PIN.</div>',
     '</footer>',
     '</section>'
@@ -455,6 +457,7 @@
     if(animate){
       // Mantener el contexto y z-index mientras el avatar vuelve al origen.
       // Los flujos de datos ya se cancelaron, sólo se anima la salida visual.
+      doc.documentElement.classList.add('gxai-immersive-closing');
       layer.classList.add('gxai-closing');
       closeTimer=setTimeout(finishClose,300);
       return;
@@ -463,7 +466,7 @@
   }
   function finishClose(){
     if(closeTimer!==null){clearTimeout(closeTimer);closeTimer=null;}
-    if(refined){layer.classList.add('gxai-closed');doc.documentElement.classList.remove('gxai-immersive-open');}
+    if(refined){layer.classList.add('gxai-closed');doc.documentElement.classList.remove('gxai-immersive-open','gxai-immersive-closing');}
     layer.classList.remove('gxai-visible','gxai-keyboard-open','gxai-closing');
     layer.style.setProperty('--gxai-viewport-height','100dvh');
     layer.style.setProperty('--gxai-viewport-top','0px');
@@ -475,7 +478,8 @@
       doc.body.style.top=pageFreeze.top||'';
       doc.body.style.width=pageFreeze.width||'';
       doc.documentElement.style.overscrollBehavior=pageFreeze.overscroll||'';
-      window.scrollTo?.(0,pageFreeze.pageY);
+      if(refined){try{window.scrollTo({top:pageFreeze.pageY,left:0,behavior:'instant'});}catch(_){window.scrollTo?.(0,pageFreeze.pageY);}}
+      else window.scrollTo?.(0,pageFreeze.pageY);
       pageFreeze=null;
     }
     mood('idle');
