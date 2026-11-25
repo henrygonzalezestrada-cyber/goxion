@@ -330,12 +330,13 @@
   // no additional robot engine, no delay to authenticated operations.
   function prepareImmersiveMorph(origin, source) {
     if (!refined) return;
+    layer.classList.add('gxai-measuring');
     const target=dialog.getBoundingClientRect();
     const avatar=layer.querySelector('.gxai-avatar').getBoundingClientRect();
     const valid=target.width>0&&target.height>0&&avatar.width>0&&source.width>0&&
       origin.bottom>target.top&&origin.top<target.bottom;
     layer.classList.toggle('gxai-no-morph',!valid||reducedMotion());
-    if(!valid)return;
+    if(!valid){layer.classList.remove('gxai-measuring');return;}
     const clamp=(n,max)=>Math.max(0,Math.min(max,n));
     const top=clamp(origin.top-target.top,target.height);
     const right=clamp(target.right-origin.right,target.width);
@@ -345,8 +346,11 @@
     layer.style.setProperty('--gxai-morph-x',((source.left+source.width/2)-(avatar.left+avatar.width/2))+'px');
     layer.style.setProperty('--gxai-morph-y',((source.top+source.height/2)-(avatar.top+avatar.height/2))+'px');
     layer.style.setProperty('--gxai-morph-scale',String(Math.min(3.3,Math.max(1,source.width/avatar.width))));
-    // Commit the starting geometry before the visible class changes.
+    // Commit the starting geometry without transitioning from stale coordinates.
+    layer.classList.add('gxai-morph-setup');
+    layer.classList.remove('gxai-measuring');
     void dialog.offsetWidth;
+    layer.classList.remove('gxai-morph-setup');
   }
   function openChat() {
     if (active || !authenticated()) {
