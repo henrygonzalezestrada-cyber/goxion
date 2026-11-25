@@ -144,7 +144,8 @@ html[data-gx-support-v3] #view-soporte .gxai-chat-layer:is(.gxai-no-morph,.gxai-
 html[data-gx-support-v3] #view-soporte .gxai-chat-layer:is(.gxai-no-morph,.gxai-measuring) .gxai-chat-head .gxai-avatar{transform:none;transition:none}
 html[data-gx-support-v3] #view-soporte .gxai-chat-layer.gxai-morph-setup :is(.gxai-chat,.gxai-chat-head .gxai-avatar){transition:none!important}
 /* Mantener la capa visible durante todo el retorno al rectángulo original. */
-html[data-gx-support-v3] #view-soporte .gxai-chat-layer.gxai-closing{pointer-events:none!important}
+html[data-gx-support-v3] #view-soporte .gxai-chat-layer.gxai-closing{pointer-events:auto!important}
+html[data-gx-support-v3] #view-soporte .gxai-chat-layer.gxai-closing :is(.gxai-chat,.gxai-backdrop){pointer-events:none!important}
 html[data-gx-support-v3] #view-soporte .gxai-chat-layer.gxai-closing .gxai-chat{clip-path:var(--gxai-morph-clip,inset(0 round 24px));transition:clip-path .44s cubic-bezier(.22,.82,.24,1)}
 html[data-gx-support-v3] #view-soporte .gxai-chat-layer.gxai-closing .gxai-chat-head .gxai-avatar{transform:translate(var(--gxai-morph-x,0px),var(--gxai-morph-y,0px)) scale(var(--gxai-morph-scale,1));transition:transform .44s cubic-bezier(.22,.82,.24,1)}
 html[data-gx-support-v3] #view-soporte .gxai-chat-layer.gxai-closing :is(.gxai-chat-name,.gxai-heading,.gxai-close,.gxai-chat-scroll,.gxai-chat-foot){opacity:0;transition:opacity .16s ease}
