@@ -118,8 +118,8 @@ Deno.serve(async(req:Request)=>{
   if(!parsed||typeof parsed.answer!=="string")return output(503,{ok:false,code:"INVALID_DIAGNOSIS"});
   const answer=parsed.answer.trim().slice(0,350);
   const platform=typeof parsed.platform==="string"&&Object.prototype.hasOwnProperty.call(KB.guides,parsed.platform)?parsed.platform:null;
-  const rows=platform?(KB.guides as Record<string,Array<{id:number}>>)[platform]:[];
-  const issueIndex=platform&&parsed.category==="known"&&Number.isInteger(parsed.issueIndex)&&rows.some(x=>x.id===parsed.issueIndex)?parsed.issueIndex:null;
+  const guideRows=platform?(KB.guides as Record<string,Array<{id:number}>>)[platform]:[];
+  const issueIndex=platform&&parsed.category==="known"&&Number.isInteger(parsed.issueIndex)&&guideRows.some(x=>x.id===parsed.issueIndex)?parsed.issueIndex:null;
   const category=issueIndex!==null?"known":parsed.category==="restart"?"restart":parsed.category==="unreadable"?"unreadable":"other";
   const asksSecret=/(?:ingres\w*|escrib\w*|envi\w*|compart\w*|proporcion\w*|indic\w*|facilit\w*|introduc\w*|mand\w*|dime)\s+(?:[^.!?\n]{0,90})\b(?:correo|contrase(?:ñ|n)a|pin|c[oó]digo|credenciales|email)\b/iu.test(answer.replace(/[*_]/g,""));
   if(asksSecret)return output(503,{ok:false,code:"UNSAFE_ANSWER"});
