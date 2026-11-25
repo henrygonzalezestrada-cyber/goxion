@@ -116,6 +116,18 @@ html[data-gx-support-v3] #view-soporte .gxai-chat-foot{
   width:100%;max-width:720px;align-self:center;box-sizing:border-box;border:0;
   background:transparent!important;padding:9px max(14px,env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));
 }
+html[data-gx-support-v3] #view-soporte .gxai-tools-menu[hidden],
+html[data-gx-support-v3] #view-soporte .gxai-attachment[hidden],
+html[data-gx-support-v3] #view-soporte :is(.gxai-image-picker,.gxai-camera-picker){display:none!important}
+html[data-gx-support-v3] #view-soporte .gxai-tools-menu{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 10px;align-items:center}
+html[data-gx-support-v3] #view-soporte .gxai-tools-menu button{border:0;border-radius:999px;background:rgba(255,255,255,.08);color:#7ee1e7;font:600 12px Poppins,sans-serif;min-height:38px;padding:9px 14px}
+html[data-gx-support-v3] #view-soporte .gxai-more[aria-expanded="true"] svg{transform:rotate(45deg)}
+html[data-gx-support-v3] #view-soporte .gxai-more svg{transition:transform .23s ease}
+html[data-gx-support-v3] #view-soporte .gxai-attachment{display:flex;align-items:center;gap:10px;margin:0 0 10px;color:#b8becd;font:400 11px/1.5 Poppins,sans-serif;min-width:0}
+html[data-gx-support-v3] #view-soporte .gxai-attachment img{width:58px;height:58px;object-fit:cover;border-radius:12px;flex:none}
+html[data-gx-support-v3] #view-soporte .gxai-attachment span{flex:1;min-width:0}
+html[data-gx-support-v3] #view-soporte .gxai-remove-image{flex:none;width:36px;height:36px;border:0;border-radius:50%;color:#071c29;background:#79e6fc;font-size:22px;line-height:1;padding:0}
+@media(prefers-reduced-motion:reduce){html[data-gx-support-v3] #view-soporte .gxai-more svg{transition:none!important}}
 html[data-gx-support-v3] #view-soporte .gxai-composer-row{display:flex;align-items:center;gap:9px;min-width:0;width:100%}
 html[data-gx-support-v3] #view-soporte .gxai-more{width:44px;height:44px;flex:0 0 44px;padding:0;border:0;border-radius:50%;background:rgba(255,255,255,.08);color:#c1cfe0;display:grid;place-items:center;opacity:1;box-shadow:none;-webkit-tap-highlight-color:transparent}
 html[data-gx-support-v3] #view-soporte .gxai-more svg{width:20px;height:20px;display:block}
