@@ -260,8 +260,9 @@
       ', el motor financiero proyecta '+money(value.amountCents)+
       ' de saldo pendiente, incluyendo '+money(value.moraCents)+' de mora.';
    if(window.GOXY_POLICY_V2){
-     if(!value.reactivationConfirmed || !valid(value.reactivationCents) || value.reactivationCents!==0)
+     if(value.mode!=='b2' && (!value.reactivationConfirmed || !valid(value.reactivationCents) || value.reactivationCents!==0) || value.mode==='b2' && (value.reactivationConfirmed===true && (!valid(value.reactivationCents)||value.reactivationCents!==0) || Number(value.reactivationCents||0)!==0))
        return {answer:'No puedo confirmar una proyección compatible con los términos 2.0: no existe cargo administrativo adicional de reactivación del 20%. Consulta tu estado de cuenta o solicita una aclaración antes de pagar. (Términos 3.2–3.4).',choices};
+     if(value.mode==='b2'&&!value.reactivationConfirmed)answer+=' El cotizador B2 no desglosa reactivación; esta proyección corresponde únicamente a sus importes confirmados para el ciclo vigente.';
      answer+=' No existe cargo administrativo adicional de reactivación. Pagar después del vencimiento original interrumpe la racha de lealtad, incluso con prórroga. Es una proyección, no un importe definitivo: puede variar por abonos, prórrogas o ajustes.';
      return {answer,choices};
    }
