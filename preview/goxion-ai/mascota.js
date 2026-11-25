@@ -121,11 +121,12 @@
   const syncSend = () => {
     if(!refined)return;
     const ready=Boolean(messageInput.value.trim());
-    const appearing=ready&&sendButton.hidden;
-    sendButton.hidden=!ready;
+    // Mantener el nodo en el layout con ancho cero: CSS abre y cierra
+    // el espacio junto a la aparición de la flecha, sin saltos de flex.
+    sendButton.hidden=false;
     sendButton.classList.toggle('gxai-send-ready',ready);
+    sendButton.setAttribute('aria-hidden',String(!ready));
     sendButton.disabled=busy||!ready;
-    if(appearing&&!reducedMotion())sendButton.animate?.([{opacity:0,transform:'scale(.72)'},{opacity:1,transform:'scale(1)'}],{duration:180,easing:'cubic-bezier(.22,.82,.24,1)'});
   };
   let interactionTimer = null, requestId = 0;
   let activeFlow = 0;
