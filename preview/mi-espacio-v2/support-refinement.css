@@ -1,9 +1,9 @@
 /* GOXION · Soporte/Goxy · candidato. No modifica robot-heads, sus moods ni viewport iOS.
    Opiniones comparte el modal con Mi Espacio; solo se armoniza esa superficie. */
 html[data-gx-support-v3] #view-soporte #smart-support-card.gxai-card{
-  border:0;background:rgba(8,8,12,.371);border-radius:24px;
+  border:1px solid rgba(255,255,255,.035);background:rgba(8,8,12,.371);border-radius:24px;
   backdrop-filter:blur(11.75px) saturate(1);-webkit-backdrop-filter:blur(11.75px) saturate(1);
-  box-shadow:0 15px 36px rgba(0,0,0,.23);
+  box-shadow:0 15px 36px rgba(0,0,0,.23),inset 0 1px rgba(255,255,255,.05);
 }
 html[data-gx-support-v3] #view-soporte .gxai-kicker{font-size:13px;font-weight:600;letter-spacing:0;text-transform:none;color:#c1cfe0}
 html[data-gx-support-v3] #view-soporte .gxai-desc{color:#a8b5c9;font-size:12px}
@@ -14,7 +14,7 @@ html[data-gx-support-v3] #view-soporte .gxai-open:hover{box-shadow:none;backgrou
 /* Chat: conservar avatar vivo, fases, indicador de escritura, sugerencias y rutas. */
 html[data-gx-support-v3] #view-soporte .gxai-chat{
   background:radial-gradient(ellipse at 0% 0%,rgba(132,107,211,.09),transparent 46%),linear-gradient(165deg,#15151f,#0c0d13 78%);
-  border:0;box-shadow:0 -20px 60px rgba(0,0,0,.4);
+  border:1px solid rgba(255,255,255,.035);box-shadow:0 -20px 60px rgba(0,0,0,.4),inset 0 1px rgba(255,255,255,.05);
 }
 html[data-gx-support-v3] #view-soporte .gxai-chat-head{border:0;gap:10px}
 html[data-gx-support-v3] #view-soporte .gxai-heading strong{font-size:18px;letter-spacing:-.02em}
@@ -58,9 +58,9 @@ html[data-gx-support-v3] #view-soporte .gxai-close svg,html[data-gx-support-v3] 
 }
 /* Atención humana y opiniones: dos accesos, no dos avisos de alerta. */
 html[data-gx-support-v3] #view-soporte .gx-support-access{
-  margin:12px 0 0;padding:19px 18px;border:0;border-radius:22px;text-align:left;
+  margin:12px 0 0;padding:19px 18px;border:1px solid rgba(255,255,255,.035);border-radius:22px;text-align:left;
   background:rgba(8,8,12,.371);backdrop-filter:blur(11.75px);-webkit-backdrop-filter:blur(11.75px);
-  box-shadow:0 15px 36px rgba(0,0,0,.23);display:grid;grid-template-columns:minmax(0,1fr) 44px;gap:8px 10px;align-items:center;
+  box-shadow:0 15px 36px rgba(0,0,0,.23),inset 0 1px rgba(255,255,255,.05);display:grid;grid-template-columns:minmax(0,1fr) 44px;gap:8px 10px;align-items:center;
 }
 html[data-gx-support-v3] #view-soporte .gx-support-access h3{margin:0;font-size:20px;line-height:1.25;font-weight:700;letter-spacing:-.035em;color:#f5f8ff}
 html[data-gx-support-v3] #view-soporte .gx-support-access p{margin:5px 0 0;font-size:12px;line-height:1.5;color:#a8b5c9}
@@ -76,7 +76,7 @@ html[data-gx-support-v3] #view-soporte .gx-support-cta:active{transform:scale(.9
 html[data-gx-support-v3] #view-soporte .faq-container{margin:24px 0 0;padding:0;background:none;border:0;box-shadow:none}
 html[data-gx-support-v3] #view-soporte .faq-container .section-title{margin:0 0 12px;text-align:left;color:#f5f8ff;font-size:19px;font-weight:700;letter-spacing:-.025em;text-transform:none}
 html[data-gx-support-v3] #view-soporte .faq-item{
-  margin:0 0 8px;border:0;background:rgba(8,8,12,.371);border-radius:17px;box-shadow:none;overflow:hidden;
+  margin:0 0 8px;border:1px solid rgba(255,255,255,.035);background:rgba(8,8,12,.371);border-radius:17px;box-shadow:0 15px 36px rgba(0,0,0,.23),inset 0 1px rgba(255,255,255,.05);overflow:hidden;
   backdrop-filter:blur(11.75px);-webkit-backdrop-filter:blur(11.75px);
 }
 html[data-gx-support-v3] #view-soporte button.faq-header{
@@ -93,7 +93,7 @@ html[data-gx-support-v3] #modal-feedback :is(.gx-rb-close,.gx-rb-submit,.gx-rb-s
 /* Opinión: se conserva la estrella->palomita real, sin neón ornamental. */
 html[data-gx-support-v3] #modal-feedback .gx-rb-shell{
   background:radial-gradient(ellipse at 0% 0%,rgba(132,107,211,.11),transparent 45%),#12131b!important;
-  border:0!important;box-shadow:0 24px 70px rgba(0,0,0,.48)!important;border-radius:25px!important;
+  border:1px solid rgba(255,255,255,.035)!important;box-shadow:0 24px 70px rgba(0,0,0,.48),inset 0 1px rgba(255,255,255,.05)!important;border-radius:25px!important;
 }
 html[data-gx-support-v3] #modal-feedback .gx-rb-shell::before,html[data-gx-support-v3] #modal-feedback .gx-rb-shell::after{display:none!important}
 html[data-gx-support-v3] #modal-feedback .gx-rb-form{padding:21px 19px 20px}
