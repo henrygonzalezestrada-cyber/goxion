@@ -896,6 +896,7 @@
   // dentro de askAI(), no en la clasificación ni en las guías.
   function isVague(text) {
     const words=knowledge.normalize(text);
+    if(refined&&window.GOXY_DIALOG_ROUTING?.classify(text,{platform:chosenPlatform},knowledge.resolveAllPlatforms)?.kind==='symptom')return false;
     if (/\b(no abre|no carga|no funciona|se congela|pantalla negra|error|sin sonido|no reproduce|no inicia sesion|se cierra|bloquea|falla al)\b/.test(words))return false;
     const meaningful=words.split(' ').filter(w=>w.length>2 &&
       !['tengo','necesito','quiero','ayuda','problema','plataforma','servicio','con','para','por','esta','algo'].includes(w));
@@ -1111,7 +1112,7 @@
         escalateAutomatically(query,target,lastGuide.issueIndex);
         return;
       }
-      if (index !== null && (!aiMode||refined&&index!==chosenGuide?.issueIndex)) {showGuide(target,index,refined?query:null);return;}
+      if (index !== null && (!aiMode||refined&&index!==chosenGuide?.issueIndex)) {if(refined&&index!==chosenGuide?.issueIndex){resetConversation();caseContext=null;pendingHandoff=null;}showGuide(target,index,refined?query:null);return;}
       if (aiMode && chosenGuide?.platform===target) {
         void askAI(query);
         return;
@@ -1495,6 +1496,9 @@
     if (!text) return;
     messageInput.value = '';
     if(refined){syncSend();if(!reducedMotion()){const icon=sendButton.querySelector('svg');icon?.animate?.([{transform:'translate(0,0)',opacity:1},{transform:'translate(7px,-7px)',opacity:0},{transform:'translate(-4px,4px)',opacity:0},{transform:'translate(0,0)',opacity:1}],{duration:340,easing:'ease-in-out'});}}
+    if(pendingAI&&refined&&(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i.test(text)||/^(?:\d[\s-]?){4,16}$/.test(text))){
+      bubble('Por seguridad, no compartas correos, PIN ni códigos en este chat.',false);return;
+    }
     if(pendingAI){
       // Consultas gratuitas y cambio de plataforma siguen disponibles sin esperar IA.
       const local=knowledge.normalize(text);
