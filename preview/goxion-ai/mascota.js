@@ -418,6 +418,7 @@
       syncChatViewport();
       prepareImmersiveMorph(origin,source);
     }
+    layer.classList.remove('gxai-closed');
     layer.classList.add('gxai-visible');
     layer.setAttribute('aria-hidden', 'false');
     syncChatViewport();
@@ -462,7 +463,7 @@
   }
   function finishClose(){
     if(closeTimer!==null){clearTimeout(closeTimer);closeTimer=null;}
-    if(refined)doc.documentElement.classList.remove('gxai-immersive-open');
+    if(refined){layer.classList.add('gxai-closed');doc.documentElement.classList.remove('gxai-immersive-open');}
     layer.classList.remove('gxai-visible','gxai-keyboard-open','gxai-closing');
     layer.style.setProperty('--gxai-viewport-height','100dvh');
     layer.style.setProperty('--gxai-viewport-top','0px');
