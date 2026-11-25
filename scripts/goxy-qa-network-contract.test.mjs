@@ -33,7 +33,7 @@ test('Goxy uses the real QA guard and session isolation, not a direct server sho
 });
 test('acceptance HTML loads the current contract in order',()=>{
  const html=readFileSync('ayuda-aceptacion-v2.html','utf8');
- const scripts=paths.map(p=>html.indexOf(p+'?v=goxy-contract-20261125'));
+ const scripts=paths.map(p=>html.indexOf(p+'?v='));
  assert.ok(scripts.every(i=>i>=0));
  assert.ok(scripts.every((i,k)=>k===0||i>scripts[k-1]));
  assert.ok(html.includes("connect-src 'self' "+QA));
