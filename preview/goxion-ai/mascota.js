@@ -66,7 +66,7 @@
     '<section class="gxai-chat" role="dialog" aria-modal="true" aria-labelledby="gxai-chat-title">',
     '<header class="gxai-chat-head">',
     '<span class="gxai-avatar" aria-hidden="true">', svg, '</span>',
-    refined ? '<span class="gxai-heading"><strong id="gxai-chat-title">Goxy</strong>' : '<span class="gxai-heading"><strong id="gxai-chat-title">Goxy · Asistente GOXION</strong>',
+    refined ? '<strong class="gxai-chat-name" id="gxai-chat-title">Goxy</strong><span class="gxai-heading">' : '<span class="gxai-heading"><strong id="gxai-chat-title">Goxy · Asistente GOXION</strong>',
     '<small class="gxai-chat-phase" role="status" aria-live="polite">Listo para escucharte</small></span>',
     refined ? '<button class="gxai-close" type="button" aria-label="Cerrar chat"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18"/></svg></button>' : '<button class="gxai-close" type="button" aria-label="Cerrar chat">×</button>',
     '</header>',
@@ -115,6 +115,9 @@
   const petStatus = hero.querySelector('.gxai-pet-status');
   const reducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches || false;
   let active = false;
+  let closeTimer = null;
+  const syncSend = () => { if(refined) { const ready=Boolean(messageInput.value.trim()); sendButton.classList.toggle('gxai-send-ready',ready); sendButton.disabled=busy||!ready; } };
+  syncSend();
   let interactionTimer = null, requestId = 0;
   let activeFlow = 0;
   const flowTimers = new Set();
@@ -263,6 +266,7 @@
     aiStart.disabled = value || !aiConfigured;
     messageInput.disabled = value;
     sendButton.disabled = value;
+    syncSend();
     suggestions.forEach(button => { button.disabled = value; });
   }
   function cancelFlow() {
@@ -353,6 +357,7 @@
     layer.classList.remove('gxai-morph-setup');
   }
   function openChat() {
+    if(closeTimer!==null) return;
     if (active || !authenticated()) {
       if (!authenticated()) window.openAuthSheet?.();
       return;
@@ -423,8 +428,10 @@
     dialog.setAttribute('tabindex', '-1');
     dialog.focus({preventScroll:true});
   }
-  function closeChat() {
+  function closeChat(animated=false) {
+    if(closeTimer!==null){if(animated!==true)finishClose();return;}
     if (!active) return;
+    const animate=refined&&animated===true&&!reducedMotion()&&authenticated()&&!layer.classList.contains('gxai-keyboard-open')&&!layer.classList.contains('gxai-no-morph');
     active = false; requestId++;
     cancelFlow();
     clearChoices();
@@ -444,11 +451,19 @@
     chatState = 'idle';
     chatPhase.textContent = phases.idle.label;
     layer.setAttribute('data-chat-state','idle');
-    if(refined){
-      if(layer.classList.contains('gxai-keyboard-open')||!authenticated())layer.classList.add('gxai-no-morph');
-      doc.documentElement.classList.remove('gxai-immersive-open');
+    if(animate){
+      // Mantener el contexto y z-index mientras el avatar vuelve al origen.
+      // Los flujos de datos ya se cancelaron, sólo se anima la salida visual.
+      layer.classList.add('gxai-closing');
+      closeTimer=setTimeout(finishClose,450);
+      return;
     }
-    layer.classList.remove('gxai-visible','gxai-keyboard-open');
+    finishClose();
+  }
+  function finishClose(){
+    if(closeTimer!==null){clearTimeout(closeTimer);closeTimer=null;}
+    if(refined)doc.documentElement.classList.remove('gxai-immersive-open');
+    layer.classList.remove('gxai-visible','gxai-keyboard-open','gxai-closing');
     layer.style.setProperty('--gxai-viewport-height','100dvh');
     layer.style.setProperty('--gxai-viewport-top','0px');
     layer.setAttribute('aria-hidden', 'true');
@@ -463,6 +478,11 @@
       pageFreeze=null;
     }
     mood('idle');
+    if(refined){
+      // No conservar mensajes privados al cerrar ni entre cuentas.
+      scroll.querySelectorAll('.gxai-bubble:not(:first-child),.gxai-choices,.gxai-date-panel').forEach(el=>el.remove());
+      messageInput.value='';syncSend();scroll.scrollTop=0;
+    }
     if (previousFocus?.isConnected) previousFocus.focus({preventScroll:true});
   }
   function bubble(text, fromMe) {
@@ -570,6 +590,7 @@
     });
     scroll.appendChild(choices);
     scroll.scrollTop = scroll.scrollHeight;
+    if(refined){const currentChoices=choices;requestAnimationFrame(()=>{if(active&&choices===currentChoices)scroll.scrollTop=scroll.scrollHeight;});}
   }
   const choosePlatformOptions = names => names.map(platform =>
     ({kind:'platform',platform,label:platform}));
@@ -793,8 +814,23 @@
         'Sigue las instrucciones de esa misión en Mi Espacio; si requiere una validación, GOXION debe confirmarla allí.',
         'Para realizarla, abre la pestaña Catálogo de Mi Espacio y visita el catálogo. GOXION comprueba el avance de esa misión.');
       const reply=bubble(answer,false);
+      if(refined&&topic==='promotions'){
+        // Presentación solamente: nombres y condiciones exactos del catálogo.
+        const prefix='Promociones públicas vigentes en el catálogo: ';
+        const divider='. Su elegibilidad y precio final';
+        const at=answer.indexOf(divider);
+        if(answer.startsWith(prefix)&&at>prefix.length){
+          const names=answer.slice(prefix.length,at).split('; ').filter(Boolean);
+          const title=doc.createElement('strong');title.className='gxai-reply-title';
+          title.textContent=prefix.trim();
+          const list=doc.createElement('ul');list.className='gxai-reply-list';
+          names.forEach(name=>{const li=doc.createElement('li');li.textContent=name;list.appendChild(li);});
+          const note=doc.createElement('span');note.className='gxai-reply-note';note.textContent=answer.slice(at+2);
+          reply.replaceChildren(title,list,note);
+        }
+      }
       reply.classList.add('gxai-delayed-bubble');
-      showChoices(financial?financial.choices:[
+      showChoices(financial?financial.choices:refined&&topic==='promotions'?[{kind:'catalog',label:'Ver promociones en Catálogo'},{kind:'account',label:'Ir a Mi Espacio'}]:[
         {kind:'account',label:'Abrir Mi Espacio'},
         ...(catalogMission?[{kind:'catalog',label:'Abrir catálogo'}]:[]),
         ...(topic==='missions'?[{kind:'promotions',label:'Ver promociones'}]:
@@ -1354,7 +1390,7 @@
   openButton.addEventListener('click', openChat);
   // No hay interruptor de IA para el cliente: el enrutador decide localmente
   // cuándo una aclaración del modelo realmente aporta valor.
-  closeButton.addEventListener('click', closeChat);
+  closeButton.addEventListener('click', () => closeChat(true));
   layer.querySelector('.gxai-backdrop').addEventListener('click', closeChat);
   layer.addEventListener('click', event => {
     const chosen = event.target.closest?.('.gxai-choice');
@@ -1383,6 +1419,7 @@
     const text = messageInput.value.trim();
     if (!text) return;
     messageInput.value = '';
+    if(refined){syncSend();if(!reducedMotion()){const icon=sendButton.querySelector('svg');icon?.animate?.([{transform:'translate(0,0)',opacity:1},{transform:'translate(7px,-7px)',opacity:0},{transform:'translate(-4px,4px)',opacity:0},{transform:'translate(0,0)',opacity:1}],{duration:340,easing:'ease-in-out'});}}
     if(pendingAI){
       // Consultas gratuitas y cambio de plataforma siguen disponibles sin esperar IA.
       const local=knowledge.normalize(text);
@@ -1404,11 +1441,12 @@
     handleText(text);
   });
   messageInput.addEventListener('input', () => {
+    syncSend();
     if (active && !busy && !pendingAI && authenticated()) chatTransition('listening');
   });
   doc.addEventListener('keydown', event => {
     if (!active) return;
-    if (event.key === 'Escape') { event.preventDefault(); closeChat(); return; }
+    if (event.key === 'Escape') { event.preventDefault(); closeChat(true); return; }
     if (event.key !== 'Tab') return;
     const focusables = refined ? [...dialog.querySelectorAll('button:not([disabled]),input:not([disabled]),[tabindex="0"]')].filter(el=>el.tabIndex>=0&&el.getClientRects().length>0&&!el.closest('[hidden],[aria-hidden="true"]')) : [...dialog.querySelectorAll('button:not([disabled])')];
     if (!focusables.length) return;
