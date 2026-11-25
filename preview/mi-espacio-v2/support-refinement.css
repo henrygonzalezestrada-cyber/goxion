@@ -126,10 +126,25 @@ html[data-gx-support-v3] #view-soporte .gxai-composer{
 }
 html[data-gx-support-v3] #view-soporte .gxai-composer:focus-within{box-shadow:0 0 0 1px rgba(126,225,231,.45)}
 html[data-gx-support-v3] #view-soporte .gxai-message-input{font-size:16px!important;line-height:1.35}
-html[data-gx-support-v3] #view-soporte .gxai-send{border:0;background:rgba(126,225,231,.14);color:#a6f1f5;width:40px;height:40px;box-shadow:none}
+html[data-gx-support-v3] #view-soporte .gxai-composer{gap:0}
+html[data-gx-support-v3] #view-soporte .gxai-send{
+ border:0;background:#79e6fc;color:#071c29;box-shadow:none;
+ flex:0 0 auto;min-width:0;width:0;height:40px;margin-left:0;padding:0;overflow:hidden;
+ opacity:0;visibility:hidden;pointer-events:none;transform:scale(.72);
+ transition:width .26s cubic-bezier(.22,.82,.24,1),margin-left .26s cubic-bezier(.22,.82,.24,1),opacity .19s ease,transform .26s cubic-bezier(.22,.82,.24,1),visibility 0s .26s;
+}
 html[data-gx-support-v3] #view-soporte .gxai-send[hidden]{display:none!important}
+html[data-gx-support-v3] #view-soporte .gxai-send.gxai-send-ready{
+ width:40px;margin-left:8px;opacity:1;visibility:visible;pointer-events:auto;transform:scale(1);
+ transition:width .26s cubic-bezier(.22,.82,.24,1),margin-left .26s cubic-bezier(.22,.82,.24,1),opacity .19s .045s ease,transform .26s cubic-bezier(.22,.82,.24,1),visibility 0s;
+}
+html[data-gx-support-v3] #view-soporte .gxai-send:not(.gxai-send-ready) svg{opacity:0}
+html[data-gx-support-v3] #view-soporte .gxai-send.gxai-send-ready svg{opacity:1}
+@media(prefers-reduced-motion:reduce){
+ html[data-gx-support-v3] #view-soporte .gxai-send{transition:none!important}
+}
 html[data-gx-support-v3] #view-soporte .gxai-send.gxai-send-ready:not(:disabled){background:#79e6fc;color:#071c29;opacity:1}
-html[data-gx-support-v3] #view-soporte .gxai-send:disabled{background:rgba(255,255,255,.06);color:#a8b5c9;opacity:.7;cursor:default}
+html[data-gx-support-v3] #view-soporte .gxai-send.gxai-send-ready:disabled{background:rgba(255,255,255,.06);color:#a8b5c9;opacity:.7;cursor:default}
 html[data-gx-support-v3] #view-soporte .gxai-send:active:not(:disabled) svg{transform:translateY(-2px) scale(1.06)}
 html[data-gx-support-v3] #view-soporte .gxai-send svg{transition:transform .18s ease}
 html[data-gx-support-v3] #view-soporte .gxai-chat-disclaimer{color:#a8b5c9;font-size:10px}
