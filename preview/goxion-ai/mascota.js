@@ -87,7 +87,7 @@
     '</div>',
     '</div>',
     '<footer class="gxai-chat-foot">',
-    refined ? '<div class="gxai-attachment" hidden></div><div class="gxai-tools-menu" hidden><button class="gxai-tool-gallery" type="button">Compartir imagen</button><button class="gxai-tool-camera" type="button">Tomar fotografía</button></div><input class="gxai-image-picker" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" hidden><input class="gxai-camera-picker" type="file" accept="image/*" capture="environment" hidden><div class="gxai-composer-row"><button class="gxai-more" type="button" aria-label="Más herramientas" aria-expanded="false" disabled><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>' : '',
+    refined ? '<div class="gxai-attachment" hidden></div><div class="gxai-tools-menu" hidden><button class="gxai-tool-gallery" type="button">Compartir imagen</button><button class="gxai-tool-camera" type="button">Tomar fotografía</button><button class="gxai-tool-example" type="button" hidden>Probar captura de ejemplo</button></div><input class="gxai-image-picker" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" hidden><input class="gxai-camera-picker" type="file" accept="image/*" capture="environment" hidden><div class="gxai-composer-row"><button class="gxai-more" type="button" aria-label="Más herramientas" aria-expanded="false" disabled><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>' : '',
     '<form class="gxai-composer" aria-label="Conversación con Goxy">',
     '<input class="gxai-message-input" type="text" placeholder="'+(refined?'Escríbele a Goxy…':'Cuéntame qué problema tienes…')+'" aria-label="Tu mensaje a Goxy" autocomplete="off" maxlength="240">',
     refined ? '<button class="gxai-send" type="submit" aria-label="Enviar mensaje" disabled hidden>' : '<button class="gxai-send" type="submit" aria-label="Enviar mensaje">',
@@ -121,10 +121,11 @@
   const vision=refined?window.GOXY_VISION:null;
   const more=layer.querySelector('.gxai-more'),toolsMenu=layer.querySelector('.gxai-tools-menu'),attachment=layer.querySelector('.gxai-attachment');
   const gallery=layer.querySelector('.gxai-image-picker'),camera=layer.querySelector('.gxai-camera-picker');
-  let imageDraft=null,visionReady=false,preparingImage=false,imageGeneration=0;
+  const exampleButton=layer.querySelector('.gxai-tool-example');
+  let imageDraft=null,visionReady=false,exampleImage=null,preparingImage=false,imageGeneration=0;
   const syncSend = () => {
     if(!refined)return;
-    const ready=imageDraft?visionReady&&!preparingImage:Boolean(messageInput.value.trim());
+    const ready=imageDraft?(imageDraft.example?Boolean(exampleImage):visionReady)&&!preparingImage:!preparingImage&&Boolean(messageInput.value.trim());
     // Mantener el nodo en el layout con ancho cero: CSS abre y cierra
     // el espacio junto a la aparición de la flecha, sin saltos de flex.
     sendButton.hidden=false;
@@ -144,6 +145,7 @@
   }
   function clearImage(){
     imageGeneration++;imageDraft=null;preparingImage=false;
+    messageInput.disabled=busy;
     if(attachment){attachment.replaceChildren();attachment.hidden=true;}
     if(gallery)gallery.value='';if(camera)camera.value='';
     toggleTools(false);syncSend();
@@ -175,6 +177,7 @@
     more.addEventListener('click',()=>{if(active&&!busy)toggleTools(toolsMenu.hidden)});
     layer.querySelector('.gxai-tool-gallery').addEventListener('click',()=>{toggleTools(false);gallery.click()});
     layer.querySelector('.gxai-tool-camera').addEventListener('click',()=>{toggleTools(false);camera.click()});
+    exampleButton.addEventListener('click',()=>{if(!active||busy||!exampleImage||!authenticated())return;clearImage();imageDraft={data:exampleImage,example:true};messageInput.value='';messageInput.disabled=true;renderAttachment('Captura ficticia · se enviará únicamente este ejemplo a Groq.');syncSend();});
     for(const picker of [gallery,camera])picker.addEventListener('change',()=>{const file=picker.files?.[0];if(file)void chooseImage(file);});
     syncSend();
   }
@@ -320,7 +323,7 @@
   function setBusy(value) {
     busy = value;
     aiStart.disabled = value || !aiConfigured;
-    messageInput.disabled = value;
+    messageInput.disabled = value || imageDraft?.example===true;
     sendButton.disabled = value;
     syncSend();
     suggestions.forEach(button => { button.disabled = value; });
@@ -423,7 +426,7 @@
     const source=refined?heroTrigger.querySelector('.gxai-mascot').getBoundingClientRect():null;
     active = true; requestId++;
     cancelFlow();
-    if(vision){clearImage();visionReady=false;const visionId=requestId;if(vision.isQA())vision.status().then(state=>{if(active&&visionId===requestId){visionReady=state.ok===true&&state.ready===true;if(imageDraft)renderAttachment(visionReady?'Oculta datos personales, contraseñas y códigos antes de enviar. La imagen se enviará a Groq para su análisis.':'Vista previa local · El análisis todavía no está habilitado.');syncSend();}});}
+    if(vision){clearImage();visionReady=false;exampleImage=null;exampleButton.hidden=true;const visionId=requestId;if(vision.isQA())vision.status().then(state=>{if(active&&visionId===requestId){visionReady=state.ok===true&&state.ready===true;exampleImage=state.ok===true&&state.exampleReady===true&&typeof state.exampleImage==='string'&&/^data:image\/png;base64,[A-Za-z0-9+/=]+$/.test(state.exampleImage)?state.exampleImage:null;exampleButton.hidden=!exampleImage;if(imageDraft&&!imageDraft.example)renderAttachment(visionReady?'Oculta datos personales, contraseñas y códigos antes de enviar. La imagen se enviará a Groq para su análisis.':'Vista previa local · El análisis todavía no está habilitado.');syncSend();}});}
     aiConfigured = false;
     aiMode = false;
     aiEntry = false;
@@ -492,7 +495,7 @@
     const animate=refined&&animated===true&&!reducedMotion()&&authenticated()&&!layer.classList.contains('gxai-keyboard-open')&&!layer.classList.contains('gxai-no-morph');
     active = false; requestId++;
     cancelFlow();
-    if(vision){clearImage();visionReady=false;}
+    if(vision){clearImage();visionReady=false;exampleImage=null;exampleButton.hidden=true;}
     clearChoices();
     chosenPlatform = null;
     chosenGuide = null;
@@ -1546,27 +1549,30 @@
   });
   // Mensajes libres: guías reales de soporte, sin consultar cuentas ni red.
   async function analyzeImage(query){
-    if(!active||busy||!authenticated()||!visionReady||!imageDraft)return;
-    if(!window.confirm('¿Confirmas que la imagen no contiene información privada, contraseñas, PIN ni códigos y autorizas enviarla a Groq para analizarla?'))return;
+    if(!active||busy||!authenticated()||!imageDraft||!(imageDraft.example?exampleImage:visionReady))return;
+    const example=imageDraft.example===true;
+    if(!window.confirm(example?'¿Enviar esta captura ficticia a Groq para comprobar el análisis visual?':'¿Confirmas que la imagen no contiene información privada, contraseñas, PIN ni códigos y autorizas enviarla a Groq para analizarla?'))return;
     if(pendingAI)cancelFlow();
     const image=imageDraft.data;clearImage();messageInput.value='';syncSend();
-    clearChoices();bubble(query||'Analiza esta imagen',true);
+    clearChoices();const sent=bubble(example?'Analiza esta captura de prueba':query||'Analiza esta imagen',true);
+    if(example){const img=doc.createElement('img');img.src=image;img.alt='Captura ficticia de Netflix';img.style.cssText='display:block;width:100%;max-width:240px;border-radius:12px;margin-top:8px';sent.append(img);}
     setBusy(true);chatTransition('thinking');chatPhase.textContent='Analizando tu imagen…';showTyping();
     const flow=++activeFlow,identity=String(window.getCurrentClientKey?.()||'');
     aiController=new AbortController();
-    const reply=await vision.analyze(image,query,aiController.signal);
+    const reply=await (example?vision.example(aiController.signal):vision.analyze(image,query,aiController.signal));
     if(!active||flow!==activeFlow||!authenticated()||identity!==String(window.getCurrentClientKey?.()||''))return;
     aiController=null;hideTyping();setBusy(false);
     if(reply.ok&&typeof reply.answer==='string'){chatTransition('speaking');bubble(reply.answer,false).classList.add('gxai-ai-answer');}
-    else if(reply.code!=='ABORTED'){chatTransition('error');bubble('No pude analizar la imagen ahora. Puedes describir la falla o acudir a nuestro equipo.',false);}
-    showChoices([{kind:'platforms',label:'Consultar guías de soporte'},{kind:'policy-support',label:'Ir a atención humana'}]);
+    else if(reply.code!=='ABORTED'){chatTransition('error');bubble(reply.code==='RATE_LIMIT'?'La cuota de IA requiere una pausa. Puedes intentar de nuevo cuando esté disponible.':'No pude analizar la imagen ahora. Puedes describir la falla o acudir a nuestro equipo.',false);}
+    if(example&&reply.ok){clearSupportContext('Netflix');showChoices([{kind:'issue',platform:'Netflix',issueIndex:1,label:'Ver guía de actualización de hogar'},{kind:'policy-support',label:'Ir a atención humana'}]);}
+    else showChoices([{kind:'platforms',label:'Consultar guías de soporte'},{kind:'policy-support',label:'Ir a atención humana'}]);
     later(flow,400,()=>chatTransition('listening'));
   }
   composer.addEventListener('submit', event => {
     event.preventDefault();
     if (!active || busy || !authenticated()) return;
     const text = messageInput.value.trim();
-    if(imageDraft){if(visionReady)void analyzeImage(text);return;}
+    if(imageDraft){if(imageDraft.example?exampleImage:visionReady)void analyzeImage(text);return;}
     if(preparingImage||!text)return;
     messageInput.value = '';
     if(refined){syncSend();}
