@@ -120,6 +120,7 @@
   let closeTimer = null;
   const vision=refined?window.GOXY_VISION:null;
   const diagnosis=refined?window.GOXY_DIAGNOSIS?.create():null;
+  const dialogue=refined?window.GOXY_DIALOG_ROUTING?.createConversation?.():null;
   const more=layer.querySelector('.gxai-more'),toolsMenu=layer.querySelector('.gxai-tools-menu'),attachment=layer.querySelector('.gxai-attachment');
   const gallery=layer.querySelector('.gxai-image-picker'),camera=layer.querySelector('.gxai-camera-picker');
   const exampleButton=layer.querySelector('.gxai-tool-example');
@@ -427,7 +428,7 @@
     const origin=refined?card.getBoundingClientRect():null;
     const source=refined?heroTrigger.querySelector('.gxai-mascot').getBoundingClientRect():null;
     active = true; requestId++;
-    cancelFlow();diagnosis?.reset();
+    cancelFlow();diagnosis?.reset();dialogue?.reset();
     if(vision){clearImage();visionReady=false;visionTestOnly=false;exampleImage=null;exampleButton.hidden=true;const visionId=requestId;if(vision.isQA())vision.status().then(state=>{if(active&&visionId===requestId){visionReady=state.ok===true&&state.ready===true;visionTestOnly=state.testOnly===true;exampleImage=state.ok===true&&state.exampleReady===true&&typeof state.exampleImage==='string'&&/^data:image\/png;base64,[A-Za-z0-9+/=]+$/.test(state.exampleImage)?state.exampleImage:null;exampleButton.hidden=!exampleImage;if(imageDraft&&!imageDraft.example)renderAttachment(imageNotice());syncSend();}});}
     aiConfigured = false;
     aiMode = false;
@@ -496,7 +497,7 @@
     if (!active) return;
     const animate=refined&&animated===true&&!reducedMotion()&&authenticated()&&!layer.classList.contains('gxai-keyboard-open')&&!layer.classList.contains('gxai-no-morph');
     active = false; requestId++;
-    cancelFlow();diagnosis?.reset();
+    cancelFlow();diagnosis?.reset();dialogue?.reset();
     if(vision){clearImage();visionReady=false;visionTestOnly=false;exampleImage=null;exampleButton.hidden=true;}
     clearChoices();
     chosenPlatform = null;
@@ -694,6 +695,7 @@
     ]);
   }
   function showIssues(platform) {
+    dialogue?.noteSupport();
     chosenGuide = null;
     aiMode = false;
     aiEntry = false;
@@ -873,6 +875,7 @@
       topic==='forecast'?payment.forecastDescribe(response):null;
     const success=Boolean(financial)||(response.ok===true&&typeof response.answer==='string');
     if(success){
+      dialogue?.noteAccount(topic);
       chatTransition('speaking');
       let answer=financial?.answer||response.answer;
       const catalogQuestion=topic==='missions'&&/\bcatalogo\b/.test(knowledge.normalize(text));
@@ -1043,7 +1046,7 @@
     return true;
   }
   function clearSupportContext(platform=null){
-    diagnosis?.reset();
+    diagnosis?.reset();dialogue?.reset();
     chosenPlatform=platform;chosenGuide=null;lastGuide=null;aiMode=false;aiEntry=false;
     awaitingSymptom=false;accessStage=null;caseContext=null;pendingHandoff=null;
     lastAccountTopic=null;resetConversation();
@@ -1091,7 +1094,7 @@
       respondFree(query,'¡Hasta pronto! Aquí estaré cuando me necesites.',[]);
       return;
     }
-    if(route?.kind==='ack'&&!awaitingSymptom&&!diagnosis?.get()){
+    if(route?.kind==='ack'&&!awaitingSymptom&&!diagnosis?.get()&&!dialogue?.get().pending){
       const previous=choices?Array.from(choices.querySelectorAll('button[data-kind]')).map(b=>({...b.dataset,label:b.textContent,issueIndex:b.dataset.issueIndex===undefined?undefined:Number(b.dataset.issueIndex),serviceIndex:b.dataset.serviceIndex===undefined?undefined:Number(b.dataset.serviceIndex)})):[];
       respondFree(query,'De acuerdo. Podemos continuar cuando quieras.',previous);
       return;
@@ -1110,6 +1113,13 @@
     if(route?.kind==='device'){
       respondFree(query,'Entendido. Revisemos lo que ocurre en '+route.device.replace(/^en /,'')+'. ¿Qué mensaje aparece o qué deja de funcionar?',[{kind:'issues',platform:chosenPlatform,label:'Ver problemas conocidos'}]);
       return;
+    }
+    if(dialogue){
+      const decision=dialogue.consume(query,{platform:chosenPlatform,brands:knowledge.resolveAllPlatforms(query),activePlatforms:myPlatforms});
+      if(decision){
+        diagnosis?.reset();chosenPlatform=null;chosenGuide=null;lastGuide=null;aiMode=false;aiEntry=false;awaitingSymptom=false;accessStage=null;caseContext=null;pendingHandoff=null;lastAccountTopic=null;resetConversation();
+        respondFree(query,decision.answer,decision.choices);return;
+      }
     }
     if(route?.brand&&route.brand!==chosenPlatform&&['brand','symptom'].includes(route.kind)&&!(diagnosis?.get()?.platform===null))clearSupportContext(route.brand);
     if(route?.kind==='brand'&&!diagnosis?.get()){
@@ -1216,6 +1226,7 @@
       return;
     }
     // Sin plataforma elegida, no consumir IA intentando adivinarla.
+    if(dialogue){const next=dialogue.fallback();respondFree(query,next.answer,next.choices);return;}
     runDemo(questions.libre,query,showPlatforms);
   }
   function humanHandoff(serviceIndex=null) {
@@ -1325,6 +1336,7 @@
     const type = button.dataset.kind;
     const platform = button.dataset.platform;
     const index = Number(button.dataset.issueIndex);
+    if(type==='conversation-reply'&&dialogue){handleText(button.textContent.trim());return;}
     if(type==='diagnosis-reply'&&diagnosis){handleText(button.textContent.trim());return;}
     if(type==='diagnosis-image'&&visionReady){toggleTools(false);gallery?.click();return;}
     if (type === 'unresolved') {

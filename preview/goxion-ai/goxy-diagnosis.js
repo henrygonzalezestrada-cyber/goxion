@@ -79,6 +79,7 @@ function create(){
    const i=match(p,text);
    if(i!==null)return begin(p,i);
    if(retry.test(n)&&/\b(pide|dice|aviso|mensaje|solicita|restart)\b/.test(n))return startRetry(p);
+   if(unknown.test(n)||/^(aparece un aviso|me sale un aviso|me aparece un aviso)$/.test(n)){clarify(p);return consume(text,p,canImage);}
    if(vague.test(n))return clarify(p);
    return null;
   }
@@ -122,8 +123,8 @@ function create(){
   if(['clarify','locate','visual-clarify','image-request'].includes(state.stage)){
    if(retry.test(n))return startRetry(p,state.source);
    if(missing.test(n)||unknown.test(n)||/\b(no puedo (mandar|enviar|compartir|describir)|no tengo captura|prefiero no)\b/.test(n)||/^(aparece un aviso|mensaje de error|me sale un error|me aparece un error|sale un aviso)$/.test(n)){
-    if(canImage&&!state.visualUsed&&state.stage!=='image-request'&&!/\b(no puedo (mandar|enviar|compartir)|no tengo captura|prefiero no)\b/.test(n)){
-     state.stage='image-request';
+    if(canImage&&!state.visualUsed&&!state.imageRequested&&state.stage!=='image-request'&&!/\b(no puedo (mandar|enviar|compartir)|no tengo captura|prefiero no)\b/.test(n)){
+     state.stage='image-request';state.imageRequested=true;
      return result('¿Puedes mostrarme el aviso? Una captura sin datos privados puede ayudarme a identificarlo. Si prefieres, descríbeme el mensaje.',[image(),step('No puedo mandar captura')]);
     }
     state.stage='visual-clarify';
