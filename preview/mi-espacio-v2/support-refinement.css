@@ -123,13 +123,14 @@ html[data-gx-support-v3] #view-soporte .gxai-keyboard-open .gxai-chat-head{
   flex-direction:row;justify-content:center;gap:9px;min-height:60px;padding:7px 56px;
 }
 html[data-gx-support-v3] #view-soporte .gxai-keyboard-open .gxai-chat-head .gxai-avatar{width:48px;height:48px}
-html[data-gx-support-v3] #view-soporte .gxai-keyboard-open .gxai-chat-head .gxai-canvas-slot{width:46px;height:46px}
-html[data-gx-support-v3] #view-soporte .gxai-keyboard-open .gxai-chat-head .gxai-canvas-slot>span{transform:scale(.9)}
+html[data-gx-support-v3] #view-soporte .gxai-keyboard-open .gxai-chat-head .gxai-avatar .gxai-mascot.gxai-canvas-slot{width:46px;height:46px}
+html[data-gx-support-v3] #view-soporte .gxai-keyboard-open .gxai-chat-head .gxai-avatar .gxai-canvas-slot>span{transform:scale(.9)}
 html[data-gx-support-v3] #view-soporte .gxai-keyboard-open .gxai-heading{text-align:left}
 html[data-gx-support-v3] #view-soporte .gxai-keyboard-open .gxai-chat-head .gxai-close{top:7px}
 html[data-gx-support-v3] #view-soporte .gxai-keyboard-open .gxai-chat-foot{padding-bottom:6px}
 html[data-gx-support-v3] #view-soporte .gxai-chat-layer:is(.gxai-no-morph,.gxai-measuring) .gxai-chat{clip-path:none;transition:none}
 html[data-gx-support-v3] #view-soporte .gxai-chat-layer:is(.gxai-no-morph,.gxai-measuring) .gxai-chat-head .gxai-avatar{transform:none;transition:none}
+html[data-gx-support-v3] #view-soporte .gxai-chat-layer.gxai-morph-setup :is(.gxai-chat,.gxai-chat-head .gxai-avatar){transition:none!important}
 @media(max-width:360px){
  html[data-gx-support-v3] #view-soporte .gxai-chat-scroll{padding-inline:15px}
  html[data-gx-support-v3] #view-soporte .gxai-chat-head .gxai-avatar{width:76px;height:76px}
