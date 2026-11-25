@@ -981,6 +981,8 @@
   function handleText(query) {
     // La información que ya administra GOXION y los saludos no consumen IA.
     const words = knowledge.normalize(query);
+    const rule=refined?window.GOXY_POLICY_V2?.reply(query):null;
+    if(rule){lastAccountTopic=null;respondFree(query,rule.answer,rule.choices);return;}
     const topic=accountTopic(query);
     if(topic){ void accountRead(topic,query); return; }
     // Una pregunta comercial no es una falla de acceso ni gasta Groq.
@@ -1240,6 +1242,16 @@
     if (type === 'account') { closeChat(); window.switchTab?.('inicio'); return; }
     if (type === 'catalog') { closeChat(); window.switchTab?.('catalogo'); return; }
     if (type === 'pay-open') { closeChat(); window.irAlTicket?.(); return; }
+    if(type==='policy-doc'||type==='terms-open'&&refined&&window.GOXY_POLICY_V2){
+      const view=type==='policy-doc'?button.dataset.view:'terminos';
+      if(!['terminos','referidos','cupones'].includes(view))return;
+      closeChat();
+      window.GOXION_LEGAL_V2?.openDocument(view);
+      return;
+    }
+    if(type==='policy-extension'){void accountRead('extension','Comprobar mi prórroga');return;}
+    if(type==='policy-loyalty'){void accountRead('loyalty','Consultar mi nivel');return;}
+    if(type==='policy-support'){closeChat();doc.querySelector('#view-soporte .gx-support-human button')?.focus({preventScroll:false});return;}
     if (type === 'terms-open') { closeChat(); window.openModal?.('modal-garantia'); return; }
     if (type === 'extend-open') {
       closeChat();window.switchTab?.('inicio');
@@ -1428,7 +1440,7 @@
     if(pendingAI){
       // Consultas gratuitas y cambio de plataforma siguen disponibles sin esperar IA.
       const local=knowledge.normalize(text);
-      if(accountTopic(text) ||
+      if((refined&&window.GOXY_POLICY_V2?.reply(text))||accountTopic(text) ||
         /\b(contrasena|password|clave de acceso|clave de inicio)\b/.test(local) ||
         (/\b(contrato|contratar|cotizar|cuanto cuesta|cuanto pagaria|precio|costo|mensual)\b/.test(local)&&knowledge.resolvePlatform(text)) ||
         /^(hola(?: goxy)?|que puedes hacer|que puedo hacer|que haces|buenos dias|buenas tardes|buenas noches)$/.test(local) ||
