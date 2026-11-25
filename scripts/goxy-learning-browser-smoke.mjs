@@ -8,8 +8,9 @@ for(const [name,engine] of [['Chromium',chromium],['WebKit',webkit]]){
  const browser=await engine.launch({headless:true});
  try{
   const page=await browser.newPage({viewport:{width:390,height:844},reducedMotion:'no-preference'});
-  await page.route('**/*',r=>r.abort());
-  await page.setContent('<html data-gx-support-v3><body><div id="view-soporte"><div class="gxai-bubble" id="answer">Respuesta de prueba</div></div></body></html>');
+  await page.route('**/*',r=>r.request().url()==='https://goxy.test/'?r.fulfill({contentType:'text/html',body:'<html data-gx-support-v3><body><div id="view-soporte"><div class="gxai-bubble" id="answer">Respuesta de prueba</div></div></body></html>'}):r.abort());
+  await page.goto('https://goxy.test/');
+  assert.equal(await page.evaluate(()=>isSecureContext&&typeof crypto.randomUUID==='function'),true);
   await page.addStyleTag({content:css});await page.addScriptTag({content:js});
   await page.evaluate(()=>{
    window.requests=[];window.current=true;window.rejectVote=false;
