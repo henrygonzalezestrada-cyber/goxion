@@ -1,5 +1,6 @@
 // GOXION Goxy F7 · beta server-side. verify_jwt=false requiere HMAC custom.
 import KB from "./knowledge.json" with { type: "json" };
+import {resolveVerifiedGuide} from "../_shared/goxy-verified-learning.mjs";
 const SITE="https://henrygonzalezestrada-cyber.github.io";
 const DB="https://nsvybyvvdpdgbgtvydfb.supabase.co";
 const MODEL="openai/gpt-oss-20b";
@@ -311,6 +312,18 @@ Deno.serve(async(req:Request)=>{
     const body=await req.json().catch(()=>null);
     if(!body||typeof body!=="object"||Array.isArray(body))return output(origin,400,{ok:false,code:"BAD_REQUEST"});
     const key=Deno.env.get("GROQ_API_KEY");
+    // QA-only, authenticated, read-only. No AI quota is used by verified lookup.
+    if(body.mode==='verified_route'){
+      if(Object.keys(body).some(k=>!['mode','message','platform'].includes(k))||!semanticSafe(body.message)||typeof body.platform!=='string')
+        return output(origin,422,{ok:false,code:'SENSITIVE_OR_INVALID_INPUT'});
+      const route=await resolveVerifiedGuide({message:body.message,platform:body.platform,canonicalMatch:null,knowledge:KB,
+        lookup:async(params:Record<string,string>)=>{
+          const result=await db('rpc/goxy_verified_route',service,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(params)});
+          return result.ok?await result.json():null;
+        }});
+      // Return only the canonical reference; client uses existing local diagnosis.
+      return output(origin,200,route?{ok:true,platform:route.platform,guideId:route.guide.id,revision:route.revision}:{ok:false,code:'NO_VERIFIED_ROUTE'});
+    }
     if(body.mode==='feedback'){
       const result=await feedbackWrite(body,clientId,service);
       return output(origin,result.ok?200:422,result);
@@ -320,10 +333,10 @@ Deno.serve(async(req:Request)=>{
       return output(origin,result.ok?200:result.code==='RATE_LIMIT'?429:422,result);
     }
     if(body.mode==="status"){
-      if(!key)return output(origin,200,{ok:true,configured:false,providerReady:false,feedbackReady:true,semanticReady:false,code:"AI_NOT_CONFIGURED"});
+      if(!key)return output(origin,200,{ok:true,configured:false,providerReady:false,feedbackReady:true,verifiedReady:true,semanticReady:false,code:"AI_NOT_CONFIGURED"});
       const provider=await providerStatus(key);
       return output(origin,200,{ok:true,configured:true,providerReady:provider.ready,
-        code:provider.code,model:provider.ready?MODEL:null,feedbackReady:true,semanticReady:provider.ready});
+        code:provider.code,model:provider.ready?MODEL:null,feedbackReady:true,verifiedReady:true,semanticReady:provider.ready});
     }
     if(body.mode==="forecast"){
       try{

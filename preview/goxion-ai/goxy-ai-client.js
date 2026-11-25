@@ -77,5 +77,11 @@
     if(!isQA()||!window.GOXION_QA_ISOLATED)return {ok:false,code:'ENVIRONMENT_MISMATCH'};
     try{return await send({mode:'feedback',responseId,topic,source,vote,reason});}catch{return {ok:false,code:'NETWORK_ERROR'};}
   }
-  window.GOXY_AI = Object.freeze({ask,status,account,forecast,interpret,feedback});
+  async function verifiedRoute(message,platform,{signal}={}){
+    if(!isQA()||!window.GOXION_QA_ISOLATED)return {ok:false,code:'ENVIRONMENT_MISMATCH'};
+    const text=String(message||'').trim();
+    if(!text||text.length>120||/[\d@<>:/\\]|https?|www\.|\b(?:pin|contrase(?:ñ|n)a|password|token|correo|cuenta bancaria|clabe|tel[eé]fono|domicilio)\s*(?:es|seria|tengo|escribe|copia)\b/iu.test(text))return {ok:false,code:'SENSITIVE_OR_INVALID_INPUT'};
+    try{return await send({mode:'verified_route',message:text,platform},{signal});}catch(e){return {ok:false,code:e?.name==='AbortError'?'ABORTED':'NETWORK_ERROR'};}
+  }
+  window.GOXY_AI = Object.freeze({ask,status,account,forecast,interpret,feedback,verifiedRoute});
 })();

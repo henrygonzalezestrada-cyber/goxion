@@ -29,7 +29,7 @@ jobs:
         run: npx playwright install --with-deps chromium webkit
 
       - name: Goxy · interpretación y diagnóstico contextual
-        run: node --test scripts/goxy-dialog-routing.test.mjs scripts/goxy-diagnosis.test.mjs scripts/goxy-conversation-context.test.mjs scripts/goxy-learning-ui.test.mjs scripts/goxy-verified-learning.test.mjs
+        run: node --test scripts/goxy-dialog-routing.test.mjs scripts/goxy-diagnosis.test.mjs scripts/goxy-conversation-context.test.mjs scripts/goxy-learning-ui.test.mjs scripts/goxy-verified-learning.test.mjs scripts/goxy-learning-integration.test.mjs
 
       - name: Goxy · valoraciones animadas (Chromium/WebKit, servidor simulado)
         run: node scripts/goxy-learning-browser-smoke.mjs
