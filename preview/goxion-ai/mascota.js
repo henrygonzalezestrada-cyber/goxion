@@ -541,18 +541,18 @@
     chatTransition('thinking');
     showTyping();
     const flowId = ++activeFlow;
-    later(flowId, 220, () => chatTransition(entry.step || 'working'));
-    later(flowId, 680, () => {
+    later(flowId, refined?90:220, () => chatTransition(entry.step || 'working'));
+    later(flowId, refined?250:680, () => {
       hideTyping();
       if (entry.finish !== 'error') chatTransition('speaking');
       else chatTransition('error');
       bubble(entry.response, false);
     });
-    later(flowId, 1050, () => {
+    later(flowId, refined?380:1050, () => {
       if (entry.finish === 'happy') chatTransition('happy');
       else chatTransition('error');
     });
-    later(flowId, 1330, () => {
+    later(flowId, refined?520:1330, () => {
       setBusy(false);
       chatTransition('listening');
       if (typeof onDone === 'function') onDone();
@@ -645,7 +645,7 @@
       {kind:'human',label:'Hablar con asesor humano'}
     ]);
   }
-  function showGuide(platform, index) {
+  function showGuide(platform, index, enteredText=null) {
     aiEntry = false;
     const guide = knowledge.guide(platform,index);
     if (!guide) {
@@ -662,12 +662,13 @@
     aiMode = false;
     // Las instrucciones proceden EXCLUSIVAMENTE de support-issues.js,
     // convertidas a texto. Nunca incluir correo_login, perfil_pin o credenciales.
+    const instructions=refined&&window.GOXY_DIALOG_ROUTING?window.GOXY_DIALOG_ROUTING.chatGuide(guide,index):guide.instructions;
     const answer = 'Guía GOXION · '+platform+'\n'+guide.issue+'\n\n'+
-      guide.instructions+'\n\n'+(guide.requiresHuman
+      instructions+'\n\n'+(guide.requiresHuman
       ? 'Para códigos, correos de autorización o revisiones de cuenta, continúa con un asesor humano. No compartas esos datos en este chat.'
       : 'Si todavía necesitas ayuda, puedes hablar con un asesor.');
     runDemo({prompt:guide.issue,step:'searching',response:answer,finish:'happy'},
-      null,()=>showChoices([
+      enteredText,()=>showChoices([
         {kind:'unresolved',platform,label:'Ya intenté esto y sigo con el problema'},
         {kind:'issues',platform,label:'Otra situación de '+platform},
         {kind:'human',label:'Hablar con asesor humano'},
@@ -748,7 +749,7 @@
         }else disclaimer.textContent='Te quedan '+reply.remaining+
           ' consultas IA de tu cupo móvil de 24 h · Nunca compartas códigos ni PIN.';
       }
-      later(current,950,()=>chatTransition('happy'));
+      if(!refined)later(current,950,()=>chatTransition('happy'));
     }else if(reply.code!=='ABORTED'){
       chatTransition('error');
       if(refined && reply.code==='RATE_LIMIT' && Number(reply.retry_after)===3600){
@@ -763,7 +764,7 @@
         setAIStatus('pending','Falta configurar la clave privada de Groq en Supabase. Las guías permanecen disponibles.');
       }
     }
-    later(current,1700,()=>{
+    later(current,refined?250:1700,()=>{
       setBusy(false);
       chatTransition('listening');
       showChoices([{kind:'human',label:'Hablar con asesor humano'},
@@ -848,7 +849,7 @@
       bubble(response.message||'No pude comprobar ese dato ahora. Consulta Mi Espacio para información oficial.',false);
       showChoices([{kind:'account',label:'Abrir Mi Espacio'}]);
     }
-    later(flow,560,()=>{hideTyping();setBusy(false);chatTransition('listening');});
+    later(flow,refined?180:560,()=>{hideTyping();setBusy(false);chatTransition('listening');});
   }
   function respondFree(text,reply,options=[]){
     if(!active||busy||!authenticated())return;
@@ -991,9 +992,12 @@
   function handleText(query) {
     // La información que ya administra GOXION y los saludos no consumen IA.
     const words = knowledge.normalize(query);
+    if(refined&&(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i.test(query)||/^(?:\d[\s-]?){4,16}$/.test(query.trim()))){
+      bubble('Por seguridad, no compartas correos, PIN ni códigos en este chat. Describe lo que aparece sin incluir esos datos.',false);return;
+    }
     const route=contextualRoute(query);
     if(route?.kind==='thanks'){
-      respondFree(query,'¡Con gusto! Si necesitas algo más, aquí estoy.',[]);
+      bubble(query.slice(0,240),true);bubble('¡Con gusto! Si necesitas algo más, aquí estoy.',false);chatTransition('listening');
       return;
     }
     if(route?.kind==='resolved'){
@@ -1045,6 +1049,7 @@
          {kind:'promotions',label:'Promociones disponibles'}]);
       return;
     }
+    if(refined&&route?.brand&&route.brand!==chosenPlatform)clearSupportContext(route.brand);
     if(helpWithAccess(query))return;
     if(/^(hola(?: goxy)?|buenos dias|buenas tardes|buenas noches|hey|que puedes hacer|que puedo hacer|que haces|en que me ayudas|en que me puedes ayudar|como me ayudas|me puedes ayudar)$/.test(words)) {
       respondFree(query,chosenPlatform
@@ -1106,7 +1111,7 @@
         escalateAutomatically(query,target,lastGuide.issueIndex);
         return;
       }
-      if (index !== null && (!aiMode||refined&&index!==chosenGuide?.issueIndex)) {showGuide(target,index);return;}
+      if (index !== null && (!aiMode||refined&&index!==chosenGuide?.issueIndex)) {showGuide(target,index,refined?query:null);return;}
       if (aiMode && chosenGuide?.platform===target) {
         void askAI(query);
         return;
@@ -1286,6 +1291,7 @@
     if (type === 'other') { showOtherPlatforms(); return; }
     if (type === 'human') { humanHandoff(); return; }
     if (type === 'missions' || type==='promotions' || type==='payment'){
+      if(refined)clearSupportContext();
       void accountRead(type==='missions'?'missions':type==='promotions'?'promotions':'payment',
         type==='missions'?'Mis misiones':type==='promotions'?'Promociones activas':'Mi próximo pago');
       return;
@@ -1466,7 +1472,8 @@
     const button = event.target.closest?.('.gxai-suggestion');
     if (!active || !button) return;
     const entry = questions[button.dataset.prompt];
-    if (!entry) return;
+    if (!entry || busy) return;
+    if(refined){if(pendingAI)cancelFlow();clearSupportContext();}
     // Los accesos a guías mantienen el recorrido manual aprobado.
     aiEntry = false;
     if (button.dataset.prompt === 'acceso' || button.dataset.prompt === 'codigo') {
