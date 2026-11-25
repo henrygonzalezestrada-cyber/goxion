@@ -117,11 +117,11 @@
   let active = false;
   let closeTimer = null;
   const syncSend = () => { if(refined) { const ready=Boolean(messageInput.value.trim()); sendButton.classList.toggle('gxai-send-ready',ready); sendButton.disabled=busy||!ready; } };
-  syncSend();
   let interactionTimer = null, requestId = 0;
   let activeFlow = 0;
   const flowTimers = new Set();
   let busy = false;
+  syncSend();
   let typing = null;
   let chatState = 'idle';
   let prevOverflowHtml = '', prevOverflowBody = '', previousFocus = null;
