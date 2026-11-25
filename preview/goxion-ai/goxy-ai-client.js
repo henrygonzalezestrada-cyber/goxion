@@ -18,7 +18,7 @@
       headers:{"Content-Type":"application/json","X-Client-Token":clientToken},
       body:JSON.stringify(payload)});
     const body=await res.json().catch(()=>({ok:false,code:"INVALID_RESPONSE"}));
-    return {ok:res.ok && body.ok===true,...body};
+    return {...body,ok:res.ok && body?.ok===true};
   }
   async function ask({message,platform,issueIndex,history=[],signal}){
     const text=String(message||"").trim();

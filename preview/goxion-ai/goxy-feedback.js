@@ -61,16 +61,24 @@ function attach({doc,node,topic,source,send,isCurrent,reducedMotion}){
  }
  async function save(next,why,button){
   if(busy||!isCurrent()||!row.isConnected)return;
-  if(Date.now()-lastSave<1100){status.textContent='Un momento…';return;}
   busy=true;buttons.forEach(b=>b.disabled=true);reasonButtons.forEach(([,b])=>b.disabled=true);
   status.textContent='Guardando…';
+  const delay=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+  let motion=Promise.resolve();
   if(button&&!reducedMotion()){
     const s=button.querySelector('svg');const a=DATA[Number(button.dataset.vote)].angle;
-    s?.animate?.([{transform:'rotate(0deg)'},{transform:'rotate('+a+'deg)'},{transform:'rotate(0deg)'}],{duration:700,easing:'ease-in-out'});
+    const animation=s?.animate?.([{transform:'rotate(0deg)'},{transform:'rotate('+a+'deg)'},{transform:'rotate(0deg)'}],{duration:700,easing:'ease-in-out'});
+    if(animation?.finished)motion=Promise.race([animation.finished.catch(()=>{}),delay(750)]);
   }
+  // Wait locally for the server's one-second update guard; never retry a write.
+  const pause=Math.max(0,1100-(Date.now()-lastSave));
+  if(pause)await delay(pause);
+  if(!isCurrent()||!row.isConnected)return;
   let res;try{res=await send({responseId:id,topic,source,vote:next,reason:why});}catch{res={ok:false};}
+  if(res?.ok===true&&res.vote===next)lastSave=Date.now();
+  await motion;
   busy=false;if(!isCurrent()||!row.isConnected)return;
-  if(res?.ok===true&&res.vote===next){vote=next;reason=why;lastSave=Date.now();status.textContent=vote===0?'Valoración retirada':vote===1?'Gracias':'Gracias por ayudarnos';}
+  if(res?.ok===true&&res.vote===next){vote=next;reason=why;status.textContent=vote===0?'Valoración retirada':vote===1?'Gracias':'Gracias por ayudarnos';}
   else status.textContent=res?.code==='FEEDBACK_LIMIT'?'Límite de valoraciones por hoy':res?.code==='LEARNING_CAPACITY'?'Valoraciones en pausa':'No se guardó. Intenta nuevamente.';
   render();
  }

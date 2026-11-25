@@ -36,3 +36,12 @@ test('new modes fail closed outside isolated acceptance and only send categorica
  assert.equal((await api.feedback({responseId:'synthetic',topic:'support',source:'local',vote:1,reason:null,secret:'never sent'})).ok,true);
  assert.deepEqual(calls[1],{mode:'feedback',responseId:'synthetic',topic:'support',source:'local',vote:1,reason:null});
 });
+
+test('HTTP failure cannot report successful feedback',async()=>{
+ const window={GOXION_QA_ISOLATED:true,GOXION_CORE:{STORAGE:{CLIENT_TOKEN:'session'},endpoint:()=> 'https://qa.example/functions/v1/goxy-ai-qa'}};
+ const location={pathname:'/goxion/ayuda-aceptacion-v2.html'};
+ const localStorage={getItem:()=> 'synthetic'};
+ const fetch=async()=>({ok:false,json:async()=>({ok:true,vote:1})});
+ vm.runInNewContext(readFileSync('preview/goxion-ai/goxy-ai-client.js','utf8'),{window,location,localStorage,fetch});
+ assert.equal((await window.GOXY_AI.feedback({responseId:'synthetic',topic:'support',source:'local',vote:1})).ok,false);
+});

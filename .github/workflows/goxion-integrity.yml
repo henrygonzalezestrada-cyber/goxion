@@ -31,6 +31,9 @@ jobs:
       - name: Goxy · interpretación y diagnóstico contextual
         run: node --test scripts/goxy-dialog-routing.test.mjs scripts/goxy-diagnosis.test.mjs scripts/goxy-conversation-context.test.mjs scripts/goxy-learning-ui.test.mjs
 
+      - name: Goxy · valoraciones animadas (Chromium/WebKit, servidor simulado)
+        run: node scripts/goxy-learning-browser-smoke.mjs
+
       - name: Verify repository integrity
         run: npm run verify
 

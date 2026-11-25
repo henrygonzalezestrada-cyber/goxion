@@ -112,6 +112,7 @@ class Element {
   fire(type,props={}){this.handlers[type]?.forEach(fn=>fn({preventDefault(){},stopPropagation(){},...props}));}
   setAttribute(name,value){this.attrs[name]=value;}
   getAttribute(name){return this.attrs[name]??null;}
+  hasAttribute(name){return Object.hasOwn(this.attrs,name);}
   focus(){doc.activeElement=this;}
   querySelector(sel) {
     if(this.name==='hero')return ({
