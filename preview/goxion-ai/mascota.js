@@ -1060,6 +1060,7 @@
       aiMode=false;awaitingSymptom=false;
     }else if(!result.handoff){clearSupportContext();}
     if(result.handoff){humanHandoff();return true;}
+    if(result.answer&&state)keepTurn(query||'Se analizó una imagen del problema.',result.answer);
     if(query!==null&&result.answer)respondFree(query,result.answer,result.choices);
     else{if(result.answer)bubble(result.answer,false);showChoices(result.choices||[]);}
     return true;
@@ -1111,7 +1112,7 @@
       return;
     }
     if(route?.brand&&route.brand!==chosenPlatform&&['brand','symptom'].includes(route.kind))clearSupportContext(route.brand);
-    if(route?.kind==='brand'){
+    if(route?.kind==='brand'&&!diagnosis?.get()){
       awaitingSymptom=true;
       respondFree(query,'¿Qué ocurre con '+route.brand+'? Cuéntame el síntoma o elige una situación conocida.',[{kind:'issues',platform:route.brand,label:'Ver soluciones disponibles'}]);
       return;
@@ -1130,8 +1131,8 @@
       return;
     }
     if(refined&&route?.brand&&route.brand!==chosenPlatform)clearSupportContext(route.brand);
+    if(helpWithAccess(query)){diagnosis?.reset();return;}
     if(diagnosis&&!accessStage){const decision=diagnosis.consume(query,chosenPlatform,visionReady);if(decision&&applyDiagnosis(decision,query))return;}
-    if(helpWithAccess(query))return;
     if(/^(hola(?: goxy)?|buenos dias|buenas tardes|buenas noches|hey|que puedes hacer|que puedo hacer|que haces|en que me ayudas|en que me puedes ayudar|como me ayudas|me puedes ayudar)$/.test(words)) {
       respondFree(query,chosenPlatform
         ? 'Puedo guiarte sobre '+chosenPlatform+', consultar tus misiones y promociones, o enviarte a tu estado de cuenta. Si la guía no basta, te ayudo a aclararla con IA.'
@@ -1324,7 +1325,7 @@
     const type = button.dataset.kind;
     const platform = button.dataset.platform;
     const index = Number(button.dataset.issueIndex);
-    if(type==='diagnosis-reply'&&diagnosis){const text=button.textContent.trim();const decision=diagnosis.consume(text,chosenPlatform,visionReady);if(decision)applyDiagnosis(decision,text);else handleText(text);return;}
+    if(type==='diagnosis-reply'&&diagnosis){handleText(button.textContent.trim());return;}
     if(type==='diagnosis-image'&&visionReady){toggleTools(false);gallery?.click();return;}
     if (type === 'unresolved') {
       const guide=lastGuide && knowledge.guide(lastGuide.platform,lastGuide.issueIndex);
@@ -1590,7 +1591,7 @@
     let diagnosed=false;
     if(reply.ok&&typeof reply.answer==='string'){
       chatTransition('speaking');
-      if(diagnosis){clearSupportContext();const decision=diagnosis.fromVision(reply.diagnosis);if(decision){if(!decision.answer)bubble(reply.answer,false).classList.add('gxai-ai-answer');diagnosed=applyDiagnosis(decision);}}
+      if(diagnosis){clearSupportContext();const decision=diagnosis.fromVision(reply.diagnosis);if(decision){if(!decision.answer){bubble(reply.answer,false).classList.add('gxai-ai-answer');keepTurn('Se analizó una imagen del problema.',reply.answer);}diagnosed=applyDiagnosis(decision);}}
       if(!diagnosed)bubble(reply.answer,false).classList.add('gxai-ai-answer');
     }
     else if(reply.code!=='ABORTED'){chatTransition('error');bubble(reply.code==='RATE_LIMIT'?'La cuota de IA requiere una pausa. Puedes intentar de nuevo cuando esté disponible.':reply.code==='INVALID_IMAGE'?'No pude validar la imagen o el texto. Prueba con una captura JPG o PNG sin información privada.':reply.code==='VISION_DISABLED'?'El análisis no está autorizado para esta sesión.':'No pude analizar la imagen ahora. Puedes describir la falla o acudir a nuestro equipo.',false);}
