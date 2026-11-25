@@ -29,7 +29,7 @@
   isolated=true;
  }catch(e){console.error('GOXION aceptación: aislamiento de sesión no disponible',e)}
  Object.defineProperty(window,'GOXION_QA_ISOLATED',{value:isolated,writable:false});
- const allowed=new Set(['login-goxion','mi-espacio','estado-cuenta-beta','estado-financiero','estado-financiero-b2-beta','cancelaciones-cliente','notificaciones-cliente','novedades-cliente','accesos-cliente-beta','inventario-publico','periodo-cobro','trato-justo','legal-consent-v2','comprobantes-b2-beta','historial-cliente','experiencia-servicio','opiniones-goxion']);
+ const allowed=new Set(['login-goxion','mi-espacio','estado-cuenta-beta','estado-financiero','estado-financiero-b2-beta','cancelaciones-cliente','notificaciones-cliente','novedades-cliente','accesos-cliente-beta','inventario-publico','periodo-cobro','trato-justo','legal-consent-v2','comprobantes-b2-beta','historial-cliente','experiencia-servicio','opiniones-goxion','goxy-ai-qa','goxy-vision-qa']);
  window.fetch=async function(input,init){
   if(!isolated)return denied();
   const raw=typeof input==='string'||input instanceof URL?String(input):input?.url||'';
@@ -46,6 +46,10 @@
   if(!m||method!=='POST'||!allowed.has(m[1]))return denied();
   let b={};try{if(typeof init?.body==='string')b=JSON.parse(init.body)}catch{return denied()}
   if(m[1]==='login-goxion'&&!/^qa-v2-(finanzas|b2|beneficios|beneficios-retest|vencido|suspendido|nuevo)$/i.test(String(b.nombre||'')))return denied();
+  // Goxy QA: sólo los contratos explícitos de texto y visión; el servidor autentica,
+  // limita cuota y autoriza los adjuntos. Nunca redirigir tráfico a producción.
+  if(m[1]==='goxy-ai-qa'&&!['status','chat','account','forecast'].includes(b.mode))return denied();
+  if(m[1]==='goxy-vision-qa'&&!['status','example','analyze'].includes(b.mode))return denied();
   // Las únicas escrituras de esta ruta son operaciones de la cuenta sintética
   // en APIs oficiales aisladas. No se admiten compras ni comunicaciones externas.
   return native(input,init);
