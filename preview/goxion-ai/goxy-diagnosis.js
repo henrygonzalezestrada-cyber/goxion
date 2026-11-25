@@ -74,7 +74,7 @@ function create(){
   const brands=k.resolveAllPlatforms(text);if(brands.length>1)return null;
   const explicit=brands[0]||null;
   const p=explicit||state?.platform||platformHint;
-  if(state&&explicit&&explicit!==state.platform){if(state.platform===null){state.platform=explicit;}else reset();}
+  if(state&&explicit&&explicit!==state.platform){if(state.platform===null){state.platform=explicit;if(n===norm(explicit))return result('Entendido, es '+explicit+'. ¿Qué sucede al intentar usarlo ahora?',[step('Sigue igual'),step('Ya funciona'),support()]);}else reset();}
   if(!state&&p){
    const i=match(p,text);
    if(i!==null)return begin(p,i);
