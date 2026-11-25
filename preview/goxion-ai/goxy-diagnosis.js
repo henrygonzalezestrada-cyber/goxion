@@ -67,15 +67,14 @@ function create(){
    state={platform:p,index:null,issue:'Captura no legible',stage:'visual-clarify',checks:[],source:'image',visualUsed:true,device:null};
    return result('No alcanzo a identificar el aviso con seguridad. ¿Qué plataforma estás usando y qué parte del mensaje alcanzas a leer? No necesitas reenviar la misma imagen.',[choice('platforms','Elegir plataforma'),step('No puedo leerlo')]);
   }
-  if(p){state={platform:p,index:null,issue:'Problema identificado en imagen',stage:'visual-clarify',checks:[],source:'image',visualUsed:true,device:null};return result(null,[step('Sigue igual'),step('Ya funciona'),support()]);}
-  return null;
+  state={platform:p,index:null,issue:'Problema identificado en imagen',stage:'visual-clarify',checks:[],source:'image',visualUsed:true,device:null};return result(null,[step('Sigue igual'),step('Ya funciona'),support()]);
  }
  function consume(text,platformHint=null,canImage=false){
   const n=norm(text);if(!n)return null;
   const brands=k.resolveAllPlatforms(text);if(brands.length>1)return null;
   const explicit=brands[0]||null;
   const p=explicit||state?.platform||platformHint;
-  if(state&&explicit&&explicit!==state.platform){reset();}
+  if(state&&explicit&&explicit!==state.platform){if(state.platform===null){state.platform=explicit;}else reset();}
   if(!state&&p){
    const i=match(p,text);
    if(i!==null)return begin(p,i);
@@ -86,7 +85,7 @@ function create(){
   if(!state)return null;
   if(human.test(n)&&/\b(quiero|necesito|hablar|contactar|pasame|continuar)\b/.test(n))return result(null,[support()],{handoff:true});
   const hasFailure=failed.test(n)||missing.test(n);
-  if(!hasFailure&&resolved.test(n)){reset();return result('¡Qué bueno que ya funciona! Si vuelve a ocurrir, aquí estoy.',[choice('platforms','Ayuda con otra plataforma')]);}
+  if(!hasFailure&&resolved.test(n)&&!/\b(ya quedo|ya esta) (enviad\w*|mandad\w*|actualizad\w*|solicitad\w*)\b/.test(n)){reset();return result('¡Qué bueno que ya funciona! Si vuelve a ocurrir, aquí estoy.',[choice('platforms','Ayuda con otra plataforma')]);}
   const i=p?match(p,text):null;
   if(i!==null&&i!==state.index)return begin(p,i);
   if(device.test(n))state.device=n.match(device)[0];
@@ -97,6 +96,7 @@ function create(){
     state.stage='locate';
     return result('Entiendo, no encuentras esa opción. ¿Qué botones aparecen en tu TV? Puedes describirlos sin compartir códigos.',[step('Sólo aparece un código'),step('No puedo describirlo'),support()]);
    }
+   if(home&&state.stage==='step'&&done.test(n)&&!/\b(envi\w*|mand\w*|solicit\w*|confirm\w*)\b/.test(n)&&!hasFailure){state.stage='confirm-send';return result('Perfecto. ¿La TV confirmó que se envió la solicitud de actualización?',[step('Sí, ya se envió'),step('No, sigue igual')]);}
    if(done.test(n)||hasFailure||state.stage==='await-human'&&/^(si|claro|ok|de acuerdo)$/.test(n)){
     state.stage='await-human';
     const check=home?'Cliente indica que intentó la actualización de hogar':'Cliente indica que siguió el paso de soporte';
@@ -105,6 +105,10 @@ function create(){
     return result('Gracias por intentarlo. Como sigue fallando, nuestro equipo puede revisar el caso sin repetir los pasos.',[support(),step('Ya funciona')]);
    }
    if(/^(si|ok|vale|entendido|de acuerdo|claro)$/.test(n))return result('Avísame cuando hayas realizado el paso o si no encuentras la opción.',[step(home?'Ya envié la solicitud':'Ya lo intenté'),step('No aparece esa opción')]);
+  }
+  if(state.stage==='confirm-send'){
+   if(!hasFailure&&/\b(si|envi\w*|mand\w*|confirm\w*|listo)\b/.test(n)){state.stage='await-human';state.checks.push('Cliente confirma envío de solicitud de hogar');return result('Perfecto. Ahora nuestro equipo debe autorizar la actualización. Ya tengo el contexto para preparar tu solicitud.',[support(),step('Ya funciona')]);}
+   if(hasFailure||/^(no|aun no|todavia no)$/.test(n)){state.stage='locate';return result('Entendido. ¿Qué aparece después de pulsar la opción? No escribas códigos ni correos.',[step('Sólo aparece un código'),step('No puedo describirlo'),support()]);}
   }
   if(state.stage==='retry'&&(done.test(n)||hasFailure)){
    if(!state.checks.includes('Cliente intentó reiniciar la aplicación'))state.checks.push('Cliente intentó reiniciar la aplicación');
@@ -117,8 +121,8 @@ function create(){
   }
   if(['clarify','locate','visual-clarify','image-request'].includes(state.stage)){
    if(retry.test(n))return startRetry(p,state.source);
-   if(missing.test(n)||unknown.test(n)||/^(aparece un aviso|mensaje de error|me sale un error|me aparece un error|sale un aviso)$/.test(n)){
-    if(canImage&&!state.visualUsed&&state.stage!=='image-request'){
+   if(missing.test(n)||unknown.test(n)||/\b(no puedo (mandar|enviar|compartir|describir)|no tengo captura|prefiero no)\b/.test(n)||/^(aparece un aviso|mensaje de error|me sale un error|me aparece un error|sale un aviso)$/.test(n)){
+    if(canImage&&!state.visualUsed&&state.stage!=='image-request'&&!/\b(no puedo (mandar|enviar|compartir)|no tengo captura|prefiero no)\b/.test(n)){
      state.stage='image-request';
      return result('¿Puedes mostrarme el aviso? Una captura sin datos privados puede ayudarme a identificarlo. Si prefieres, descríbeme el mensaje.',[image(),step('No puedo mandar captura')]);
     }
