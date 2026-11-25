@@ -119,6 +119,7 @@
   let active = false;
   let closeTimer = null;
   const vision=refined?window.GOXY_VISION:null;
+  const diagnosis=refined?window.GOXY_DIAGNOSIS?.create():null;
   const more=layer.querySelector('.gxai-more'),toolsMenu=layer.querySelector('.gxai-tools-menu'),attachment=layer.querySelector('.gxai-attachment');
   const gallery=layer.querySelector('.gxai-image-picker'),camera=layer.querySelector('.gxai-camera-picker');
   const exampleButton=layer.querySelector('.gxai-tool-example');
@@ -426,7 +427,7 @@
     const origin=refined?card.getBoundingClientRect():null;
     const source=refined?heroTrigger.querySelector('.gxai-mascot').getBoundingClientRect():null;
     active = true; requestId++;
-    cancelFlow();
+    cancelFlow();diagnosis?.reset();
     if(vision){clearImage();visionReady=false;visionTestOnly=false;exampleImage=null;exampleButton.hidden=true;const visionId=requestId;if(vision.isQA())vision.status().then(state=>{if(active&&visionId===requestId){visionReady=state.ok===true&&state.ready===true;visionTestOnly=state.testOnly===true;exampleImage=state.ok===true&&state.exampleReady===true&&typeof state.exampleImage==='string'&&/^data:image\/png;base64,[A-Za-z0-9+/=]+$/.test(state.exampleImage)?state.exampleImage:null;exampleButton.hidden=!exampleImage;if(imageDraft&&!imageDraft.example)renderAttachment(imageNotice());syncSend();}});}
     aiConfigured = false;
     aiMode = false;
@@ -495,7 +496,7 @@
     if (!active) return;
     const animate=refined&&animated===true&&!reducedMotion()&&authenticated()&&!layer.classList.contains('gxai-keyboard-open')&&!layer.classList.contains('gxai-no-morph');
     active = false; requestId++;
-    cancelFlow();
+    cancelFlow();diagnosis?.reset();
     if(vision){clearImage();visionReady=false;visionTestOnly=false;exampleImage=null;exampleButton.hidden=true;}
     clearChoices();
     chosenPlatform = null;
@@ -708,6 +709,7 @@
   function showGuide(platform, index, enteredText=null) {
     aiEntry = false;
     const guide = knowledge.guide(platform,index);
+    if(guide&&diagnosis){const next=diagnosis.begin(platform,index);if(next){applyDiagnosis(next,enteredText||guide.issue);return;}}
     if (!guide) {
       runDemo({prompt:'Consultar guía',step:'searching',
         response:'No encontré esa guía actualizada. Puedes elegir otra situación o hablar directamente con un asesor.',
@@ -1041,9 +1043,26 @@
     return true;
   }
   function clearSupportContext(platform=null){
+    diagnosis?.reset();
     chosenPlatform=platform;chosenGuide=null;lastGuide=null;aiMode=false;aiEntry=false;
     awaitingSymptom=false;accessStage=null;caseContext=null;pendingHandoff=null;
     lastAccountTopic=null;resetConversation();
+  }
+  function applyDiagnosis(result,query=null){
+    if(!result)return false;
+    const state=result.state;
+    if(state){
+      if(state.platform&&chosenPlatform!==state.platform){resetConversation();accessStage=null;pendingHandoff=null;}
+      chosenPlatform=state.platform;
+      chosenGuide=Number.isInteger(state.index)?{platform:state.platform,issueIndex:state.index}:null;
+      lastGuide=chosenGuide?{...chosenGuide,requiresHuman:knowledge.guide(state.platform,state.index)?.requiresHuman}:null;
+      caseContext={issue:state.issue,checks:[...state.checks]};
+      aiMode=false;awaitingSymptom=false;
+    }else if(!result.handoff){clearSupportContext();}
+    if(result.handoff){humanHandoff();return true;}
+    if(query!==null&&result.answer)respondFree(query,result.answer,result.choices);
+    else{if(result.answer)bubble(result.answer,false);showChoices(result.choices||[]);}
+    return true;
   }
   function contextualRoute(query){
     return refined?window.GOXY_DIALOG_ROUTING?.classify(query,{
@@ -1071,7 +1090,7 @@
       respondFree(query,'¡Hasta pronto! Aquí estaré cuando me necesites.',[]);
       return;
     }
-    if(route?.kind==='ack'&&!awaitingSymptom){
+    if(route?.kind==='ack'&&!awaitingSymptom&&!diagnosis?.get()){
       const previous=choices?Array.from(choices.querySelectorAll('button[data-kind]')).map(b=>({...b.dataset,label:b.textContent,issueIndex:b.dataset.issueIndex===undefined?undefined:Number(b.dataset.issueIndex),serviceIndex:b.dataset.serviceIndex===undefined?undefined:Number(b.dataset.serviceIndex)})):[];
       respondFree(query,'De acuerdo. Podemos continuar cuando quieras.',previous);
       return;
@@ -1111,6 +1130,7 @@
       return;
     }
     if(refined&&route?.brand&&route.brand!==chosenPlatform)clearSupportContext(route.brand);
+    if(diagnosis&&!accessStage){const decision=diagnosis.consume(query,chosenPlatform,visionReady);if(decision&&applyDiagnosis(decision,query))return;}
     if(helpWithAccess(query))return;
     if(/^(hola(?: goxy)?|buenos dias|buenas tardes|buenas noches|hey|que puedes hacer|que puedo hacer|que haces|en que me ayudas|en que me puedes ayudar|como me ayudas|me puedes ayudar)$/.test(words)) {
       respondFree(query,chosenPlatform
@@ -1304,6 +1324,8 @@
     const type = button.dataset.kind;
     const platform = button.dataset.platform;
     const index = Number(button.dataset.issueIndex);
+    if(type==='diagnosis-reply'&&diagnosis){const text=button.textContent.trim();const decision=diagnosis.consume(text,chosenPlatform,visionReady);if(decision)applyDiagnosis(decision,text);else handleText(text);return;}
+    if(type==='diagnosis-image'&&visionReady){toggleTools(false);gallery?.click();return;}
     if (type === 'unresolved') {
       const guide=lastGuide && knowledge.guide(lastGuide.platform,lastGuide.issueIndex);
       if(needsHumanAuthorization(guide)){
@@ -1565,9 +1587,15 @@
     const reply=await (example?vision.example(aiController.signal):vision.analyze(image,query,aiController.signal,testOnly));
     if(!active||flow!==activeFlow||!authenticated()||identity!==String(window.getCurrentClientKey?.()||''))return;
     aiController=null;hideTyping();setBusy(false);
-    if(reply.ok&&typeof reply.answer==='string'){chatTransition('speaking');bubble(reply.answer,false).classList.add('gxai-ai-answer');}
+    let diagnosed=false;
+    if(reply.ok&&typeof reply.answer==='string'){
+      chatTransition('speaking');
+      if(diagnosis){clearSupportContext();const decision=diagnosis.fromVision(reply.diagnosis);if(decision){if(!decision.answer)bubble(reply.answer,false).classList.add('gxai-ai-answer');diagnosed=applyDiagnosis(decision);}}
+      if(!diagnosed)bubble(reply.answer,false).classList.add('gxai-ai-answer');
+    }
     else if(reply.code!=='ABORTED'){chatTransition('error');bubble(reply.code==='RATE_LIMIT'?'La cuota de IA requiere una pausa. Puedes intentar de nuevo cuando esté disponible.':reply.code==='INVALID_IMAGE'?'No pude validar la imagen o el texto. Prueba con una captura JPG o PNG sin información privada.':reply.code==='VISION_DISABLED'?'El análisis no está autorizado para esta sesión.':'No pude analizar la imagen ahora. Puedes describir la falla o acudir a nuestro equipo.',false);}
-    if(example&&reply.ok){clearSupportContext('Netflix');showChoices([{kind:'issue',platform:'Netflix',issueIndex:1,label:'Ver guía de actualización de hogar'},{kind:'policy-support',label:'Ir a atención humana'}]);}
+    if(diagnosed){/* diagnosis engine already supplied the next steps */}
+    else if(example&&reply.ok){clearSupportContext('Netflix');showChoices([{kind:'issue',platform:'Netflix',issueIndex:1,label:'Ver guía de actualización de hogar'},{kind:'policy-support',label:'Ir a atención humana'}]);}
     else showChoices([{kind:'platforms',label:'Consultar guías de soporte'},{kind:'policy-support',label:'Ir a atención humana'}]);
     later(flow,400,()=>chatTransition('listening'));
   }
