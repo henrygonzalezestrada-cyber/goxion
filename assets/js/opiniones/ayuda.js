@@ -28,12 +28,14 @@
     '<path class="gx-rb-neon-star-halo" d="'+starShape+'"/>'+
     '<path class="gx-rb-neon-star-line" d="'+starShape+'"/>'+
     '</svg>';
-  const modal=document.getElementById("modal-feedback");
+  const legacyModal=document.getElementById("modal-feedback");
   const view=document.getElementById("view-inicio");
-  if(!modal||!view)return;
-  modal.classList.add("gx-rb-modal");
-  modal.setAttribute("aria-labelledby","gx-rb-title");
-  modal.innerHTML=
+  if(!legacyModal||!view)return;
+  const inlineCard=refined?document.querySelector("#view-soporte .gx-support-opinion"):null;
+  const modal=inlineCard||legacyModal;
+  if(!inlineCard)modal.classList.add("gx-rb-modal");
+  legacyModal.setAttribute("aria-labelledby","gx-rb-title");
+  legacyModal.innerHTML=
     '<div class="glass-card modal-content gx-rb-shell">'+
       '<button type="button" class="gx-rb-close" id="gx-rb-close" aria-label="Cerrar">'+icon.close+'</button>'+
       '<div class="gx-rb-form" id="gx-rb-form">'+
@@ -62,6 +64,20 @@
         '<button type="button" class="gx-rb-submit" id="gx-rb-submit"><span>Enviar mi opinión</span>'+(refined?'':icon.arrow)+'</button>'+
       '</div>'+
     '</div>';
+  let compactCopy=null,compactButton=null,emoji=null,form=null,inlineClose=null,cardMotion=null,emojiMotion=null,submitEpoch=0;
+  if(inlineCard){
+    compactCopy=inlineCard.firstElementChild;
+    compactButton=inlineCard.querySelector(".gx-support-cta");
+    emoji=inlineCard.querySelector(".gx-support-art");
+    form=legacyModal.querySelector(".gx-rb-form");
+    inlineClose=legacyModal.querySelector(".gx-rb-close");
+    inlineCard.append(inlineClose,form);
+    legacyModal.replaceChildren();
+    inlineCard.classList.add("gx-rb-inline");
+    compactButton.setAttribute("aria-controls","gx-rb-form");
+    compactButton.setAttribute("aria-expanded","false");
+    form.hidden=true;inlineClose.hidden=true;
+  }
   let rating=0,preview=0,sending=false,lockedScroll=null,fieldsTimer=null;
   const originalTitle="¿Cómo te fue con nosotros?";
   // Morph SVG auténtico, sin iconos superpuestos ni bibliotecas externas.
@@ -121,6 +137,32 @@
     heroFrame=setInterval(frame,24);
   }
 
+  // Animate geometry, not a second surface. The original emoji is never cloned.
+  function animateCard(change){
+    if(!inlineCard){change();return;}
+    cardMotion?.cancel();emojiMotion?.cancel();
+    const before=inlineCard.getBoundingClientRect(),artBefore=emoji.getBoundingClientRect();
+    change();
+    const after=inlineCard.getBoundingClientRect(),artAfter=emoji.getBoundingClientRect();
+    if(reducedHeroMotion.matches||!inlineCard.animate||!before.height||!after.height)return;
+    const timing={duration:390,easing:"cubic-bezier(.22,.72,.2,1)"};
+    cardMotion=inlineCard.animate([{height:before.height+"px"},{height:after.height+"px"}],timing);
+    if(artBefore.width&&artAfter.width){
+      emojiMotion=emoji.animate([
+        {transform:"translate("+(artBefore.left-artAfter.left)+"px,"+(artBefore.top-artAfter.top)+"px) scale("+(artBefore.width/artAfter.width)+")",transformOrigin:"top left"},
+        {transform:"translate(0,0) scale(1)",transformOrigin:"top left"}
+      ],timing);
+    }
+  }
+  function setInlineOpen(open,animate=true){
+    if(!inlineCard)return;
+    const change=()=>{
+      inlineCard.classList.toggle("gx-rb-expanded",open);
+      compactCopy.hidden=open;compactButton.hidden=open;form.hidden=!open;inlineClose.hidden=!open;
+      compactButton.setAttribute("aria-expanded",String(open));
+    };
+    if(animate)animateCard(change);else change();
+  }
   function lockBackground(){
     if(lockedScroll)return;
     const body=document.body,styles=body.style;
@@ -143,6 +185,7 @@
     for(const key of ["position","top","left","right","width"])style[key]=saved[key];
     window.scrollTo(0,saved.y);
   }
+  if(!inlineCard){
   const modalVisibility=new MutationObserver(()=>{
     if(modal.classList.contains("show"))lockBackground();
     else unlockBackground();
@@ -151,7 +194,16 @@
   modal.addEventListener("touchmove",event=>{
     if(modal.classList.contains("gx-rb-complete")&&event.cancelable)event.preventDefault();
   },{passive:false});
+  }
   function closeFeedback(){
+    if(inlineCard){
+      if(sending)return;
+      setInlineOpen(false);
+      submitEpoch++;
+      reset();form.hidden=true;
+      compactButton.focus({preventScroll:true});
+      return;
+    }
     if(typeof window.closeModal==="function")window.closeModal("modal-feedback");
     else{modal.classList.remove("show");modal.style.display="none"}
     unlockBackground();
@@ -183,7 +235,8 @@
     $("gx-rb-form").hidden=false;
     $("gx-rb-success").hidden=true;
     $("gx-rb-submit").disabled=false;
-    $("gx-rb-submit").classList.remove("is-success");
+    $("gx-rb-submit").classList.remove("is-success","is-loading");
+    if(inlineCard){inlineClose.disabled=false;$("gx-rb-submit").removeAttribute("aria-busy");}
     $("gx-rb-submit").removeAttribute("aria-label");
     $("gx-rb-submit").querySelector("span").textContent="Enviar mi opinión";
     // Restore the arrow after the success morph when opening a fresh review.
@@ -208,6 +261,10 @@
       button.classList.add("is-chosen");
       setTimeout(()=>button.classList.remove("is-chosen"),600);
       $("gx-rb-error").textContent="";
+      if(inlineCard&&!reducedHeroMotion.matches){
+        emojiMotion?.cancel();
+        emojiMotion=emoji.animate?.([{transform:"scale(1)",filter:"brightness(1)"},{transform:"scale(1.13) rotate(-5deg)",filter:"brightness(1.13)"},{transform:"scale(1)",filter:"brightness(1)"}],{duration:420,easing:"cubic-bezier(.2,.7,.3,1)"});
+      }
     });
   });
   $("gx-rb-text").addEventListener("input",event=>{
@@ -216,10 +273,12 @@
   });
   $("gx-rb-close").addEventListener("click",closeFeedback);
   async function send(){
-    if(sending)return;
+    if(sending||modal.classList.contains("gx-rb-complete")||(inlineCard&&!inlineCard.classList.contains("gx-rb-expanded")))return;
     sending=true;
+    const epoch=++submitEpoch;
     const btn=$("gx-rb-submit");
     btn.disabled=true;
+    if(inlineCard){btn.classList.add("is-loading");btn.setAttribute("aria-busy","true");inlineClose.disabled=true;}
     $("gx-rb-error").textContent="";
     try{
       const review=await store.add({
@@ -228,9 +287,15 @@
       // Solo una opinión guardada de verdad puede acreditar la misión
       // [FEEDBACK]. La API existente valida la sesión y el ciclo activo,
       // sincroniza Supabase y actualiza el estado visual de Mi Espacio.
+      if(inlineCard&&epoch!==submitEpoch)return;
       if(typeof window.completarMisionInteligente==="function"){
-        await window.completarMisionInteligente("feedback");
+        if(inlineCard){
+          // Saving the opinion and crediting a mission are separate results.
+          // A mission error must never invite a second opinion submission.
+          try{await window.completarMisionInteligente("feedback");}catch(error){console.warn("GOXION misión de opinión",error);}
+        }else await window.completarMisionInteligente("feedback");
       }
+      if(inlineCard&&epoch!==submitEpoch)return;
       $("gx-rb-success-text").textContent=review.consent?
         "Podrás verla en la cinta después de que se apruebe su publicación.":
         "Tu comentario es privado y solo podrá publicarse con tu autorización.";
@@ -246,13 +311,17 @@
       confirmHeroMorph();
       btn.disabled=false;
       fieldsTimer=setTimeout(()=>{
-        $("gx-rb-fields").hidden=true;
-        modal.classList.remove("gx-rb-morphing");
+        const finish=()=>{$("gx-rb-fields").hidden=true;modal.classList.remove("gx-rb-morphing");};
+        if(inlineCard)animateCard(finish);else finish();
       },450);
     }catch(error){
-      $("gx-rb-error").textContent=error.message;
-      btn.disabled=false;
-    }finally{sending=false;}
+      if(!inlineCard||epoch===submitEpoch){
+        $("gx-rb-error").textContent=error.message||"No se pudo guardar tu opinión.";
+        btn.disabled=false;
+      }
+    }finally{
+      if(!inlineCard||epoch===submitEpoch){sending=false;if(inlineCard){btn.classList.remove("is-loading");btn.removeAttribute("aria-busy");inlineClose.disabled=false;}}
+    }
   }
   $("gx-rb-submit").addEventListener("click",()=>{
     if(modal.classList.contains("gx-rb-complete"))closeFeedback();
@@ -262,10 +331,25 @@
     if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();send()}
   });
   window.openFeedbackModal=function(){
+    if(inlineCard){
+      if(inlineCard.classList.contains("gx-rb-expanded"))return;
+      if(!inlineCard.getClientRects().length&&typeof window.switchTab==="function")window.switchTab("soporte");
+      reset();setInlineOpen(true);
+      inlineCard.scrollIntoView({block:"nearest",behavior:reducedHeroMotion.matches?"auto":"smooth"});
+      return;
+    }
     reset();
     if(typeof window.openModal==="function")window.openModal("modal-feedback");
     else{modal.classList.add("show");modal.style.display="flex"}
   };
+  if(inlineCard){
+    window.addEventListener("goxion:client-logout",()=>{
+      submitEpoch++;cardMotion?.cancel();emojiMotion?.cancel();reset();setInlineOpen(false,false);
+    });
+    inlineCard.addEventListener("keydown",event=>{
+      if(event.key==="Escape"&&inlineCard.classList.contains("gx-rb-expanded")&&!sending){event.preventDefault();closeFeedback();}
+    });
+  }
   // Animate a repeating STRIP, not fractional scrollLeft steps. Safari rounds
   // subpixel scroll changes to zero on some devices, leaving the marquee frozen.
   // Transform animations retain subpixel precision and loop seamlessly.

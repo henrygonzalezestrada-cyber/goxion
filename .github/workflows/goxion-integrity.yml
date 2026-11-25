@@ -50,6 +50,10 @@ jobs:
         if: ${{ !cancelled() }}
         run: npm run test:opiniones:oficial
 
+      - name: Opiniones espejo · transformación en la misma tarjeta
+        if: ${{ !cancelled() }}
+        run: node scripts/opiniones-inline-smoke.mjs
+
       - name: Browser smoke
         if: ${{ !cancelled() }}
         run: npm run test:smoke
