@@ -87,7 +87,8 @@ Deno.serve(async(req:Request)=>{
   const body=await bodyLimited(req).catch(()=>null);
   if(!body||typeof body!=="object"||Array.isArray(body))return output(400,{ok:false,code:"INVALID_BODY"});
   const key=Deno.env.get("GROQ_API_KEY")||"";
-  if(body.mode==="status")return output(200,{ok:true,ready:Boolean(key)&&await providerReady(key)});
+  if(body.mode==="status")return output(200,{ok:true,ready:Deno.env.get("GOXY_VISION_QA_QUOTA_VERIFIED")==="true"&&Deno.env.get("GOXY_VISION_QA_PRIVACY_VERIFIED")==="true"&&Boolean(key)&&await providerReady(key)});
+  if(Deno.env.get("GOXY_VISION_QA_QUOTA_VERIFIED")!=="true"||Deno.env.get("GOXY_VISION_QA_PRIVACY_VERIFIED")!=="true")return output(503,{ok:false,code:"VISION_DISABLED"});
   if(body.mode!=="analyze"||body.consent!==true||!safeMessage(body.message)||!validJPEG(body.image))return output(422,{ok:false,code:"INVALID_IMAGE"});
   if(!key)return output(503,{ok:false,code:"VISION_UNAVAILABLE"});
   // No model calls without transactional quota. Missing RPC fails closed.
