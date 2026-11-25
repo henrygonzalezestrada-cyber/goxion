@@ -326,12 +326,36 @@
     setTimeout(syncChatViewport, 80);
     setTimeout(syncChatViewport, 260);
   });
+  // Visual-only morph: measure the real hero and destination. No cloned chat,
+  // no additional robot engine, no delay to authenticated operations.
+  function prepareImmersiveMorph(origin, source) {
+    if (!refined) return;
+    const target=dialog.getBoundingClientRect();
+    const avatar=layer.querySelector('.gxai-avatar').getBoundingClientRect();
+    const valid=target.width>0&&target.height>0&&avatar.width>0&&source.width>0&&
+      origin.bottom>target.top&&origin.top<target.bottom;
+    layer.classList.toggle('gxai-no-morph',!valid||reducedMotion());
+    if(!valid)return;
+    const clamp=(n,max)=>Math.max(0,Math.min(max,n));
+    const top=clamp(origin.top-target.top,target.height);
+    const right=clamp(target.right-origin.right,target.width);
+    const bottom=clamp(target.bottom-origin.bottom,target.height);
+    const left=clamp(origin.left-target.left,target.width);
+    layer.style.setProperty('--gxai-morph-clip',`inset(${top}px ${right}px ${bottom}px ${left}px round 24px)`);
+    layer.style.setProperty('--gxai-morph-x',((source.left+source.width/2)-(avatar.left+avatar.width/2))+'px');
+    layer.style.setProperty('--gxai-morph-y',((source.top+source.height/2)-(avatar.top+avatar.height/2))+'px');
+    layer.style.setProperty('--gxai-morph-scale',String(Math.min(3.3,Math.max(1,source.width/avatar.width))));
+    // Commit the starting geometry before the visible class changes.
+    void dialog.offsetWidth;
+  }
   function openChat() {
     if (active || !authenticated()) {
       if (!authenticated()) window.openAuthSheet?.();
       return;
     }
     previousFocus = doc.activeElement;
+    const origin=refined?card.getBoundingClientRect():null;
+    const source=refined?heroTrigger.querySelector('.gxai-mascot').getBoundingClientRect():null;
     active = true; requestId++;
     cancelFlow();
     aiConfigured = false;
@@ -380,6 +404,11 @@
     doc.body.style.top='-'+pageY+'px';
     doc.body.style.width='100%';
     doc.documentElement.style.overscrollBehavior='none';
+    if(refined){
+      doc.documentElement.classList.add('gxai-immersive-open');
+      syncChatViewport();
+      prepareImmersiveMorph(origin,source);
+    }
     layer.classList.add('gxai-visible');
     layer.setAttribute('aria-hidden', 'false');
     syncChatViewport();
@@ -411,6 +440,10 @@
     chatState = 'idle';
     chatPhase.textContent = phases.idle.label;
     layer.setAttribute('data-chat-state','idle');
+    if(refined){
+      if(layer.classList.contains('gxai-keyboard-open')||!authenticated())layer.classList.add('gxai-no-morph');
+      doc.documentElement.classList.remove('gxai-immersive-open');
+    }
     layer.classList.remove('gxai-visible','gxai-keyboard-open');
     layer.style.setProperty('--gxai-viewport-height','100dvh');
     layer.style.setProperty('--gxai-viewport-top','0px');
@@ -430,7 +463,7 @@
   }
   function bubble(text, fromMe) {
     const node = doc.createElement('div');
-    node.className = 'gxai-bubble' + (fromMe ? ' gxai-me' : '');
+    node.className = 'gxai-bubble' + (fromMe ? ' gxai-me' : refined ? ' gxai-local-answer' : '');
     node.textContent = text;
     scroll.appendChild(node);
     scroll.scrollTop = scroll.scrollHeight;
@@ -675,7 +708,8 @@
     if(reply.ok&&typeof reply.answer==='string'){
       lastAIAnswerAt=Date.now();lastAIAccount=identity;
       chatTransition('speaking');
-      bubble(reply.answer,false);
+      const answerNode=bubble(reply.answer,false);
+      if(refined){answerNode.classList.remove('gxai-local-answer');answerNode.classList.add('gxai-ai-answer');}
       keepTurn(text,reply.answer);
       if(Number.isInteger(reply.remaining)){
         if(refined){
@@ -1372,7 +1406,7 @@
     if (!active) return;
     if (event.key === 'Escape') { event.preventDefault(); closeChat(); return; }
     if (event.key !== 'Tab') return;
-    const focusables = [...dialog.querySelectorAll('button:not([disabled])')];
+    const focusables = refined ? [...dialog.querySelectorAll('button:not([disabled]),input:not([disabled]),[tabindex="0"]')].filter(el=>el.tabIndex>=0&&el.getClientRects().length>0&&!el.closest('[hidden],[aria-hidden="true"]')) : [...dialog.querySelectorAll('button:not([disabled])')];
     if (!focusables.length) return;
     const first = focusables[0], last = focusables[focusables.length-1];
     if (event.shiftKey && (doc.activeElement === first || doc.activeElement === dialog)) {
