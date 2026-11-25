@@ -1,6 +1,7 @@
 /* GOXION · Opiniones oficiales · Cliente Supabase */
 (() => {
   "use strict";
+  const refined=document.documentElement.hasAttribute('data-gx-support-v3');
   const store=window.GOXION_REVIEWS;
   if(!store||window.__gxOpinionClient)return;
   window.__gxOpinionClient=true;
@@ -38,13 +39,13 @@
       '<div class="gx-rb-form" id="gx-rb-form">'+
         '<div class="gx-rb-form-head">'+
           '<div class="gx-rb-emblem" aria-hidden="true">'+heroStar+'</div>'+
-          '<span class="gx-rb-eyebrow">TU EXPERIENCIA EN GOXION</span>'+
+          (refined?'':'<span class="gx-rb-eyebrow">TU EXPERIENCIA EN GOXION</span>')+
           '<h2 id="gx-rb-title">¿Cómo te fue con nosotros?</h2>'+
-          '<p class="gx-rb-intro">Queremos escucharte. Comparte tu experiencia y ayúdanos a seguir mejorando.</p>'+
+          '<p class="gx-rb-intro">'+(refined?'Tu opinión nos ayuda a mejorar.':'Queremos escucharte. Comparte tu experiencia y ayúdanos a seguir mejorando.')+'</p>'+
         '</div>'+
         '<div class="gx-rb-fields" id="gx-rb-fields">'+
         '<div class="gx-rb-score">'+
-          '<span class="gx-rb-score-label">¿Cómo calificarías tu experiencia?</span>'+
+          (refined?'':'<span class="gx-rb-score-label">¿Cómo calificarías tu experiencia?</span>')+
           '<div class="gx-rb-stars" id="gx-rb-stars" role="group" aria-label="Califica de una a cinco estrellas">'+
           [1,2,3,4,5].map(i=>'<button type="button" class="gx-rb-star" data-score="'+i+'" aria-label="'+i+' '+(i===1?'estrella':'estrellas')+'" aria-pressed="false">'+svg+'</button>').join("")+
           '</div><span class="gx-rb-rating-feedback" id="gx-rb-rating-feedback" aria-live="polite">Selecciona las estrellas</span>'+
@@ -52,13 +53,13 @@
         '<div class="gx-rb-fieldhead"><label for="gx-rb-text">Cuéntanos un poco más</label><span class="gx-rb-counter" id="gx-rb-counter">0/500</span></div>'+
         '<textarea class="gx-rb-text" id="gx-rb-text" maxlength="500" placeholder="¿Qué te gustó? ¿Qué podríamos hacer mejor? Tu experiencia cuenta..." rows="4"></textarea>'+
         '<label class="gx-rb-consent"><input id="gx-rb-consent" type="checkbox"><span><strong>Permitir compartir mi opinión</strong><small>Si la autorizas, podrá aparecer en la portada después de revisión. Sin nombres completos, teléfonos ni folios.</small></span></label>'+
-        '<p class="gx-rb-formnote">Para enviar, inicia sesión en Mi Espacio. Solo publicaremos tu opinión con permiso y aprobación.</p>'+
+        '<p class="gx-rb-formnote">'+(refined?'Para enviar, inicia sesión en Mi Espacio.':'Para enviar, inicia sesión en Mi Espacio. Solo publicaremos tu opinión con permiso y aprobación.')+'</p>'+
         '<p class="gx-rb-error" id="gx-rb-error" role="alert" aria-live="polite"></p>'+
         '</div>'+
         '<div class="gx-rb-success-screen" id="gx-rb-success" hidden>'+
           '<p id="gx-rb-success-text">Tu comentario se encuentra en revisión.</p>'+
         '</div>'+
-        '<button type="button" class="gx-rb-submit" id="gx-rb-submit"><span>Enviar mi opinión</span>'+icon.arrow+'</button>'+
+        '<button type="button" class="gx-rb-submit" id="gx-rb-submit"><span>Enviar mi opinión</span>'+(refined?'':icon.arrow)+'</button>'+
       '</div>'+
     '</div>';
   let rating=0,preview=0,sending=false,lockedScroll=null,fieldsTimer=null;
@@ -188,7 +189,7 @@
     // Restore the arrow after the success morph when opening a fresh review.
     const submitIcon=$("gx-rb-submit").querySelector("svg");
     if(submitIcon)submitIcon.remove();
-    $("gx-rb-submit").insertAdjacentHTML("beforeend",icon.arrow);
+    if(!refined)$("gx-rb-submit").insertAdjacentHTML("beforeend",icon.arrow);
     paint();
   }
   starButtons.forEach(button=>{
