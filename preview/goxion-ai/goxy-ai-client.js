@@ -2,7 +2,7 @@
    All business/auth/rate limits live in Supabase goxy-ai-beta. */
 (() => {
   "use strict";
-  const URL="https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/goxy-ai-beta";
+  const URL=location.pathname.endsWith("/ayuda-aceptacion-v2.html")?"https://nsvybyvvdpdgbgtvydfb.supabase.co/functions/v1/goxy-ai-qa":"https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/goxy-ai-beta";
   const sensitive=/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b|\b(?:\d[\s.-]?){9,16}\b|\b\d{4,8}\b/iu;
   function token(){
     const key=window.GOXION_CORE?.STORAGE?.CLIENT_TOKEN;
