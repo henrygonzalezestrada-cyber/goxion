@@ -4,6 +4,7 @@
 (() => {
   'use strict';
   const doc = document;
+  const refined = doc.documentElement.hasAttribute('data-gx-support-v3');
   const section = doc.getElementById('view-soporte');
   const card = doc.getElementById('smart-support-card');
   if (!section || !card || card.classList.contains('gxai-card')) return;
@@ -42,7 +43,7 @@
   const hero = doc.createElement('div');
   hero.className = 'gxai-hero';
   hero.innerHTML = [
-    '<div class="gxai-kicker">CONOCE A GOXY · TU ASISTENTE</div>',
+    refined ? '<div class="gxai-kicker">Goxy, tu asistente</div>' : '<div class="gxai-kicker">CONOCE A GOXY · TU ASISTENTE</div>',
     '<button class="gxai-mascot-button" type="button" aria-label="Juega con Goxy: tócalo o desliza tu dedo para acariciarlo">',
     svg,
     '<span class="gxai-reactions" aria-hidden="true"></span>',
@@ -50,7 +51,7 @@
     '<div class="gxai-touch-hint">Tócalo o acarícialo de lado a lado</div>',
     '<span class="gxai-pet-status" role="status" aria-live="polite"></span>',
     '<h2 class="gxai-title">¿Necesitas <span>ayuda?</span></h2>',
-    '<p class="gxai-desc">¿Tienes algún problema con tus plataformas o algo que te gustaría saber? Estoy aquí para ayudarte.</p>',
+    refined ? '<p class="gxai-desc">Resuelve tus dudas y encuentra ayuda para tus plataformas.</p>' : '<p class="gxai-desc">¿Tienes algún problema con tus plataformas o algo que te gustaría saber? Estoy aquí para ayudarte.</p>',
     '<button class="gxai-open" type="button" aria-label="Abrir conversación con Goxy">',
     '<span class="gxai-open-inner"><span class="gxai-open-signal" aria-hidden="true"><i></i><i></i><i></i></span>',
     '<span class="gxai-open-copy">Hablar con Goxy</span><span class="gxai-open-balance" aria-hidden="true"></span></span></button>'
@@ -65,13 +66,13 @@
     '<section class="gxai-chat" role="dialog" aria-modal="true" aria-labelledby="gxai-chat-title">',
     '<header class="gxai-chat-head">',
     '<span class="gxai-avatar" aria-hidden="true">', svg, '</span>',
-    '<span class="gxai-heading"><strong id="gxai-chat-title">Goxy · Asistente GOXION</strong>',
+    refined ? '<span class="gxai-heading"><strong id="gxai-chat-title">Goxy</strong>' : '<span class="gxai-heading"><strong id="gxai-chat-title">Goxy · Asistente GOXION</strong>',
     '<small class="gxai-chat-phase" role="status" aria-live="polite">Listo para escucharte</small></span>',
-    '<button class="gxai-close" type="button" aria-label="Cerrar chat">×</button>',
+    refined ? '<button class="gxai-close" type="button" aria-label="Cerrar chat"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18"/></svg></button>' : '<button class="gxai-close" type="button" aria-label="Cerrar chat">×</button>',
     '</header>',
     '<div class="gxai-chat-scroll" role="log" aria-live="polite">',
-    '<div class="gxai-beta-note">GOXY · IA CON SOPORTE REAL</div>',
-    '<div class="gxai-bubble">¡Hola! Soy Goxy. 🤖 Cuéntame qué necesitas: revisar misiones, promociones o solucionar un problema con tus plataformas. Si hace falta, buscaré una explicación adicional automáticamente. Nunca compartas contraseñas, códigos ni PIN aquí.</div>',
+    refined ? '' : '<div class="gxai-beta-note">GOXY · IA CON SOPORTE REAL</div>',
+    refined ? '<div class="gxai-bubble">¡Hola! Soy Goxy, tu asistente virtual. ¿En qué puedo ayudarte hoy?</div>' : '<div class="gxai-bubble">¡Hola! Soy Goxy. 🤖 Cuéntame qué necesitas: revisar misiones, promociones o solucionar un problema con tus plataformas. Si hace falta, buscaré una explicación adicional automáticamente. Nunca compartas contraseñas, códigos ni PIN aquí.</div>',
     '<div class="gxai-ai-panel" role="status" aria-live="polite">',
     '<span class="gxai-ai-light" aria-hidden="true"></span>',
     '<div class="gxai-ai-panel-copy"><strong class="gxai-ai-title">Comprobando IA…</strong><small class="gxai-ai-description">Verificando la conexión segura con Goxy.</small></div>',
@@ -92,7 +93,7 @@
     '<svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 14-8-4 16-3-6-7-2Zm7 2 7-10"/></svg>',
     '</button>',
     '</form>',
-    '<div class="gxai-chat-disclaimer">Asistencia GOXION · Nunca compartas contraseñas, códigos ni PIN.</div>',
+    refined ? '<div class="gxai-chat-disclaimer">No compartas contraseñas, códigos ni PIN.</div>' : '<div class="gxai-chat-disclaimer">Asistencia GOXION · Nunca compartas contraseñas, códigos ni PIN.</div>',
     '</footer>',
     '</section>'
   ].join('');
@@ -190,6 +191,14 @@
   function setAIStatus(status, message) {
     aiPanel.setAttribute('data-ai-status', status);
     aiStart.disabled = status !== 'ready';
+    if(refined){
+      // Estado normal sin tarjeta técnica; errores útiles siguen disponibles.
+      aiPanel.hidden=status==='ready'||status==='checking';
+      aiTitle.textContent='Asistencia adicional no disponible';
+      aiDescription.textContent='Puedes seguir usando las guías y contactar a nuestro equipo.';
+      disclaimer.textContent='No compartas contraseñas, códigos ni PIN.';
+      return;
+    }
     aiTitle.textContent = status === 'ready' ? 'Asistencia inteligente lista' :
       status === 'pending' ? 'Guías de soporte disponibles' :
       status === 'checking' ? 'Preparando tu asistencia…' : 'Asistencia adicional no disponible';
@@ -669,15 +678,22 @@
       bubble(reply.answer,false);
       keepTurn(text,reply.answer);
       if(Number.isInteger(reply.remaining)){
-        disclaimer.textContent='Te quedan '+reply.remaining+
+        if(refined){
+          if(reply.remaining===0) bubble('Alcanzaste tu límite de consultas con IA. Las guías y la atención humana siguen disponibles.',false).classList.add('gxai-quota-notice');
+          else if(reply.remaining===1) bubble('Te queda una consulta con IA. Las guías y la atención humana siguen disponibles.',false).classList.add('gxai-quota-notice');
+        }else disclaimer.textContent='Te quedan '+reply.remaining+
           ' consultas IA de tu cupo móvil de 24 h · Nunca compartas códigos ni PIN.';
       }
       later(current,950,()=>chatTransition('happy'));
     }else if(reply.code!=='ABORTED'){
       chatTransition('error');
-      bubble(reply.code==='RATE_LIMIT'
+      if(refined && reply.code==='RATE_LIMIT' && Number(reply.retry_after)===3600){
+        bubble('Alcanzaste tu límite de consultas con IA. Las guías y la atención humana siguen disponibles.',false).classList.add('gxai-quota-notice');
+      }else bubble(reply.code==='RATE_LIMIT'
         ? 'La asistencia avanzada sigue en pausa. Puedes continuar con las guías y el asesor sin gastar IA.'
-        : reply.message||'Goxy no puede conectar con la IA todavía. Las guías siguen disponibles.',false);
+        : refined && ['AI_NOT_CONFIGURED','AI_UNAVAILABLE','PROVIDER_LIMIT','QUOTA_UNAVAILABLE'].includes(reply.code)
+          ? 'Por ahora no puedo usar la asistencia adicional. Las guías y nuestro equipo siguen disponibles.'
+          : reply.message||'Goxy no puede conectar con la IA todavía. Las guías siguen disponibles.',false);
       if(reply.code==='AI_NOT_CONFIGURED'){
         aiConfigured=false;aiMode=false;
         setAIStatus('pending','Falta configurar la clave privada de Groq en Supabase. Las guías permanecen disponibles.');
