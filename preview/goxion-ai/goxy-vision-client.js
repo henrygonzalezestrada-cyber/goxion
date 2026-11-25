@@ -37,5 +37,6 @@
  }
  const status=signal=>send({mode:'status'},signal);
  const analyze=(image,message,signal)=>send({mode:'analyze',image,message:String(message||'').trim(),consent:true},signal);
- window.GOXY_VISION=Object.freeze({prepare,status,analyze,isQA});
+ const example=signal=>send({mode:'example',consent:true},signal);
+ window.GOXY_VISION=Object.freeze({prepare,status,analyze,example,isQA});
 })();
