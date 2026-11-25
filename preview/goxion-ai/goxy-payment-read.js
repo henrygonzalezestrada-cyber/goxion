@@ -144,6 +144,14 @@
    }catch(error){return unavailable(error?.name==='AbortError'?'aborted':'network');}
  }
  function extensionDescribe(state){
+   if(window.GOXY_POLICY_V2){
+     const policy=window.GOXY_POLICY_V2.reply('Cómo funciona la prórroga').answer;
+     const choices=[{kind:'pay-open',label:'Revisar mi pago'},{kind:'policy-doc',view:'terminos',label:'Consultar términos 2.0'}];
+     if(!state?.ok)return {answer:'No pude comprobar tu elegibilidad en este momento. '+policy,choices};
+     if(state.agreement)return {answer:'Hay un acuerdo registrado en tu cuenta con fecha '+date(state.agreement.fecha_pactada)+'. Revisa su estado y confirmación en Mi Espacio. '+policy,choices};
+     if(state.eligible)return {answer:'El sistema indica que puedes solicitar una prórroga, con fecha máxima '+date(state.max)+'. '+policy,choices:[{kind:'extend-open',label:'Solicitar prórroga'},...choices]};
+     return {answer:'El sistema no muestra una prórroga disponible para activar en este momento. '+policy,choices};
+   }
    const choices=[{kind:'pay-open',label:'Revisar mi pago'}];
    if(!state?.ok)return {answer:'Puedo explicarte las prórrogas, pero ahora no pude comprobar si tu cuenta tiene una disponible. La opción oficial aparece en Mi Espacio solo cuando cumples las condiciones.',choices};
    if(state.agreement){
@@ -251,6 +259,12 @@
    let answer='Si realizas tu pago el '+date(value.date)+
       ', el motor financiero proyecta '+money(value.amountCents)+
       ' de saldo pendiente, incluyendo '+money(value.moraCents)+' de mora.';
+   if(window.GOXY_POLICY_V2){
+     if(!value.reactivationConfirmed || !valid(value.reactivationCents) || value.reactivationCents!==0)
+       return {answer:'No puedo confirmar una proyección compatible con los términos 2.0: no existe cargo administrativo adicional de reactivación del 20%. Consulta tu estado de cuenta o solicita una aclaración antes de pagar. (Términos 3.2–3.4).',choices};
+     answer+=' No existe cargo administrativo adicional de reactivación. Pagar después del vencimiento original interrumpe la racha de lealtad, incluso con prórroga. Es una proyección, no un importe definitivo: puede variar por abonos, prórrogas o ajustes.';
+     return {answer,choices};
+   }
    if(value.reactivationConfirmed && valid(value.reactivationCents))
      answer+=value.reactivationCents>0
        ? ' Además, el motor aplicaría '+money(value.reactivationCents)+' de reactivación (cargo del 20% según la política para atrasos de más de 15 días).'
