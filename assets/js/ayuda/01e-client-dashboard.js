@@ -650,12 +650,34 @@
                         ? `${escape(updateNotice.titulo || 'Acceso actualizado')}${updateExtraCount ? ` +${updateExtraCount}` : ''}`
                         : '';
                     const updateType = String(updateNotice?.tipo || 'acceso').toLowerCase();
+                    // Estado semántico de presentación. La fuente real sigue siendo la misma:
+                    // cancelaciones, novedades, entregas y alertas oficiales del cliente.
+                    const serviceInterrupted = gxServiceHasAlert(s.nombre);
+                    const serviceTone = updateType === 'cancelacion_rechazada'
+                        ? 'danger'
+                        : serviceInterrupted || updateType === 'cancelacion_aprobada'
+                            ? 'caution'
+                            : updateNotice ? 'pending' : 'ok';
                     const updateKey = updateNotice
                         ? String(updateNotice.id || `${s.id}-${updateType}-${updateNotice.created_at || ''}`)
                         : '';
 
                     const updateBadgeHTML = updateNotice
                         ? `<span class="gx-service-update-badge gx-update-${escape(updateType)}" title="${escape(updateNotice.resumen || updateNotice.titulo || '')}">${updateLabel}</span>`
+                        : '';
+
+                    // Mostrar novedades secundarias sin duplicar la contraseña
+                    // que ya tiene su propio flujo protegido de consulta única.
+                    const secondaryNotices = combinedNotices.slice(1).filter(n =>
+                        !(delivery && String(n?.tipo || '').toLowerCase() === 'password')
+                    );
+                    const secondaryNoticesHTML = secondaryNotices.length
+                        ? `<details class="gx-service-other-notices">
+                            <summary>Otras novedades (${secondaryNotices.length})</summary>
+                            <ul>${secondaryNotices.map(n =>
+                                `<li><strong>${escape(n?.titulo || 'Novedad de servicio')}</strong>${n?.resumen ? `<span>${escape(n.resumen)}</span>` : ''}</li>`
+                            ).join('')}</ul>
+                           </details>`
                         : '';
 
                     const credentialNoticeHTML = delivery ? `
@@ -827,14 +849,14 @@
                     }
 
                     srvHTML += `
-                        <article class="gx-service-manage-card ${updateNotice ? 'gx-service-has-update' : ''}" id="gx-service-card-${idx}" ${updateNotice ? `data-gx-update-key="${escape(updateKey)}"` : ''}>
+                        <article class="gx-service-manage-card ${updateNotice ? 'gx-service-has-update' : ''}" id="gx-service-card-${idx}" data-gx-priority-tone="${serviceTone}" ${updateNotice ? `data-gx-update-key="${escape(updateKey)}"` : ''}>
                             <button type="button" class="gx-service-summary" aria-expanded="false" onclick="gxToggleServiceCard(${idx})">
                                 <img src="${serviceLogo(s.nombre)}" class="gx-service-logo-img" alt="${s.nombre}" onerror="this.src='logo2.PNG'">
 
                                 <span>
                                     <span class="gx-service-name">${s.nombre}</span>
                                     <span class="gx-service-state-line">
-                                        <span class="gx-service-state ${gxServiceHasAlert(s.nombre) ? 'gx-service-interrupted' : ''}">${gxServiceHasAlert(s.nombre) ? 'Temporalmente inactivo' : 'Activo'}</span>
+                                        <span class="gx-service-state ${serviceInterrupted ? 'gx-service-interrupted' : ''}">${serviceInterrupted ? 'Temporalmente inactivo' : 'Activo'}</span>
                                         ${updateBadgeHTML}
                                     </span>
                                 </span>
@@ -843,6 +865,7 @@
                                 <svg class="gx-chevron-svg" viewBox="0 0 24 16" aria-hidden="true">
                                 <path d="M3.2 4.2L12 11.3L20.8 4.2"></path>
                             </svg>
+                            <svg class="gx-service-close-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"></path></svg>
                             </span>
                             </button>
 
@@ -851,6 +874,7 @@
 
                                 <div id="gx-service-home-${idx}" class="gx-service-home">
                                     ${credentialNoticeHTML}
+                                    ${secondaryNoticesHTML}
                                     <div class="gx-access-heading">Tus accesos</div>
                                     ${credsHTML}
                                     <div class="gx-service-toolbar">

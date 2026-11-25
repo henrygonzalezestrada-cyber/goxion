@@ -14312,3 +14312,210 @@ body.gx-promo-morph-open{overflow:hidden!important}
     rotate:0deg!important;
     animation:none!important;
 }
+
+/* ==========================================================
+   GOXION · SERVICIOS CONECTADOS · JERARQUÍA SEMÁNTICA V1
+   Preparación de integración de UI: solo #dash-services.
+   Reutiliza HTML/acciones oficiales; no crea una segunda ruta.
+   ========================================================== */
+#view-dashboard .gx-services-stack{
+  --gx-srv-close-disc:35px;
+  --gx-srv-close-x:16px;
+  display:grid;
+  gap:9px;
+  min-width:0;
+}
+#view-dashboard .gx-service-manage-card{
+  --gx-srv-tone:#66d6a4;
+  --gx-srv-tint:rgba(39,126,91,.10);
+  min-width:0;
+  border-radius:22px;
+  border:1px solid rgba(255,255,255,.05);
+  background:rgba(8,8,12,.371);
+  -webkit-backdrop-filter:blur(11.75px) saturate(1);
+  backdrop-filter:blur(11.75px) saturate(1);
+  box-shadow:inset 0 1px rgba(255,255,255,.045);
+}
+#view-dashboard .gx-service-manage-card[data-gx-priority-tone="pending"]{
+  --gx-srv-tone:#e9ca6f;
+  --gx-srv-tint:rgba(163,128,39,.12);
+}
+#view-dashboard .gx-service-manage-card[data-gx-priority-tone="caution"]{
+  --gx-srv-tone:#efab70;
+  --gx-srv-tint:rgba(173,94,42,.14);
+}
+#view-dashboard .gx-service-manage-card[data-gx-priority-tone="danger"]{
+  --gx-srv-tone:#ef858b;
+  --gx-srv-tint:rgba(167,57,69,.14);
+}
+#view-dashboard .gx-service-manage-card.expanded{
+  background:rgba(8,8,12,.371);
+  border-color:rgba(188,217,231,.12);
+  box-shadow:0 15px 35px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.055);
+}
+#view-dashboard .gx-service-summary{
+  display:grid;
+  grid-template-columns:47px minmax(0,1fr) 44px;
+  width:100%;
+  min-height:78px;
+  align-items:center;
+  gap:12px;
+  padding:12px 13px;
+  border:0;
+  background:transparent;
+  overflow:hidden;
+}
+#view-dashboard .gx-service-summary > span:not(.gx-service-expand-icon){min-width:0}
+#view-dashboard .gx-service-logo-img{
+  width:47px;height:47px;min-width:47px;flex:0 0 47px;
+  border-radius:13px;object-fit:cover;
+  filter:drop-shadow(0 5px 9px rgba(0,0,0,.2));
+  box-shadow:none;transform:none!important;
+}
+#view-dashboard .gx-service-name{
+  display:block;
+  color:#f5f9ff;
+  font-size:14px;
+  font-weight:700;
+  letter-spacing:-.014em;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+#view-dashboard .gx-service-state-line{
+  display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;
+  min-width:0;margin-top:5px;
+}
+#view-dashboard .gx-service-state{
+  font-size:10.5px;font-weight:600;
+  line-height:1.4;color:#66d6a4;
+}
+#view-dashboard .gx-service-state.gx-service-interrupted{color:#efab70}
+#view-dashboard .gx-service-state::before{
+  width:6px;height:6px;flex:0 0 6px;
+  box-shadow:none;background:currentColor;
+}
+#view-dashboard .gx-service-manage-card .gx-service-update-badge,
+#view-dashboard .gx-service-manage-card .gx-service-update-badge[class*="gx-update-"]{
+  display:inline-flex;
+  align-items:center;
+  min-height:21px;
+  max-width:100%;
+  min-width:0;
+  overflow:hidden;
+  padding:4px 8px;
+  border:0!important;border-radius:11px;
+  background:var(--gx-srv-tint)!important;
+  color:var(--gx-srv-tone)!important;
+  box-shadow:none!important;
+  font-size:10.5px;
+  font-weight:600;
+  line-height:1.2;
+  text-overflow:ellipsis;
+  white-space:normal;
+  text-align:left;
+}
+#view-dashboard .gx-service-manage-card .gx-service-expand-icon{
+  position:relative;
+  display:grid!important;place-items:center;
+  justify-self:end;
+  width:44px!important;min-width:44px!important;height:44px!important;
+  flex:0 0 44px!important;
+  margin:0!important;padding:0!important;
+  border:0!important;border-radius:50%;
+  background:transparent!important;color:#b3c9d9!important;
+  box-shadow:none!important;
+}
+#view-dashboard .gx-service-manage-card .gx-service-expand-icon::before{
+  content:"";position:absolute;inset:calc((44px - var(--gx-srv-close-disc))/2);
+  border-radius:50%;background:transparent;pointer-events:none;
+}
+#view-dashboard .gx-service-manage-card .gx-service-expand-icon .gx-chevron-svg{
+  position:relative;display:block;width:14px;height:14px;fill:none;
+  stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;
+}
+#view-dashboard .gx-service-manage-card .gx-service-expand-icon .gx-service-close-svg{display:none}
+#view-dashboard .gx-service-manage-card.expanded .gx-service-expand-icon{
+  color:#071c29!important;
+}
+#view-dashboard .gx-service-manage-card.expanded .gx-service-expand-icon::before{
+  background:#79e6fc;
+}
+#view-dashboard .gx-service-manage-card.expanded .gx-service-expand-icon .gx-chevron-svg{display:none}
+#view-dashboard .gx-service-manage-card.expanded .gx-service-expand-icon .gx-service-close-svg{
+  position:relative;display:block;
+  width:var(--gx-srv-close-x);height:var(--gx-srv-close-x);
+  fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;
+}
+#view-dashboard .gx-service-expanded{padding:0 16px 17px}
+/* Nada de líneas decorativas bajo el logo en tarjetas desplegadas. */
+#view-dashboard .gx-service-divider{display:none!important}
+#view-dashboard .gx-service-manage-card .gx-access-heading{
+  color:#e2edf6;font-size:12px;font-weight:650;margin:3px 0 7px;
+}
+#view-dashboard .gx-service-manage-card .gx-access-row{
+  border:0;background:transparent;box-shadow:none;
+  border-radius:0;min-height:44px;
+}
+#view-dashboard .gx-service-manage-card .gx-access-row + .gx-access-row{
+  border-top:1px solid rgba(221,236,252,.065);
+}
+#view-dashboard .gx-service-manage-card .gx-credential-notice{
+  background:var(--gx-srv-tint)!important;
+  border-color:transparent!important;
+  border-radius:14px;
+  box-shadow:none!important;
+}
+#view-dashboard .gx-service-manage-card .gx-credential-notice-copy strong{
+  color:var(--gx-srv-tone);
+}
+#view-dashboard .gx-service-manage-card .gx-service-more{
+  min-height:38px;
+  background:rgba(255,255,255,.08)!important;
+  color:#8be3eb!important;
+  border:0!important;border-radius:999px;
+  box-shadow:none!important;
+}
+@media(max-width:380px){
+  #view-dashboard .gx-service-summary{grid-template-columns:43px minmax(0,1fr) 44px;min-height:75px;gap:10px;padding:11px}
+  #view-dashboard .gx-service-logo-img{width:43px;height:43px;min-width:43px;flex-basis:43px}
+  #view-dashboard .gx-service-name{font-size:13.5px}
+  #view-dashboard .gx-service-expanded{padding:0 13px 15px}
+}
+@media(prefers-reduced-motion:reduce){
+  #view-dashboard .gx-service-manage-card .gx-service-expand-icon::before{transition:none!important;animation:none!important}
+}
+
+/* Novedades secundarias de la fuente oficial, detrás de disclosure nativo. */
+#view-dashboard .gx-service-other-notices{
+  margin:6px 0 13px;
+  border:0;
+  color:#c8d8e5;
+}
+#view-dashboard .gx-service-other-notices summary{
+  display:list-item;
+  min-height:44px;
+  padding:13px 3px 9px;
+  color:#93dbe4;
+  font-size:11px;
+  font-weight:650;
+  cursor:pointer;
+}
+#view-dashboard .gx-service-other-notices ul{
+  list-style:none;
+  margin:0;padding:0 4px 11px;
+}
+#view-dashboard .gx-service-other-notices li{
+  display:grid;gap:3px;padding:8px 0;
+}
+#view-dashboard .gx-service-other-notices li+li{
+  border-top:1px solid rgba(221,236,252,.07);
+}
+#view-dashboard .gx-service-other-notices strong{
+  font-size:11px;font-weight:650;color:#ddecf4;
+}
+#view-dashboard .gx-service-other-notices span{
+  font-size:10.5px;line-height:1.5;color:#b1c4d3;
+}
+#view-dashboard .gx-service-other-notices summary:focus-visible{
+  outline:2px solid #79e6fc;outline-offset:2px;border-radius:8px;
+}
+/* /GOXION · SERVICIOS CONECTADOS · JERARQUÍA SEMÁNTICA V1 */
