@@ -37,7 +37,7 @@
    }catch(e){return {ok:false,code:e?.name==='AbortError'?'ABORTED':'VISION_UNAVAILABLE'}}
  }
  const status=signal=>send({mode:'status'},signal);
- const analyze=(image,message,signal)=>send({mode:'analyze',image,message:String(message||'').trim(),consent:true},signal);
+ const analyze=(image,message,signal,testConsent=false)=>send({mode:'analyze',image,message:String(message||'').trim(),consent:true,testConsent:testConsent===true},signal);
  const example=signal=>send({mode:'example',consent:true},signal);
  window.GOXY_VISION=Object.freeze({prepare,status,analyze,example,isQA});
 })();
