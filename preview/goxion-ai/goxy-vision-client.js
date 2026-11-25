@@ -3,7 +3,7 @@
  */
 (()=>{
  'use strict';
- const endpoint='https://nsvybyvvdpdgbgtvydfb.supabase.co/functions/v1/goxy-vision-qa';
+ const endpoint=()=>window.GOXION_CORE?.endpoint?.('goxy-vision-qa');
  const isQA=()=>location.pathname.endsWith('/ayuda-aceptacion-v2.html');
  const token=()=>{try{return localStorage.getItem(window.GOXION_CORE?.STORAGE?.CLIENT_TOKEN||'')||''}catch{return ''}};
  const maxBytes=750000, maxSide=1440;
@@ -26,10 +26,11 @@
    }finally{URL.revokeObjectURL(url)}
  }
  async function send(payload,signal){
-   if(!isQA())return {ok:false,code:'VISION_QA_ONLY'};
+   if(!isQA()||!window.GOXION_QA_ISOLATED)return {ok:false,code:'VISION_QA_ONLY'};
+   const url=endpoint();if(!url||!url.endsWith('/goxy-vision-qa'))return {ok:false,code:'ENVIRONMENT_MISMATCH'};
    const auth=token();if(!auth)return {ok:false,code:'SESSION_INVALID'};
    try{
-     const r=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json','X-Client-Token':auth},body:JSON.stringify(payload),signal,cache:'no-store'});
+     const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json','X-Client-Token':auth},body:JSON.stringify(payload),signal,cache:'no-store'});
      const data=await r.json().catch(()=>({ok:false,code:'INVALID_RESPONSE'}));
      if(auth!==token())return {ok:false,code:'SESSION_INVALID'};
      return {...data,ok:r.ok&&data.ok===true};
