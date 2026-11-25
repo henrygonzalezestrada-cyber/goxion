@@ -28,4 +28,6 @@ test('reglas de prórroga vigentes y proyección rechaza cargo incompatible',()=
  assert.match(p.forecastDescribe({...fixture,reactivationCents:2000}).answer,/No puedo confirmar/);
  assert.match(p.forecastDescribe({...fixture,reactivationCents:0}).answer,/No existe cargo administrativo/);
  assert.match(p.forecastDescribe({...fixture,reactivationConfirmed:false}).answer,/No puedo confirmar/);
+ assert.match(p.forecastDescribe({...fixture,mode:'b2',reactivationConfirmed:false,reactivationCents:undefined}).answer,/cotizador B2 no desglosa/);
+ assert.match(p.forecastDescribe({...fixture,mode:'b2',reactivationConfirmed:false,reactivationCents:2000}).answer,/No puedo confirmar/);
 });
