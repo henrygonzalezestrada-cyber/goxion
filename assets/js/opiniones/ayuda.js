@@ -145,8 +145,8 @@
     change();
     const after=inlineCard.getBoundingClientRect(),artAfter=emoji.getBoundingClientRect();
     if(reducedHeroMotion.matches||!inlineCard.animate||!before.height||!after.height)return;
-    const timing={duration:390,easing:"cubic-bezier(.22,.72,.2,1)"};
-    cardMotion=inlineCard.animate([{height:before.height+"px"},{height:after.height+"px"}],timing);
+    const timing={duration:460,easing:"cubic-bezier(.22,.72,.2,1)"};
+    cardMotion=inlineCard.animate([{height:before.height+"px",boxSizing:"border-box"},{height:after.height+"px",boxSizing:"border-box"}],timing);
     if(artBefore.width&&artAfter.width){
       emojiMotion=emoji.animate([
         {transform:"translate("+(artBefore.left-artAfter.left)+"px,"+(artBefore.top-artAfter.top)+"px) scale("+(artBefore.width/artAfter.width)+")",transformOrigin:"top left"},
@@ -161,6 +161,7 @@
       compactCopy.hidden=open;compactButton.hidden=open;form.hidden=!open;inlineClose.hidden=!open;
       compactButton.setAttribute("aria-expanded",String(open));
     };
+    emoji.classList.remove("gx-rb-art-react");
     if(animate)animateCard(change);else change();
   }
   function lockBackground(){
@@ -263,7 +264,9 @@
       $("gx-rb-error").textContent="";
       if(inlineCard&&!reducedHeroMotion.matches){
         emojiMotion?.cancel();
-        emojiMotion=emoji.animate?.([{transform:"scale(1)",filter:"brightness(1)"},{transform:"scale(1.13) rotate(-5deg)",filter:"brightness(1.13)"},{transform:"scale(1)",filter:"brightness(1)"}],{duration:420,easing:"cubic-bezier(.2,.7,.3,1)"});
+        emoji.classList.remove("gx-rb-art-react");
+        void emoji.offsetWidth;
+        emoji.classList.add("gx-rb-art-react");
       }
     });
   });
@@ -346,6 +349,7 @@
     window.addEventListener("goxion:client-logout",()=>{
       submitEpoch++;cardMotion?.cancel();emojiMotion?.cancel();reset();setInlineOpen(false,false);
     });
+    emoji.addEventListener("animationend",event=>{if(event.animationName==="gxOpinionStarReact")emoji.classList.remove("gx-rb-art-react");});
     inlineCard.addEventListener("keydown",event=>{
       if(event.key==="Escape"&&inlineCard.classList.contains("gx-rb-expanded")&&!sending){event.preventDefault();closeFeedback();}
     });

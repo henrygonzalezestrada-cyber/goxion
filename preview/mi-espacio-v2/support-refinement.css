@@ -202,14 +202,16 @@ html[data-gx-support-v3] #view-soporte .gxai-chat-layer.gxai-closed{opacity:0;vi
  html[data-gx-support-v3] #view-soporte .gxai-chat-head .gxai-avatar{transform:none}
 }
 html[data-gx-support-v3] #view-soporte .gxai-close,
+html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-close,
 html[data-gx-support-v3] #modal-feedback .gx-rb-close{
   width:44px!important;height:44px!important;min-width:44px;min-height:44px;padding:0!important;border:0!important;
   border-radius:50%!important;display:grid!important;place-items:center;
   background:radial-gradient(circle at center,#79e6fc 0 17px,#79e6fc 17px,transparent 17.6px)!important;color:#071c29!important;box-shadow:none!important;
 }
 html[data-gx-support-v3] #view-soporte .gxai-close::before,html[data-gx-support-v3] #view-soporte .gxai-close::after,
+html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-close::before,html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-close::after,
 html[data-gx-support-v3] #modal-feedback .gx-rb-close::before,html[data-gx-support-v3] #modal-feedback .gx-rb-close::after{content:none!important;display:none!important}
-html[data-gx-support-v3] #view-soporte .gxai-close svg,html[data-gx-support-v3] #modal-feedback .gx-rb-close svg{
+html[data-gx-support-v3] #view-soporte .gxai-close svg,html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-close svg,html[data-gx-support-v3] #modal-feedback .gx-rb-close svg{
   width:16px!important;height:16px!important;stroke:currentColor!important;fill:none!important;stroke-width:2.5!important;stroke-linecap:round;display:block!important;transform:none!important;
 }
 /* Atención humana y opiniones: dos accesos, no dos avisos de alerta. */
@@ -226,7 +228,8 @@ html[data-gx-support-v3] #view-soporte .gx-support-human .gx-support-art{right:-
 html[data-gx-support-v3] #view-soporte .gx-support-opinion .gx-support-art{right:-7px;bottom:-12px}
 html[data-gx-support-v3] #view-soporte .gx-support-human h3 span{color:#baa5f7}
 html[data-gx-support-v3] #view-soporte .gx-support-opinion h3 span{color:#7ee1e7}
-html[data-gx-support-v3] #view-soporte .gx-support-access .gx-support-cta{
+html[data-gx-support-v3] #view-soporte .gx-support-access .gx-support-cta,
+html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-submit{
   grid-column:1;position:relative;z-index:1;justify-self:start;width:auto;max-width:calc(100% - 67px);min-height:38px;padding:9px 15px;
   border:0;background:rgba(255,255,255,.08);border-radius:999px;color:#7ee1e7;box-shadow:none;font:600 11px/1.2 Poppins,sans-serif;
 }
@@ -306,8 +309,8 @@ html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-emblem svg{width:72p
 html[data-gx-support-v3] #view-soporte .gx-rb-inline.gx-rb-complete .gx-rb-emblem svg{opacity:1;transition:opacity .2s ease}
 html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-neon-star-halo{display:none!important}
 html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-neon-star-line{fill:none;stroke:#91e7bd;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none!important;stroke-dashoffset:0!important;animation:none!important;filter:none!important}
-html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-close{position:absolute;top:14px;right:14px;width:35px;height:35px;border:0;border-radius:50%;background:#199aaa;color:#fff;box-shadow:none;display:grid;place-items:center;z-index:3;padding:0}
-html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-close svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-close{position:absolute;top:10px;right:10px;z-index:3}
+html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-close[hidden]{display:none!important}
 html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-close:disabled{opacity:.45}
 html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-form h2{font:700 20px/1.25 Poppins,sans-serif;letter-spacing:-.035em;margin:5px 0 7px;color:#f5f8ff}
 html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-intro{margin:0 0 8px;color:#a8b5c9;font-size:12px}
@@ -326,11 +329,11 @@ html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-consent small,html[d
 html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-error{color:#ff9eab;font-size:11px;margin:5px 0 0}
 html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-error:empty{display:none}
 html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-submit{
- width:100%;min-height:38px;margin:12px auto 0;padding:9px 15px;border:0;border-radius:999px;background:rgba(255,255,255,.08);color:#7ee1e7;box-shadow:none;font:600 12px/1.2 Poppins,sans-serif;transition:width .25s ease,padding .25s ease;
+ display:flex;width:max-content;max-width:100%;height:38px;min-height:38px;box-sizing:border-box;margin:12px auto 0;white-space:normal;transition:width .24s cubic-bezier(.22,.82,.24,1),padding .24s cubic-bezier(.22,.82,.24,1);
 }
 html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-submit.is-loading{width:38px;height:38px;min-height:38px;padding:0;opacity:1;position:relative}
 html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-submit.is-loading span{position:absolute;clip-path:inset(50%);width:1px;height:1px;overflow:hidden}
-html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-submit.is-loading::after{content:"";width:18px;height:18px;border:2px solid rgba(126,225,231,.22);border-top-color:#7ee1e7;border-radius:50%;animation:gxOpinionSpin .75s linear infinite}
+html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-submit.is-loading::after{content:"";width:24px;height:24px;box-sizing:border-box;border:2px solid rgba(126,225,231,.18);border-top-color:#7ee1e7;border-right-color:#7ee1e7;border-radius:50%;animation:gxOpinionSpin .75s linear infinite}
 @keyframes gxOpinionSpin{to{transform:rotate(360deg)}}
 html[data-gx-support-v3] #view-soporte .gx-rb-inline.gx-rb-complete .gx-rb-intro{display:none}
 html[data-gx-support-v3] #view-soporte .gx-rb-inline.gx-rb-complete .gx-rb-fields[aria-hidden=true]{opacity:0;pointer-events:none;transition:opacity .18s ease}
@@ -338,4 +341,24 @@ html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-success-screen{paddi
 html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-success-screen p{margin:0 auto;font-size:12px;color:#a8b5c9}
 html[data-gx-support-v3] #view-soporte .gx-rb-inline :is(.gx-rb-star,.gx-rb-close,.gx-rb-submit,.gx-rb-consent input,.gx-rb-text):focus-visible{outline:2px solid #7ee1e7;outline-offset:2px}
 @media(max-width:360px){html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-star{width:38px;height:40px}}
-@media(prefers-reduced-motion:reduce){html[data-gx-support-v3] #view-soporte .gx-rb-inline *{animation:none!important;transition:none!important}}
+/* Reaction has its own finite keyframe; no reliance on Web Animations for tap.
+   Same response for every score, no color grading or continuous glow. */
+html[data-gx-support-v3] #view-soporte .gx-rb-inline.gx-rb-expanded:not(.gx-rb-complete) .gx-support-art.gx-rb-art-react{
+ animation:gxOpinionStarReact .64s cubic-bezier(.22,.8,.25,1) both;
+}
+@keyframes gxOpinionStarReact{
+ 0%{transform:translateY(0) scale(1) rotate(0)}
+ 22%{transform:translateY(2px) scale(.88) rotate(4deg)}
+ 49%{transform:translateY(-9px) scale(1.21) rotate(-9deg);filter:brightness(1.12)}
+ 76%{transform:translateY(1px) scale(.96) rotate(3deg)}
+ 100%{transform:translateY(0) scale(1) rotate(0);filter:none}
+}
+html[data-gx-support-v3] #view-soporte .gx-rb-inline.gx-rb-expanded:not(.gx-rb-complete) .gx-support-art.gx-rb-art-react::before,
+html[data-gx-support-v3] #view-soporte .gx-rb-inline.gx-rb-expanded:not(.gx-rb-complete) .gx-support-art.gx-rb-art-react::after{
+ content:"✦";position:absolute;line-height:1;font-size:13px;color:#ffe6ae;pointer-events:none;opacity:0;animation:gxOpinionArtSpark .58s ease-out both;
+}
+html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-support-art.gx-rb-art-react::before{left:-5px;top:13px}
+html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-support-art.gx-rb-art-react::after{right:-5px;top:5px;animation-delay:.06s}
+@keyframes gxOpinionArtSpark{0%,15%{opacity:0;transform:scale(.45)}40%{opacity:.85;transform:scale(1)}100%{opacity:0;transform:translateY(-9px) scale(.45)}}
+@media(prefers-reduced-motion:reduce){html[data-gx-support-v3] #view-soporte .gx-rb-inline *,html[data-gx-support-v3] #view-soporte .gx-rb-inline *::before,html[data-gx-support-v3] #view-soporte .gx-rb-inline *::after{animation:none!important;transition:none!important}}
+
