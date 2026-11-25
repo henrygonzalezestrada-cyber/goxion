@@ -66,5 +66,16 @@
         message:'No fue posible consultar el cálculo oficial ahora.'};
     }
   }
-  window.GOXY_AI = Object.freeze({ask,status,account,forecast});
+  // QA only: production gateway does not expose these modes.
+  async function interpret(message,topic,{signal}={}){
+    if(!isQA()||!window.GOXION_QA_ISOLATED)return {ok:false,code:'ENVIRONMENT_MISMATCH'};
+    const text=String(message||'').trim();
+    if(!text||text.length>260||/[\d@<>]|https?:|www\.|\b(?:pin|contrase(?:ñ|n)a|password|token|correo|cuenta bancaria|tarjeta bancaria|clabe|domicilio|tel[eé]fono)\s*(?:es|:|=)/iu.test(text))return {ok:false,code:'SENSITIVE_OR_INVALID_INPUT'};
+    try{return await send({mode:'interpret',message:text,topic},{signal});}catch(e){return {ok:false,code:e?.name==='AbortError'?'ABORTED':'NETWORK_ERROR'};}
+  }
+  async function feedback({responseId,topic,source,vote,reason}){
+    if(!isQA()||!window.GOXION_QA_ISOLATED)return {ok:false,code:'ENVIRONMENT_MISMATCH'};
+    try{return await send({mode:'feedback',responseId,topic,source,vote,reason});}catch{return {ok:false,code:'NETWORK_ERROR'};}
+  }
+  window.GOXY_AI = Object.freeze({ask,status,account,forecast,interpret,feedback});
 })();

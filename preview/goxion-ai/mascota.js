@@ -121,6 +121,8 @@
   const vision=refined?window.GOXY_VISION:null;
   const diagnosis=refined?window.GOXY_DIAGNOSIS?.create():null;
   const dialogue=refined?window.GOXY_DIALOG_ROUTING?.createConversation?.():null;
+  const learning=refined?window.GOXY_FEEDBACK:null;
+  let feedbackReady=false,semanticReady=false;
   const more=layer.querySelector('.gxai-more'),toolsMenu=layer.querySelector('.gxai-tools-menu'),attachment=layer.querySelector('.gxai-attachment');
   const gallery=layer.querySelector('.gxai-image-picker'),camera=layer.querySelector('.gxai-camera-picker');
   const exampleButton=layer.querySelector('.gxai-tool-example');
@@ -431,6 +433,7 @@
     cancelFlow();diagnosis?.reset();dialogue?.reset();
     if(vision){clearImage();visionReady=false;visionTestOnly=false;exampleImage=null;exampleButton.hidden=true;const visionId=requestId;if(vision.isQA())vision.status().then(state=>{if(active&&visionId===requestId){visionReady=state.ok===true&&state.ready===true;visionTestOnly=state.testOnly===true;exampleImage=state.ok===true&&state.exampleReady===true&&typeof state.exampleImage==='string'&&/^data:image\/png;base64,[A-Za-z0-9+/=]+$/.test(state.exampleImage)?state.exampleImage:null;exampleButton.hidden=!exampleImage;if(imageDraft&&!imageDraft.example)renderAttachment(imageNotice());syncSend();}});}
     aiConfigured = false;
+    feedbackReady=false;semanticReady=false;
     aiMode = false;
     aiEntry = false;
     awaitingSymptom = false;
@@ -446,6 +449,8 @@
     ai.status().then(state => {
       if (!active || statusId !== requestId) return;
       aiConfigured = state.ok===true && state.configured===true && state.providerReady===true;
+      feedbackReady=Boolean(learning&&window.GOXION_QA_ISOLATED&&state.ok===true&&state.feedbackReady===true);
+      semanticReady=Boolean(learning&&window.GOXION_QA_ISOLATED&&state.ok===true&&state.semanticReady===true&&aiConfigured);
       if (aiConfigured) setAIStatus('ready',
         'Tengo ayuda adicional disponible y la utilizaré si las guías no son suficientes.');
       else if (state.ok===true && state.configured===false) setAIStatus('pending',
@@ -560,6 +565,14 @@
     scroll.scrollTop = scroll.scrollHeight;
     return node;
   }
+  function rateResponse(node,source='local',topic=null){
+    if(!feedbackReady||!learning||!active||!authenticated()||!node)return;
+    const session=requestId,identity=String(window.getCurrentClientKey?.()||'');
+    const token=()=>localStorage.getItem(window.GOXION_CORE?.STORAGE?.CLIENT_TOKEN||'')||'';
+    const login=token();
+    const isCurrent=()=>active&&requestId===session&&authenticated()&&identity===String(window.getCurrentClientKey?.()||'')&&login===token();
+    learning.attach({doc,node,topic:topic||dialogue?.get()?.topic||(chosenPlatform?'support':'other'),source,send:payload=>isCurrent()?ai.feedback(payload):Promise.resolve({ok:false}),isCurrent,reducedMotion});
+  }
   const questions = Object.freeze({
     acceso: {
       prompt: 'Tengo un problema de acceso',
@@ -608,7 +621,8 @@
       hideTyping();
       if (entry.finish !== 'error') chatTransition('speaking');
       else chatTransition('error');
-      bubble(entry.response, false);
+      const answer=bubble(entry.response, false);
+      if(entry.finish!=='error')rateResponse(answer);
     });
     later(flowId, refined?380:1050, () => {
       if (entry.finish === 'happy') chatTransition('happy');
@@ -805,6 +819,7 @@
       chatTransition('speaking');
       const answerNode=bubble(reply.answer,false);
       if(refined){answerNode.classList.remove('gxai-local-answer');answerNode.classList.add('gxai-ai-answer');}
+      rateResponse(answerNode,'ai','support');
       keepTurn(text,reply.answer);
       if(Number.isInteger(reply.remaining)){
         if(refined){
@@ -901,6 +916,7 @@
         }
       }
       reply.classList.add('gxai-delayed-bubble');
+      rateResponse(reply,'official',topic);
       showChoices(financial?financial.choices:refined&&topic==='promotions'?[{kind:'catalog',label:'Ver promociones en Catálogo'},{kind:'account',label:'Ir a Mi Espacio'}]:[
         {kind:'account',label:'Abrir Mi Espacio'},
         ...(catalogMission?[{kind:'catalog',label:'Abrir catálogo'}]:[]),
@@ -922,6 +938,7 @@
     chatTransition('thinking');showTyping();
     const message=bubble(reply,false);
     message.classList.add('gxai-delayed-bubble');
+    rateResponse(message);
     if(options.length){
       showChoices(options);
       choices?.classList.add('gxai-delayed-choices');
@@ -1065,13 +1082,32 @@
     if(result.handoff){humanHandoff();return true;}
     if(result.answer&&state)keepTurn(query||'Se analizó una imagen del problema.',result.answer);
     if(query!==null&&result.answer)respondFree(query,result.answer,result.choices);
-    else{if(result.answer)bubble(result.answer,false);showChoices(result.choices||[]);}
+    else{if(result.answer)rateResponse(bubble(result.answer,false),state?.source==='image'?'vision':'local','support');showChoices(result.choices||[]);}
     return true;
   }
   function contextualRoute(query){
     return refined?window.GOXY_DIALOG_ROUTING?.classify(query,{
       platform:chosenPlatform,awaitingSymptom,accessStage
     },knowledge.resolveAllPlatforms):null;
+  }
+  async function semanticFallback(query){
+    if(!active||busy||!authenticated())return;
+    const fallback=dialogue.fallback();
+    const identity=String(window.getCurrentClientKey?.()||''),login=localStorage.getItem(window.GOXION_CORE?.STORAGE?.CLIENT_TOKEN||'')||'';
+    const remaining=lastAIAccount===identity?21000-(Date.now()-lastAIAnswerAt):0;
+    if(!semanticReady||remaining>0){respondFree(query,fallback.answer,fallback.choices);return;}
+    clearChoices();bubble(query.slice(0,240),true);setBusy(true);chatTransition('thinking');showTyping();
+    const flow=++activeFlow;aiController=new AbortController();
+    const res=await ai.interpret(query,dialogue.get().topic||'other',{signal:aiController.signal});
+    if(!active||flow!==activeFlow||!authenticated()||identity!==String(window.getCurrentClientKey?.()||'')||login!==(localStorage.getItem(window.GOXION_CORE?.STORAGE?.CLIENT_TOKEN||'')||''))return;
+    aiController=null;hideTyping();setBusy(false);chatTransition('speaking');
+    if(res.ok===true||['RATE_LIMIT','PROVIDER_LIMIT','AI_UNAVAILABLE','INVALID_INTENT'].includes(res.code)){lastAIAccount=identity;lastAIAnswerAt=Date.now();}
+    const decision=res.ok===true?learning.semanticReply(res.intent):fallback;
+    if(res.ok===true)dialogue.noteAccount(decision.topic);
+    const answer=bubble(decision.answer,false);
+    if(res.ok===true){answer.classList.remove('gxai-local-answer');answer.classList.add('gxai-ai-answer');}
+    rateResponse(answer,res.ok===true?'ai':'local',decision.topic);showChoices(decision.choices||[]);
+    later(flow,300,()=>chatTransition('listening'));
   }
   function handleText(query) {
     // La información que ya administra GOXION y los saludos no consumen IA.
@@ -1226,7 +1262,7 @@
       return;
     }
     // Sin plataforma elegida, no consumir IA intentando adivinarla.
-    if(dialogue){const next=dialogue.fallback();respondFree(query,next.answer,next.choices);return;}
+    if(dialogue){void semanticFallback(query);return;}
     runDemo(questions.libre,query,showPlatforms);
   }
   function humanHandoff(serviceIndex=null) {
@@ -1603,8 +1639,8 @@
     let diagnosed=false;
     if(reply.ok&&typeof reply.answer==='string'){
       chatTransition('speaking');
-      if(diagnosis){clearSupportContext();const decision=diagnosis.fromVision(reply.diagnosis);if(decision){if(!decision.answer)bubble(reply.answer,false).classList.add('gxai-ai-answer');diagnosed=applyDiagnosis(decision);if(!decision.answer)keepTurn('Se analizó una imagen del problema.',reply.answer);}}
-      if(!diagnosed)bubble(reply.answer,false).classList.add('gxai-ai-answer');
+      if(diagnosis){clearSupportContext();const decision=diagnosis.fromVision(reply.diagnosis);if(decision){if(!decision.answer){const answer=bubble(reply.answer,false);answer.classList.add('gxai-ai-answer');rateResponse(answer,'vision','support');}diagnosed=applyDiagnosis(decision);if(!decision.answer)keepTurn('Se analizó una imagen del problema.',reply.answer);}}
+      if(!diagnosed){const answer=bubble(reply.answer,false);answer.classList.add('gxai-ai-answer');rateResponse(answer,'vision','support');}
     }
     else if(reply.code!=='ABORTED'){chatTransition('error');bubble(reply.code==='RATE_LIMIT'?'La cuota de IA requiere una pausa. Puedes intentar de nuevo cuando esté disponible.':reply.code==='INVALID_IMAGE'?'No pude validar la imagen o el texto. Prueba con una captura JPG o PNG sin información privada.':reply.code==='VISION_DISABLED'?'El análisis no está autorizado para esta sesión.':'No pude analizar la imagen ahora. Puedes describir la falla o acudir a nuestro equipo.',false);}
     if(diagnosed){/* diagnosis engine already supplied the next steps */}
