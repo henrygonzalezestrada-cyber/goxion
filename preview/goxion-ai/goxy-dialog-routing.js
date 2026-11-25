@@ -64,7 +64,7 @@
    const reply=(answer,choices)=>({answer,choices});
    function consume(text,{platform=null,brands=[],activePlatforms=[]}={}){
      const n=normalize(text);if(!n)return null;
-     const buy=/\b(contrat\w*|adquir\w*|compr\w*|agregar|anadir|sumar)\b/.test(n)&&!/\b(me pide|me sale|me aparece|para entrar|para iniciar sesion|error|no me deja|ya contrate|ya compre|no quiero|no puedo|no se|cancelar)\b/.test(n);
+     const buy=/(?:\b(?:quiero|quisiera|deseo|necesito|me gustaria|puedo|como|donde|para)\b.{0,28}\b(?:contratar|adquirir|comprar|agregar|anadir|sumar)\b|^(?:contratar|adquirir|comprar|agregar|anadir|sumar)\b)/.test(n)&&!/\b(me pide|me sale|me aparece|para entrar|para iniciar sesion|error|no me deja|ya contrate|ya compre|no quiero|no puedo|no se|cancelar)\b/.test(n);
      const cancel=/\b(quiero|quisiera|necesito|deseo|puedo|voy a|me gustaria)\s+(cancelar|dar de baja|quitar)\b|^(cancelar|dar de baja)(?:\s|$)/.test(n)&&!/\b(como|cuando|reembolso|politica|terminos|que pasa|si cancelo|no quiero|no puedo|ya cancel)\b/.test(n);
      const disputed=/\b(no (?:lo |la |me )?(?:reclame|canjee|recibi|use|utilice|solicite|hice|pedi|aparece|llego|sale|tengo)|no es cierto|no reconozco|no fui yo|no es correcto|esta mal)\b/.test(n);
      const confused=/^(?:pero )?(eso que|que es eso|a que te refieres|que significa eso|no entiendo|no entendi|explicame|como asi|por que|porque|y entonces|y ahora que)$/.test(n);
@@ -86,11 +86,11 @@
      if(payProblem||(topic==='payment'&&!explicit&&disputed)){
        topic='payment';pending='payment-review';return reply('Entiendo. Si ya pagaste y todavía no aparece acreditado, revisemos el comprobante en tu cuenta. No puedo determinar la causa sin comprobar su estado.',[payment(),human()]);
      }
-     if((topic==='missions'||topic==='loyalty')&&!explicit&&(disputed||confused)){
+     if((topic==='missions'||topic==='loyalty')&&((!explicit&&(disputed||confused))||(disputed&&/\b(cupon\w*|recompensa\w*|beneficio\w*|lealtad)\b/.test(n)&&!brands.length&&!/\b(pago|prorroga|contratar|cancelar)\b/.test(n)))){
        const mission=topic==='missions';pending='benefit-review';
        return reply(disputed?(mission?'Entiendo, me dices que no reconoces lo que figura sobre tu recompensa. Podemos revisar el estado en Mi Espacio y pedir al equipo que compruebe la discrepancia.':'Entiendo que el estado de tu beneficio no coincide con lo que esperabas. Podemos pedir una revisión.'):(mission?'Me refiero a las misiones y recompensas de tu cuenta. Si el estado del cupón no coincide con lo que hiciste, podemos revisarlo.':'Me refiero al estado de tu beneficio de lealtad.'),[account(),human()]);
      }
-     if(topic==='payment'&&!explicit&&confused)return reply('Me refería a la información de pago de tu cuenta. ¿Quieres revisar el saldo, la próxima fecha o un comprobante?',[action('payment','Consultar pago'),payment(),human()]);
+     if(topic==='payment'&&!explicit&&(confused||(pending==='payment-review'&&/^(si|ya pague|ya lo envie|ya mande|ya lo mande|ya lo hice)$/.test(n))))return reply('Me refería a la información de pago de tu cuenta. ¿Quieres revisar el saldo, la próxima fecha o un comprobante?',[action('payment','Consultar pago'),payment(),human()]);
      if(topic==='catalog'&&!explicit&&confused)return reply('Me refiero a los planes que puedes contratar en GOXION. Puedes revisar precios y disponibilidad antes de decidir.',[catalog()]);
      if(pending==='cancel'&&!explicit&&confused)return reply('Necesito saber qué servicio quieres dar de baja. No se ha realizado ninguna cancelación.',[account(),human()]);
      if(brands.length||platform)noteSupport();

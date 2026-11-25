@@ -128,7 +128,8 @@ function create(){
      return result('¿Puedes mostrarme el aviso? Una captura sin datos privados puede ayudarme a identificarlo. Si prefieres, descríbeme el mensaje.',[image(),step('No puedo mandar captura')]);
     }
     state.stage='visual-clarify';
-    return result('No hace falta otra foto. Con lo que tenemos, dime qué ocurre al intentar entrar o si aparece otro mensaje.',[support(),choice('issues','Ver situaciones conocidas',{platform:p})].filter(x=>x.kind!=='issues'||p));
+    const message=state.visualUsed?'No hace falta otra foto.':state.imageRequested?'No pasa nada si no puedes enviar una captura.':!canImage?'Por ahora no puedo analizar imágenes desde esta sesión.':'Podemos seguir sin una foto.';
+    return result(message+' Dime qué ocurre al intentar entrar o si aparece otro mensaje.',[support(),choice('issues','Ver situaciones conocidas',{platform:p})].filter(x=>x.kind!=='issues'||p));
    }
    if(/\b(no abre|no carga|no reproduce|no arranca|pantalla negra|se cierra|se congela)\b/.test(n)){
     state.issue='Problema de apertura o reproducción';state.stage='retry';
