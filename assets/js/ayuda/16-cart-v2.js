@@ -119,7 +119,7 @@
       if (Math.abs(delta)>1) row.animate([{transform:`translateY(${delta}px)`},{transform:'translateY(0)'}],{duration:320,easing:'cubic-bezier(.16,1,.3,1)'});
     }
     const amount = money(total());
-    if(refined)dialog.querySelector('.gx-cart-summary').classList.toggle('is-wide-total',amount.length>9);
+    if(refined)dialog.querySelector('.gx-cart-summary').classList.toggle('is-wide-total',amount.length>7);
     if ($('gx-cart-total').textContent !== amount) {
       $('gx-cart-total').textContent = amount;
       if (!reduced()) $('gx-cart-total').animate([{opacity:.4,transform:'translateY(5px)'},{opacity:1,transform:'translateY(0)'}],{duration:280});
