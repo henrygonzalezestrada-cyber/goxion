@@ -46,9 +46,37 @@
   dialog.id = 'gx-cart-dialog';
   dialog.setAttribute('aria-labelledby', 'gx-cart-title');
   dialog.innerHTML = `<div class="gx-cart-shell"><header><div class="gx-cart-heading"><span class="gx-cart-bag">${svg('bag')}</span><h2 id="gx-cart-title" tabindex="-1" autofocus>Tu carrito</h2><span id="gx-cart-count"></span></div><button type="button" class="gx-cart-close" aria-label="Cerrar carrito">${refined ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6L18 18"/><path d="M18 6L6 18"/></svg>' : svg('close')}</button></header><form id="gx-cart-form"><div class="gx-cart-scroll"><div id="gx-cart-lines"></div><section class="gx-cart-contact"><label for="gx-cart-phone">WhatsApp para tus accesos</label><input id="gx-cart-phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" placeholder="+52 961 123 4567" aria-describedby="gx-cart-phone-help"><p id="gx-cart-phone-help">México: 10 dígitos. Otro país: incluye + y código.</p></section><p id="gx-cart-member" hidden>${refined ? '' : 'Recibirás tus credenciales en breve.'}</p></div><footer><div class="gx-cart-trust">${svg('shield')}<span>${refined ? 'Primero tu acceso, después tu pago.' : 'En GOXION, primero tu acceso; después tu pago.'}</span></div><div class="gx-cart-total"><span>Total <small>MXN</small></span><strong id="gx-cart-total" aria-live="polite"></strong></div>${refined ? '' : '<p class="gx-cart-caption">Paquetes completos y servicios mensuales.</p>'}<p id="gx-cart-error" role="alert"></p><button type="submit" class="gx-cart-submit"><span class="gx-cart-submit-label">Enviar solicitud</span><span class="gx-cart-send-icon">${svg('send')}</span></button></footer></form><section id="gx-cart-success" hidden tabindex="-1"><div class="gx-cart-check">${svg('check')}</div><h3>¡Todo listo!</h3><p id="gx-cart-success-text"></p><p>Pagas cuando tengas acceso.</p><button type="button" class="gx-cart-submit gx-cart-done">Seguir explorando ${refined ? '' : svg('send')}</button></section></div>`;
+  if (refined) {
+    const footer=dialog.querySelector('footer');
+    const summary=document.createElement('div'); summary.className='gx-cart-summary';
+    const action=document.createElement('div'); action.className='gx-cart-action-slot';
+    action.append(footer.querySelector('button[type=submit]'));
+    summary.append(footer.querySelector('.gx-cart-total'),action);
+    // DOM order matches reading order: error, summary/action, reassurance.
+    footer.append(footer.querySelector('#gx-cart-error'),summary,footer.querySelector('.gx-cart-trust'));
+  }
   document.body.append(dialog);
   const $ = id => document.getElementById(id);
-  function showError(message) { $('gx-cart-error').textContent = message; }
+  let sizeMotion=null, naturalHeight=0;
+  function stopSizeMotion(){sizeMotion?.cancel();sizeMotion=null;naturalHeight=0;}
+  function resizeCart(before){
+    if(!refined||!dialog.open||closing||dialog.classList.contains('is-opening')||reduced()||typeof dialog.animate!=='function')return;
+    // The shell is content-sized independently of the outer animated height.
+    const target=dialog.querySelector('.gx-cart-shell').offsetHeight;
+    if(sizeMotion&&naturalHeight===target)return;
+    stopSizeMotion();
+    const after=dialog.offsetHeight;
+    naturalHeight=target;
+    if(!before||Math.abs(before-after)<2)return;
+    const anim=dialog.animate([{height:before+'px'},{height:after+'px'}],{duration:340,easing:'cubic-bezier(.2,.82,.2,1)',fill:'none'});
+    sizeMotion=anim;
+    anim.finished.catch(()=>{}).then(()=>{if(sizeMotion===anim){sizeMotion=null;naturalHeight=0;}});
+  }
+  function showError(message) {
+    const before=dialog.open?dialog.offsetHeight:0;
+    $('gx-cart-error').textContent=message;
+    resizeCart(before);
+  }
   function total() { return entries().reduce((sum, [, x]) => sum + x.cents * x.qty, 0); }
   function unit(plan) {
     return /cuenta\s+completa/i.test(plan.nombre) ? 'cuenta completa' : 'perfil';
@@ -64,6 +92,7 @@
       if (el) el.textContent = carritoPedidos[p.nombre]?.qty || 0;
     }
     if (!dialog.open) return;
+    const before=refined?dialog.offsetHeight:0;
     const list = $('gx-cart-lines');
     const oldRows = new Map(Array.from(list.querySelectorAll('.gx-cart-line')).map(row => [row.dataset.cartKey, {row, top:row.getBoundingClientRect().top}]));
     list.querySelector('.gx-cart-empty')?.remove();
@@ -90,6 +119,7 @@
       if (Math.abs(delta)>1) row.animate([{transform:`translateY(${delta}px)`},{transform:'translateY(0)'}],{duration:320,easing:'cubic-bezier(.16,1,.3,1)'});
     }
     const amount = money(total());
+    if(refined)dialog.querySelector('.gx-cart-summary').classList.toggle('is-wide-total',amount.length>9);
     if ($('gx-cart-total').textContent !== amount) {
       $('gx-cart-total').textContent = amount;
       if (!reduced()) $('gx-cart-total').animate([{opacity:.4,transform:'translateY(5px)'},{opacity:1,transform:'translateY(0)'}],{duration:280});
@@ -100,6 +130,7 @@
     $('gx-cart-phone').required = !logged;
     $('gx-cart-member').hidden = !logged;
     dialog.querySelector('button[type=submit]').disabled = busy || !items.length;
+    resizeCart(before);
   }
   function originTransform() {
     const target = $('floating-cart');
@@ -110,6 +141,7 @@
   function open() {
     if (dialog.open) return;
     previousFocus = document.activeElement;
+    if(refined)stopSizeMotion();
     $('gx-cart-form').hidden = false; $('gx-cart-success').hidden = true;
     showError(''); closing = false;
     oldOverflow = document.body.style.overflow; document.body.style.overflow = 'hidden';
@@ -125,8 +157,8 @@
     } else dialog.classList.remove('is-opening');
   }
   async function close() {
-    if (busy || closing || !dialog.open) return;
-    closing = true; motion?.cancel();
+    if (busy || closing || !dialog.open || (refined&&editing)) return;
+    closing = true; motion?.cancel();if(refined)stopSizeMotion();
     dialog.classList.remove('is-opening'); dialog.classList.add('is-closing');
     if(!refined) iconTo(dialog.querySelector('.gx-cart-close'), 'bag');
     if (!reduced()) {
@@ -264,6 +296,7 @@
         body:JSON.stringify({categoria:'pedidos', titulo:'🛒 CARRITO GOXION · NUEVA SOLICITUD', mensaje:message, colorHex:'7c4dff', session_token:token, referencia:requestId})});
       const data = await response.json().catch(() => ({}));
       if (!response.ok || data.ok !== true) throw new Error(data.error || 'No pudimos confirmar el envío. Tu selección sigue en el carrito.');
+      const beforeSuccess=refined?dialog.offsetHeight:0;
       carritoPedidos = {};
       $('gx-cart-phone').value = '';
       $('gx-cart-form').hidden = true;
@@ -273,6 +306,7 @@
       else iconTo(dialog.querySelector('.gx-cart-check'), 'check');
       if (!reduced()) $('gx-cart-success').animate([{opacity:0,transform:'translateY(18px) scale(.96)'},{opacity:1,transform:'none'}],{duration:500,easing:'cubic-bezier(.16,1,.3,1)'});
       $('gx-cart-success').focus();
+      resizeCart(beforeSuccess);
       requestId = '';
     } catch (error) {
       showError(error.name === 'AbortError' ? 'El servidor tardó en responder. No pudimos confirmar el envío; tu selección se conserva.' : error.message);
