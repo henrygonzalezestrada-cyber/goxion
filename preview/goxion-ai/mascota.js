@@ -122,7 +122,8 @@
   const more=layer.querySelector('.gxai-more'),toolsMenu=layer.querySelector('.gxai-tools-menu'),attachment=layer.querySelector('.gxai-attachment');
   const gallery=layer.querySelector('.gxai-image-picker'),camera=layer.querySelector('.gxai-camera-picker');
   const exampleButton=layer.querySelector('.gxai-tool-example');
-  let imageDraft=null,visionReady=false,exampleImage=null,preparingImage=false,imageGeneration=0;
+  let imageDraft=null,visionReady=false,visionTestOnly=false,exampleImage=null,preparingImage=false,imageGeneration=0;
+  const imageNotice=()=>visionReady?(visionTestOnly?'Prueba QA · Sólo capturas sin datos privados. Se enviará a Groq.':'Oculta datos personales, contraseñas y códigos antes de enviar. La imagen se enviará a Groq para su análisis.'):'Vista previa local · El análisis todavía no está habilitado.';
   const syncSend = () => {
     if(!refined)return;
     const ready=imageDraft?(imageDraft.example?Boolean(exampleImage):visionReady)&&!preparingImage:!preparingImage&&Boolean(messageInput.value.trim());
@@ -169,7 +170,7 @@
       const result=await vision.prepare(file);
       if(!active||generation!==imageGeneration||!authenticated())return;
       imageDraft=result;
-      renderAttachment(visionReady?'Oculta datos personales, contraseñas y códigos antes de enviar. La imagen se enviará a Groq para su análisis.':'Vista previa local · El análisis todavía no está habilitado.');
+      renderAttachment(imageNotice());
     }catch(e){if(active&&generation===imageGeneration)renderAttachment('No pude preparar la imagen. Prueba con una captura JPG o PNG.');}
     finally{if(generation===imageGeneration){preparingImage=false;syncSend();}}
   }
@@ -426,7 +427,7 @@
     const source=refined?heroTrigger.querySelector('.gxai-mascot').getBoundingClientRect():null;
     active = true; requestId++;
     cancelFlow();
-    if(vision){clearImage();visionReady=false;exampleImage=null;exampleButton.hidden=true;const visionId=requestId;if(vision.isQA())vision.status().then(state=>{if(active&&visionId===requestId){visionReady=state.ok===true&&state.ready===true;exampleImage=state.ok===true&&state.exampleReady===true&&typeof state.exampleImage==='string'&&/^data:image\/png;base64,[A-Za-z0-9+/=]+$/.test(state.exampleImage)?state.exampleImage:null;exampleButton.hidden=!exampleImage;if(imageDraft&&!imageDraft.example)renderAttachment(visionReady?'Oculta datos personales, contraseñas y códigos antes de enviar. La imagen se enviará a Groq para su análisis.':'Vista previa local · El análisis todavía no está habilitado.');syncSend();}});}
+    if(vision){clearImage();visionReady=false;visionTestOnly=false;exampleImage=null;exampleButton.hidden=true;const visionId=requestId;if(vision.isQA())vision.status().then(state=>{if(active&&visionId===requestId){visionReady=state.ok===true&&state.ready===true;visionTestOnly=state.testOnly===true;exampleImage=state.ok===true&&state.exampleReady===true&&typeof state.exampleImage==='string'&&/^data:image\/png;base64,[A-Za-z0-9+/=]+$/.test(state.exampleImage)?state.exampleImage:null;exampleButton.hidden=!exampleImage;if(imageDraft&&!imageDraft.example)renderAttachment(imageNotice());syncSend();}});}
     aiConfigured = false;
     aiMode = false;
     aiEntry = false;
@@ -495,7 +496,7 @@
     const animate=refined&&animated===true&&!reducedMotion()&&authenticated()&&!layer.classList.contains('gxai-keyboard-open')&&!layer.classList.contains('gxai-no-morph');
     active = false; requestId++;
     cancelFlow();
-    if(vision){clearImage();visionReady=false;exampleImage=null;exampleButton.hidden=true;}
+    if(vision){clearImage();visionReady=false;visionTestOnly=false;exampleImage=null;exampleButton.hidden=true;}
     clearChoices();
     chosenPlatform = null;
     chosenGuide = null;
@@ -1551,19 +1552,21 @@
   async function analyzeImage(query){
     if(!active||busy||!authenticated()||!imageDraft||!(imageDraft.example?exampleImage:visionReady))return;
     const example=imageDraft.example===true;
-    if(!window.confirm(example?'¿Enviar esta captura ficticia a Groq para comprobar el análisis visual?':'¿Confirmas que la imagen no contiene información privada, contraseñas, PIN ni códigos y autorizas enviarla a Groq para analizarla?'))return;
+    const testOnly=visionTestOnly;
+    if(!example&&(query.length>240||/[<>]/.test(query)||/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b|\b(?:\d[\s.-]?){9,16}\b|\b\d{4,8}\b/iu.test(query))){renderAttachment('Describe el problema sin correos, números privados, PIN ni códigos (máximo 240 caracteres).');return;}
+    if(!window.confirm(example?'¿Enviar esta captura ficticia a Groq para comprobar el análisis visual?':testOnly?'Prueba aislada: confirma que la captura no contiene datos personales, contraseñas, PIN ni códigos. Se enviará a Groq, que puede conservarla excepcionalmente hasta 30 días. ¿Autorizas el envío?':'¿Confirmas que la imagen no contiene información privada, contraseñas, PIN ni códigos y autorizas enviarla a Groq para analizarla?'))return;
     if(pendingAI)cancelFlow();
     const image=imageDraft.data;clearImage();messageInput.value='';syncSend();
     clearChoices();const sent=bubble(example?'Analiza esta captura de prueba':query||'Analiza esta imagen',true);
-    if(example){const img=doc.createElement('img');img.src=image;img.alt='Captura ficticia de Netflix';img.style.cssText='display:block;width:100%;max-width:240px;border-radius:12px;margin-top:8px';sent.append(img);}
+    {const img=doc.createElement('img');img.src=image;img.alt=example?'Captura ficticia de Netflix':'Imagen adjunta';img.style.cssText='display:block;width:100%;max-width:240px;max-height:240px;object-fit:contain;border-radius:12px;margin-top:8px';sent.append(img);scroll.scrollTop=scroll.scrollHeight;}
     setBusy(true);chatTransition('thinking');chatPhase.textContent='Analizando tu imagen…';showTyping();
     const flow=++activeFlow,identity=String(window.getCurrentClientKey?.()||'');
     aiController=new AbortController();
-    const reply=await (example?vision.example(aiController.signal):vision.analyze(image,query,aiController.signal));
+    const reply=await (example?vision.example(aiController.signal):vision.analyze(image,query,aiController.signal,testOnly));
     if(!active||flow!==activeFlow||!authenticated()||identity!==String(window.getCurrentClientKey?.()||''))return;
     aiController=null;hideTyping();setBusy(false);
     if(reply.ok&&typeof reply.answer==='string'){chatTransition('speaking');bubble(reply.answer,false).classList.add('gxai-ai-answer');}
-    else if(reply.code!=='ABORTED'){chatTransition('error');bubble(reply.code==='RATE_LIMIT'?'La cuota de IA requiere una pausa. Puedes intentar de nuevo cuando esté disponible.':'No pude analizar la imagen ahora. Puedes describir la falla o acudir a nuestro equipo.',false);}
+    else if(reply.code!=='ABORTED'){chatTransition('error');bubble(reply.code==='RATE_LIMIT'?'La cuota de IA requiere una pausa. Puedes intentar de nuevo cuando esté disponible.':reply.code==='INVALID_IMAGE'?'No pude validar la imagen o el texto. Prueba con una captura JPG o PNG sin información privada.':reply.code==='VISION_DISABLED'?'El análisis no está autorizado para esta sesión.':'No pude analizar la imagen ahora. Puedes describir la falla o acudir a nuestro equipo.',false);}
     if(example&&reply.ok){clearSupportContext('Netflix');showChoices([{kind:'issue',platform:'Netflix',issueIndex:1,label:'Ver guía de actualización de hogar'},{kind:'policy-support',label:'Ir a atención humana'}]);}
     else showChoices([{kind:'platforms',label:'Consultar guías de soporte'},{kind:'policy-support',label:'Ir a atención humana'}]);
     later(flow,400,()=>chatTransition('listening'));
