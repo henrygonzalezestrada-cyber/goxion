@@ -5,10 +5,11 @@
 | Estado | Ruta o referencia | Uso |
 |---|---|---|
 | Oficial actual | `ayuda.html` | No sustituir hasta autorización y cierre de lanzamiento |
-| Candidato único | `ayuda-espejo-feed-v2.html` | Base funcional para Catálogo, Goxy y Soporte; Mi Espacio aprobado visualmente |
+| Candidato único | `ayuda-espejo-feed-v2.html` | Mi Espacio y Catálogo/carrito aprobados; base funcional para Goxy y Soporte |
 | Aceptación aislada | `ayuda-aceptacion-v2.html` | Mismos assets de candidato; guard, sesión y datos aislados |
 | Histórico oficial | rama `historico-oficial-mi-espacio-20261124` | Restauración/consulta, no publicar como segunda oficial |
 | Histórico candidato aprobado | rama `historico-feed-mi-espacio-aprobado-20261124`, commit `d69de74fd09255cb8f2260cd916ba036db9d3c75` | Punto de restauración antes de Catálogo |
+| Histórico Catálogo aprobado | rama `historico-catalogo-aprobado-20261124` | Restauración antes de Goxy; no publicar como ruta adicional |
 | Históricos retirados | `preview/mi-espacio-v2/index.html`, `espejo.html` | Solo aviso/enlace a candidato, sin login, iframe, CSS/JS propios ni acciones |
 | Históricos de referencia | `preview/experiencia-mi-espacio-inteligente/`, `preview/mi-espacio-espejo/`, `preview/gixys-mi-espacio-espejo/` | No continuar diseño allí; conservar por referencias y pruebas existentes, nunca fuente vigente |
 
@@ -19,8 +20,8 @@ Retirados del árbol activo: `preview/mi-espacio-v2/v2-app.js`, `v2-notification
 
 ## Orden autorizado y metodología
 1. Congelar feed aprobado y retirar duplicados sin consumidores: hecho.
-2. Catálogo en el mismo espejo y aceptación: revisar HTML/CSS/JS actuales; preservar filtros, recomendaciones, stock, precios/planes, promociones, selección, carrito y pedido. Estilos acotados a Catálogo y su carrito, sin tocar layout de Mi Espacio. Conservar handlers e IDs, no crear segundo carrito. Validar estados público/privado y flujos afectados; no enviar pedidos reales desde QA.
-3. Goxy: adaptar visualmente, conservar mascotita, conversación, consultas, contexto, escalamiento, rutas y estados.
+2. **Catálogo cerrado y aprobado por usuario.** Catálogo en el mismo espejo y aceptación: revisar HTML/CSS/JS actuales; preservar filtros, recomendaciones, stock, precios/planes, promociones, selección, carrito y pedido. Estilos acotados a Catálogo y su carrito, sin tocar layout de Mi Espacio. Conservar handlers e IDs, no crear segundo carrito. Validar estados público/privado y flujos afectados; no enviar pedidos reales desde QA.
+3. **Siguiente bloque: Goxy.** Adaptar visualmente, conservar mascotita, conversación, consultas, contexto, escalamiento, rutas y estados.
 4. Soporte y elementos compartidos: armonizar solo diferencias comprobadas.
 5. Validación final focalizada, incluida aceptación funcional pendiente.
 6. Limpiar residuos de los módulos, verificar respaldo oficial al momento del corte y promover el candidato exacto a ayuda.html solo tras autorización.
@@ -56,3 +57,6 @@ La primera versión no fue aprobada: excesivo espacio vacío, controles desplaza
 
 ### Carrito · composición de referencia elegida para prueba (24 nov, 18:47)
 Segunda propuesta rechazada por distribución; no acumular parches. Usuario aprueba probar el boceto con captura de referencia: conservar encabezado, agrupar logo/nombre/importe/cantidades/papelera en una sola microsuperficie por producto; total y CTA en una fila, aviso de confianza debajo. Acabado profundo con luz ambiental morada/cian, no copiar contornos luminosos ni línea divisoria de la imagen (decisiones previas vigentes). No añadir tirador decorativo sin gesto; el carrito conserva modal centrado y morph desde barra flotante. Crece/encoge animando altura medida al variar productos/errores/éxito, lista scroll si excede viewport, encabezado y resumen fuera del scroll. Para anchos estrechos/importes largos, resumen se apila. X: causa exacta era duplicación de pseudo-trazos de goxion-modal-headers.css y SVG local; ahora sólo SVG y botón táctil 44 con disco 35, icono 16, sin pseudo-trazos. Papelera PulsoIcon se mantiene; no tocar promociones/listado aprobados. Reemplazado bloque CSS de carrito, no superponer segunda propuesta. Versión cart-composition-20261124; sintaxis y comparación de lógica total/servicios/promos/stock/envío sin cambios, contratos de altura (crecer, contraer, repetir, reduced motion, apertura) con mock correctos. Sin prueba de Safari ni envío real. Pendiente aprobación visual en iPhone, cierre y limpieza de carrito.
+
+## Cierre de Catálogo y carrito · 24 nov 2026, 20:07 CDMX
+Usuario confirma: «Muchísimo mejor» y después valida agregar/eliminar plataformas y promociones, comportamiento del carrito, envío real de orden y recepción, además de apariencia. Resultado: **aprobado visual y funcionalmente por el usuario en los recorridos que reporta**. No repetir compras reales para demostrar lo ya comprobado. No equivale a certificar todos los errores, concurrencia, sesiones o flujos de lanzamiento. La revisión técnica previa preservó total, servicios, promociones y validaciones/envío. Referencia congelada: rama `historico-catalogo-aprobado-20261124`, candidato con CSS y JS `cart-composition-20261124`. Aceptación aislada comparte assets, pero no habilita solicitudes reales. Limpieza: verificado que no existe selector A/B/C activo ni hojas separadas de variantes; un único bloque de carrito sustituye las propuestas anteriores. Conservar dependencias compartidas con la oficial (no eliminar ramas legacy necesarias); no cambiar interfaz aprobada para renombrar archivos. **Próximo módulo: Goxy**, revisar experiencia pública y autenticada, conservar personalidad, mascotita, conversación, consultas, contexto, acciones, escalamiento a soporte, estados y conexiones. Analizar composición y comportamiento actual antes de editar. Después Soporte, armonización compartida, validación final y promoción expresa del candidato; quedan los pendientes autenticados del feed. No tocar Admin, Index ni oficial.
