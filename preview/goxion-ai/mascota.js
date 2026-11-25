@@ -978,13 +978,64 @@
     }else respondFree(query,result.reply,result.options||[]);
     return true;
   }
+  function clearSupportContext(platform=null){
+    chosenPlatform=platform;chosenGuide=null;lastGuide=null;aiMode=false;aiEntry=false;
+    awaitingSymptom=false;accessStage=null;caseContext=null;pendingHandoff=null;
+    lastAccountTopic=null;resetConversation();
+  }
+  function contextualRoute(query){
+    return refined?window.GOXY_DIALOG_ROUTING?.classify(query,{
+      platform:chosenPlatform,awaitingSymptom,accessStage
+    },knowledge.resolveAllPlatforms):null;
+  }
   function handleText(query) {
     // La información que ya administra GOXION y los saludos no consumen IA.
     const words = knowledge.normalize(query);
+    const route=contextualRoute(query);
+    if(route?.kind==='thanks'){
+      respondFree(query,'¡Con gusto! Si necesitas algo más, aquí estoy.',[]);
+      return;
+    }
+    if(route?.kind==='resolved'){
+      clearSupportContext();
+      respondFree(query,'¡Qué bueno que ya funciona! Si vuelve a ocurrir, podemos revisarlo juntos.',[{kind:'platforms',label:'Ayuda con otra plataforma'},{kind:'account',label:'Ir a Mi Espacio'}]);
+      return;
+    }
+    if(route?.kind==='farewell'){
+      clearSupportContext();
+      respondFree(query,'¡Hasta pronto! Aquí estaré cuando me necesites.',[]);
+      return;
+    }
+    if(route?.kind==='ack'&&!awaitingSymptom){
+      const previous=choices?Array.from(choices.querySelectorAll('button[data-kind]')).map(b=>({...b.dataset,label:b.textContent,issueIndex:b.dataset.issueIndex===undefined?undefined:Number(b.dataset.issueIndex),serviceIndex:b.dataset.serviceIndex===undefined?undefined:Number(b.dataset.serviceIndex)})):[];
+      respondFree(query,'De acuerdo. Podemos continuar cuando quieras.',previous);
+      return;
+    }
+    if(route?.kind==='human'){
+      if(route.brand&&route.brand!==chosenPlatform)clearSupportContext(route.brand);
+      if(chosenPlatform){respondFree(query,'Claro. Puedo preparar una ficha para nuestro equipo; tú decides si la compartes.',[{kind:'human',label:'Preparar ficha de soporte'},{kind:'policy-support',label:'Ir a atención humana'}]);}
+      else respondFree(query,'Claro, puedes hablar directamente con nuestro equipo.',[{kind:'policy-support',label:'Ir a atención humana'},{kind:'platforms',label:'Elegir plataforma para preparar ficha'}]);
+      return;
+    }
+    if(route?.kind==='multiple'){
+      clearSupportContext();
+      respondFree(query,'Podemos revisar ambos servicios, uno por uno. ¿Con cuál empezamos?',choosePlatformOptions(route.brands));
+      return;
+    }
+    if(route?.kind==='device'){
+      respondFree(query,'Entendido. Revisemos lo que ocurre en '+route.device.replace(/^en /,'')+'. ¿Qué mensaje aparece o qué deja de funcionar?',[{kind:'issues',platform:chosenPlatform,label:'Ver problemas conocidos'}]);
+      return;
+    }
+    if(route?.brand&&route.brand!==chosenPlatform&&['brand','symptom'].includes(route.kind))clearSupportContext(route.brand);
+    if(route?.kind==='brand'){
+      awaitingSymptom=true;
+      respondFree(query,'¿Qué ocurre con '+route.brand+'? Cuéntame el síntoma o elige una situación conocida.',[{kind:'issues',platform:route.brand,label:'Ver soluciones disponibles'}]);
+      return;
+    }
     const rule=refined?window.GOXY_POLICY_V2?.reply(query):null;
-    if(rule){lastAccountTopic=null;respondFree(query,rule.answer,rule.choices);return;}
+    if(rule){clearSupportContext();respondFree(query,rule.answer,rule.choices);return;}
     const topic=accountTopic(query);
-    if(topic){ void accountRead(topic,query); return; }
+    if(topic && route?.kind!=='symptom'){ if(refined){const previous=lastAccountTopic;clearSupportContext();lastAccountTopic=previous;} void accountRead(topic,query); return; }
     // Una pregunta comercial no es una falla de acceso ni gasta Groq.
     const platformOffer=knowledge.resolvePlatform(query);
     if(platformOffer && /\b(si contrato|si contratara|quiero contratar|quiero adquirir|cuanto pagaria|cuanto cuesta|cuanto sale|cuanto saldria|precio|costo|mensual|contratacion|contratar)\b/.test(words) &&
@@ -1032,8 +1083,8 @@
     }
     const platform = knowledge.resolvePlatform(query);
     if(platform && chosenPlatform && platform!==chosenPlatform){
-      aiMode=false;awaitingSymptom=false;lastGuide=null;chosenGuide=null;
-      resetConversation();
+      if(refined)clearSupportContext(platform);
+      else {aiMode=false;awaitingSymptom=false;lastGuide=null;chosenGuide=null;resetConversation();}
     }
     if (/\b(asesor|humano|whatsapp|persona)\b/.test(words)) {
       runDemo({prompt:query,step:'working',
@@ -1050,12 +1101,12 @@
     if (target) {
       const samePlatform = lastGuide?.platform===target;
       const index = knowledge.matchIssue(target,query);
-      const failed=/\b(ya|hice|intente|probe|sigue|todavia|aun|no sirvio|no resolvio|no funciona|mismo problema)\b/.test(words);
-      if(samePlatform && lastGuide && failed){
+      const failed=refined?(route?.kind==='follow'||/\b(ya (lo )?(hice|intente|probe|revise)|sigue (igual|fallando|sin funcionar)|no sirvio|no resolvio)\b/.test(words)):/\b(ya|hice|intente|probe|sigue|todavia|aun|no sirvio|no resolvio|no funciona|mismo problema)\b/.test(words);
+      if(samePlatform && lastGuide && failed && (index===null||index===lastGuide.issueIndex)){
         escalateAutomatically(query,target,lastGuide.issueIndex);
         return;
       }
-      if (index !== null && !aiMode) {showGuide(target,index);return;}
+      if (index !== null && (!aiMode||refined&&index!==chosenGuide?.issueIndex)) {showGuide(target,index);return;}
       if (aiMode && chosenGuide?.platform===target) {
         void askAI(query);
         return;
@@ -1070,8 +1121,8 @@
       }
       if(isVague(query) && awaitingSymptom){
         respondFree(query,
-          'Para poder ayudarte necesito un detalle más: ¿qué ves en la pantalla y en qué momento sucede?',
-          [{kind:'issues',platform:target,label:'Ver guías disponibles'}]);
+          refined?'Si no sabes cómo describirlo, elige la situación más parecida o habla con nuestro equipo.':'Para poder ayudarte necesito un detalle más: ¿qué ves en la pantalla y en qué momento sucede?',
+          refined?[...knowledge.issues(target).map((issue,index)=>({kind:'issue',platform:target,issueIndex:index,label:issue.issue})),{kind:'human',label:'Hablar con asesor'}]:[{kind:'issues',platform:target,label:'Ver guías disponibles'}]);
         return;
       }
       escalateAutomatically(query,target,samePlatform?lastGuide?.issueIndex:undefined);
@@ -1251,7 +1302,7 @@
     }
     if(type==='policy-extension'){void accountRead('extension','Comprobar mi prórroga');return;}
     if(type==='policy-loyalty'){void accountRead('loyalty','Consultar mi nivel');return;}
-    if(type==='policy-support'){closeChat();doc.querySelector('#view-soporte .gx-support-human button')?.focus({preventScroll:false});return;}
+    if(type==='policy-support'){closeChat();const button=doc.querySelector('#view-soporte .gx-support-human button');button?.scrollIntoView({block:'center',behavior:reducedMotion()?'instant':'smooth'});button?.focus({preventScroll:true});return;}
     if (type === 'terms-open') { closeChat(); window.openModal?.('modal-garantia'); return; }
     if (type === 'extend-open') {
       closeChat();window.switchTab?.('inicio');
@@ -1272,7 +1323,7 @@
       return;
     }
     if (type === 'platforms') {
-      chosenPlatform = null;
+      if(refined)clearSupportContext();else chosenPlatform = null;
       runDemo({prompt:'Ver plataformas',step:'searching',
         response:'Elige tu plataforma para consultar las soluciones disponibles.',finish:'happy'},null,showPlatforms);
     } else if (type === 'platform' && knowledge.platforms().includes(platform)) {
@@ -1281,7 +1332,7 @@
         const route=accessRouter.routes(platform,mode);
         respondFree('Consultar '+platform,route.reply,route.options);return;
       }
-      if(chosenPlatform!==platform)resetConversation();
+      if(chosenPlatform!==platform){if(refined)clearSupportContext(platform);else resetConversation();}
       chosenPlatform = platform;
       awaitingSymptom = true;
       chosenGuide = null;
@@ -1440,7 +1491,8 @@
     if(pendingAI){
       // Consultas gratuitas y cambio de plataforma siguen disponibles sin esperar IA.
       const local=knowledge.normalize(text);
-      if((refined&&window.GOXY_POLICY_V2?.reply(text))||accountTopic(text) ||
+      const route=contextualRoute(text);
+      if((route&&['thanks','resolved','farewell','ack','human','multiple','brand','device'].includes(route.kind))||(refined&&window.GOXY_POLICY_V2?.reply(text))||accountTopic(text) ||
         /\b(contrasena|password|clave de acceso|clave de inicio)\b/.test(local) ||
         (/\b(contrato|contratar|cotizar|cuanto cuesta|cuanto pagaria|precio|costo|mensual)\b/.test(local)&&knowledge.resolvePlatform(text)) ||
         /^(hola(?: goxy)?|que puedes hacer|que puedo hacer|que haces|buenos dias|buenas tardes|buenas noches)$/.test(local) ||
