@@ -1111,7 +1111,7 @@
       respondFree(query,'Entendido. Revisemos lo que ocurre en '+route.device.replace(/^en /,'')+'. ¿Qué mensaje aparece o qué deja de funcionar?',[{kind:'issues',platform:chosenPlatform,label:'Ver problemas conocidos'}]);
       return;
     }
-    if(route?.brand&&route.brand!==chosenPlatform&&['brand','symptom'].includes(route.kind))clearSupportContext(route.brand);
+    if(route?.brand&&route.brand!==chosenPlatform&&['brand','symptom'].includes(route.kind)&&!(diagnosis?.get()?.platform===null))clearSupportContext(route.brand);
     if(route?.kind==='brand'&&!diagnosis?.get()){
       awaitingSymptom=true;
       respondFree(query,'¿Qué ocurre con '+route.brand+'? Cuéntame el síntoma o elige una situación conocida.',[{kind:'issues',platform:route.brand,label:'Ver soluciones disponibles'}]);
@@ -1130,7 +1130,7 @@
          {kind:'promotions',label:'Promociones disponibles'}]);
       return;
     }
-    if(refined&&route?.brand&&route.brand!==chosenPlatform)clearSupportContext(route.brand);
+    if(refined&&route?.brand&&route.brand!==chosenPlatform&&!(diagnosis?.get()?.platform===null))clearSupportContext(route.brand);
     if(helpWithAccess(query)){diagnosis?.reset();return;}
     if(diagnosis&&!accessStage){const decision=diagnosis.consume(query,chosenPlatform,visionReady);if(decision&&applyDiagnosis(decision,query))return;}
     if(/^(hola(?: goxy)?|buenos dias|buenas tardes|buenas noches|hey|que puedes hacer|que puedo hacer|que haces|en que me ayudas|en que me puedes ayudar|como me ayudas|me puedes ayudar)$/.test(words)) {
@@ -1591,7 +1591,7 @@
     let diagnosed=false;
     if(reply.ok&&typeof reply.answer==='string'){
       chatTransition('speaking');
-      if(diagnosis){clearSupportContext();const decision=diagnosis.fromVision(reply.diagnosis);if(decision){if(!decision.answer){bubble(reply.answer,false).classList.add('gxai-ai-answer');keepTurn('Se analizó una imagen del problema.',reply.answer);}diagnosed=applyDiagnosis(decision);}}
+      if(diagnosis){clearSupportContext();const decision=diagnosis.fromVision(reply.diagnosis);if(decision){if(!decision.answer)bubble(reply.answer,false).classList.add('gxai-ai-answer');diagnosed=applyDiagnosis(decision);if(!decision.answer)keepTurn('Se analizó una imagen del problema.',reply.answer);}}
       if(!diagnosed)bubble(reply.answer,false).classList.add('gxai-ai-answer');
     }
     else if(reply.code!=='ABORTED'){chatTransition('error');bubble(reply.code==='RATE_LIMIT'?'La cuota de IA requiere una pausa. Puedes intentar de nuevo cuando esté disponible.':reply.code==='INVALID_IMAGE'?'No pude validar la imagen o el texto. Prueba con una captura JPG o PNG sin información privada.':reply.code==='VISION_DISABLED'?'El análisis no está autorizado para esta sesión.':'No pude analizar la imagen ahora. Puedes describir la falla o acudir a nuestro equipo.',false);}
