@@ -2,7 +2,8 @@
    All business/auth/rate limits live in Supabase goxy-ai-beta. */
 (() => {
   "use strict";
-  const URL=location.pathname.endsWith("/ayuda-aceptacion-v2.html")?"https://nsvybyvvdpdgbgtvydfb.supabase.co/functions/v1/goxy-ai-qa":"https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/goxy-ai-beta";
+  const endpoint=()=>window.GOXION_CORE?.endpoint?.("goxy-ai-beta");
+  const isQA=()=>location.pathname.endsWith("/ayuda-aceptacion-v2.html");
   const sensitive=/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b|\b(?:\d[\s.-]?){9,16}\b|\b\d{4,8}\b/iu;
   function token(){
     const key=window.GOXION_CORE?.STORAGE?.CLIENT_TOKEN;
@@ -11,7 +12,9 @@
   async function send(payload,{signal}={}){
     const clientToken=token();
     if(!clientToken) return {ok:false,code:"SESSION_INVALID",message:"Inicia sesión nuevamente en Mi Espacio."};
-    const res=await fetch(URL,{method:"POST",signal,cache:"no-store",
+    const url=endpoint();
+    if(!url||(isQA()&&(!window.GOXION_QA_ISOLATED||!url.endsWith('/goxy-ai-qa'))))return {ok:false,code:'ENVIRONMENT_MISMATCH'};
+    const res=await fetch(url,{method:"POST",signal,cache:"no-store",
       headers:{"Content-Type":"application/json","X-Client-Token":clientToken},
       body:JSON.stringify(payload)});
     const body=await res.json().catch(()=>({ok:false,code:"INVALID_RESPONSE"}));
