@@ -55,20 +55,25 @@ html[data-gx-support-v3] #view-soporte .gxai-chat-head .gxai-avatar .gxai-mascot
   width:70px;height:70px;max-width:none;display:grid;place-items:center;overflow:visible;
 }
 html[data-gx-support-v3] #view-soporte .gxai-chat-head .gxai-avatar .gxai-canvas-slot>span{
-  transform:scale(1.42);transform-origin:center;pointer-events:none;
+  transform:none;transform-origin:center;pointer-events:none;
 }
 html[data-gx-support-v3] #view-soporte .gxai-heading{flex:none;min-width:0;text-align:center}
-html[data-gx-support-v3] #view-soporte .gxai-heading strong{font-size:18px;font-weight:700;letter-spacing:-.02em;line-height:1.2}
-html[data-gx-support-v3] #view-soporte .gxai-heading small{font-size:11px;line-height:1.45;margin-top:4px}
-html[data-gx-support-v3] #view-soporte .gxai-chat-phase{display:inline-block;color:#a8dfe3}
+html[data-gx-support-v3] #view-soporte .gxai-chat-name{position:absolute;left:max(18px,env(safe-area-inset-left));top:calc(19px + env(safe-area-inset-top));font:700 22px/1.2 Poppins,sans-serif;letter-spacing:-.04em;color:#b39afa;margin:0}
+html[data-gx-support-v3] #view-soporte .gxai-heading{height:32px;display:flex;align-items:center;justify-content:center;width:min(100%,300px)}
+html[data-gx-support-v3] #view-soporte .gxai-heading small{font-size:11.5px;line-height:1.35;margin:0;max-width:100%}
+html[data-gx-support-v3] #view-soporte .gxai-chat-phase{display:inline-block;color:#7ee1e7;transition:color .2s ease}
+html[data-gx-support-v3] #view-soporte .gxai-chat-layer[data-chat-state='searching'] .gxai-chat-phase{color:#9ab9ff}
+html[data-gx-support-v3] #view-soporte .gxai-chat-layer[data-chat-state='searching'] .gxai-chat-phase::before{background:#9ab9ff;box-shadow:none}
+html[data-gx-support-v3] #view-soporte .gxai-chat-layer[data-chat-state='happy'] .gxai-chat-phase{color:#8ee2b9}
+html[data-gx-support-v3] #view-soporte .gxai-chat-layer[data-chat-state='error'] .gxai-chat-phase{color:#ff9eac}
 html[data-gx-support-v3] #view-soporte .gxai-chat-phase::before{box-shadow:none}
 html[data-gx-support-v3] #view-soporte .gxai-chat-head .gxai-close{
   position:absolute;right:max(12px,env(safe-area-inset-right));top:calc(10px + env(safe-area-inset-top));margin:0;
 }
-html[data-gx-support-v3] #view-soporte :is(.gxai-heading,.gxai-chat-head .gxai-close,.gxai-chat-scroll,.gxai-chat-foot){
+html[data-gx-support-v3] #view-soporte :is(.gxai-chat-name,.gxai-heading,.gxai-chat-head .gxai-close,.gxai-chat-scroll,.gxai-chat-foot){
   opacity:0;transition:opacity .18s ease;
 }
-html[data-gx-support-v3] #view-soporte .gxai-visible :is(.gxai-heading,.gxai-chat-head .gxai-close,.gxai-chat-scroll,.gxai-chat-foot){
+html[data-gx-support-v3] #view-soporte .gxai-visible :is(.gxai-chat-name,.gxai-heading,.gxai-chat-head .gxai-close,.gxai-chat-scroll,.gxai-chat-foot){
   opacity:1;transition:opacity .22s .12s ease;
 }
 html[data-gx-support-v3] #view-soporte .gxai-chat-scroll{
@@ -80,7 +85,11 @@ html[data-gx-support-v3] #view-soporte .gxai-bubble{
   border:0;box-shadow:none;background:transparent;border-radius:0;max-width:100%;padding:0;
   color:#f5f8ff;font-size:14px;line-height:1.7;white-space:pre-line;overflow-wrap:anywhere;
 }
-html[data-gx-support-v3] #view-soporte .gxai-local-answer{color:#d8d0f3}
+html[data-gx-support-v3] #view-soporte .gxai-local-answer{color:#f1edf9}
+html[data-gx-support-v3] #view-soporte .gxai-reply-title{display:block;font-weight:650;color:#f5f8ff;margin-bottom:8px}
+html[data-gx-support-v3] #view-soporte .gxai-reply-list{display:grid;gap:6px;margin:0 0 10px;padding:0 0 0 18px;color:#c6b1ff;font-weight:600;white-space:normal}
+html[data-gx-support-v3] #view-soporte .gxai-reply-note{display:block;font-size:12px;line-height:1.65;color:#a8b5c9}
+html[data-gx-support-v3] #view-soporte .gxai-chat-scroll>*{flex-shrink:0}
 html[data-gx-support-v3] #view-soporte .gxai-ai-answer{color:#f5f8ff}
 html[data-gx-support-v3] #view-soporte .gxai-bubble.gxai-me{
   align-self:flex-end;max-width:86%;padding:10px 14px;border:0;border-radius:18px 18px 5px 18px;
@@ -115,22 +124,32 @@ html[data-gx-support-v3] #view-soporte .gxai-composer{
 html[data-gx-support-v3] #view-soporte .gxai-composer:focus-within{box-shadow:0 0 0 1px rgba(126,225,231,.45)}
 html[data-gx-support-v3] #view-soporte .gxai-message-input{font-size:16px!important;line-height:1.35}
 html[data-gx-support-v3] #view-soporte .gxai-send{border:0;background:rgba(126,225,231,.14);color:#a6f1f5;width:40px;height:40px;box-shadow:none}
+html[data-gx-support-v3] #view-soporte .gxai-send.gxai-send-ready:not(:disabled){background:#79e6fc;color:#071c29;opacity:1}
+html[data-gx-support-v3] #view-soporte .gxai-send:disabled{background:rgba(255,255,255,.06);color:#a8b5c9;opacity:.7;cursor:default}
 html[data-gx-support-v3] #view-soporte .gxai-send:active:not(:disabled) svg{transform:translateY(-2px) scale(1.06)}
 html[data-gx-support-v3] #view-soporte .gxai-send svg{transition:transform .18s ease}
 html[data-gx-support-v3] #view-soporte .gxai-chat-disclaimer{color:#a8b5c9;font-size:10px}
 html[data-gx-support-v3] #view-soporte .gxai-chat-layer.gxai-keyboard-open .gxai-chat{border-radius:0!important;clip-path:none}
 html[data-gx-support-v3] #view-soporte .gxai-keyboard-open .gxai-chat-head{
-  flex-direction:row;justify-content:center;gap:9px;min-height:60px;padding:7px 56px;
+  flex-direction:column;justify-content:center;gap:2px;min-height:0;padding:5px 56px;
 }
 html[data-gx-support-v3] #view-soporte .gxai-keyboard-open .gxai-chat-head .gxai-avatar{width:48px;height:48px}
 html[data-gx-support-v3] #view-soporte .gxai-keyboard-open .gxai-chat-head .gxai-avatar .gxai-mascot.gxai-canvas-slot{width:46px;height:46px}
-html[data-gx-support-v3] #view-soporte .gxai-keyboard-open .gxai-chat-head .gxai-avatar .gxai-canvas-slot>span{transform:scale(.9)}
-html[data-gx-support-v3] #view-soporte .gxai-keyboard-open .gxai-heading{text-align:left}
+html[data-gx-support-v3] #view-soporte .gxai-keyboard-open .gxai-chat-head .gxai-avatar .gxai-canvas-slot>span{transform:scale(.68)}
+html[data-gx-support-v3] #view-soporte .gxai-keyboard-open .gxai-heading{height:22px;text-align:center}
+html[data-gx-support-v3] #view-soporte .gxai-keyboard-open .gxai-chat-name{top:16px;font-size:20px}
 html[data-gx-support-v3] #view-soporte .gxai-keyboard-open .gxai-chat-head .gxai-close{top:7px}
 html[data-gx-support-v3] #view-soporte .gxai-keyboard-open .gxai-chat-foot{padding-bottom:6px}
 html[data-gx-support-v3] #view-soporte .gxai-chat-layer:is(.gxai-no-morph,.gxai-measuring) .gxai-chat{clip-path:none;transition:none}
 html[data-gx-support-v3] #view-soporte .gxai-chat-layer:is(.gxai-no-morph,.gxai-measuring) .gxai-chat-head .gxai-avatar{transform:none;transition:none}
 html[data-gx-support-v3] #view-soporte .gxai-chat-layer.gxai-morph-setup :is(.gxai-chat,.gxai-chat-head .gxai-avatar){transition:none!important}
+/* Mantener la capa visible durante todo el retorno al rectángulo original. */
+html[data-gx-support-v3] #view-soporte .gxai-chat-layer.gxai-closing{pointer-events:none!important}
+html[data-gx-support-v3] #view-soporte .gxai-chat-layer.gxai-closing .gxai-chat{clip-path:var(--gxai-morph-clip,inset(0 round 24px));transition:clip-path .44s cubic-bezier(.22,.82,.24,1)}
+html[data-gx-support-v3] #view-soporte .gxai-chat-layer.gxai-closing .gxai-chat-head .gxai-avatar{transform:translate(var(--gxai-morph-x,0px),var(--gxai-morph-y,0px)) scale(var(--gxai-morph-scale,1));transition:transform .44s cubic-bezier(.22,.82,.24,1)}
+html[data-gx-support-v3] #view-soporte .gxai-chat-layer.gxai-closing :is(.gxai-chat-name,.gxai-heading,.gxai-close,.gxai-chat-scroll,.gxai-chat-foot){opacity:0;transition:opacity .16s ease}
+html[data-gx-support-v3] #view-soporte .gxai-chat-layer.gxai-closing .gxai-backdrop{opacity:0;transition:opacity .4s ease}
+html[data-gx-support-v3] #view-soporte .gxai-chat-layer.gxai-closed{opacity:0;visibility:hidden;transition:none}
 @media(max-width:360px){
  html[data-gx-support-v3] #view-soporte .gxai-chat-scroll{padding-inline:15px}
  html[data-gx-support-v3] #view-soporte .gxai-chat-head .gxai-avatar{width:76px;height:76px}
@@ -140,7 +159,7 @@ html[data-gx-support-v3] #view-soporte .gxai-chat-layer.gxai-morph-setup :is(.gx
  html[data-gx-support-v3] #view-soporte .gxai-chat-layer,
  html[data-gx-support-v3] #view-soporte .gxai-chat,
  html[data-gx-support-v3] #view-soporte .gxai-chat-head .gxai-avatar,
- html[data-gx-support-v3] #view-soporte :is(.gxai-heading,.gxai-chat-head .gxai-close,.gxai-chat-scroll,.gxai-chat-foot,.gxai-send svg){transition:none!important}
+ html[data-gx-support-v3] #view-soporte :is(.gxai-chat-name,.gxai-heading,.gxai-chat-head .gxai-close,.gxai-chat-scroll,.gxai-chat-foot,.gxai-send svg){transition:none!important}
  html[data-gx-support-v3] #view-soporte .gxai-chat{clip-path:none}
  html[data-gx-support-v3] #view-soporte .gxai-chat-head .gxai-avatar{transform:none}
 }
