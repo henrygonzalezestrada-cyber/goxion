@@ -13,6 +13,8 @@
     'estado-financiero': 'estado-financiero',
     'inventario-publico': 'inventario-publico',
     'login-goxion': 'login-goxion',
+    'goxy-ai-beta': 'goxy-ai-qa',
+    'goxy-vision-qa': 'goxy-vision-qa',
     'legal-consent-v2': 'legal-consent-v2',
     'mi-espacio': 'mi-espacio',
     'notificar-goxion': 'notificar-goxion',
