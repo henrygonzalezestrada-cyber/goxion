@@ -130,13 +130,13 @@ html[data-gx-support-v3] #view-soporte .gxai-composer{gap:0}
 html[data-gx-support-v3] #view-soporte .gxai-send{
  border:0;background:#79e6fc;color:#071c29;box-shadow:none;
  flex:0 0 auto;min-width:0;width:0;height:40px;margin-left:0;padding:0;overflow:hidden;
- opacity:0;visibility:hidden;pointer-events:none;transform:scale(.72);
- transition:width .26s cubic-bezier(.22,.82,.24,1),margin-left .26s cubic-bezier(.22,.82,.24,1),opacity .19s ease,transform .26s cubic-bezier(.22,.82,.24,1),visibility 0s .26s;
+ opacity:0;visibility:hidden;pointer-events:none;transform:scale(.35);transform-origin:center;clip-path:circle(0% at 50% 50%);
+ transition:width .26s cubic-bezier(.22,.82,.24,1),margin-left .26s cubic-bezier(.22,.82,.24,1),opacity .16s ease,transform .30s cubic-bezier(.2,.85,.25,1),clip-path .26s ease,visibility 0s .30s;
 }
 html[data-gx-support-v3] #view-soporte .gxai-send[hidden]{display:none!important}
 html[data-gx-support-v3] #view-soporte .gxai-send.gxai-send-ready{
- width:40px;margin-left:8px;opacity:1;visibility:visible;pointer-events:auto;transform:scale(1);
- transition:width .26s cubic-bezier(.22,.82,.24,1),margin-left .26s cubic-bezier(.22,.82,.24,1),opacity .19s .045s ease,transform .26s cubic-bezier(.22,.82,.24,1),visibility 0s;
+ width:40px;margin-left:8px;opacity:1;visibility:visible;pointer-events:auto;transform:scale(1);clip-path:circle(72% at 50% 50%);
+ transition:width .26s cubic-bezier(.22,.82,.24,1),margin-left .26s cubic-bezier(.22,.82,.24,1),opacity .20s ease,transform .30s cubic-bezier(.2,.85,.25,1),clip-path .28s cubic-bezier(.2,.85,.25,1),visibility 0s;
 }
 html[data-gx-support-v3] #view-soporte .gxai-send:not(.gxai-send-ready) svg{opacity:0}
 html[data-gx-support-v3] #view-soporte .gxai-send.gxai-send-ready svg{opacity:1}
