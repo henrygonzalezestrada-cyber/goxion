@@ -127,6 +127,7 @@ html[data-gx-support-v3] #view-soporte .gxai-composer{
 html[data-gx-support-v3] #view-soporte .gxai-composer:focus-within{box-shadow:0 0 0 1px rgba(126,225,231,.45)}
 html[data-gx-support-v3] #view-soporte .gxai-message-input{font-size:16px!important;line-height:1.35}
 html[data-gx-support-v3] #view-soporte .gxai-send{border:0;background:rgba(126,225,231,.14);color:#a6f1f5;width:40px;height:40px;box-shadow:none}
+html[data-gx-support-v3] #view-soporte .gxai-send[hidden]{display:none!important}
 html[data-gx-support-v3] #view-soporte .gxai-send.gxai-send-ready:not(:disabled){background:#79e6fc;color:#071c29;opacity:1}
 html[data-gx-support-v3] #view-soporte .gxai-send:disabled{background:rgba(255,255,255,.06);color:#a8b5c9;opacity:.7;cursor:default}
 html[data-gx-support-v3] #view-soporte .gxai-send:active:not(:disabled) svg{transform:translateY(-2px) scale(1.06)}
