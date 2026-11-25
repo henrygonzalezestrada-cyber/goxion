@@ -28,6 +28,9 @@ jobs:
       - name: Install Chromium and WebKit
         run: npx playwright install --with-deps chromium webkit
 
+      - name: Goxy · interpretación y diagnóstico contextual
+        run: node --test scripts/goxy-dialog-routing.test.mjs scripts/goxy-diagnosis.test.mjs scripts/goxy-conversation-context.test.mjs
+
       - name: Verify repository integrity
         run: npm run verify
 
