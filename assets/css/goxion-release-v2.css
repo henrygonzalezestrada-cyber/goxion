@@ -104,12 +104,14 @@ body.gx-release-v2-body-lock{overflow:hidden!important}
 .gx-release-v2[data-edition="launch"]{
  padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right))
    max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));
- background:rgba(3,3,5,.77);-webkit-backdrop-filter:blur(11.75px);backdrop-filter:blur(11.75px);
+ /* No usar una capa fixed filtrada y transformada en WebKit. El fondo
+    translúcido y la superficie se pintan inmediatamente; sólo mueve el contenido. */
+ background:rgba(3,3,5,.86);-webkit-backdrop-filter:none;backdrop-filter:none;
 }
 .gx-release-v2[data-edition="launch"] .gx-launch-card{
  width:min(100%,420px);height:min(600px,calc(100vh - 24px));height:min(600px,calc(100dvh - 24px));
  max-height:100%;border:0;border-radius:26px;background:#15151c;
- box-shadow:0 22px 64px rgba(0,0,0,.36);animation:gx-launch-enter .43s cubic-bezier(.22,.82,.24,1) backwards;
+ box-shadow:0 22px 64px rgba(0,0,0,.36);animation:none;
 }
 .gx-release-v2[data-edition="launch"] .gx-launch-header{
  position:relative;display:flex;align-items:center;justify-content:space-between;
@@ -182,8 +184,9 @@ body.gx-release-v2-body-lock{overflow:hidden!important}
 .gx-launch-status{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 .gx-release-v2[data-edition="launch"] .gx-launch-card:focus{outline:0}
 .gx-release-v2[data-edition="launch"] button:focus-visible{outline:2px solid #79e6fc!important;outline-offset:3px}
-@keyframes gx-launch-enter{from{opacity:0;transform:translateY(18px) scale(.974)}to{opacity:1;transform:none}}
-@keyframes gx-launch-chapter{from{opacity:0;transform:translateX(var(--gx-launch-offset,0px)) translateY(6px)}to{opacity:1;transform:none}}
+/* Nunca iniciar invisible: aun si el compositor de iOS retrasa el movimiento,
+   texto, icono y controles siguen presentes y legibles. */
+@keyframes gx-launch-chapter{from{opacity:.88;transform:translateX(var(--gx-launch-offset,0px)) translateY(6px)}to{opacity:1;transform:none}}
 @media(max-height:600px){
  .gx-launch-content{gap:10px;padding-block:5px 12px}
  .gx-launch-art{height:100px}
