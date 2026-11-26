@@ -6,7 +6,8 @@
  "use strict";
  if(window.GOXION_LEGAL_V2)return;
  const VERSION="2.0", CORE=window.GOXION_CORE;
- const TOKEN_KEY=CORE?.STORAGE?.CLIENT_TOKEN||"goxion_client_token";
+ // Única clave de sesión: runtime oficial o runtime de aceptación aislada.
+ const TOKEN_KEY=CORE?.STORAGE?.CLIENT_TOKEN;
  const API=CORE?.endpoint?.("legal-consent-v2")||"";
  const DOCS={
    terminos:{title:"Términos y Condiciones",url:"./assets/legal/terminos-v2.txt"},
@@ -51,7 +52,7 @@
    };
    retryTimer=setTimeout(offer,1100);
  }
- const token=()=>{try{return localStorage.getItem(TOKEN_KEY)||"";}catch{return "";}};
+ const token=()=>{if(!TOKEN_KEY)return "";try{return localStorage.getItem(TOKEN_KEY)||"";}catch{return "";}};
  function el(tag,cls,text){
    const n=document.createElement(tag);
    if(cls)n.className=cls;
@@ -466,7 +467,7 @@
  // Mientras Mi Espacio permanezca abierto, seguir comprobando la decisión.
  setInterval(()=>{if(!document.hidden&&token())void checkSession();},30*1000);
  window.addEventListener("goxion:client-logout",logout);
- window.addEventListener("storage",ev=>{if(ev.key===TOKEN_KEY){logout();if(token())void checkSession();}});
+ window.addEventListener("storage",ev=>{if(TOKEN_KEY&&ev.key===TOKEN_KEY){logout();if(token())void checkSession();}});
  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",setup,{once:true});
  else setup();
 })();

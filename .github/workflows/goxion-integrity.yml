@@ -37,6 +37,10 @@ jobs:
       - name: Verify repository integrity
         run: npm run verify
 
+      - name: Sesión legal · runtime único y aislamiento (simulado)
+        if: ${{ !cancelled() }}
+        run: node scripts/legal-session-runtime.test.mjs
+
       # Release Goxy must stay independent from legacy browser-smoke failures.
       - name: Goxy F17 oficial + aviso por cliente autenticado
         if: ${{ !cancelled() }}

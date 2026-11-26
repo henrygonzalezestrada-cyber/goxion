@@ -3995,8 +3995,8 @@ html .gx-bank-close{
   box-shadow:0 0 18px rgba(0,242,254,.20);
   z-index:2;
 }
-html .gx-payment-v2 #payment-modal .close-modal::before,
-html .gx-payment-v2 #payment-modal .close-modal::after,
+html.gx-payment-v2 #payment-modal .close-modal::before,
+html.gx-payment-v2 #payment-modal .close-modal::after,
 html .gx-bank-close::before,
 html .gx-bank-close::after{display:none}
 .gx-20-row{transition:transform .18s ease}

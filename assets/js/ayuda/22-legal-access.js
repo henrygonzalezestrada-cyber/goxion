@@ -5,7 +5,9 @@
  "use strict";
  if(window.GOXION_LEGAL_ACCESS)return;
  const CORE=window.GOXION_CORE,legal=()=>window.GOXION_LEGAL_V2;
- const TOKEN_KEY=CORE?.STORAGE?.CLIENT_TOKEN||"goxion_client_token";
+ // La identidad sólo se obtiene del runtime central; sin él no se pide historial.
+ const TOKEN_KEY=CORE?.STORAGE?.CLIENT_TOKEN;
+ const token=()=>{if(!TOKEN_KEY)return "";try{return localStorage.getItem(TOKEN_KEY)||"";}catch{return "";}};
  let locked=false,blocked=false,managed=[],lastAccess=null,loadingHistory=false;
  const $=(s,root=document)=>root.querySelector(s);
  function n(tag,cls,text){
@@ -34,7 +36,7 @@
    $("[data-gx-lock-accept]",shell).addEventListener("click",()=>{legal()?.openConsent?.();});
    $("[data-gx-lock-exit]",shell).addEventListener("click",()=>{
      if(typeof window.cerrarSesion==="function")window.cerrarSesion();
-     else{localStorage.removeItem(TOKEN_KEY);window.dispatchEvent(new Event("goxion:client-logout"));location.reload();}
+     else{if(TOKEN_KEY)try{localStorage.removeItem(TOKEN_KEY);}catch(_){}window.dispatchEvent(new Event("goxion:client-logout"));location.reload();}
    });
    $("[data-gx-lock-history]",shell).addEventListener("click",()=>void showHistory());
  }
@@ -101,7 +103,7 @@
      window.switchTab?.("inicio");
    setActiveWarning(state);
    setLocked(state?.restringido===true);
-   if(prev&&!locked&&state?.fase==="aceptado"&&localStorage.getItem(TOKEN_KEY)){
+   if(prev&&!locked&&state?.fase==="aceptado"&&token()){
      // Al aceptar tras el bloqueo la vista anterior solo tenía historial.
      setTimeout(()=>location.reload(),160);
    }
@@ -114,15 +116,16 @@
    panel.hidden=false;btn.setAttribute("aria-expanded","true");
    panel.replaceChildren(n("p","","Consultando tu historial…"));
    loadingHistory=true;
-   const current=localStorage.getItem(TOKEN_KEY)||"";
+   const current=token();
    try{
+     if(!current||typeof CORE?.endpoint!=="function")throw Error("Sesión requerida");
      const res=await fetch(CORE.endpoint("mi-espacio"),{
        method:"POST",cache:"no-store",
        headers:{"Content-Type":"application/json","X-Client-Token":current},
        body:JSON.stringify({modo:""})
      });
      const data=await res.json();
-     if(current!==localStorage.getItem(TOKEN_KEY)||!locked)return;
+     if(current!==token()||!locked)return;
      if(!res.ok||data.ok!==true||data.acceso_restringido!==true||!data.cliente?.id)
        throw Error("No fue posible verificar el historial");
      panel.replaceChildren(n("h3","","Historial de pagos"));
@@ -150,8 +153,8 @@
  },true);
  window.addEventListener("goxion:legal-state",event=>render(event.detail));
  window.addEventListener("goxion:client-logout",()=>render({acceso:null}));
- window.addEventListener("storage",event=>{if(event.key===TOKEN_KEY)legal()?.refresh?.();});
- window.addEventListener("focus",()=>{if(localStorage.getItem(TOKEN_KEY))legal()?.refresh?.();});
+ window.addEventListener("storage",event=>{if(TOKEN_KEY&&event.key===TOKEN_KEY)legal()?.refresh?.();});
+ window.addEventListener("focus",()=>{if(token())legal()?.refresh?.();});
  const baseSwitch=window.switchTab;
  if(typeof baseSwitch==="function"){
    window.switchTab=function(name){
@@ -160,6 +163,6 @@
    };
  }
  init();
- if(localStorage.getItem(TOKEN_KEY))setTimeout(()=>legal()?.refresh?.(),1250);
+ if(token())setTimeout(()=>legal()?.refresh?.(),1250);
  window.GOXION_LEGAL_ACCESS=Object.freeze({getState:()=>lastAccess,refresh:()=>legal()?.refresh?.()});
 })();

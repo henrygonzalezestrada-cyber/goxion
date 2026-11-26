@@ -26,7 +26,7 @@ async function check(browser,name){
     filler.style.height="1000px";filler.style.flex="0 0 1000px";scroll.append(filler);
     const y=head.getBoundingClientRect().y;scroll.scrollTop=130;
     const close=head.querySelector("button"),style=getComputedStyle(close);
-    return {scroll:scroll.scrollTop,shift:Math.abs(head.getBoundingClientRect().y-y),
+    return {control:close.className,scroll:scroll.scrollTop,shift:Math.abs(head.getBoundingClientRect().y-y),
       width:parseFloat(style.width),height:parseFloat(style.height),
       gradient:style.backgroundImage,glyph:close.textContent.trim(),fontSize:parseFloat(style.fontSize),
       foreground:style.color,before:getComputedStyle(close,"::before").display,
@@ -41,7 +41,7 @@ async function check(browser,name){
    assert.ok(b.gradient.includes("linear-gradient")&&b.gradient.includes("36, 240, 255")&&b.gradient.includes("97, 220, 255"),JSON.stringify(b));
    assert.ok(b.foreground.includes("3, 16, 21"),JSON.stringify(b));
    assert.equal(Math.round(b.fontSize),17);
-   assert.ok(/^[✕×✖]$/.test(b.glyph));assert.equal(b.before,"none");assert.equal(b.after,"none");
+   assert.ok(/^[✕×✖]$/.test(b.glyph));assert.equal(b.before,"none",JSON.stringify(b));assert.equal(b.after,"none",JSON.stringify(b));
    assert.ok(b.accessible);
   }
   await page.goto(base+"/ayuda.html",{waitUntil:"domcontentloaded",timeout:18000});
