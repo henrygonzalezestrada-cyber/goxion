@@ -35,12 +35,12 @@
    if(key){try{localStorage.setItem(key,String(Date.now()+REMIND_AFTER_MS));}catch(_){}}
    openQueued=false;clearTimeout(retryTimer);scheduleReminder();
  }
- function tryOffer(){
+ function tryOffer(afterRelease=false){
    if(serverState?.estado!=="pendiente"||!serverState?.habilitado||!token()||busy||
       (dialog?.element.open)||openQueued)return;
    if(remindAfter()>Date.now()){scheduleReminder();return;}
    openQueued=true;
-   let attempts=0;
+   let attempts=afterRelease?2:0;
    const offer=()=>{
      if(!openQueued||!token()||serverState?.estado!=="pendiente")return;
      if(remindAfter()>Date.now()){openQueued=false;scheduleReminder();return;}
@@ -50,7 +50,7 @@
      if(++attempts<80)retryTimer=setTimeout(offer,700);
      else openQueued=false; // Se reintentará al regresar a la pestaña.
    };
-   retryTimer=setTimeout(offer,1100);
+   retryTimer=setTimeout(offer,afterRelease?0:1100);
  }
  const token=()=>{if(!TOKEN_KEY)return "";try{return localStorage.getItem(TOKEN_KEY)||"";}catch{return "";}};
  function el(tag,cls,text){
@@ -348,7 +348,14 @@
    };
    return dialog;
  }
+ // La excepción se activa exclusivamente en la edición de lanzamiento del
+ // espejo. En oficial/aceptación off, el controlador mantiene su cola previa.
+ function releaseEdition(){
+   const mode=document.documentElement?.getAttribute?.("data-gx-release-launch");
+   return mode==="pilot"||mode==="enabled";
+ }
  function alreadyBlocked(){
+   if(releaseEdition()&&window.GOXION_RELEASE_202610?.holdsLegalOffer?.())return true;
    if(document.hidden||document.body.classList.contains("no-scroll"))return true;
    const splash=document.getElementById("splash-screen");
    if(splash&&splash.style.visibility!=="hidden")return true;
@@ -395,11 +402,11 @@
      dlg.ready();
    }
  }
- async function checkSession({force=false}={}){
+ async function checkSession({force=false,afterRelease=false}={}){
    const current=token();
    if(!current)return;
    if(!force&&current===activeToken&&Date.now()-lastCheckedAt<REFRESH_AFTER_MS){
-     tryOffer();return serverState;
+     tryOffer(afterRelease);return serverState;
    }
    activeToken=current;
    try{
@@ -411,7 +418,7 @@
        estado:state.estado,acceso:state.acceso||null
      }}));
      window.GOXION_CLIENT_NOTIFICATIONS?.refresh?.();
-     if(state.habilitado&&state.estado==="pendiente")tryOffer();
+     if(state.habilitado&&state.estado==="pendiente")tryOffer(afterRelease);
      else{openQueued=false;clearTimeout(retryTimer);clearTimeout(remindTimer);}
      return state;
    }catch(error){
@@ -458,6 +465,10 @@
      deferido:remindAfter()>Date.now(),
      modalAbierto:Boolean(dialog?.element.open)
    })
+ });
+ window.addEventListener("goxion:release:legal-ready",()=>{
+   if(!releaseEdition()||!token()||serverState?.estado!=="pendiente"||dialog?.element.open)return;
+   clearTimeout(retryTimer);openQueued=false;void checkSession({force:true,afterRelease:true});
  });
  window.addEventListener("goxion:client-ready",()=>void checkSession({force:true}));
  window.addEventListener("focus",()=>{if(!document.hidden)void checkSession({force:true});});

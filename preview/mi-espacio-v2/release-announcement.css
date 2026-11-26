@@ -116,26 +116,15 @@ body.gx-release-v2-body-lock{overflow:hidden!important}
  box-shadow:0 22px 64px rgba(0,0,0,.36);animation:none;
 }
 .gx-release-v2[data-edition="launch"] .gx-launch-header{
- position:relative;display:flex;align-items:center;justify-content:space-between;
- gap:6px;flex:none;padding:12px 14px 3px 23px;
+ position:relative;display:flex;align-items:center;justify-content:center;
+ gap:6px;flex:none;min-height:59px;padding:12px 23px 3px;
 }
 .gx-release-v2[data-accent="violet"]{--gx-launch-accent:#bca9ff;--gx-launch-light:130,83,255}
 .gx-release-v2[data-accent="cyan"]{--gx-launch-accent:#7ee1e7;--gx-launch-light:48,187,214}
-.gx-launch-motion{display:grid;place-items:center;flex:0 0 44px;width:44px;height:44px;padding:0;border:0;border-radius:50%;color:#adbbcf;background:transparent}
-.gx-launch-motion[hidden]{display:none!important}
-.gx-launch-motion svg{display:block;width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.gx-launch-motion:active{transform:scale(.9)}
 .gx-launch-progress{display:flex;align-items:center;gap:5px;flex:1;max-width:220px;min-width:0}
 .gx-launch-progress span{display:block;height:3px;flex:1;min-width:0;border-radius:4px;background:rgba(255,255,255,.16);transition:background .18s}
 .gx-launch-progress span[data-state="done"]{background:#a78bfa}
 .gx-launch-progress span[data-state="current"]{background:#79e6fc}
-.gx-launch-close{
- display:grid;place-items:center;flex:0 0 44px;width:44px;height:44px;border:0;
- padding:0;border-radius:50%;background:transparent;box-shadow:none;color:#071c29;
-}
-.gx-launch-close span{display:grid;place-items:center;width:35px;height:35px;border-radius:50%;background:#79e6fc}
-.gx-launch-close svg{display:block;width:16px;height:16px;stroke-width:2.5px}
-.gx-launch-close:active span{transform:scale(.94)}
 .gx-launch-content{
  flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
  display:flex;flex-direction:column;align-items:stretch;justify-content:center;justify-content:safe center;
@@ -275,9 +264,9 @@ body.gx-launch-goxy-active #gxn-avatar :is(.gxn-goxy-real,.gxn-goxy-fallback,.gx
 @keyframes gx-launch-dim{from{background-color:rgba(3,3,5,.32)}to{background-color:rgba(3,3,5,.86)}}
 @keyframes gx-launch-surface-in{0%{opacity:0;transform:scale(1.14)}35%{opacity:.55}100%{opacity:1;transform:none}}
 @keyframes gx-launch-reveal{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
-/* La portada queda en reposo al aterrizar, luego flota apenas 3px. */
+/* La portada queda en reposo al aterrizar, luego levita 7px con calma. */
 .gx-launch-orbit img{animation-name:gx-launch-cover-breathe}
-@keyframes gx-launch-cover-breathe{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes gx-launch-cover-breathe{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
 @media(prefers-reduced-motion:reduce){
  .gx-release-v2[data-entry],.gx-release-v2[data-entry] .gx-launch-card::before,
  .gx-release-v2[data-entry] .gx-launch-header,.gx-release-v2[data-entry] .gx-launch-copy,

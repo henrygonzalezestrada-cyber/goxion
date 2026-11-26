@@ -7,7 +7,7 @@
  // La edición nueva es opt-in por configuración del HTML, no por URL ni storage.
  // La rama candidata la conserva apagada hasta autorización de lanzamiento.
  const mode=document.documentElement.getAttribute("data-gx-release-launch");
- const PILOT="casone",PILOT_VERSION="nov2026-mi-espacio-lanzamiento-pilot-v4";
+ const PILOT="casone",PILOT_VERSION="nov2026-mi-espacio-lanzamiento-pilot-v5";
  const GENERAL_VERSION="nov2026-mi-espacio-lanzamiento-v1",LEGACY_VERSION="nov2026-novedades-apiladas-v2-todos";
  let launch=mode==="enabled",pilot=false,VERSION=launch?GENERAL_VERSION:LEGACY_VERSION;
  const PREFIX="gx-release-seen:";
@@ -53,33 +53,60 @@
  const seen=k=>{if(launch&&completed.has(seenKey(k)))return true;try{return (pilot?sessionStorage:localStorage).getItem(seenKey(k))==="1";}catch(_){return false;}};
  const mark=k=>{if(launch)completed.add(seenKey(k));try{(pilot?sessionStorage:localStorage).setItem(seenKey(k),"1");}catch(_){}};
  const reducedMotion=()=>Boolean(window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches);
- // Cerrar pospone sólo la nueva presentación en esta pestaña. Completar la marca por cuenta/versión.
- const snoozed=new Set();
- const snoozeKey=k=>"gx-release-deferred:"+VERSION+":"+k;
- const deferred=k=>{
-   if(!launch)return false;
-   try{return snoozed.has(snoozeKey(k))||sessionStorage.getItem(snoozeKey(k))==="1";}catch(_){return snoozed.has(snoozeKey(k));}
- };
- const postpone=k=>{if(launch&&k){snoozed.add(snoozeKey(k));try{sessionStorage.setItem(snoozeKey(k),"1");}catch(_){}}};
- const eligible=k=>Boolean(k&&!seen(k)&&!deferred(k));
+ // La presentación nueva sólo se consume al completar su último capítulo.
+ const eligible=k=>Boolean(k&&!seen(k));
  let chapterIndex=0,backgroundInert=[];
  const queue=()=>window.GOXION_LEGAL_V2?.getQueueStatus?.()||{
    estado:"sin_activar",deferido:false,modalAbierto:false
  };
- let overlay=null,scroll=null,activeKey="",timer=0,attempts=0,open=false,focusSource=null,keyboard=false;
+ let overlay=null,scroll=null,activeKey="",activeSession="",timer=0,attempts=0,open=false,focusSource=null,keyboard=false;
  let frame=0,lastTick=0,autoDelay=0,autoPosition=0,loopHeight=0,manual=false,scrollY=0;
- let handoff=null,motionPaused=false,goxyPortrait=null,goxySlot=null,goxyAvatar=null,goxyAvatarPaused=null,goxyFlight=null,goxyImpact=null;
+ let handoff=null,goxyPortrait=null,goxySlot=null,goxyAvatar=null,goxyAvatarPaused=null,goxyFlight=null,goxyImpact=null;
  let colorTimer=0,colorOptions=[],colorStep=0,colorComplete=true,colorFrame=0,colorTween=null;
  let entryTimer=0,entryAnimation=null;
+ let legalContinuation=null,legalReservation=null;
+ const session=()=>{try{return tokenKey?localStorage.getItem(tokenKey)||"":"";}catch(_){return "";}};
+ const legalDue=()=>{const state=queue(),access=window.GOXION_LEGAL_V2?.getAccessState?.();
+   return state.estado==="pendiente"&&!state.deferido&&!state.modalAbierto&&!access?.restringido&&!access?.bloquea_operaciones;
+ };
+ const continuationValid=()=>legalContinuation&&key()===legalContinuation.account&&session()===legalContinuation.session&&legalDue();
+ // Sólo aplaza la aparición automática; no cambia el acceso, el recordatorio,
+ // la sesión, el consentimiento ni el orden de una lectura ya iniciada.
+ function holdsLegalOffer(){
+   const k=key();selectEdition(k);
+   if(!launch||!legalDue()||!k)return false;
+   if(continuationValid())return true;
+   if(open&&activeKey===k&&activeSession===session())return true;
+   if(!eligible(k))return false;
+   const current=session();
+   if(legalReservation?.session!==current||legalReservation?.account!==k)
+      legalReservation={account:k,session:current,until:Date.now()+9000};
+   // Fail-safe: sin una presentación que llegue a abrirse, el legal se libera.
+   return Date.now()<legalReservation.until;
+ }
+ function clearLegalContinuation(resume=false){
+   const c=legalContinuation;legalContinuation=null;
+   if(c)clearTimeout(c.timer);
+   if(!open)releaseInert();
+   if(resume&&c&&key()===c.account&&session()===c.session&&legalDue())
+     window.dispatchEvent(new Event("goxion:release:legal-ready"));
+ }
+ function startLegalCooldown(){
+   if(!legalContinuation||legalContinuation.phase==="cooldown")return;
+   if(!continuationValid()){clearLegalContinuation();return;}
+   legalContinuation.phase="cooldown";
+   legalContinuation.timer=setTimeout(()=>clearLegalContinuation(true),1800);
+ }
  // Una sola decisión para el vuelo inicial, la apertura normal y la salida.
  function launchGate(state,access){
    if(state.modalAbierto||access?.restringido||access?.bloquea_operaciones)return "skip";
    if(state.estado==="sin_activar")return "waiting";
-   return state.estado==="aceptado"||state.estado==="pendiente"&&state.deferido?"ready":"skip";
+   return state.estado==="aceptado"||state.estado==="pendiente"?"ready":"skip";
  }
  function selectEdition(k){
    if(goxyFlight&&goxyFlight.account!==k)stopGoxyFlight(false);
-   if(open&&activeKey!==k)dismiss(false);
+   if(legalContinuation&&(legalContinuation.account!==k||legalContinuation.session!==session()))clearLegalContinuation();
+   if(open&&(activeKey!==k||activeSession!==session()))dismiss(false);
    const nextPilot=mode==="pilot"&&k===PILOT;
    const nextLaunch=mode==="enabled"||nextPilot;
    const next=nextPilot?PILOT_VERSION:nextLaunch?GENERAL_VERSION:LEGACY_VERSION;
@@ -181,18 +208,19 @@
    }
  }
  function dismiss(markSeen=true, userAction=false, keepGoxyFlight=false){
+   if(!markSeen&&legalContinuation)clearLegalContinuation();
    if(!keepGoxyFlight){stopGoxyFlight(false);releaseGoxy();}
    if(!overlay||!open)return;
-   const closingKey=activeKey;
+   const closingKey=activeKey,closingSession=activeSession;
    const interrupted=handoff;handoff=null;
    if(launch)finishEntry();
    stopAuto(true);open=false;overlay.hidden=true;
    overlay.setAttribute("aria-hidden","true");
    document.body.classList.remove("gx-release-v2-body-lock");
-   activeKey="";
-   if(launch)releaseInert();
-   if(markSeen&&closingKey&&(!launch||key()===closingKey))mark(closingKey);
-   else if(launch&&userAction)postpone(closingKey);
+   activeKey="";activeSession="";
+   if(launch&&!legalContinuation)releaseInert();
+   if(markSeen&&closingKey&&(!launch||key()===closingKey&&session()===closingSession))mark(closingKey);
+
    if((keyboard||launch&&userAction)&&focusSource?.isConnected&&!focusSource.closest("#gx-release-overlay")&&!focusSource.closest("[inert]"))
      focusSource.focus({preventScroll:true});
    focusSource=null;
@@ -217,7 +245,7 @@
  // The original robot-heads renderer is mounted once, at its native large size.
  // It is paused and detached outside this chapter; no second visible animated mascot.
  const avatarEl=()=>$("#gxn-avatar");
- const noMotion=()=>motionPaused||reducedMotion()||document.hidden;
+ const noMotion=()=>reducedMotion()||document.hidden;
   // Read the actual account palette; never change the saved selection or tint the face.
   const avatarColor=()=>goxyAvatar?.getAttribute("data-goxy-color")||null;
   function paintGoxyColor(color){
@@ -345,6 +373,7 @@
    f.shell.remove();releaseGoxy();
    if(arrived&&key()===f.account&&!modalBusy()&&!noMotion())impactAt(f.avatar);
    else clearImpact();
+   if(legalContinuation?.phase==="flight")startLegalCooldown();
  }
  function beginGoxyFlight(){
    if(!goxyPortrait?.isConnected||!goxySlot?.querySelector("canvas")||noMotion()||goxyFlight||!$("#view-dashboard")?.classList.contains("active"))return false;
@@ -378,21 +407,15 @@
      return true;
    }catch(_){stopGoxyFlight(false);return false;}
  }
- function exitLaunch(markSeen){
+ function exitLaunch(){
    const flying=chapterIndex===chapters.length-1&&beginGoxyFlight();
-   dismiss(markSeen,true,flying);
+   if(legalDue())legalContinuation={account:activeKey,session:session(),phase:"flight",timer:0};
+   dismiss(true,true,flying);
+   if(!flying)startLegalCooldown();
  }
- const motionIcon=paused=>paused?'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 11 7-11 7Z"/></svg>':'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5v14M15 5v14"/></svg>';
  function updateMotion(){
    if(!overlay||!launch)return;
-   overlay.dataset.motion=motionPaused||document.hidden?"paused":"playing";
-   const control=$(".gx-launch-motion",overlay);
-   if(control){
-     control.hidden=reducedMotion();
-      control.setAttribute("aria-label",motionPaused?"Reanudar efectos visuales":"Pausar efectos visuales");
-      control.setAttribute("title",motionPaused?"Reanudar movimiento de las ilustraciones":"Pausar movimiento de las ilustraciones");
-     control.setAttribute("aria-pressed",String(motionPaused));control.innerHTML=motionIcon(motionPaused);
-   }
+   overlay.dataset.motion=document.hidden?"paused":"playing";
    syncGoxyMotion();
  }
   function showChapter(index,direction=0){
@@ -421,20 +444,18 @@
  }
  function finishLaunch(){
    const current=key();
-   if(!current||current!==activeKey){dismiss(false);return;}
+   if(!current||current!==activeKey||session()!==activeSession){dismiss(false);return;}
    const state=queue(),access=window.GOXION_LEGAL_V2?.getAccessState?.();
    if(launchGate(state,access)!=="ready"){dismiss(false);return;}
-   exitLaunch(true);
+   exitLaunch();
    if(!$("#view-dashboard")?.classList.contains("active"))window.switchTab?.("inicio");
  }
  function mountLaunch(){
    overlay.dataset.edition="launch";
-   motionPaused=false;
    overlay.innerHTML=[
      '<section class="gx-release-v2-card gx-launch-card" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="gx-release-v2-title">',
      '<header class="gx-launch-header"><div class="gx-launch-progress" role="progressbar" aria-label="Paso 1 de 6" aria-valuemin="1" aria-valuemax="6" aria-valuenow="1">'+chapters.map(()=>'<span></span>').join("")+'</div>',
-      '<button type="button" class="gx-launch-motion" aria-label="Pausar efectos visuales" aria-pressed="false"></button>',
-     '<button type="button" class="gx-launch-close" aria-label="Posponer novedades"><span>'+closeSvg+'</span></button></header>',
+     '</header>',
      '<div class="gx-launch-content" aria-live="polite" aria-atomic="true"></div>',
      '<span class="gx-launch-status" role="status"></span>',
      '<footer class="gx-launch-footer"><button type="button" class="gx-launch-back">Atrás</button><button type="button" class="gx-launch-next">Comenzar</button></footer></section>'
@@ -443,13 +464,11 @@
    const next=()=>{if(chapterIndex===chapters.length-1)finishLaunch();else render(chapterIndex+1,1);};
    const back=()=>{if(chapterIndex>0)render(chapterIndex-1,-1);};
    overlay.addEventListener("click",e=>{
-     if(e.target.closest?.(".gx-launch-close"))exitLaunch(false);
-     else if(e.target.closest?.(".gx-launch-motion")){motionPaused=!motionPaused;updateMotion();}
-     else if(e.target.closest?.(".gx-launch-next"))next();
+     if(e.target.closest?.(".gx-launch-next"))next();
      else if(e.target.closest?.(".gx-launch-back"))back();
    });
    overlay.addEventListener("keydown",e=>{
-     if(e.key==="Escape"){e.preventDefault();exitLaunch(false);return;}
+     if(e.key==="Escape"){e.preventDefault();return;}
      if(e.key==="ArrowRight"){e.preventDefault();if(chapterIndex<chapters.length-1)next();return;}
      if(e.key==="ArrowLeft"){e.preventDefault();back();return;}
      if(e.key!=="Tab")return;
@@ -543,7 +562,7 @@
    const k=key(),state=queue();
    selectEdition(k);
    const access=launch?window.GOXION_LEGAL_V2?.getAccessState?.():null;
-   if(!eligible(k)||open||modalBusy(claim))return false;
+   if(!eligible(k)||open||legalContinuation||modalBusy(claim))return false;
    if(launch?launchGate(state,access)!=="ready":
       state.estado==="sin_activar"||state.estado==="rechazado"||state.modalAbierto||
       (state.estado==="pendiente"&&!state.deferido))return false;
@@ -551,7 +570,7 @@
    if(open)return false;
    if(claim){overlay.dataset.handoff="flying";overlay.dataset.entry="handoff";}
    else if(launch&&!reducedMotion())overlay.dataset.entry="preparing";
-   activeKey=k;focusSource=document.activeElement;
+   activeKey=k;activeSession=session();focusSource=document.activeElement;
    scrollY=Number(window.scrollY)||0;
    if(!launch){manual=false;stopAuto(true);scroll.scrollTop=0;}
    open=true;overlay.hidden=false;overlay.setAttribute("aria-hidden","false");
@@ -604,14 +623,15 @@
  }
  function logout(resetPilot=false){
    clearTimeout(timer);timer=0;attempts=0;
-   dismiss(false);removePeek();
+   dismiss(false);removePeek();legalReservation=null;clearLegalContinuation();
    if(resetPilot===true&&mode==="pilot"){
-     const seenId=PREFIX+PILOT_VERSION+":"+PILOT,delayId="gx-release-deferred:"+PILOT_VERSION+":"+PILOT;
-     completed.delete(seenId);snoozed.delete(delayId);
-     try{sessionStorage.removeItem(seenId);sessionStorage.removeItem(delayId);}catch(_){}
+     const seenId=PREFIX+PILOT_VERSION+":"+PILOT;
+     completed.delete(seenId);
+     try{sessionStorage.removeItem(seenId);}catch(_){}
    }
  }
  window.addEventListener("goxion:legal-opened",()=>{
+   if(legalContinuation)clearLegalContinuation();
    stopGoxyFlight(false);
    clearTimeout(timer);timer=0;
    if(open)dismiss(false);
@@ -624,10 +644,10 @@
  });
  window.addEventListener("goxion:legal-state",e=>{
    if(e.detail?.acceso?.restringido||e.detail?.estado==="rechazado"||
-      (launch&&(e.detail?.acceso?.bloquea_operaciones||e.detail?.estado==="sin_activar"||
-                (e.detail?.estado==="pendiente"&&!queue().deferido)))){
+      (launch&&(e.detail?.acceso?.bloquea_operaciones||e.detail?.estado==="sin_activar"))){
      dismiss(false);removePeek();clearTimeout(timer);return;
    }
+   if(legalContinuation&&!continuationValid())clearLegalContinuation();
    syncPeek();
    if(!$("#gx-legal-consent")?.open)schedule(800);
  });
@@ -650,7 +670,7 @@
  const motionPreference=window.matchMedia?.("(prefers-reduced-motion: reduce)");
  motionPreference?.addEventListener?.("change",()=>{if(reducedMotion()&&overlay?.dataset.entry){const pending=handoff;handoff=null;finishEntry();pending?.abort();}stopGoxyFlight(false);updateMotion();});
  window.GOXION_RELEASE_202610=Object.freeze({
-   get version(){return VERSION;},handoffStatus,claimHandoff,close:()=>dismiss(!launch,launch),refresh:()=>schedule(250)
+   get version(){return VERSION;},handoffStatus,claimHandoff,holdsLegalOffer,close:()=>dismiss(!launch),refresh:()=>schedule(250)
  });
  if(document.readyState!=="loading")schedule(1200);
  else document.addEventListener("DOMContentLoaded",()=>schedule(1200),{once:true});

@@ -3,6 +3,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
+import {execFileSync} from "node:child_process";
 import vm from "node:vm";
 
 const source=fs.readFileSync("preview/mi-espacio-v2/release-announcement.js","utf8");
@@ -31,47 +32,57 @@ function fixture({enabled=true,mode=enabled?"enabled":"off",account="a",query=""
   assert.equal(writes,0,"la elegibilidad no consume novedades");
   return attempts;
  };
- return {check,get version(){return win.GOXION_RELEASE_202610.version;},status:()=>win.GOXION_RELEASE_202610.handoffStatus()};
+ return {check,get version(){return win.GOXION_RELEASE_202610.version;},status:()=>win.GOXION_RELEASE_202610.handoffStatus(),held:()=>win.GOXION_RELEASE_202610.holdsLegalOffer()};
 }
 test("sólo espejo modo piloto; aceptación apagada y oficial sin opt-in",()=>{
+ execFileSync(process.execPath,["scripts/build-goxy-mirror-bundle.mjs","--check"]);
  for(const path of ["ayuda-espejo-feed-v2.html","ayuda-aceptacion-v2.html"]){
   const html=fs.readFileSync(path,"utf8");
   assert.ok(html.includes('data-gx-release-launch="'+(path==="ayuda-espejo-feed-v2.html"?"pilot":"off")+'"'));
   assert.equal((html.match(/release-announcement\.js\?/g)||[]).length,1);
  }
  assert.doesNotMatch(fs.readFileSync("ayuda.html","utf8"),/<html[^>]+data-gx-release-launch="enabled"/);
+ assert.match(fs.readFileSync("ayuda.html","utf8"),/preview\/goxion-ai\/goxy-heads.bundle.js/);
+ assert.doesNotMatch(fs.readFileSync("ayuda.html","utf8"),/goxy-heads-mirror.bundle/);
+ assert.match(fs.readFileSync("ayuda-espejo-feed-v2.html","utf8"),/preview\/mi-espacio-v2\/goxy-heads-mirror.bundle.js/);
  const off=fixture({enabled:false,query:"?launch=enabled&release-preview=1",priorSeen:oldVersion});
  assert.equal(off.version,oldVersion);assert.equal(off.check(),0);
 });
 test("F sólo admite sesión y perfil cargados, estado legal elegible y modal libre",()=>{
  for(const input of [{token:false},{profile:false},{estado:"sin_activar"},{estado:"rechazado"},{estado:"error"},
-  {estado:"pendiente"},{modalAbierto:true},{blocked:true},{dialog:true},{storageUnusable:true}]){
+  {modalAbierto:true},{blocked:true},{dialog:true},{storageUnusable:true}]){
   const f=fixture(input);assert.equal(f.version,version);assert.equal(f.check(),0,JSON.stringify(input));
  }
- for(const input of [{},{estado:"pendiente",deferido:true}]){
+ for(const input of [{},{estado:"pendiente"},{estado:"pendiente",deferido:true}]){
   const f=fixture(input);assert.equal(f.check(),1);
  }
 });
-test("versión y cuenta vistas; X diferida de esta pestaña no consume versión",()=>{
+test("versión y cuenta vistas; diferido informativo viejo no omite la presentación obligatoria",()=>{
  assert.equal(fixture({priorSeen:oldVersion}).check(),1);
  assert.equal(fixture({priorSeen:version}).check(),0);
- assert.equal(fixture({tabDeferred:true}).check(),0);
+ assert.equal(fixture({tabDeferred:true}).check(),1);
 });
 
 test("piloto exclusivo para la clave exacta Casone; versión separada, términos y sesión",()=>{
- const pilotVersion="nov2026-mi-espacio-lanzamiento-pilot-v4";
+ const pilotVersion="nov2026-mi-espacio-lanzamiento-pilot-v5";
  const c=fixture({mode:"pilot",account:"casone",priorSeen:version});
  assert.equal(c.status(),"ready");assert.equal(c.version,pilotVersion);assert.equal(c.check(),1);
  for(const account of ["a","Casone","casone2",""]){
   const other=fixture({mode:"pilot",account,priorSeen:oldVersion});
   assert.equal(other.status(),"skip");assert.equal(other.version,oldVersion);assert.equal(other.check(),0);
  }
- for(const input of [{token:false},{profile:false},{estado:"pendiente"},{estado:"rechazado"},{modalAbierto:true},{blocked:true}]){
+ for(const input of [{token:false},{profile:false},{estado:"rechazado"},{modalAbierto:true},{blocked:true}]){
   assert.equal(fixture({mode:"pilot",account:"casone",...input}).status(),"skip");
  }
  assert.equal(fixture({mode:"pilot",account:"casone",estado:"sin_activar"}).status(),"waiting");
+ const pending=fixture({mode:"pilot",account:"casone",estado:"pendiente"});
+ assert.equal(pending.status(),"ready");assert.equal(pending.check(),1);assert.equal(pending.held(),true);
+ assert.equal(fixture({mode:"pilot",account:"b",estado:"pendiente"}).held(),false);
+ assert.equal(fixture({mode:"off",account:"casone",estado:"pendiente"}).held(),false);
+ assert.equal(fixture({mode:"pilot",account:"casone",estado:"rechazado"}).held(),false);
+ assert.equal(fixture({mode:"pilot",account:"casone",estado:"pendiente",modalAbierto:true}).held(),false);
  const deferred=fixture({mode:"pilot",account:"casone",estado:"pendiente",deferido:true});
- assert.equal(deferred.status(),"ready");assert.equal(deferred.check(),1);
+ assert.equal(deferred.status(),"ready");assert.equal(deferred.check(),1);assert.equal(deferred.held(),false);
  assert.equal(fixture({mode:"pilot",account:"casone",dialog:true}).status(),"waiting");
  assert.equal(fixture({mode:"pilot",account:"casone",estado:"pendiente",deferido:true,blocked:true}).status(),"skip");
 });
