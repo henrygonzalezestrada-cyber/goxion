@@ -41,6 +41,10 @@ jobs:
         if: ${{ !cancelled() }}
         run: node scripts/legal-session-runtime.test.mjs
 
+      - name: Aceptación aislada · retorno de Index y guardia de producción (simulado)
+        if: ${{ !cancelled() }}
+        run: node scripts/qa-acceptance-return.test.mjs
+
       # Release Goxy must stay independent from legacy browser-smoke failures.
       - name: Goxy F17 oficial + aviso por cliente autenticado
         if: ${{ !cancelled() }}

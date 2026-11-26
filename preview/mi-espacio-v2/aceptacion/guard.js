@@ -64,7 +64,15 @@
  document.addEventListener('click',e=>{
   const a=e.target.closest?.('a[href]');if(!a)return;
   const raw=a.getAttribute('href');if(raw.startsWith('#'))return;
-  try{const u=new URL(a.href,location.href);if(u.origin===location.origin&&routes.includes(u.pathname.split('/').pop()))return;
+  try{const u=new URL(a.href,location.href);
+   // El cierre heredado de Index apunta a la oficial. En QA sólo este control
+   // se traduce a la ruta aislada; cualquier otro enlace a producción sigue bloqueado.
+   const indexQA=['index-aceptacion-v2.html','index-b2-aceptacion-v2.html'].includes(location.pathname.split('/').pop());
+   if(isolated&&indexQA&&a.matches('a.gx-index-close-btn[aria-label="Mi Espacio"]')&&u.href===new URL('./ayuda.html',location.href).href){
+    e.preventDefault();e.stopImmediatePropagation();
+    location.assign(new URL('./ayuda-aceptacion-v2.html',location.href).href);return;
+   }
+   if(u.origin===location.origin&&routes.includes(u.pathname.split('/').pop()))return;
    if(u.origin===location.origin&&/\.(pdf|png|jpg|jpeg|webp)$/i.test(u.pathname))return;
   }catch(_){}
   e.preventDefault();e.stopImmediatePropagation();
