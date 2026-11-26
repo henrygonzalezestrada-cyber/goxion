@@ -48,7 +48,18 @@
   if(m[1]==='login-goxion'&&!/^qa-v2-(finanzas|b2|beneficios|beneficios-retest|vencido|suspendido|nuevo)$/i.test(String(b.nombre||'')))return denied();
   // Goxy QA: sólo los contratos explícitos de texto y visión; el servidor autentica,
   // limita cuota y autoriza los adjuntos. Nunca redirigir tráfico a producción.
-  if(m[1]==='goxy-ai-qa'&&!['status','chat','account','forecast'].includes(b.mode))return denied();
+  if(m[1]==='goxy-ai-qa'){
+   if(!['status','chat','account','forecast','feedback'].includes(b.mode))return denied();
+   // Only the certified categorical feedback mode is enabled; no free text.
+   if(b.mode==='feedback'){
+    if(location.pathname.split('/').pop()!=='ayuda-aceptacion-v2.html'||
+     Object.keys(b).some(k=>!['mode','responseId','topic','source','vote','reason'].includes(k))||
+     typeof b.responseId!=='string'||!/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(b.responseId)||
+     !['identity','catalog','payment','missions','loyalty','promotions','cancel','support','policy','other'].includes(b.topic)||
+     !['local','official','ai','vision'].includes(b.source)||![-1,0,1].includes(b.vote)||
+     !(b.reason==null||(b.vote===-1&&['understanding','incorrect','unresolved','repetitive','other'].includes(b.reason))))return denied();
+   }
+  }
   if(m[1]==='goxy-vision-qa'&&!['status','example','analyze'].includes(b.mode))return denied();
   // Las únicas escrituras de esta ruta son operaciones de la cuenta sintética
   // en APIs oficiales aisladas. No se admiten compras ni comunicaciones externas.
