@@ -36,7 +36,7 @@ function syncPresence(){
  const inSupport=support.classList.contains('active'),chat=d.documentElement.classList.contains('gxai-immersive-open');
  const next=inSupport?'support':'avatar',hero=support.querySelector('.gxai-hero .gxai-canvas-slot'),chatSlot=support.querySelector('.gxai-chat .gxai-canvas-slot');
  const active=!d.hidden;
- slot.setAttribute('data-goxy-paused',String(!active||inSupport));
+ slot.setAttribute('data-goxy-paused',String(!active||inSupport||d.body.classList.contains("gx-launch-goxy-active")));
  if(hero)hero.setAttribute('data-goxy-paused',String(!active||!inSupport||chat));
  if(chatSlot)chatSlot.setAttribute('data-goxy-paused',String(!active||!inSupport||!chat));
  if(prior===next)return;

@@ -7,7 +7,7 @@
  // La edición nueva es opt-in por configuración del HTML, no por URL ni storage.
  // La rama candidata la conserva apagada hasta autorización de lanzamiento.
  const mode=document.documentElement.getAttribute("data-gx-release-launch");
- const PILOT="casone",PILOT_VERSION="nov2026-mi-espacio-lanzamiento-pilot-v1";
+ const PILOT="casone",PILOT_VERSION="nov2026-mi-espacio-lanzamiento-pilot-v2";
  const GENERAL_VERSION="nov2026-mi-espacio-lanzamiento-v1",LEGACY_VERSION="nov2026-novedades-apiladas-v2-todos";
  let launch=mode==="enabled",pilot=false,VERSION=launch?GENERAL_VERSION:LEGACY_VERSION;
  const PREFIX="gx-release-seen:";
@@ -23,11 +23,11 @@
  // Capítulos editoriales: descripción de interfaz disponible, sin datos de cuenta ni promesas de IA.
  const chapters=[
    {id:"cover",title:"Tu Espacio.",accent:"Más inteligente que nunca.",copy:"Todo lo que necesitas, en una experiencia más clara y cercana.",art:"cover"},
-   {id:"space",title:"Tu cuenta, de un vistazo.",accent:"",copy:"Consulta lo importante de tu cuenta, sigue tus servicios y revisa tus movimientos desde Mi Espacio.",art:"space"},
-   {id:"benefits",title:"Cada avance cuenta.",accent:"",copy:"Descubre tus ahorros y sigue tu lealtad, referidos y misiones en un solo lugar.",art:"benefits"},
-   {id:"services",title:"Todo en su fecha.",accent:"",copy:"Consulta tus vencimientos, estado de cuenta y opciones de prórroga cuando tu cuenta sea elegible.",art:"services"},
-   {id:"catalog",title:"Encuentra tu próximo favorito.",accent:"",copy:"Explora plataformas, combos y promociones; elige tus servicios y revisa tu selección en el carrito.",art:"catalog"},
-   {id:"support",title:"Estamos más cerca.",accent:"",copy:"Personaliza a Goxy, encuentra ayuda desde Soporte y comparte tu opinión para seguir mejorando.",art:"support"}
+   {id:"space",title:"Tu cuenta,",accent:"de un vistazo.",copy:"Consulta lo importante de tu cuenta, sigue tus servicios y revisa tus movimientos desde Mi Espacio.",art:"space"},
+   {id:"benefits",title:"Cada avance",accent:"cuenta.",copy:"Descubre tus ahorros y sigue tu lealtad, referidos y misiones en un solo lugar.",art:"benefits"},
+   {id:"services",title:"Todo",accent:"en su fecha.",copy:"Consulta tus vencimientos, estado de cuenta y opciones de prórroga cuando tu cuenta sea elegible.",art:"services"},
+   {id:"catalog",title:"Encuentra tu",accent:"próximo favorito.",copy:"Explora plataformas, combos y promociones; elige tus servicios y revisa tu selección en el carrito.",art:"catalog"},
+   {id:"support",title:"Estamos",accent:"más cerca.",copy:"Personaliza a Goxy, encuentra ayuda desde Soporte y comparte tu opinión para seguir mejorando.",art:"support"}
  ];
  const $=(selector,root=document)=>root.querySelector(selector);
  const create=(tag,cls,text)=>{
@@ -68,8 +68,9 @@
  };
  let overlay=null,scroll=null,activeKey="",timer=0,attempts=0,open=false,focusSource=null,keyboard=false;
  let frame=0,lastTick=0,autoDelay=0,autoPosition=0,loopHeight=0,manual=false,scrollY=0;
- let handoff=null;
+ let handoff=null,motionPaused=false,goxyPortrait=null,goxySlot=null,goxyAvatar=null,goxyAvatarPaused=null,goxyFlight=null,goxyImpact=null;
  function selectEdition(k){
+   if(goxyFlight&&goxyFlight.account!==k)stopGoxyFlight(false);
    if(open&&activeKey!==k)dismiss(false);
    const nextPilot=mode==="pilot"&&k===PILOT;
    const nextLaunch=mode==="enabled"||nextPilot;
@@ -171,7 +172,8 @@
      node.inert=true;backgroundInert.push(node);
    }
  }
- function dismiss(markSeen=true, userAction=false){
+ function dismiss(markSeen=true, userAction=false, keepGoxyFlight=false){
+   if(!keepGoxyFlight){stopGoxyFlight(false);releaseGoxy();}
    if(!overlay||!open)return;
    const closingKey=activeKey;
    const interrupted=handoff;handoff=null;
@@ -195,15 +197,132 @@
  // Los gráficos son recursos semánticos del propio GOXION, no estados/importe simulados.
  const art={
    cover:'<div class="gx-launch-orbit"><img src="./Logo individual.png" alt="" width="100" height="100" decoding="async"></div>',
-   space:'<div class="gx-launch-visual-space"><svg viewBox="0 0 104 104" fill="none"><rect x="12" y="19" width="80" height="66" rx="21" fill="currentColor" opacity=".07"/><path d="M28 44h31M28 55h47M28 66h22" stroke="currentColor" stroke-width="3" stroke-linecap="round" opacity=".75"/><circle cx="77" cy="36" r="9" fill="#79e6fc"/><path d="m73 36 3 3 5-6" stroke="#071c29" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>',
+   // PulsoIcon · list-checks, calendar-clock, shopping-bag; paths & motion recipes
+   // adapted to vanilla CSS, ISC + upstream notices in PULSOICON-LICENSE.txt.
+   space:'<div class="gx-launch-pulso gx-launch-visual-space"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.55" stroke-linecap="round" stroke-linejoin="round"><path class="gx-pulso-row gx-pulso-row-a" d="M13 5h8"/><path class="gx-pulso-row gx-pulso-row-b" d="M13 12h8"/><path class="gx-pulso-row gx-pulso-row-c" d="M13 19h8"/><path class="gx-pulso-check gx-pulso-check-b" pathLength="1" d="m3 17 2 2 4-4"/><path class="gx-pulso-check gx-pulso-check-a" pathLength="1" d="m3 7 2 2 4-4"/></svg></div>',
    benefits:'<div class="gx-launch-benefit-icons"><span>⭐</span><span>🎁</span><span>🎯</span></div>',
-   services:'<div class="gx-launch-calendar"><svg viewBox="0 0 104 104" fill="none"><rect x="18" y="24" width="68" height="62" rx="12" stroke="currentColor" stroke-width="3"/><path d="M18 43h68M36 17v16m32-16v16" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M35 57h8m9 0h8m9 0h3M35 69h8m9 0h8" stroke="currentColor" stroke-width="3" stroke-linecap="round" opacity=".75"/><circle cx="73" cy="75" r="14" fill="#1f2731" stroke="#79e6fc" stroke-width="2"/><path d="M73 67v8l5 3" stroke="#79e6fc" stroke-width="2.5" stroke-linecap="round"/></svg></div>',
-   catalog:'<div class="gx-launch-catalog"><svg viewBox="0 0 104 104" fill="none"><path d="M24 38h56l8 45H16l8-45Z" fill="currentColor" opacity=".09"/><path d="M24 38h56l8 45H16l8-45Zm13 1V29a15 15 0 0 1 30 0v10" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="m79 21 3 7 7 3-7 3-3 7-3-7-7-3 7-3 3-7Z" fill="#79e6fc"/></svg></div>',
-   support:'<div class="gx-launch-support"><svg viewBox="0 0 104 104" fill="none"><rect x="17" y="20" width="70" height="56" rx="20" fill="currentColor" opacity=".09"/><rect x="17" y="20" width="70" height="56" rx="20" stroke="currentColor" stroke-width="3"/><path d="M35 46h8m18 0h8M44 61h16" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><path d="m78 71 5 10 11 2-8 8 2 11-10-5-10 5 2-11-8-8 11-2 5-10Z" fill="#f2c97e"/></svg></div>'
+   services:'<div class="gx-launch-pulso gx-launch-calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round"><g class="gx-pulso-calendar-case"><path d="M21 7.338V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2h2.338"/><path d="M3 9h5.859"/></g><path class="gx-pulso-calendar-ring gx-pulso-ring-a" d="M16 2v3"/><path class="gx-pulso-calendar-ring gx-pulso-ring-b" d="M8 2v3"/><circle class="gx-pulso-clock-dial" cx="16" cy="16" r="6"/><path class="gx-pulso-clock-hand" d="M16 14v2.2l1.6 1"/></svg></div>',
+   catalog:'<div class="gx-launch-pulso gx-launch-catalog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round"><g class="gx-pulso-bag"><path d="M3.103 6.034h17.794"/><path d="M3.4 5.467a2 2 0 0 0-.4 1.2V20a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6.667a2 2 0 0 0-.4-1.2l-2-2.667A2 2 0 0 0 17 2H7a2 2 0 0 0-1.6.8z"/><path class="gx-pulso-bag-handle" pathLength="1" d="M16 10a4 4 0 0 1-8 0"/></g></svg></div>',
+   support:'<div class="gx-launch-goxy-mount"></div>' 
  };
- function showChapter(index,direction=0){
+ // The original robot-heads renderer is mounted once, at its native large size.
+ // It is paused and detached outside this chapter; no second visible animated mascot.
+ const avatarEl=()=>$("#gxn-avatar");
+ const noMotion=()=>motionPaused||reducedMotion()||document.hidden;
+ function syncGoxyMotion(){
+   if(goxySlot)goxySlot.setAttribute("data-goxy-paused",String(noMotion()||!goxyPortrait?.isConnected));
+ }
+ function releaseGoxy(){
+   if(!goxyPortrait&&!goxyAvatar)return;
+   if(goxyPortrait){goxySlot?.setAttribute("data-goxy-paused","true");goxyPortrait.remove();}
+   document.body.classList.remove("gx-launch-goxy-active");
+   if(goxyAvatar){
+     const paused=document.hidden||$("#view-soporte")?.classList.contains("active")||goxyAvatarPaused==="true";
+     if(goxyAvatarPaused===null&&!paused)goxyAvatar.removeAttribute("data-goxy-paused");
+     else goxyAvatar.setAttribute("data-goxy-paused",String(Boolean(paused)));
+   }
+   goxyAvatar=null;goxyAvatarPaused=null;
+ }
+ function mountGoxyChapter(host){
+   if(!host)return;
+   const avatar=avatarEl(),source=$("#gxn-goxy-slot");
+   if(!goxyPortrait){
+     goxyPortrait=create("div","gx-launch-goxy-portrait");
+     const fallback=avatar?.querySelector(".gxn-goxy-fallback")?.cloneNode(true);
+     if(fallback){
+       fallback.className="gx-launch-goxy-fallback";
+       for(const e of fallback.querySelectorAll("[id]")){
+         const id=e.id,next="gx-launch-"+id;e.id=next;
+         for(const el of fallback.querySelectorAll("[fill],[stroke]"))for(const a of ["fill","stroke"])if(el.getAttribute(a)==="url(#"+id+")")el.setAttribute(a,"url(#"+next+")");
+       }
+       goxyPortrait.append(fallback);
+     }
+     goxySlot=create("span","gx-launch-goxy-render gxai-canvas-slot");
+     goxySlot.setAttribute("data-mood","happy");
+     goxyPortrait.append(goxySlot);
+   }
+   const color=source?.getAttribute("data-goxy-color");
+   if(color)goxySlot.setAttribute("data-goxy-color",color);else goxySlot.removeAttribute("data-goxy-color");
+   host.append(goxyPortrait);
+   if(source){goxyAvatar=source;goxyAvatarPaused=source.getAttribute("data-goxy-paused");source.setAttribute("data-goxy-paused","true");}
+   document.body.classList.add("gx-launch-goxy-active");
+   syncGoxyMotion();
+   try{window.GOXY_ROBOT?.mount?.(goxySlot);}catch(_){}
+ }
+ function clearImpact(){
+   if(!goxyImpact)return;
+   clearTimeout(goxyImpact.timer);goxyImpact.anim?.cancel();goxyImpact.node.remove();goxyImpact=null;
+ }
+ function impactAt(avatar){
+   if(!avatar?.isConnected||noMotion())return;
+   const r=avatar.getBoundingClientRect();if(!r.width||!r.height)return;
+   const node=create("span","gx-launch-goxy-impact");
+   node.setAttribute("aria-hidden","true");
+   Object.assign(node.style,{left:r.left+"px",top:r.top+"px",width:r.width+"px",height:r.height+"px"});
+   document.body.append(node);
+   let anim=null;
+   try{anim=avatar.animate([{transform:"scale(.90)"},{transform:"scale(1.07)",offset:.47},{transform:"scale(1)"}],{duration:350,easing:"cubic-bezier(.2,.75,.25,1)"});}catch(_){}
+   goxyImpact={node,anim,timer:setTimeout(clearImpact,520)};
+ }
+ function stopGoxyFlight(arrived=false){
+   const f=goxyFlight;if(!f){if(!arrived)clearImpact();return;}
+   goxyFlight=null;clearTimeout(f.timer);try{f.anim?.cancel();}catch(_){}
+   f.shell.remove();releaseGoxy();
+   if(arrived&&key()===f.account&&!modalBusy()&&!noMotion())impactAt(f.avatar);
+   else clearImpact();
+ }
+ function beginGoxyFlight(){
+   if(!goxyPortrait?.isConnected||!goxySlot?.querySelector("canvas")||noMotion()||goxyFlight||!$("#view-dashboard")?.classList.contains("active"))return false;
+   const avatar=avatarEl();
+   if(!avatar||avatar.querySelector(".gxn-avatar-photo:not([hidden])")||!avatar.getClientRects().length||typeof goxyPortrait.animate!=="function")return false;
+   const a=goxyPortrait.getBoundingClientRect(),b=avatar.getBoundingClientRect();
+   if(!a.width||!a.height||!b.width||!b.height||b.top<0||b.bottom>innerHeight||b.left<0||b.right>innerWidth)return false;
+   clearImpact();
+   const shell=create("div","gx-launch-goxy-flight");
+   shell.setAttribute("aria-hidden","true");
+   Object.assign(shell.style,{left:a.left+"px",top:a.top+"px",width:a.width+"px",height:a.height+"px"});
+   // Capture current floating position. The real live portrait moves, not a screenshot or duplicate.
+   document.body.append(shell);shell.append(goxyPortrait);
+   const dx=b.left+b.width/2-a.left-a.width/2,dy=b.top+b.height/2-a.top-a.height/2,
+     scale=Math.min(b.width/a.width,b.height/a.height);
+   const t=(x,y,z)=>"translate3d("+x+"px,"+y+"px,0) scale("+z+")";
+   const f={shell,avatar,account:activeKey,anim:null,timer:0};goxyFlight=f;
+   try{
+     f.anim=shell.animate([
+       {transform:t(0,0,1),offset:0,easing:"cubic-bezier(.4,0,.8,.5)"},
+       {transform:t(-dx*.026,-dy*.026,1.025),offset:.14,easing:"cubic-bezier(.55,.02,.75,.45)"},
+       {transform:t(dx,dy,scale*1.08),offset:.79,easing:"ease-out"},
+       {transform:t(dx,dy,scale*.89),offset:.89,easing:"ease-out"},
+       {transform:t(dx,dy,scale),offset:1}
+     ],{duration:620,fill:"forwards"});
+     f.timer=setTimeout(()=>{if(goxyFlight===f)stopGoxyFlight(true)},850);
+     f.anim.finished.then(()=>{if(goxyFlight===f)stopGoxyFlight(true)},()=>{if(goxyFlight===f)stopGoxyFlight(false)});
+     return true;
+   }catch(_){stopGoxyFlight(false);return false;}
+ }
+ function exitLaunch(markSeen){
+   const flying=chapterIndex===chapters.length-1&&beginGoxyFlight();
+   dismiss(markSeen,true,flying);
+ }
+ const motionIcon=paused=>paused?'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 11 7-11 7Z"/></svg>':'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5v14M15 5v14"/></svg>';
+ function updateMotion(){
+   if(!overlay||!launch)return;
+   overlay.dataset.motion=motionPaused||document.hidden?"paused":"playing";
+   const control=$(".gx-launch-motion",overlay);
+   if(control){
+     control.hidden=reducedMotion();
+     control.setAttribute("aria-label",motionPaused?"Reanudar animaciones":"Pausar animaciones");
+     control.setAttribute("title",motionPaused?"Reanudar animaciones":"Pausar animaciones");
+     control.setAttribute("aria-pressed",String(motionPaused));control.innerHTML=motionIcon(motionPaused);
+   }
+   syncGoxyMotion();
+ }
+  function showChapter(index,direction=0){
    chapterIndex=Math.max(0,Math.min(index,chapters.length-1));
    const c=chapters[chapterIndex],body=$(".gx-launch-content",overlay);
+   releaseGoxy();
+   overlay.dataset.chapter=c.id;
+   overlay.dataset.accent=chapterIndex%2===0?"violet":"cyan";
    body.dataset.chapter=c.id;
    body.dataset.direction=String(direction);
    const caption=c.id==="cover"?'<p class="gx-launch-kicker">UNA NUEVA EXPERIENCIA</p>':"";
@@ -211,6 +330,7 @@
      '<div class="gx-launch-copy">'+caption+
      '<h2 id="gx-release-v2-title">'+c.title+(c.accent?' <span>'+c.accent+'</span>':'')+'</h2>'+
      '<p class="gx-launch-description">'+c.copy+'</p></div>';
+   if(c.id==="support")mountGoxyChapter($(".gx-launch-goxy-mount",body));
    body.scrollTop=0;
    const segments=[...overlay.querySelectorAll(".gx-launch-progress span")];
    segments.forEach((segment,i)=>{segment.dataset.state=i===chapterIndex?"current":i<chapterIndex?"done":"next";});
@@ -226,14 +346,16 @@
    if(!current||current!==activeKey){dismiss(false);return;}
    const state=queue(),access=window.GOXION_LEGAL_V2?.getAccessState?.();
    if(!["aceptado","pendiente"].includes(state.estado)||state.modalAbierto||(state.estado==="pendiente"&&!state.deferido)||access?.restringido||access?.bloquea_operaciones){dismiss(false);return;}
-   dismiss(true,true);
+   exitLaunch(true);
    if(!$("#view-dashboard")?.classList.contains("active"))window.switchTab?.("inicio");
  }
  function mountLaunch(){
    overlay.dataset.edition="launch";
+   motionPaused=false;
    overlay.innerHTML=[
      '<section class="gx-release-v2-card gx-launch-card" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="gx-release-v2-title">',
      '<header class="gx-launch-header"><div class="gx-launch-progress" role="progressbar" aria-label="Paso 1 de 6" aria-valuemin="1" aria-valuemax="6" aria-valuenow="1">'+chapters.map(()=>'<span></span>').join("")+'</div>',
+     '<button type="button" class="gx-launch-motion" aria-label="Pausar animaciones" aria-pressed="false"></button>',
      '<button type="button" class="gx-launch-close" aria-label="Posponer novedades"><span>'+closeSvg+'</span></button></header>',
      '<div class="gx-launch-content" aria-live="polite" aria-atomic="true"></div>',
      '<span class="gx-launch-status" role="status"></span>',
@@ -243,20 +365,21 @@
    const next=()=>{if(chapterIndex===chapters.length-1)finishLaunch();else render(chapterIndex+1,1);};
    const back=()=>{if(chapterIndex>0)render(chapterIndex-1,-1);};
    overlay.addEventListener("click",e=>{
-     if(e.target.closest?.(".gx-launch-close"))dismiss(false,true);
+     if(e.target.closest?.(".gx-launch-close"))exitLaunch(false);
+     else if(e.target.closest?.(".gx-launch-motion")){motionPaused=!motionPaused;updateMotion();}
      else if(e.target.closest?.(".gx-launch-next"))next();
      else if(e.target.closest?.(".gx-launch-back"))back();
    });
    overlay.addEventListener("keydown",e=>{
-     if(e.key==="Escape"){e.preventDefault();dismiss(false,true);return;}
+     if(e.key==="Escape"){e.preventDefault();exitLaunch(false);return;}
      if(e.key==="ArrowRight"){e.preventDefault();if(chapterIndex<chapters.length-1)next();return;}
      if(e.key==="ArrowLeft"){e.preventDefault();back();return;}
      if(e.key!=="Tab")return;
-     const buttons=[...overlay.querySelectorAll("button:not([disabled])")];
+     const buttons=[...overlay.querySelectorAll("button:not([disabled]):not([hidden])")];
      if(e.shiftKey&&(document.activeElement===buttons[0]||document.activeElement===$(".gx-launch-card",overlay))){e.preventDefault();buttons.at(-1).focus();}
      else if(!e.shiftKey&&document.activeElement===buttons.at(-1)){e.preventDefault();buttons[0].focus();}
    });
-   render(0,0);
+   render(0,0);updateMotion();
  }
  function mount(){
    if(overlay)return overlay;
@@ -295,7 +418,7 @@
      keyboard=true;overlay.dataset.input="keyboard";
      if(e.key==="Escape"){e.preventDefault();dismiss(true);return;}
      if(e.key!=="Tab")return;
-     const buttons=[...overlay.querySelectorAll("button:not([disabled])")];
+     const buttons=[...overlay.querySelectorAll("button:not([disabled]):not([hidden])")];
      if(!buttons.length)return;
      if(e.shiftKey&&document.activeElement===buttons[0]){
        e.preventDefault();buttons[buttons.length-1].focus();
@@ -363,7 +486,7 @@
    const complete=()=>{
      if(handoff!==controller)return;
      handoff=null;
-     if(overlay)delete overlay.dataset.handoff;
+     if(overlay){overlay.dataset.docked="true";delete overlay.dataset.handoff;}
    };
    if(!target){complete();return null;}
    return {target,signal:controller.signal,complete,cancel:complete};
@@ -378,6 +501,7 @@
    }
  }
  window.addEventListener("goxion:legal-opened",()=>{
+   stopGoxyFlight(false);
    clearTimeout(timer);timer=0;
    if(open)dismiss(false);
    syncPeek();
@@ -406,13 +530,18 @@
    if(!document.hidden&&!open)schedule(700);
  });
  document.addEventListener("visibilitychange",()=>{
-   if(document.hidden){cancelAnimationFrame(frame);frame=0;lastTick=0;return;}
+   if(document.hidden){stopGoxyFlight(false);updateMotion();cancelAnimationFrame(frame);frame=0;lastTick=0;return;}
+   updateMotion();
    if(open&&!manual&&!launch)scheduleAuto();
    else schedule(700);
  });
+ window.addEventListener("resize",()=>stopGoxyFlight(false));
+ const motionPreference=window.matchMedia?.("(prefers-reduced-motion: reduce)");
+ motionPreference?.addEventListener?.("change",()=>{stopGoxyFlight(false);updateMotion();});
  window.GOXION_RELEASE_202610=Object.freeze({
    get version(){return VERSION;},handoffStatus,claimHandoff,close:()=>dismiss(!launch,launch),refresh:()=>schedule(250)
  });
  if(document.readyState!=="loading")schedule(1200);
  else document.addEventListener("DOMContentLoaded",()=>schedule(1200),{once:true});
 })();
+

@@ -23,18 +23,20 @@ for(const name of ["ayuda-espejo-feed-v2.html","ayuda-aceptacion-v2.html"]){
 const official=await readFile(resolve(cwd,"ayuda.html"),"utf8");
 assert.doesNotMatch(official,/<html[^>]+data-gx-release-launch="enabled"/);
 const intro="/preview/mi-espacio-v2/official-feed-intro.js",introCss="/preview/mi-espacio-v2/official-feed-intro.css";
-const allowed=new Map([[intro,"text/javascript"],[introCss,"text/css"],[script,"text/javascript"],[css,"text/css"],[logo,"image/png"]]);
+const robot="/preview/goxion-ai/goxy-heads.bundle.js";
+const allowed=new Map([[robot,"text/javascript"],[intro,"text/javascript"],[introCss,"text/css"],[script,"text/javascript"],[css,"text/css"],[logo,"image/png"]]);
 const fixture=(params)=>{
  const edition=params.get("edition")==="pilot"?"pilot":params.get("edition")==="enabled"?"enabled":"off",startup=params.get("startup")==="1",scenario=params.get("scenario")||"accepted";
  const account=params.get("account")==="casone"?"casone":params.get("account")==="b"?"test-account-b":"test-account";
  // Las variables se limitan a constantes de prueba; no hay endpoints reales.
  return `<!doctype html><html lang="es" data-gx-release-launch="${edition}"><head>
  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
- <link rel="stylesheet" href="${css}">${startup?'<link rel="stylesheet" href="'+introCss+'">':""}<style>html,body{margin:0;background:#030305;color:white;font:16px system-ui}#account{padding:30px}#behind{position:absolute;top:30px;left:30px}</style></head><body class="${startup?"gx-v2-private-visible":""}">
+ <link rel="stylesheet" href="${css}">${startup?'<link rel="stylesheet" href="'+introCss+'">':""}<style>html,body{margin:0;background:#030305;color:white;font:16px system-ui}#account{padding:30px}#behind{position:absolute;top:30px;left:30px}#gx-v2-shared-header{position:fixed;left:12px;top:12px;right:12px;height:44px;display:flex;justify-content:space-between;align-items:center}#gxn-avatar{position:relative;display:grid;place-items:center;width:42px;height:42px;border-radius:50%;overflow:hidden;background:#17243d}#gxn-goxy-slot{display:grid;place-items:center;width:46px;height:46px}</style></head><body class="${startup?"gx-v2-private-visible":""}">
  <main id="account"><button id="behind">Mi Espacio</button><section id="view-dashboard" class="${startup?"active":""}"><div id="gx-v2-feed"></div><div id="gx-v2-sync" ${startup?"":"hidden"}></div></section></main><div id="pre-inert" inert>Anteriormente inerte</div>
- ${startup?'<header id="gx-v2-shared-header"><img class="gxn-wordmark" width="34" height="34" src="/Logo individual.png"></header><div id="gx-v2-handoff" hidden><div class="gx-v2-handoff-center"><img class="gx-v2-handoff-mark" src="/Logo individual.png"><div class="gx-v2-handoff-wait" hidden></div></div></div>':""}
+ <header id="gx-v2-shared-header"><img class="gxn-wordmark" width="34" height="34" src="/Logo individual.png"><span id="gxn-avatar"><span class="gxai-avatar gxn-goxy-real"><span id="gxn-goxy-slot" data-goxy-color="#25887e" data-goxy-paused="false"></span></span></span></header>
+ ${startup?'<div id="gx-v2-handoff" hidden><div class="gx-v2-handoff-center"><img class="gx-v2-handoff-mark" src="/Logo individual.png"><div class="gx-v2-handoff-wait" hidden></div></div></div>':""}
  <script>
- window.flightTrace=false;new MutationObserver(()=>{const root=document.querySelector("#gx-v2-handoff"),overlay=document.querySelector("#gx-release-overlay");if(root?.classList.contains("is-launch-flight")&&overlay?.dataset.handoff==="flying"&&getComputedStyle(overlay.querySelector(".gx-launch-orbit img")).visibility==="hidden")window.flightTrace=true}).observe(document.body,{subtree:true,attributes:true,childList:true});
+ window.flightTrace=false;window.goxyTrace=false;window.goxyImpactTrace=false;new MutationObserver(()=>{const g=document.querySelector(".gx-launch-goxy-flight .gx-launch-goxy-portrait");if(g&&g===window.goxyOriginal)window.goxyTrace=true;if(document.querySelector(".gx-launch-goxy-impact"))window.goxyImpactTrace=true;const root=document.querySelector("#gx-v2-handoff"),overlay=document.querySelector("#gx-release-overlay");if(root?.classList.contains("is-launch-flight")&&overlay?.dataset.handoff==="flying"&&getComputedStyle(overlay.querySelector(".gx-launch-orbit img")).visibility==="hidden")window.flightTrace=true}).observe(document.body,{subtree:true,attributes:true,childList:true});
  window.GOXION_CORE={STORAGE:{CLIENT_TOKEN:"fixture-session"}};
  window.fixtureAccount=${JSON.stringify(account)};
  window.fixtureState={estado:${JSON.stringify(scenario==="pending"?"pendiente":scenario==="rejected"?"rechazado":"aceptado")},deferido:false,modalAbierto:false};
@@ -46,7 +48,7 @@ const fixture=(params)=>{
  else localStorage.removeItem("fixture-session");
  window.switchTab=name=>{window.routeCalled=name;document.querySelector("#view-dashboard").classList.add("active")};
  document.getElementById("behind").focus();
- </script><script src="${script}"></script>${startup?'<script src="'+intro+'"></script><script>window.addEventListener("load",()=>{document.querySelector("#gx-v2-sync").hidden=true;window.dispatchEvent(new Event("goxion:v2-feed:rendered"))})</script>':""}</body></html>`;
+ </script><script src="${robot}"></script><script>window.GOXY_ROBOT.mount(document.getElementById("gxn-goxy-slot"))</script><script src="${script}"></script>${startup?'<script src="'+intro+'"></script><script>window.addEventListener("load",()=>{document.querySelector("#gx-v2-sync").hidden=true;window.dispatchEvent(new Event("goxion:v2-feed:rendered"))})</script>':""}</body></html>`;
 };
 const server=createServer(async(req,res)=>{
  const u=new URL(req.url,"http://localhost");
@@ -105,8 +107,10 @@ async function captureCover(page,name){
  const rect=await page.locator(".gx-launch-card").boundingBox();
  assert.ok(rect);
  const screenshot=await page.screenshot(dir?{path:resolve(dir,name+".png")}:{});
- const pixel=rgbAt(screenshot,Math.round(rect.x+12),Math.round(rect.y+80));
- assert.ok(pixel.every((v,i)=>Math.abs(v-[21,21,28][i])<=6),"La portada no fue pintada por el navegador: "+JSON.stringify(pixel));
+ const pixel=rgbAt(screenshot,Math.round(rect.x+12),Math.round(rect.y+rect.height-50));
+ assert.ok(pixel.every((v,i)=>Math.abs(v-[21,21,28][i])<=8),"La portada no fue pintada por el navegador: "+JSON.stringify(pixel));
+ const glow=rgbAt(screenshot,Math.round(rect.x+rect.width/2),Math.round(rect.y+80));
+ assert.ok(glow[2]>pixel[2]+4,"Iluminación ambiental real: "+JSON.stringify({glow,pixel}));
 }
 const assertGeometry=async(p)=>{
  const result=await p.evaluate(()=>{
@@ -161,13 +165,14 @@ try{
    await waitOpen(p);
    await captureCover(p,name+"-01-reapertura");
    // Foco de teclado y navegación explícita (ningún avance automático).
-   await p.locator(".gx-launch-close").focus();await p.keyboard.press("Shift+Tab");
+   await p.locator(".gx-launch-motion").focus();await p.keyboard.press("Shift+Tab");
    assert.equal(await p.evaluate(()=>document.activeElement.className),"gx-launch-next");
    await p.keyboard.press("ArrowRight");assert.match(await title(p),/de un vistazo/);
    await p.locator(".gx-launch-back").click();assert.match(await title(p),/Más inteligente/);
    for(let i=0;i<6;i++){
     await assertGeometry(p);
     assert.equal(await p.locator(".gx-launch-progress").getAttribute("aria-valuenow"),String(i+1));
+    if(i===5)await p.locator(".gx-launch-goxy-render canvas").waitFor({state:"visible",timeout:4000});
     await p.waitForTimeout(400);
     if(dir&&i>0)await p.screenshot({path:resolve(dir,name+"-0"+(i+1)+"-capitulo.png")});
     if(i<5)await p.locator(".gx-launch-next").click();
@@ -201,6 +206,7 @@ try{
     for(let i=0;i<5;i++)await p.locator(".gx-launch-back").click();
    }
    assert.equal(await p.locator(".gx-launch-copy").evaluate(el=>getComputedStyle(el).animationName),"none");
+   assert.equal(await p.locator(".gx-launch-motion").isVisible(),false);
    assert.equal(obj.errors.length,0);await responsive.close();
    // Arranque real del espejo, limitado a cuenta piloto sintética: un solo logo en vuelo.
    const pilotContext=await browser.newContext({viewport:{width:390,height:844}});
@@ -210,8 +216,32 @@ try{
    assert.equal(await pilotPage.evaluate(()=>window.flightTrace),true,"acople del logo a la tarjeta");
    assert.equal(await pilotPage.locator(".gx-launch-orbit img").evaluate(el=>getComputedStyle(el).visibility),"visible");
    assert.equal(await pilotPage.locator("#gx-release-overlay").getAttribute("data-handoff"),null);
-   for(let i=0;i<6;i++)await pilotPage.locator(".gx-launch-next").click();
-   const pilotSeen="gx-release-seen:nov2026-mi-espacio-lanzamiento-pilot-v1:casone";
+   assert.ok((await pilotPage.locator(".gx-launch-orbit img").boundingBox()).width>=185,"logo con presencia");
+   await pilotPage.locator(".gx-launch-next").click();
+   assert.equal(await pilotPage.locator("#gx-release-overlay").getAttribute("data-accent"),"cyan");
+   assert.ok((await pilotPage.locator(".gx-launch-pulso svg").boundingBox()).width>=150);
+   await pilotPage.locator(".gx-launch-motion").click();
+   assert.equal(await pilotPage.locator(".gx-pulso-row-a").evaluate(el=>getComputedStyle(el).animationPlayState),"paused");
+   await pilotPage.locator(".gx-launch-motion").click();
+   assert.equal(await pilotPage.locator(".gx-pulso-row-a").evaluate(el=>getComputedStyle(el).animationPlayState),"running");
+   await pilotPage.locator(".gx-launch-next").click();
+   assert.ok(parseFloat(await pilotPage.locator(".gx-launch-benefit-icons").evaluate(el=>getComputedStyle(el).fontSize))>=60);
+   assert.equal(await pilotPage.locator(".gx-launch-benefit-icons span").first().evaluate(el=>getComputedStyle(el).animationIterationCount),"infinite");
+   for(let i=0;i<3;i++)await pilotPage.locator(".gx-launch-next").click();
+   await pilotPage.locator(".gx-launch-goxy-render canvas").waitFor({state:"visible",timeout:4000});
+   assert.equal(await pilotPage.locator(".gx-launch-goxy-render").getAttribute("data-goxy-color"),"#25887e");
+   assert.equal(await pilotPage.locator("#gxn-goxy-slot").getAttribute("data-goxy-paused"),"true");
+   await pilotPage.evaluate(()=>{window.goxyOriginal=document.querySelector(".gx-launch-goxy-portrait")});
+   // Real renderer, same node flies; no clone and no stale animation.
+   await pilotPage.locator(".gx-launch-next").click();
+   await pilotPage.locator(".gx-launch-goxy-flight").waitFor({state:"attached",timeout:2000});
+   await pilotPage.locator(".gx-launch-goxy-flight").waitFor({state:"detached",timeout:3000});
+   await pilotPage.locator(".gx-launch-goxy-impact").waitFor({state:"detached",timeout:3000});
+   assert.equal(await pilotPage.evaluate(()=>window.goxyTrace&&window.goxyImpactTrace),true,"Goxy aterrizó en el avatar con onda");
+   assert.equal(await pilotPage.locator("#gxn-goxy-slot").getAttribute("data-goxy-paused"),"false");
+   assert.equal(await pilotPage.locator(".gx-launch-goxy-portrait").count(),0);
+   assert.equal(await pilotPage.evaluate(()=>document.body.classList.contains("gx-launch-goxy-active")),false);
+   const pilotSeen="gx-release-seen:nov2026-mi-espacio-lanzamiento-pilot-v2:casone";
    assert.equal(await pilotPage.evaluate(k=>sessionStorage.getItem(k),pilotSeen),"1");
    assert.equal(await pilotPage.evaluate(()=>localStorage.getItem("gx-release-seen:nov2026-mi-espacio-lanzamiento-v1:casone")),null);
    await pilotPage.evaluate(()=>{localStorage.removeItem("fixture-session");window.dispatchEvent(new Event("goxion:client-logout"))});
@@ -232,3 +262,4 @@ try{
   }finally{await browser.close();}
  }
 }finally{await new Promise(r=>server.close(r));}
+
