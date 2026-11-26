@@ -168,6 +168,9 @@
      focusSource.focus({preventScroll:true});
    focusSource=null;
    window.scrollTo?.(0,scrollY);
+   // En WebKit una capa fixed/backdrop oculta y reutilizada puede no repintar
+   // al volver de términos. La edición nueva vuelve a montar una única capa.
+   if(launch){overlay.remove();overlay=null;}
  }
  // Presentación nueva dentro del mismo overlay, con un solo motor de elegibilidad.
  // Los gráficos son recursos semánticos del propio GOXION, no estados/importe simulados.
@@ -210,7 +213,7 @@
  function mountLaunch(){
    overlay.dataset.edition="launch";
    overlay.innerHTML=[
-     '<section class="gx-release-v2-card gx-launch-card" role="dialog" aria-modal="true" aria-labelledby="gx-release-v2-title">',
+     '<section class="gx-release-v2-card gx-launch-card" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="gx-release-v2-title">',
      '<header class="gx-launch-header"><div class="gx-launch-progress" role="progressbar" aria-label="Paso 1 de 6" aria-valuemin="1" aria-valuemax="6" aria-valuenow="1">'+chapters.map(()=>'<span></span>').join("")+'</div>',
      '<button type="button" class="gx-launch-close" aria-label="Posponer novedades"><span>'+closeSvg+'</span></button></header>',
      '<div class="gx-launch-content" aria-live="polite" aria-atomic="true"></div>',
@@ -231,7 +234,7 @@
      if(e.key==="ArrowLeft"){e.preventDefault();back();return;}
      if(e.key!=="Tab")return;
      const buttons=[...overlay.querySelectorAll("button:not([disabled])")];
-     if(e.shiftKey&&(document.activeElement===buttons[0]||document.activeElement===overlay)){e.preventDefault();buttons.at(-1).focus();}
+     if(e.shiftKey&&(document.activeElement===buttons[0]||document.activeElement===$(".gx-launch-card",overlay))){e.preventDefault();buttons.at(-1).focus();}
      else if(!e.shiftKey&&document.activeElement===buttons.at(-1)){e.preventDefault();buttons[0].focus();}
    });
    render(0,0);
@@ -302,12 +305,11 @@
    if(open)return false;
    activeKey=k;focusSource=document.activeElement;
    scrollY=Number(window.scrollY)||0;
-   if(launch){showChapter(0,0);$(".gx-launch-progress",overlay).setAttribute("aria-valuenow","1");}
-   else{manual=false;stopAuto(true);scroll.scrollTop=0;}
+   if(!launch){manual=false;stopAuto(true);scroll.scrollTop=0;}
    open=true;overlay.hidden=false;overlay.setAttribute("aria-hidden","false");
    document.body.classList.add("gx-release-v2-body-lock");
    if(launch)holdBackground();
-   (launch?$(".gx-launch-close",overlay):overlay).focus({preventScroll:true});
+   (launch?$(".gx-launch-card",overlay):overlay).focus({preventScroll:true});
    if(!launch)scheduleAuto();
    return true;
  }

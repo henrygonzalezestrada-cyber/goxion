@@ -109,7 +109,7 @@ body.gx-release-v2-body-lock{overflow:hidden!important}
 .gx-release-v2[data-edition="launch"] .gx-launch-card{
  width:min(100%,420px);height:min(600px,calc(100vh - 24px));height:min(600px,calc(100dvh - 24px));
  max-height:100%;border:0;border-radius:26px;background:#15151c;
- box-shadow:0 22px 64px rgba(0,0,0,.36);animation:gx-launch-enter .43s cubic-bezier(.22,.82,.24,1) both;
+ box-shadow:0 22px 64px rgba(0,0,0,.36);animation:gx-launch-enter .43s cubic-bezier(.22,.82,.24,1) backwards;
 }
 .gx-release-v2[data-edition="launch"] .gx-launch-header{
  position:relative;display:flex;align-items:center;justify-content:space-between;
@@ -163,7 +163,7 @@ body.gx-release-v2-body-lock{overflow:hidden!important}
 .gx-launch-copy h2 span{display:block;color:#bca9ff}
 .gx-launch-description{margin:14px 0 0;color:#b9c3d4;font-size:clamp(14px,3.9vw,15.5px);line-height:1.59;max-width:340px}
 .gx-launch-content .gx-launch-art,.gx-launch-content .gx-launch-copy{
- animation:gx-launch-chapter .34s cubic-bezier(.22,.82,.24,1) both;
+ animation:gx-launch-chapter .34s cubic-bezier(.22,.82,.24,1) backwards;
 }
 .gx-launch-content[data-direction="-1"]{--gx-launch-offset:-10px}
 .gx-launch-content[data-direction="1"]{--gx-launch-offset:10px}
@@ -175,11 +175,12 @@ body.gx-release-v2-body-lock{overflow:hidden!important}
  font-size:12px;font-weight:650;line-height:1.25;white-space:normal;transition:transform .16s ease;
 }
 .gx-launch-back{padding:8px 10px;background:transparent;color:#c1cfe0;flex:0 0 auto}
-.gx-launch-back:disabled{visibility:hidden}
+.gx-launch-back:disabled{display:none}
 .gx-launch-next{position:relative;isolation:isolate;padding:8px 18px;background:transparent;color:#7ee1e7;min-width:0!important;flex:1}
 .gx-launch-next::before{content:"";position:absolute;inset:3px 0;border-radius:999px;background:rgba(255,255,255,.08);z-index:-1}
 .gx-launch-next:active,.gx-launch-back:active{transform:scale(.97)}
 .gx-launch-status{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.gx-release-v2[data-edition="launch"] .gx-launch-card:focus{outline:0}
 .gx-release-v2[data-edition="launch"] button:focus-visible{outline:2px solid #79e6fc!important;outline-offset:3px}
 @keyframes gx-launch-enter{from{opacity:0;transform:translateY(18px) scale(.974)}to{opacity:1;transform:none}}
 @keyframes gx-launch-chapter{from{opacity:0;transform:translateX(var(--gx-launch-offset,0px)) translateY(6px)}to{opacity:1;transform:none}}

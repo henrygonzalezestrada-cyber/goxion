@@ -4,6 +4,7 @@ import assert from "node:assert/strict";
 import { createServer } from "node:http";
 import { readFile, mkdir } from "node:fs/promises";
 import { resolve } from "node:path";
+import { inflateSync } from "node:zlib";
 import { chromium, webkit } from "playwright";
 
 const cwd=process.cwd(), script="/assets/js/ayuda/20-release-announcement.js",
@@ -74,6 +75,35 @@ const launchState=async p=>p.evaluate(()=>({
  bodyLock:document.body.classList.contains("gx-release-v2-body-lock")
 }));
 const title=async p=>p.locator("#gx-release-v2-title").innerText();
+// Validación de pintura real, no basta con un bounding box visible en WebKit.
+// PNG estándar de Playwright: RGB/RGBA, 8 bits, sin entrelazar. Reconstituir scanlines.
+function rgbAt(png,x,y){
+ const width=png.readUInt32BE(16),height=png.readUInt32BE(20),depth=png[24],kind=png[25];
+ assert.equal(depth,8);assert.ok(kind===2||kind===6);assert.equal(png[28],0);
+ assert.ok(x>=0&&x<width&&y>=0&&y<height);
+ const data=[];for(let i=8;i<png.length;){const n=png.readUInt32BE(i),type=png.toString("ascii",i+4,i+8);if(type==="IDAT")data.push(png.subarray(i+8,i+8+n));i+=12+n;}
+ const raw=inflateSync(Buffer.concat(data)),bpp=kind===6?4:3,stride=width*bpp;
+ let previous=Buffer.alloc(stride),offset=0;
+ const paeth=(a,b,c)=>{const p=a+b-c,pa=Math.abs(p-a),pb=Math.abs(p-b),pc=Math.abs(p-c);return pa<=pb&&pa<=pc?a:pb<=pc?b:c;};
+ for(let j=0;j<=y;j++){
+  const filter=raw[offset++],row=Buffer.alloc(stride);
+  for(let i=0;i<stride;i++){
+   const a=i>=bpp?row[i-bpp]:0,b=previous[i],c=i>=bpp?previous[i-bpp]:0;
+   const predictor=filter===0?0:filter===1?a:filter===2?b:filter===3?Math.floor((a+b)/2):filter===4?paeth(a,b,c):NaN;
+   assert.ok(Number.isFinite(predictor));row[i]=(raw[offset++]+predictor)&255;
+  }
+  previous=row;
+ }
+ return [...previous.subarray(x*bpp,x*bpp+3)];
+}
+async function captureCover(page,name){
+ await page.waitForTimeout(600);
+ const rect=await page.locator(".gx-launch-card").boundingBox();
+ assert.ok(rect);
+ const screenshot=await page.screenshot(dir?{path:resolve(dir,name+".png")}:{});
+ const pixel=rgbAt(screenshot,Math.round(rect.x+12),Math.round(rect.y+80));
+ assert.ok(pixel.every((v,i)=>Math.abs(v-[21,21,28][i])<=6),"La portada no fue pintada por el navegador: "+JSON.stringify(pixel));
+}
 const assertGeometry=async(p)=>{
  const result=await p.evaluate(()=>{
   const card=document.querySelector(".gx-launch-card"),content=document.querySelector(".gx-launch-content"),header=document.querySelector(".gx-launch-header"),footer=document.querySelector(".gx-launch-footer"),next=document.querySelector(".gx-launch-next"),close=document.querySelector(".gx-launch-close"),disk=close.querySelector("span");
@@ -113,14 +143,14 @@ try{
    assert.match(await title(p),/Más inteligente que nunca/);
    assert.equal(await p.locator("[data-gx-release-clone]").count(),0);
    await assertGeometry(p);
+   await captureCover(p,name+"-01-portada");
    // Prioridad de términos: interrumpir sin consumir; luego vuelve la portada.
    await p.evaluate(()=>{fixtureState={estado:"pendiente",deferido:false,modalAbierto:true};window.dispatchEvent(new Event("goxion:legal-opened"));});
    await p.locator("#gx-release-overlay").waitFor({state:"hidden"});
    assert.deepEqual(await launchState(p),{seen:null,background:false,preInert:true,bodyLock:false});
    await p.evaluate(()=>{fixtureState={estado:"aceptado",deferido:false,modalAbierto:false};window.dispatchEvent(new Event("goxion:legal-dismissed"));});
    await waitOpen(p);
-   await p.waitForTimeout(500);
-   if(dir)await p.screenshot({path:resolve(dir,name+"-01-portada.png")});
+   await captureCover(p,name+"-01-reapertura");
    // Foco de teclado y navegación explícita (ningún avance automático).
    await p.locator(".gx-launch-close").focus();await p.keyboard.press("Shift+Tab");
    assert.equal(await p.evaluate(()=>document.activeElement.className),"gx-launch-next");
