@@ -17,6 +17,7 @@ const dir=process.env.GX_LAUNCH_SCREENSHOTS||"";
 for(const name of ["ayuda-espejo-feed-v2.html","ayuda-aceptacion-v2.html"]){
  const html=await readFile(resolve(cwd,name),"utf8");
  assert.match(html,/<html[^>]+data-gx-release-launch="off"/);
+ assert.match(html,/family=Poppins:/,"el candidato carga la fuente canónica");
  assert.equal((html.match(/20-release-announcement\.js\?/g)||[]).length,1,"un controlador por página");
 }
 const official=await readFile(resolve(cwd,"ayuda.html"),"utf8");
@@ -108,13 +109,18 @@ const assertGeometry=async(p)=>{
  const result=await p.evaluate(()=>{
   const card=document.querySelector(".gx-launch-card"),content=document.querySelector(".gx-launch-content"),header=document.querySelector(".gx-launch-header"),footer=document.querySelector(".gx-launch-footer"),next=document.querySelector(".gx-launch-next"),close=document.querySelector(".gx-launch-close"),disk=close.querySelector("span");
   const c=card.getBoundingClientRect(),h=header.getBoundingClientRect(),f=footer.getBoundingClientRect(),n=next.getBoundingClientRect(),hit=close.getBoundingClientRect(),disc=disk.getBoundingClientRect(),txt=content.getBoundingClientRect();
-  return {fits:c.width<=innerWidth&&c.height<=innerHeight&&c.left>=0&&c.top>=0&&c.right<=innerWidth+.5&&c.bottom<=innerHeight+.5,
+  const type=getComputedStyle(next),pill=getComputedStyle(next,"::before");
+  const glyph=close.querySelector("svg").getBoundingClientRect();
+  return {canonicalCTA:type.fontFamily.includes("Poppins")&&type.fontSize==="11px"&&type.fontWeight==="600"&&type.borderTopWidth==="0px"&&pill.backgroundColor.replace(/\s/g,"")==="rgba(255,255,255,0.08)"&&n.width>=44,
+   canonicalClose:Math.round(glyph.width)===16&&Math.round(glyph.height)===16,
+   fits:c.width<=innerWidth&&c.height<=innerHeight&&c.left>=0&&c.top>=0&&c.right<=innerWidth+.5&&c.bottom<=innerHeight+.5,
    actionVisible:n.left>=c.left&&n.right<=c.right+.5&&n.bottom<=c.bottom+.5&&n.height>=44,
    dimensions:Math.round(hit.width)===44&&Math.round(disc.width)===35,ordered:h.bottom<=txt.top+1&&txt.bottom<=f.top+1,
    overflow:content.scrollWidth>content.clientWidth+1,docOverflow:document.documentElement.scrollWidth>innerWidth+1,
    progress:document.querySelector(".gx-launch-progress").getAttribute("aria-valuenow")};
  });
  assert.equal(result.fits,true,JSON.stringify(result));assert.equal(result.actionVisible,true,JSON.stringify(result));
+ assert.equal(result.canonicalCTA,true,"CTA canónica Poppins 11/600, cristal .08 y objetivo 44px");assert.equal(result.canonicalClose,true,"Glifo canónico 16px");
  assert.equal(result.dimensions,true);assert.equal(result.ordered,true);assert.equal(result.overflow,false);assert.equal(result.docOverflow,false);
 };
 
