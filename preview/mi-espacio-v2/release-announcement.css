@@ -254,7 +254,8 @@ body.gx-launch-goxy-active #gxn-avatar :is(.gxn-goxy-real,.gxn-goxy-fallback,.gx
 /* The landing target is motionless during docking. The art never replays entry after landing. */
 .gx-release-v2[data-handoff="flying"] .gx-launch-orbit img{visibility:hidden;animation:none}
 .gx-release-v2[data-handoff="flying"] .gx-launch-art,
-.gx-release-v2[data-docked="true"] .gx-launch-content[data-chapter="cover"] .gx-launch-art{animation:none}
+.gx-release-v2[data-docked="true"] .gx-launch-content[data-chapter="cover"] .gx-launch-art,
+.gx-release-v2[data-docked="true"] .gx-launch-content[data-chapter="cover"] .gx-launch-copy{animation:none}
 @media(prefers-reduced-motion:reduce){
  .gx-launch-goxy-flight,.gx-launch-goxy-impact{display:none!important}
 }

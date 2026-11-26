@@ -232,6 +232,7 @@ try{
    const pilotContext=await browser.newContext({viewport:{width:390,height:844}});
    const {page:pilotPage,errors:pilotErrors}=await openFixture(pilotContext,{edition:"pilot",account:"casone",startup:"1",scenario:"late-legal"});
    await waitOpen(pilotPage);
+   if(dir){await pilotPage.waitForTimeout(350);await pilotPage.screenshot({path:resolve(dir,name+"-pilot-entrada.png")});}
    await pilotPage.locator("#gx-v2-handoff").waitFor({state:"hidden",timeout:4000});
    assert.equal(await pilotPage.evaluate(()=>window.flightTrace),true,"acople del logo a la tarjeta");
    const flightSamples=await pilotPage.evaluate(()=>window.flightSamples);
@@ -262,11 +263,13 @@ try{
    assert.equal(await pilotPage.locator(".gx-launch-goxy-render").getAttribute("data-goxy-color"),"#25887e");
    assert.equal(await pilotPage.locator("#gxn-goxy-slot").getAttribute("data-goxy-paused"),"true");
    const portrait=pilotPage.locator(".gx-launch-goxy-render");
-   await pilotPage.waitForFunction(colors=>colors.includes(document.querySelector(".gx-launch-goxy-render")?.getAttribute("data-goxy-color")),paletteColors);
+   await pilotPage.waitForFunction(colors=>window.colorTrace.filter(c=>c!=="#25887e"&&!colors.includes(c)).length>=5,paletteColors);
+   if(dir)await pilotPage.screenshot({path:resolve(dir,name+"-pilot-mezcla.png")});
+   await pilotPage.waitForFunction(colors=>{const c=document.querySelector(".gx-launch-goxy-render")?.getAttribute("data-goxy-color");return c!=="#25887e"&&colors.includes(c);},paletteColors);
    const pausedColor=await portrait.getAttribute("data-goxy-color");
    assert.ok(paletteColors.includes(pausedColor));
    const trace=await pilotPage.evaluate(()=>window.colorTrace);
-   assert.ok(trace.filter(c=>c!=="#25887e"&&!paletteColors.includes(c)).length>=5,"mezcla gradual del color real, no saltos discretos");
+   assert.ok(trace.filter(c=>c!=="#25887e"&&!paletteColors.includes(c)).length>=5,"mezcla gradual del color real, no saltos discretos: "+JSON.stringify(trace));
    await pilotPage.waitForTimeout(250);
    if(dir)await pilotPage.screenshot({path:resolve(dir,name+"-pilot-color-1.png")});
    await pilotPage.locator(".gx-launch-motion").click();
@@ -283,7 +286,7 @@ try{
    assert.equal(await pilotPage.locator("#gxn-goxy-slot").getAttribute("data-goxy-color"),"#25887e","no altera preferencia del avatar");
    await pilotPage.locator(".gx-launch-back").click();
    await pilotPage.locator(".gx-launch-next").click();
-   await pilotPage.waitForFunction(colors=>colors.includes(document.querySelector(".gx-launch-goxy-render")?.getAttribute("data-goxy-color")),paletteColors);
+   await pilotPage.waitForFunction(colors=>{const c=document.querySelector(".gx-launch-goxy-render")?.getAttribute("data-goxy-color");return c!=="#25887e"&&colors.includes(c);},paletteColors);
    await pilotPage.evaluate(()=>{window.goxyOriginal=document.querySelector(".gx-launch-goxy-portrait")});
    // Real renderer, same node flies; no clone and no stale animation.
    await pilotPage.locator(".gx-launch-next").click();
