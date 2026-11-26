@@ -1710,7 +1710,7 @@ html[data-gx-support-v3] .gxn-goxy-fallback #gxn-robot-case stop{stop-color:var(
 
 /* Hero: secondary states, same approved surface and CTA. */
 /* The global incident belongs only to the authenticated smart hero, never the legacy banner. */
-#dynamic-alert{display:none!important}
+html[data-gx-smart-hero] #dynamic-alert:not([data-gx-sync-error="true"]),html[data-gx-smart-hero] #dynamic-alert[hidden]{display:none!important}
 #gx-v2-feed .gx-state-bubbles{display:flex;align-items:center;gap:6px;flex:0 0 auto}
 #gx-v2-feed .gx-state-bubbles[hidden],#gx-v2-feed .gx-state-panel [hidden],#gx-v2-feed .gx-state-panel[hidden]{display:none!important}
 #gx-v2-feed .gx-state-bubble{width:38px;height:38px;min-width:38px;min-height:38px;padding:0;flex:0 0 38px;position:relative;display:grid;place-items:center;border:0;border-radius:50%;background:rgba(255,255,255,.08);color:#c1cfe0;box-shadow:none;cursor:pointer;touch-action:manipulation}

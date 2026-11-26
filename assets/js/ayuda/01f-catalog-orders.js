@@ -367,9 +367,18 @@
             document.getElementById('view-catalogo')?.classList.toggle('gx-catalog-public', gxCatalogClient.authenticated !== true);
             gxSetupCatalogFilters(gxCatalogClient);
 
-            if (config.alertas && config.alertas.activa) {
-                const banner = document.getElementById('dynamic-alert');
-                const content = document.getElementById('alert-content');
+            // The smart hero owns global incidents in the candidate, including guest navigation.
+            // Keep the legacy official renderer unchanged unless the candidate explicitly opts in.
+            const banner = document.getElementById('dynamic-alert');
+            const content = document.getElementById('alert-content');
+            if (document.documentElement.hasAttribute('data-gx-smart-hero')) {
+                if (banner) {
+                    banner.hidden = true;
+                    banner.style.display = 'none';
+                    delete banner.dataset.gxSyncError;
+                }
+                if (content) content.textContent = '';
+            } else if (config.alertas?.activa && banner && content) {
                 content.innerHTML = `<strong>Aviso Técnico:</strong> El servicio de <strong>${config.alertas.plataforma || "Servicios"}</strong> está ${config.alertas.falla || "presentando intermitencias"}. Las demás plataformas operan con normalidad.${config.alertas.mensaje ? `<br><small>${config.alertas.mensaje}</small>` : ''}`;
                 banner.style.display = 'flex';
             }

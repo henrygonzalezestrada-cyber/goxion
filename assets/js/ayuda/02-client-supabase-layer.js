@@ -407,6 +407,10 @@ function goxionViewModelAdapter(data) {
                 const alertContent = document.getElementById("alert-content");
                 if (dynamicAlert && alertContent) {
                     alertContent.innerHTML = "<strong>No fue posible sincronizar con GOXION.</strong><br>Intenta recargar la página.";
+                    if(document.documentElement.hasAttribute("data-gx-smart-hero")){
+                        dynamicAlert.dataset.gxSyncError="true";
+                        dynamicAlert.hidden=false;
+                    }
                     dynamicAlert.style.display = "flex";
                 }
             }

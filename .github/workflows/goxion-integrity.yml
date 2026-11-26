@@ -58,6 +58,10 @@ jobs:
         if: ${{ !cancelled() }}
         run: node scripts/goxy-identity-smoke.mjs
 
+      - name: Incidencias · sin aviso heredado en el candidato
+        if: ${{ !cancelled() }}
+        run: node scripts/hero-global-alert-guard.test.mjs
+
       - name: Tarjeta inteligente · estados secundarios (Chromium/WebKit)
         if: ${{ !cancelled() }}
         run: node scripts/hero-states-smoke.mjs
