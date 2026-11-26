@@ -3,6 +3,9 @@
 (function(){
 'use strict';
 const data=window.GOXION_V2_DATA;
+const continuity=window.GOXION_FEED_CONTINUITY;
+const tabScroll=continuity?.createScroll();
+let historyDigest='',snapshotError=false,scrollGeneration=0;
 if(!data)return;
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -36,8 +39,11 @@ async function load(){
  }finally{loadingOfficial=false}
 }
 async function showClient(view){
+ const sameAccount=state.view&&String(state.view.cliente.id)===String(view.cliente.id);
+ if(sameAccount){state.view=continuity?.merge(state.view,view)||view;snapshotError=false;renderClient();window.dispatchEvent(new CustomEvent('goxion:v2-feed:rendered',{detail:{clientId:String(view.cliente.id||'')}}));return}
  benefitRevision++;
- state.view=view;
+ tabScroll?.reset();historyDigest='';snapshotError=false;
+ state.view=continuity?.merge(null,view)||view;
  state.lastState='';
  state.activeFilter='all';
  state.showAllHistory=false;
@@ -81,6 +87,7 @@ function heroState(view){
   if(st.includes('vencid')||accountStatus.includes('vencid')||accountStatus.includes('incumpl'))return ['overdue','Tienes un pago vencido',when,'attention','clock'];
  }
  
+ if(continuity?.financialUnavailable(view))return ['sync','Estamos sincronizando tu cuenta','Consulta los datos actualizados en tu estado de cuenta','muted','clock'];
  if((view.servicios||[]).some(x=>['solicitada','aprobada'].includes(clean(x.cancelacion?.estado))))return ['cancellation','Tu cancelación está en proceso','Consulta el seguimiento','review','layers'];
  if((pending&&pending.length===0)||(!b2&&(account.esta_pagado_periodo===true||st==='pagado')))return ['clear','Todo al corriente',dateText(account.fecha_corte)?when:'Fecha de pago principal · día '+(Number(c.dia_pago)||15),'calm','check'];
  return ['soon','Revisa tu próximo pago',dateText(date)?when:'Fecha principal · día '+(Number(c.dia_pago)||15),'due','calendar'];
@@ -1004,9 +1011,13 @@ function historyRows(){
  return [...new Map(items.filter(x=>x.id).map(x=>[x.id,x])).values()].sort((a,b)=>String(b.date).localeCompare(String(a.date)));
 }
 function drawHistory(){
- const list=$('gxm-list');list.replaceChildren();
+ const list=$('gxm-list');
  const records=historyRows().filter(x=>state.activeFilter==='all'||(state.activeFilter==='payment'?x.kind==='payment':x.kind!=='payment'));
  const shown=state.showAllHistory?records:records.slice(0,3);
+ const signature=JSON.stringify([shown,records.length,state.activeFilter,state.showAllHistory,state.view.lecturas?.historial,state.view.lecturas?.cancelaciones,state.view.historial?.limitado]);
+ if(historyDigest===signature)return;historyDigest=signature;
+ const focused=list.contains(document.activeElement)?document.activeElement.closest('.gxm-entry')?.dataset.movement:null;
+ list.replaceChildren();
  if(!shown.length){list.innerHTML='<div class="gxm-empty">No hay movimientos registrados para este filtro.</div>'}
  const glyph={
   payment:'<path d="M5 12.5 10 17l9-10"/>',
@@ -1036,6 +1047,7 @@ function drawHistory(){
   row.append(b,detail);list.append(row);
  });
  const foot=document.querySelector('#gxm-history .gxm-footnote');if(foot)foot.textContent=state.view.lecturas?.historial===false||state.view.lecturas?.cancelaciones===false?'Algunos movimientos están pendientes de sincronización.':state.view.historial?.limitado?'Mostramos los movimientos más recientes.':'Movimientos registrados en GOXION.';
+ if(focused){[...list.querySelectorAll('.gxm-entry')].find(e=>e.dataset.movement===focused)?.querySelector('button')?.focus({preventScroll:true})}
  const more=$('gxm-more');more.hidden=records.length<=3;more.textContent=state.showAllHistory?'Mostrar menos':'Ver '+Math.max(0,records.length-3)+' '+(records.length===4?'movimiento':'movimientos')+' más';
 }
 $('gxm-more').addEventListener('click',()=>{state.showAllHistory=!state.showAllHistory;drawHistory()});
@@ -1141,15 +1153,18 @@ document.addEventListener('visibilitychange',()=>{
  if(document.hidden){stopSavingsMotion();savingCurrent=savingTarget;showSavingAmount(savingTarget)}
 });
 function navigate(name,skipScroll){
- if(name!=='space')wipeServiceSecrets();
  if(!['space','catalog','support'].includes(name))return;
+ const previous=state.tab,changed=previous!==name;
+ if(changed&&state.view)tabScroll?.remember(previous,currentScroll());
+ if(name!=='space')wipeServiceSecrets();
+ const generation=++scrollGeneration;
  state.tab=name;
  if(typeof window.switchTab==='function')window.switchTab(name==='space'?'inicio':name==='catalog'?'catalogo':'soporte');
  document.querySelectorAll('#gxn-nav .gxn-tab').forEach(b=>{
   if(b.dataset.gxnTarget===name)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')
  });
  $('gxn-profile-menu').hidden=true;
- if(!skipScroll)window.scrollTo({top:0,behavior:reduced()?'instant':'smooth'});
+ if(!skipScroll&&changed){const y=state.view?(tabScroll?.get(name)||0):0;requestAnimationFrame(()=>{if(generation===scrollGeneration&&state.tab===name)window.scrollTo({top:y,behavior:'instant'})})}
 }
 window.GOXION_V2_OPEN_OFFICIAL=name=>navigate(name==='catalog'?'catalog':name==='support'?'support':'space');
 window.GOXION_V2_GO_SPACE=()=>navigate('space');
@@ -1206,15 +1221,16 @@ function mountGoxy(){
  if(window.GOXY_ROBOT?.mount){mount();return}
  const s=document.createElement('script');s.async=true;s.src='./preview/goxion-ai/goxy-heads.bundle.js';s.onload=mount;document.head.append(s);
 }
-function renderClient(){renderHero();renderBenefits();renderServices();drawHistory();renderSavings()}
+function syncNotice(){const card=$('focus');let notice=$('gx-feed-stale');const stale=snapshotError||Boolean(state.view?.staleReads?.length);if(!notice){notice=document.createElement('p');notice.id='gx-feed-stale';notice.className='gx-feed-stale';notice.setAttribute('role','status');card.insertAdjacentElement('afterend',notice)}const message=snapshotError?'No pudimos actualizar tu información. Último estado disponible.':stale?'Algunos datos están pendientes de sincronización.':'';if(notice.textContent!==message)notice.textContent=message;notice.hidden=!stale;}
+function renderClient(){renderHero();renderBenefits();renderServices();drawHistory();renderSavings();syncNotice()}
 async function refreshClient(){
  if(!state.view||document.hidden)return;
  if(state.refreshing){state.refreshAgain=true;return}
  state.refreshing=true;const current=TOKEN(),id=state.view.cliente.id,revision=benefitRevision;
  try{const next=await data.restore(current);if(TOKEN()!==current||!next||next.cliente.id!==id)return;
   if(revision!==benefitRevision){state.refreshAgain=true;return}
-  state.view=next;renderClient()}
- catch(_){/* Mantener el último estado verificado; no inventar pagos. */}
+  state.view=continuity?.merge(state.view,next)||next;snapshotError=false;renderClient()}
+ catch(error){if(TOKEN()===current&&state.view&&String(state.view.cliente.id)===String(id)){if(error?.status===401){wipeServiceSecrets();window.dispatchEvent(new CustomEvent('goxion:realtime:client-session',{detail:{status:401}}));if(typeof window.cerrarSesion==='function')window.cerrarSesion();window.dispatchEvent(new Event('goxion:client-logout'))}else{snapshotError=true;wipeServiceSecrets();syncNotice()}}}
  finally{state.refreshing=false;if(state.refreshAgain){state.refreshAgain=false;queueMicrotask(()=>void refreshClient())}}
 }
 $('focus-icon').dataset.motionPaused=String(document.hidden);
@@ -1226,12 +1242,14 @@ let realtimeTimer=0;
 window.addEventListener('goxion:realtime',event=>{if(!['account_state','rewards','referrals','client_state','client_access','cancellations','resync'].includes(event.detail?.scope||''))return;clearTimeout(realtimeTimer);realtimeTimer=setTimeout(()=>void refreshClient(),220)});
 window.GOXION_V2_RETRY_FEED=()=>load();
 window.addEventListener('goxion:client-ready',()=>{void load()});
-window.addEventListener('goxion:client-logout',()=>{heroStates?.reset();wipeServiceSecrets();serviceOperation=null;clearInterval(greetingTimer);greetingTimer=0;stopSavingsMotion();state.view=null;shell.hidden=true;window.GOXION_V2_CLIENT_ID=''});
+window.addEventListener('goxion:client-logout',()=>{tabScroll?.reset();historyDigest='';snapshotError=false;scrollGeneration++;heroStates?.reset();wipeServiceSecrets();serviceOperation=null;clearInterval(greetingTimer);greetingTimer=0;stopSavingsMotion();state.view=null;shell.hidden=true;window.GOXION_V2_CLIENT_ID=''});
 if(typeof getCurrentClientKey==='function'&&getCurrentClientKey())void load();
 // Se conserva Morphicons del laboratorio aprobado; icono SVG nativo si no hay red.
 if(!reduced())import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
  if(typeof mod.createMorph==='function')iconHandle=mod.createMorph($('state-path'),paths[$('focus-icon').dataset.icon]||paths.check,{reducedMotion:'user'});
 }).catch(()=>{});
-setInterval(()=>{if(!document.hidden&&state.view){void refreshClient();void window.GOXION_V2_NOTIFICATIONS?.refresh({realtime:true})}},45000);
+window.addEventListener('online',()=>{if(state.view&&!document.hidden){void refreshClient();void window.GOXION_V2_NOTIFICATIONS?.refresh({realtime:true})}});
+window.addEventListener('offline',()=>{if(state.view){snapshotError=true;wipeServiceSecrets();syncNotice()}});
+setInterval(()=>{if(!document.hidden&&state.view&&navigator.onLine!==false){void refreshClient();void window.GOXION_V2_NOTIFICATIONS?.refresh({realtime:true})}},45000);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)wipeServiceSecrets();if(!document.hidden&&state.view){void refreshClient();void window.GOXION_V2_NOTIFICATIONS?.refresh({realtime:true})}});
 })();

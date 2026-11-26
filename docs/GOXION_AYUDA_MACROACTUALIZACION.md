@@ -173,3 +173,7 @@ Usuario aprueba F2 hero, burbujas, seguimiento y movimiento; referencia b4052d1b
 
 ### Revisión de salida F3 · exclusión del aviso heredado
 Capturas de Catálogo/Soporte: controlador cargarCatalogo regeneraba aviso. Flag explícito data-gx-smart-hero sólo candidato/aceptación; legacy no genera aviso y limpia DOM, CSS/hidden de respaldo, error de sincronización separado. Oficial sin flag conserva comportamiento. Smoke de guard añadido; no cambios a base ni alerta activa. Auditoría inicial 46/47 scripts oficiales reutilizados, 1 sustitución prórroga, 59 scripts candidato sin rutas locales faltantes. Ver documento de cierre para matriz y propuesta de pop-up de lanzamiento. Goxy QA continúa versión 1, sin capacidades nuevas; no repetir despliegue bloqueado.
+
+
+### Estabilidad A · continuidad y recuperación
+Historial sin reconstrucción idéntica; scroll por sección/cuenta; refresco de misma cuenta no reinicia UI; merge limitado de historial y cancelaciones pendientes, nunca accesos/credenciales/finanzas obsoletos; indicador de sincronización y recuperación online; 401 cierra sesión. QA recibe alertas. Prueba focal, sin nuevas dependencias ni laboratorios. Pendientes: selective reads validadas, rutas notificaciones, rendimiento, resolución hero, integridad y anuncio. Ver control de salida.

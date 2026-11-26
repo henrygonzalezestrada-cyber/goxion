@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import vm from 'node:vm';
+const context={window:{}};vm.runInNewContext(readFileSync('preview/mi-espacio-v2/feed-continuity.js','utf8'),context);
+const {merge,financialUnavailable,createScroll}=context.window.GOXION_FEED_CONTINUITY;
+const c={id:'c1'},cancel={id:'q1',cliente_servicio_id:'s1',estado:'solicitada'},old={cliente:c,servicios:[{id:'s1',cancelacion:cancel,accesos:[{pin:'synthetic'}],credencial_pendiente:{id:'old'}}],cancelaciones:[cancel],historial:{altas:[{id:'old'}]},estado_cuenta:{total_actual:100},finanzas_b2:{modo:'old'}};
+const next={cliente:c,servicios:[{id:'s1',cancelacion:null,accesos:[],credencial_pendiente:null}],cancelaciones:[],historial:null,estado_cuenta:null,finanzas_b2:null,lecturas:{historial:false,cancelaciones:false,estado_cuenta:false,finanzas_b2:false,cliente_accesos:false,credenciales_entregas:false}};
+const r=merge(old,next);assert.equal(r.historial,old.historial);assert.equal(r.servicios[0].cancelacion,cancel);assert.equal(r.servicios[0].accesos.length,0);assert.equal(r.servicios[0].credencial_pendiente,null);assert.equal(r.estado_cuenta,null);assert.equal(r.finanzas_b2,null);assert.equal(financialUnavailable(r),true);
+assert.equal(merge(old,{...next,cliente:{id:'c2'}}).historial,null);
+assert.equal(merge(old,{...next,lecturas:{historial:true,cancelaciones:true}}).servicios[0].cancelacion,null);
+const scroll=createScroll();scroll.remember('space',442);scroll.remember('catalog',100);assert.equal(scroll.get('space'),442);scroll.reset();assert.equal(scroll.get('space'),0);
+console.log('Continuidad: sesión aislada, historial y cancelación no sensibles, accesos sin caché, estado financiero protegido, scroll por sección OK');

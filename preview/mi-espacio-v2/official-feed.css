@@ -1750,3 +1750,7 @@ html[data-gx-smart-hero] #dynamic-alert:not([data-gx-sync-error="true"]),html[da
 #gx-v2-feed .gx-state-flight{position:absolute;z-index:6;pointer-events:none;transform-origin:center;will-change:transform}
 #gx-v2-feed .gx-state-hero-art[role=button]{cursor:pointer;touch-action:manipulation}
 #gx-v2-feed .gx-state-hero-art[role=button]:focus-visible{outline:2px solid #7ee1e7;outline-offset:3px;border-radius:50%}
+
+/* Connection notice appears only when partial/offline. */
+#gx-v2-feed .gx-feed-stale{margin:6px 4px 0;text-align:center;color:#b5c5d2;font-size:10px;line-height:1.4}
+#gx-v2-feed .gx-feed-stale[hidden]{display:none!important}

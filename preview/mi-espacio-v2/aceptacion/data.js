@@ -65,6 +65,7 @@
       ['historial','historial-cliente',{}]
     ];
     const extra=await Promise.allSettled(reqs.map(r=>post(r[1],r[2],token)));
+    if(extra.some(r=>r.status==='rejected'&&r.reason?.status===401))throw Object.assign(new Error('No se pudo verificar la sesión.'),{status:401});
     const value=(index,key)=>extra[index].status==='fulfilled'&&Array.isArray(extra[index].value?.[key])?extra[index].value[key]:[];
     const cancellations=value(0,'solicitudes');
     const deliveries=value(1,'entregas');
@@ -86,7 +87,7 @@
       });
     }).filter(s=>!['efectiva','efectuada','completada'].includes(clean(s.cancelacion?.estado)));
     return {
-      cliente:main.cliente,servicios:services,pagos:Array.isArray(main.pagos)?main.pagos:[],
+      cliente:main.cliente,alertas:main.alertas??null,servicios:services,pagos:Array.isArray(main.pagos)?main.pagos:[],
       gamificacion:main.gamificacion||null,misiones_progreso:Array.isArray(main.misiones_progreso)?main.misiones_progreso:[],
       referidos:Array.isArray(main.referidos)?main.referidos:[],
       cancelaciones:cancellations,historial:extra[6].status==='fulfilled'?extra[6].value:null,estado_cuenta:account,catalogo:Array.isArray(main.catalogo)?main.catalogo:[],

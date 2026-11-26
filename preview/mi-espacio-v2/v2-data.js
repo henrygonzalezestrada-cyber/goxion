@@ -65,6 +65,7 @@
       ['historial','historial-cliente',{}]
     ];
     const extra=await Promise.allSettled(reqs.map(r=>post(r[1],r[2],token)));
+    if(extra.some(r=>r.status==='rejected'&&r.reason?.status===401))throw Object.assign(new Error('No se pudo verificar la sesión.'),{status:401});
     const value=(index,key)=>extra[index].status==='fulfilled'&&Array.isArray(extra[index].value?.[key])?extra[index].value[key]:[];
     const cancellations=value(0,'solicitudes');
     const deliveries=value(1,'entregas');

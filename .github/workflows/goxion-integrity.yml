@@ -58,6 +58,10 @@ jobs:
         if: ${{ !cancelled() }}
         run: node scripts/goxy-identity-smoke.mjs
 
+      - name: Continuidad del feed · lectura parcial y aislamiento
+        if: ${{ !cancelled() }}
+        run: node scripts/feed-continuity.test.mjs
+
       - name: Incidencias · sin aviso heredado en el candidato
         if: ${{ !cancelled() }}
         run: node scripts/hero-global-alert-guard.test.mjs
