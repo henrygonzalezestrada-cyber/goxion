@@ -157,3 +157,7 @@ Cinco reacciones según puntuación: inclinación, comprensión, rebote, entusia
 
 ### Goxy · identidad visual y paleta (25 nov 2026)
 Opiniones aprobado visualmente, baseline 08998a75. Candidato y aceptación: cinco colores de carcasa, render original con atributos de color/pausa (fuente y adaptador al final del bundle actual modificados juntos; biblioteca intacta), perfil compacto, silueta estática en Soporte, transición lateral breve; mismo color en avatar/hero/chat. Preferencia local aislada por cliente, reseteada visualmente al salir; sincronización cuenta/dispositivos pendiente. No se toca IA, ni la tarjeta inteligente, ni Admin, ni ayuda oficial. Prueba de identidad aislada sin red. Validación visual iPhone pendiente.
+
+
+### Tarjeta inteligente · estados simultáneos
+Fuentes: ayuda.html, admin.html Incidencias 2.0, index.html, contrato mi-espacio y esquema alertas/solicitudes_cancelacion en producción (sólo metadatos). API retorna alerta única id/activa/plataforma/falla/mensaje, no updated_at; dedupe por firma y cuenta/dispositivo; resolución sólo ante activa=false de plataforma previamente observada. Ciclos idénticos no observados entre sincronizaciones y sincronización multidispositivo pendientes hasta exponer versión de servidor. Alerta real y cancelaciones secundarias sin backend nuevo. Lab aislado con revisión de pago + incidencia + cancelación y overflow. Oficial intacta, no alertas reales creadas. Smoke añadido.

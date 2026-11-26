@@ -124,6 +124,7 @@ heroIcon.addEventListener('keydown',event=>{
  if(!['Enter',' '].includes(event.key)||event.repeat||!heroGestures.has(heroIcon.dataset.icon))return;
  event.preventDefault();replayHeroGesture(event);
 });
+const heroStates=window.GOXION_HERO_STATES?.create({card:$('focus'),logo,openCancellation:id=>{const tile=[...$('gxs-list').querySelectorAll('.gxs-card')].find(el=>el.dataset.service===String(id));if(tile&&!serviceOperation){if(!tile.classList.contains('is-open'))tile.querySelector('.gxs-trigger').click();setServiceStage(tile,'cancel');tile.scrollIntoView({behavior:reduced()?'auto':'smooth',block:'start'})}}});
 function renderHero(){
  const s=heroState(state.view),prev=state.lastState;state.lastState=s[0];
  const card=$('focus');card.dataset.state=s[0];card.dataset.tone=s[3];
@@ -144,6 +145,7 @@ function renderHero(){
  ?'Importe confirmado por GOXION: '+data.money(account.total_actual)+'. Fecha principal de pago: día '+(Number(c.dia_pago)||15)+'.'
  :'Consulta tus movimientos registrados. Cuando el estado de cuenta esté conciliado, GOXION confirmará los importes y fechas de pago.';
  card.setAttribute('aria-label',s[1]+'. '+s[2]+'. Estado informativo; utiliza el botón para consultar.');
+ heroStates?.update(state.view,s[0]);
 }
 $('focus-action').addEventListener('click',event=>{
  event.stopPropagation();
@@ -1224,7 +1226,7 @@ let realtimeTimer=0;
 window.addEventListener('goxion:realtime',event=>{if(!['account_state','rewards','referrals','client_state','client_access','cancellations','resync'].includes(event.detail?.scope||''))return;clearTimeout(realtimeTimer);realtimeTimer=setTimeout(()=>void refreshClient(),220)});
 window.GOXION_V2_RETRY_FEED=()=>load();
 window.addEventListener('goxion:client-ready',()=>{void load()});
-window.addEventListener('goxion:client-logout',()=>{wipeServiceSecrets();serviceOperation=null;clearInterval(greetingTimer);greetingTimer=0;stopSavingsMotion();state.view=null;shell.hidden=true;window.GOXION_V2_CLIENT_ID=''});
+window.addEventListener('goxion:client-logout',()=>{heroStates?.reset();wipeServiceSecrets();serviceOperation=null;clearInterval(greetingTimer);greetingTimer=0;stopSavingsMotion();state.view=null;shell.hidden=true;window.GOXION_V2_CLIENT_ID=''});
 if(typeof getCurrentClientKey==='function'&&getCurrentClientKey())void load();
 // Se conserva Morphicons del laboratorio aprobado; icono SVG nativo si no hay red.
 if(!reduced())import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
