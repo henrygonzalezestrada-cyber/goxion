@@ -29,9 +29,15 @@ for(const [name,engine] of Object.entries({chromium,webkit})){
  assert.equal(close.width,44);assert.equal(close.glyph,16);assert.equal(close.color,'rgb(7, 28, 41)');assert.ok(close.bg.includes('121, 230, 252'),'canonical cyan disc');
  await page.emulateMedia({reducedMotion:'no-preference'});
  await card.locator('[data-score="1"]').click();assert.equal(await card.locator('.is-lit').count(),1);
- assert.equal(await card.locator('.gx-support-art').evaluate(e=>getComputedStyle(e).animationName),'gxOpinionStarReact');
+ assert.equal(await card.locator('.gx-support-art').evaluate(e=>getComputedStyle(e).animationName),'gxOpinionListen');
  await page.waitForFunction(()=>!document.querySelector('.gx-support-art').classList.contains('gx-rb-art-react'));
+ for(const [score,name] of [[2,'Understand'],[3,'Bounce'],[4,'Delight'],[5,'Celebrate']]){
+ await card.locator('[data-score="'+score+'"]').click();
+ assert.equal(await card.locator('.gx-support-art').evaluate(e=>getComputedStyle(e).animationName),'gxOpinion'+name);
+ await page.waitForFunction(()=>!document.querySelector('.gx-support-art').classList.contains('gx-rb-art-react'));
+ }
  await page.emulateMedia({reducedMotion:'reduce'});
+ await card.locator('[data-score="1"]').click();
  await card.locator('#gx-rb-text').fill('Prueba de experiencia de aceptación.');
  await card.locator('#gx-rb-submit').click();
  await page.waitForFunction(()=>document.querySelector('#gx-rb-error').textContent==='Error simulado');

@@ -145,3 +145,7 @@ Espejo y aceptación: misma tarjeta existente de Soporte se expande en su posici
 
 ### Opiniones · corrección visual tras Safari (25 nov 2026)
 Se detectó desviación: X teal sólida y CTA ancho completo introducidos en inline. Reutilizar la regla compartida existente (cyan #79e6fc, símbolo oscuro #071c29, disco 35/área táctil 44/glyph 16), CTA de Soporte (38px, 8%, texto/padding idénticos; ancho intrínseco). Reacción estrella con keyframe finito .64s, squash/stretch, rebote 9px y dos destellos breves, idéntico para 1–5 estrellas; respeta reducción de movimiento. Test Chromium/WebKit ahora verifica tamaños, colores, ancho, estado hidden, animación de estrella. Primer smoke inline anterior aprobado (run 45720757040). Sin tocar backend, oficial ni Goxy.
+
+
+### Opiniones · personalidad de estrella
+Cinco reacciones según puntuación: inclinación, comprensión, rebote, entusiasmo y doble palpitar. Sin destellos; mismo emoji, flotación sólo en reposo de Opiniones. No se cambian X, CTA, estructura ni controladores. Respeta movimiento reducido. Smoke comprueba los cinco nombres de animación; pendiente ejecución CI y validación iPhone.

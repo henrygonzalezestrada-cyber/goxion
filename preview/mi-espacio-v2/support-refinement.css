@@ -341,24 +341,16 @@ html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-success-screen{paddi
 html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-success-screen p{margin:0 auto;font-size:12px;color:#a8b5c9}
 html[data-gx-support-v3] #view-soporte .gx-rb-inline :is(.gx-rb-star,.gx-rb-close,.gx-rb-submit,.gx-rb-consent input,.gx-rb-text):focus-visible{outline:2px solid #7ee1e7;outline-offset:2px}
 @media(max-width:360px){html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-star{width:38px;height:40px}}
-/* Reaction has its own finite keyframe; no reliance on Web Animations for tap.
-   Same response for every score, no color grading or continuous glow. */
-html[data-gx-support-v3] #view-soporte .gx-rb-inline.gx-rb-expanded:not(.gx-rb-complete) .gx-support-art.gx-rb-art-react{
- animation:gxOpinionStarReact .64s cubic-bezier(.22,.8,.25,1) both;
-}
-@keyframes gxOpinionStarReact{
- 0%{transform:translateY(0) scale(1) rotate(0)}
- 22%{transform:translateY(2px) scale(.88) rotate(4deg)}
- 49%{transform:translateY(-9px) scale(1.21) rotate(-9deg);filter:brightness(1.12)}
- 76%{transform:translateY(1px) scale(.96) rotate(3deg)}
- 100%{transform:translateY(0) scale(1) rotate(0);filter:none}
-}
-html[data-gx-support-v3] #view-soporte .gx-rb-inline.gx-rb-expanded:not(.gx-rb-complete) .gx-support-art.gx-rb-art-react::before,
-html[data-gx-support-v3] #view-soporte .gx-rb-inline.gx-rb-expanded:not(.gx-rb-complete) .gx-support-art.gx-rb-art-react::after{
- content:"✦";position:absolute;line-height:1;font-size:13px;color:#ffe6ae;pointer-events:none;opacity:0;animation:gxOpinionArtSpark .58s ease-out both;
-}
-html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-support-art.gx-rb-art-react::before{left:-5px;top:13px}
-html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-support-art.gx-rb-art-react::after{right:-5px;top:5px;animation-delay:.06s}
-@keyframes gxOpinionArtSpark{0%,15%{opacity:0;transform:scale(.45)}40%{opacity:.85;transform:scale(1)}100%{opacity:0;transform:translateY(-9px) scale(.45)}}
+/* Opiniones: cinco reacciones finitas, sin destellos ni cambio de color. */
+html[data-gx-support-v3] #view-soporte .gx-rb-inline.gx-rb-expanded:not(.gx-rb-complete) .gx-support-art.gx-rb-art-react[data-reaction="1"]{animation:gxOpinionListen 520ms cubic-bezier(.22,.8,.25,1) both}
+@keyframes gxOpinionListen{0%,100%{transform:none}45%{transform:translateY(1px) rotate(-12deg) scale(.96)}}
+html[data-gx-support-v3] #view-soporte .gx-rb-inline.gx-rb-expanded:not(.gx-rb-complete) .gx-support-art.gx-rb-art-react[data-reaction="2"]{animation:gxOpinionUnderstand 560ms cubic-bezier(.22,.8,.25,1) both}
+@keyframes gxOpinionUnderstand{0%,100%{transform:none}35%{transform:rotate(-7deg) scale(.96)}70%{transform:rotate(3deg) scale(1.03)}}
+html[data-gx-support-v3] #view-soporte .gx-rb-inline.gx-rb-expanded:not(.gx-rb-complete) .gx-support-art.gx-rb-art-react[data-reaction="3"]{animation:gxOpinionBounce 600ms cubic-bezier(.22,.8,.25,1) both}
+@keyframes gxOpinionBounce{0%,100%{transform:none}22%{transform:translateY(2px) scale(.94)}52%{transform:translateY(-6px) scale(1.09)}78%{transform:scale(.98)}}
+html[data-gx-support-v3] #view-soporte .gx-rb-inline.gx-rb-expanded:not(.gx-rb-complete) .gx-support-art.gx-rb-art-react[data-reaction="4"]{animation:gxOpinionDelight 680ms cubic-bezier(.22,.8,.25,1) both}
+@keyframes gxOpinionDelight{0%,100%{transform:none}20%{transform:scale(.91) rotate(-4deg)}45%{transform:translateY(-9px) scale(1.17) rotate(8deg)}72%{transform:rotate(-4deg) scale(1.04)}}
+html[data-gx-support-v3] #view-soporte .gx-rb-inline.gx-rb-expanded:not(.gx-rb-complete) .gx-support-art.gx-rb-art-react[data-reaction="5"]{animation:gxOpinionCelebrate 900ms cubic-bezier(.22,.8,.25,1) both}
+@keyframes gxOpinionCelebrate{0%,100%{transform:none}15%{transform:scale(.92)}32%{transform:scale(1.24)}48%{transform:scale(.99)}64%{transform:scale(1.19)}82%{transform:scale(1.02)}}
 @media(prefers-reduced-motion:reduce){html[data-gx-support-v3] #view-soporte .gx-rb-inline *,html[data-gx-support-v3] #view-soporte .gx-rb-inline *::before,html[data-gx-support-v3] #view-soporte .gx-rb-inline *::after{animation:none!important;transition:none!important}}
 

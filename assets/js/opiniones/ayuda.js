@@ -266,6 +266,7 @@
         emojiMotion?.cancel();
         emoji.classList.remove("gx-rb-art-react");
         void emoji.offsetWidth;
+        emoji.dataset.reaction=String(chosen);
         emoji.classList.add("gx-rb-art-react");
       }
     });
@@ -349,7 +350,7 @@
     window.addEventListener("goxion:client-logout",()=>{
       submitEpoch++;cardMotion?.cancel();emojiMotion?.cancel();reset();setInlineOpen(false,false);
     });
-    emoji.addEventListener("animationend",event=>{if(event.animationName==="gxOpinionStarReact")emoji.classList.remove("gx-rb-art-react");});
+    emoji.addEventListener("animationend",event=>{if(/^gxOpinion(?:Listen|Understand|Bounce|Delight|Celebrate)$/.test(event.animationName))emoji.classList.remove("gx-rb-art-react");});
     inlineCard.addEventListener("keydown",event=>{
       if(event.key==="Escape"&&inlineCard.classList.contains("gx-rb-expanded")&&!sending){event.preventDefault();closeFeedback();}
     });
