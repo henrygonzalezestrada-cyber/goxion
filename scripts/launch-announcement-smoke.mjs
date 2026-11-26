@@ -139,7 +139,7 @@ async function captureCover(page,name){
  const pixel=rgbAt(screenshot,Math.round(rect.x+12),Math.round(rect.y+rect.height-50));
  assert.ok(pixel.every((v,i)=>Math.abs(v-[21,21,28][i])<=8),"La portada no fue pintada por el navegador: "+JSON.stringify(pixel));
  const glow=rgbAt(screenshot,Math.round(rect.x+rect.width/2),Math.round(rect.y+80));
- assert.ok(glow[2]>pixel[2]+4,"Iluminación ambiental real: "+JSON.stringify({glow,pixel}));
+ assert.ok(glow[2]>pixel[2]+24,"Iluminación editorial perceptible y pie neutro: "+JSON.stringify({glow,pixel}));
 }
 const assertGeometry=async(p)=>{
  const result=await p.evaluate(()=>{

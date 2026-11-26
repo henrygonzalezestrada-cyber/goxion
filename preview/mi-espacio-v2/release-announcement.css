@@ -111,7 +111,10 @@ body.gx-release-v2-body-lock{overflow:hidden!important}
 .gx-release-v2[data-edition="launch"] .gx-launch-card{
  width:min(100%,420px);height:min(600px,calc(100vh - 24px));height:min(600px,calc(100dvh - 24px));
  max-height:100%;border:0;border-radius:26px;
- --gx-launch-surface:radial-gradient(ellipse 78% 37% at 50% 30%,rgba(var(--gx-launch-light,130,83,255),.24) 0%,rgba(var(--gx-launch-light,130,83,255),.10) 36%,rgba(var(--gx-launch-light,130,83,255),.025) 63%,transparent 89%),#15151c;
+ /* Pulido editorial v5: más profundidad óptica en la zona protagonista;
+    una sola luz difusa de la misma paleta, sin filtros, capas ni movimiento nuevo.
+    El faldón de lectura y los CTA conservan su neutro. */
+ --gx-launch-surface:radial-gradient(ellipse 100% 48% at 47% 26%,rgba(var(--gx-launch-light,130,83,255),.37) 0%,rgba(var(--gx-launch-light,130,83,255),.21) 32%,rgba(var(--gx-launch-light,130,83,255),.085) 61%,rgba(var(--gx-launch-light,130,83,255),.02) 82%,transparent 100%),#15151c;
  background:var(--gx-launch-surface);
  box-shadow:0 22px 64px rgba(0,0,0,.36);animation:none;
 }
