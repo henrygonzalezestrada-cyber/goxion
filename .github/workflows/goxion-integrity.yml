@@ -22,6 +22,11 @@ jobs:
         with:
           node-version: 22
 
+      - name: Goxy H1 · piloto del espejo (controlador firmado simulado y alcance del cliente)
+        run: |
+          node --experimental-strip-types scripts/goxy-feedback-pilot-gateway.test.mjs
+          node --test scripts/goxy-feedback-pilot-client.test.mjs
+
       - name: Install browser test
         run: npm install --no-save playwright
 
