@@ -161,3 +161,7 @@ Opiniones aprobado visualmente, baseline 08998a75. Candidato y aceptación: cinc
 
 ### Tarjeta inteligente · estados simultáneos
 Fuentes: ayuda.html, admin.html Incidencias 2.0, index.html, contrato mi-espacio y esquema alertas/solicitudes_cancelacion en producción (sólo metadatos). API retorna alerta única id/activa/plataforma/falla/mensaje, no updated_at; dedupe por firma y cuenta/dispositivo; resolución sólo ante activa=false de plataforma previamente observada. Ciclos idénticos no observados entre sincronizaciones y sincronización multidispositivo pendientes hasta exponer versión de servidor. Alerta real y cancelaciones secundarias sin backend nuevo. Lab aislado con revisión de pago + incidencia + cancelación y overflow. Oficial intacta, no alertas reales creadas. Smoke añadido.
+
+
+### Hero F2 · refinamiento del espejo tras prueba real
+Usuario valida composición/burbujas y CTA de seguimiento; video muestra contracción con fundido prematuro y aviso legado visible en inicio público. F2: viaje de un único elemento a su destino, crossfade independiente, reapertura de estado principal durante el vuelo, círculo-menos PulsoIcon canónico y replay al tocar, ocultar banner heredado en todo el candidato. No se modifica ayuda.html, Admin, Index ni datos reales; Samuel y la incidencia activa se conservan para repetir la prueba. El smoke previo falló al comprobar resolución; se espera explícitamente que el panel sea visible, y se registra cierre observado sin confundir un ciclo nuevo con el anterior. No se considera validado hasta resultado CI.

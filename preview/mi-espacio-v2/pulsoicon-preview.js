@@ -53,6 +53,11 @@ function install(host,name){
 function play(svg){if(!svg)return;const name=svg.dataset.gxPulso;DATA[name]?.nodes.forEach((n,i)=>animate(svg.children[i],n[2]))}
 // API local acotada a la confirmación de cancelación/retención del candidato.
 window.GOXION_PULSO_CANCEL=Object.freeze({play(svg){if(svg?.dataset.gxPulso==='check')play(svg)}});
+// Tarjeta inteligente: reutiliza los mismos iconos canónicos de Historial.
+window.GOXION_PULSO_HERO=Object.freeze({
+ prepare(host,kind){if(host?.matches('#gx-v2-feed .gx-state-art'))install(host,kind==='resolved'?'circle-check':'circle-minus')},
+ play(host,kind){if(host?.matches('#gx-v2-feed .gx-state-art'))play(install(host,kind==='resolved'?'circle-check':'circle-minus'))}
+});
 // Confirmación de carrito: sólo la superficie de éxito, tras respuesta positiva.
 window.GOXION_PULSO_CART=Object.freeze({
  confirm(host){if(host?.matches('#gx-cart-success .gx-cart-check'))play(install(host,'circle-check'));},

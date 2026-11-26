@@ -16,7 +16,7 @@ for(const [name,engine] of Object.entries({chromium,webkit})){
  await p.locator('#lab-more').click();assert.equal(await p.locator('.gx-state-bubble').count(),3);
  await p.locator('.gx-state-more').click();assert.equal(await p.locator('.gx-state-overflow-item').count(),3);
  await panel.getByRole('button',{name:'Volver a mi estado'}).click();
- await p.locator('#lab-resolve').click();assert.equal(await panel.isVisible(),true);assert.ok((await panel.innerText()).includes('Incidencia finalizada'));
+ await p.locator('#lab-resolve').click();await panel.waitFor({state:'visible',timeout:5000});assert.equal(await panel.isVisible(),true);assert.ok((await panel.innerText()).includes('Incidencia finalizada'));
  await panel.getByRole('button',{name:'Entendido'}).click();assert.equal(await p.locator('[data-state-id="global"]').count(),0);
  assert.equal(await card.evaluate(e=>e.getBoundingClientRect().height),h);
  await p.locator('#lab-reset').click();assert.equal(await p.locator('.gx-state-bubble').count(),0);

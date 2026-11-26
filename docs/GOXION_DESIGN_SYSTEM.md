@@ -179,3 +179,5 @@ Chat a pantalla completa sin tarjetas anidadas; avatar animado real en círculo 
 
 ## Tarjeta inteligente · estados secundarios (candidato, 25 nov 2026)
 La tarjeta comunica estados y procesos importantes, la campana acontecimientos. Conservar el hero aprobado, prioridad financiera y controladores; aviso global nuevo/modificado temporal (~5s), contracción hacia círculo de 38px (36px móvil estrecho), máximo dos burbujas + contador. Logos originales sin deformación; punto rojo estático. Consulta manual permanece abierta; cierre confirmado retira burbuja. Cancelación secundaria usa seguimiento real. No avisos ordinarios ni duplicar reportes personales. Sin cambios de altura ni tarjeta exterior. Validación pendiente.
+
+- Refinamiento aprobado del hero (prueba del usuario en espejo, 25 nov): disposición y seguimiento validados. F2 conserva burbujas; transición compartida de logo con viaje de 460ms y fundido independiente, círculo-menos PulsoIcon de Historial, gesto sólo al abrir/tocar. No mostrar banner global fuera de sesión; fuente de estado permanece Admin. Validación de F2 pendiente.

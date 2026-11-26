@@ -1709,7 +1709,8 @@ html[data-gx-support-v3] .gxn-goxy-fallback #gxn-robot-case stop{stop-color:var(
 
 
 /* Hero: secondary states, same approved surface and CTA. */
-body.gx-v2-private-visible #dynamic-alert{display:none!important}
+/* The global incident belongs only to the authenticated smart hero, never the legacy banner. */
+#dynamic-alert{display:none!important}
 #gx-v2-feed .gx-state-bubbles{display:flex;align-items:center;gap:6px;flex:0 0 auto}
 #gx-v2-feed .gx-state-bubbles[hidden],#gx-v2-feed .gx-state-panel [hidden],#gx-v2-feed .gx-state-panel[hidden]{display:none!important}
 #gx-v2-feed .gx-state-bubble{width:38px;height:38px;min-width:38px;min-height:38px;padding:0;flex:0 0 38px;position:relative;display:grid;place-items:center;border:0;border-radius:50%;background:rgba(255,255,255,.08);color:#c1cfe0;box-shadow:none;cursor:pointer;touch-action:manipulation}
@@ -1738,3 +1739,14 @@ body.gx-v2-private-visible #dynamic-alert{display:none!important}
 #gx-v2-feed .gx-state-overflow-item{background:rgba(255,255,255,.08);border:0;border-radius:999px;padding:8px 12px;min-height:38px;color:#c1cfe0;font:600 11px/1.2 Poppins,sans-serif;text-align:left}
 #gx-v2-feed :is(.gx-state-bubble,.gx-state-overflow-item):focus-visible{outline:2px solid #7ee1e7;outline-offset:2px}
 @media(max-width:355px){#gx-v2-feed .gx-state-bubble{width:36px;height:36px;min-width:36px;min-height:36px;flex-basis:36px}#gx-v2-feed .gx-state-bubbles{gap:4px}}
+
+
+/* Hero F2: one shared-element flight, independent text crossfade. */
+#gx-v2-feed .focus.gx-state-presenting.gx-state-returning>.focus-copy,
+#gx-v2-feed .focus.gx-state-presenting.gx-state-returning>.focus-icon,
+#gx-v2-feed .focus.gx-state-presenting.gx-state-returning>.focus-bottom{visibility:visible}
+#gx-v2-feed .gx-state-panel{pointer-events:auto}
+#gx-v2-feed .focus.gx-state-returning .gx-state-panel{pointer-events:none}
+#gx-v2-feed .gx-state-flight{position:absolute;z-index:6;pointer-events:none;transform-origin:center;will-change:transform}
+#gx-v2-feed .gx-state-hero-art[role=button]{cursor:pointer;touch-action:manipulation}
+#gx-v2-feed .gx-state-hero-art[role=button]:focus-visible{outline:2px solid #7ee1e7;outline-offset:3px;border-radius:50%}
