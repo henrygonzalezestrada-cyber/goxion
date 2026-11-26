@@ -449,7 +449,7 @@
     ai.status().then(state => {
       if (!active || statusId !== requestId) return;
       aiConfigured = state.ok===true && state.configured===true && state.providerReady===true;
-      feedbackReady=Boolean(learning&&window.GOXION_QA_ISOLATED&&state.ok===true&&state.feedbackReady===true);
+      feedbackReady=Boolean(learning&&(window.GOXION_QA_ISOLATED||location.pathname.endsWith('/ayuda-espejo-feed-v2.html'))&&state.ok===true&&state.feedbackReady===true);
       semanticReady=Boolean(learning&&window.GOXION_QA_ISOLATED&&state.ok===true&&state.semanticReady===true&&aiConfigured);
       verifiedReady=Boolean(refined&&window.GOXION_QA_ISOLATED&&state.ok===true&&state.verifiedReady===true&&typeof ai.verifiedRoute==='function');
       if (aiConfigured) setAIStatus('ready',
