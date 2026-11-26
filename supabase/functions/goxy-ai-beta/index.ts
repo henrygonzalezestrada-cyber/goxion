@@ -247,6 +247,44 @@ async function forecast(clientId:string,service:string,target:unknown){
     moraCents:fee,reactivationCents:react,reactivationConfirmed:true,
     note:"Proyección del motor oficial para esta fecha y período, suponiendo que no se registra otro pago. El importe definitivo se recalcula al pagar."};
 }
+/** Single-account feedback pilot. The old chat/account/forecast contract is unchanged.
+ *  No provider request, raw text, transcript, image or account identifier is stored. */
+const feedbackTopics=['identity','catalog','payment','missions','loyalty','promotions','cancel','support','policy','other'];
+const feedbackSources=['local','official','ai','vision'];
+const feedbackReasons=['understanding','incorrect','unresolved','repetitive','other'];
+const feedbackErrors=['INVALID_FEEDBACK','RESPONSE_MISMATCH','EXPIRED','FEEDBACK_PAUSE','FEEDBACK_LIMIT','LEARNING_CAPACITY','PILOT_REQUIRED'];
+const feedbackFields=['mode','responseId','topic','source','vote','reason'];
+async function feedbackRpc(service:string,params:Record<string,unknown>){
+ const response=await db('rpc/goxy_feedback_pilot',service,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(params)});
+ if(!response.ok)return null;
+ return await response.json().catch(()=>null);
+}
+// Non-mutating contract probe: all arguments required by the writer are null.
+// Its validation returns INVALID_FEEDBACK before locks/reads/writes; the DB also
+// forbids storing null actor/response. Only the authenticated id is used by the private allowlist; no feedback row is written.
+async function feedbackStatus(clientId:string,service:string):Promise<boolean>{
+ try{
+  const result=await feedbackRpc(service,{p_client_id:clientId,p_actor:null,p_response:null,p_topic:null,p_source:null,p_vote:null,p_reason:null});
+  return result?.ok===false&&result.code==='INVALID_FEEDBACK';
+ }catch{return false;}
+}
+async function feedbackActor(clientId:string,service:string){
+ const key=await crypto.subtle.importKey('raw',new TextEncoder().encode(service),{name:'HMAC',hash:'SHA-256'},false,['sign']);
+ return Array.from(new Uint8Array(await crypto.subtle.sign('HMAC',key,new TextEncoder().encode('goxy-feedback-v1:'+clientId))),b=>b.toString(16).padStart(2,'0')).join('');
+}
+async function feedbackWrite(body:any,clientId:string,service:string){
+ if(typeof body.responseId!=='string'||!/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(body.responseId)||
+  !feedbackTopics.includes(body.topic)||!feedbackSources.includes(body.source)||![-1,0,1].includes(body.vote)||
+  !(body.reason==null||(body.vote===-1&&feedbackReasons.includes(body.reason)))||
+  Object.keys(body).some(k=>!feedbackFields.includes(k)))return {ok:false,code:'INVALID_FEEDBACK'};
+ const actor=await feedbackActor(clientId,service);
+ const result=await feedbackRpc(service,{p_client_id:clientId,p_actor:actor,p_response:body.responseId,p_topic:body.topic,p_source:body.source,p_vote:body.vote,p_reason:body.reason??null});
+ if(result?.ok===true&&result.vote===body.vote)return {ok:true,vote:result.vote,unchanged:result.unchanged===true,warning:result.warning===true};
+ if(result?.ok===false&&feedbackErrors.includes(result.code))return {ok:false,code:result.code};
+ return {ok:false,code:'FEEDBACK_UNAVAILABLE'};
+}
+
+
 Deno.serve(async(req:Request)=>{
   const origin=req.headers.get("Origin");
   if(origin!==SITE)return output(origin,403,{ok:false,code:"ORIGIN_DENIED"});
@@ -268,11 +306,24 @@ Deno.serve(async(req:Request)=>{
     const body=await req.json().catch(()=>null);
     if(!body||typeof body!=="object"||Array.isArray(body))return output(origin,400,{ok:false,code:"BAD_REQUEST"});
     const key=Deno.env.get("GROQ_API_KEY");
+    if(body.mode==='feedback'){
+      // The SQL wrapper checks the signed client id against the private pilot
+      // allowlist before the existing writer is called; a browser flag cannot grant access.
+      const result=await feedbackWrite(body,clientId,service);
+      return output(origin,result.ok?200:result.code==='PILOT_REQUIRED'?403:result.code==='FEEDBACK_UNAVAILABLE'?503:422,result);
+    }
     if(body.mode==="status"){
-      if(!key)return output(origin,200,{ok:true,configured:false,providerReady:false,code:"AI_NOT_CONFIGURED"});
-      const provider=await providerStatus(key);
+      // Leave the normal production response and provider calls unchanged.
+      // Only the mirror asks for a capability probe. Database authorization
+      // is independent of that hint and fails closed on errors.
+      const pilot=body.feedbackPilot===true;
+      const readiness=pilot?feedbackStatus(clientId,service):Promise.resolve(false);
+      if(!key)return output(origin,200,{ok:true,configured:false,providerReady:false,code:"AI_NOT_CONFIGURED",
+        ...(pilot?{feedbackReady:await readiness,semanticReady:false,verifiedReady:false}:{})});
+      const [provider,feedbackReady]=await Promise.all([providerStatus(key),readiness]);
       return output(origin,200,{ok:true,configured:true,providerReady:provider.ready,
-        code:provider.code,model:provider.ready?MODEL:null});
+        code:provider.code,model:provider.ready?MODEL:null,
+        ...(pilot?{feedbackReady,semanticReady:false,verifiedReady:false}:{})});
     }
     if(body.mode==="forecast"){
       try{
