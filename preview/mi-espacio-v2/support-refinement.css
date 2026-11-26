@@ -216,6 +216,7 @@ html[data-gx-support-v3] #view-soporte .gxai-close svg,html[data-gx-support-v3] 
 }
 /* Atención humana y opiniones: dos accesos, no dos avisos de alerta. */
 html[data-gx-support-v3] #view-soporte .gx-support-access{
+  --gx-support-control-fill:rgba(255,255,255,.08);
   margin:12px 0 0;padding:19px 18px;border:1px solid rgba(255,255,255,.035);border-radius:22px;text-align:left;
   background:rgba(8,8,12,.371);backdrop-filter:blur(11.75px);-webkit-backdrop-filter:blur(11.75px);
   box-shadow:0 15px 36px rgba(0,0,0,.23),inset 0 1px rgba(255,255,255,.05);position:relative;isolation:isolate;overflow:hidden;display:grid;grid-template-columns:minmax(0,1fr);gap:8px;align-items:center;min-height:140px;
@@ -231,7 +232,7 @@ html[data-gx-support-v3] #view-soporte .gx-support-opinion h3 span{color:#7ee1e7
 html[data-gx-support-v3] #view-soporte .gx-support-access .gx-support-cta,
 html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-submit{
   grid-column:1;position:relative;z-index:1;justify-self:start;width:auto;max-width:calc(100% - 67px);min-height:38px;padding:9px 15px;
-  border:0;background:rgba(255,255,255,.08);border-radius:999px;color:#7ee1e7;box-shadow:none;font:600 11px/1.2 Poppins,sans-serif;
+  border:0;background:var(--gx-support-control-fill);border-radius:999px;color:#7ee1e7;box-shadow:none;font:600 11px/1.2 Poppins,sans-serif;
 }
 html[data-gx-support-v3] #view-soporte .gx-support-cta:active{transform:scale(.98)}
 html[data-gx-support-v3] #view-soporte .faq-container{margin:24px 0 0;padding:0;background:none;border:0;box-shadow:none}
@@ -322,7 +323,7 @@ html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-star.is-lit{color:#e
 html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-rating-feedback{margin-top:4px;color:#eac477}
 html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-fieldhead{margin:11px 0 8px}
 html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-fieldhead label{font-size:12px}
-html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-text{border:0;border-radius:14px;background:rgba(255,255,255,.065);font-size:16px;box-shadow:none;resize:vertical;min-height:102px}
+html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-text{border:0;border-radius:14px;background:var(--gx-support-control-fill);font-size:16px;box-shadow:none;resize:vertical;min-height:102px}
 html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-consent{background:none;border:0;padding:9px 0;margin-top:10px}
 html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-consent strong{font-size:12px}
 html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-consent small,html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-formnote{font-size:11px;color:#a8b5c9}
@@ -341,7 +342,7 @@ html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-success-screen{paddi
 html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-success-screen p{margin:0 auto;font-size:12px;color:#a8b5c9}
 html[data-gx-support-v3] #view-soporte .gx-rb-inline :is(.gx-rb-star,.gx-rb-close,.gx-rb-submit,.gx-rb-consent input,.gx-rb-text):focus-visible{outline:2px solid #7ee1e7;outline-offset:2px}
 @media(max-width:360px){html[data-gx-support-v3] #view-soporte .gx-rb-inline .gx-rb-star{width:38px;height:40px}}
-/* Opiniones: cinco reacciones finitas, sin destellos ni cambio de color. */
+/* Opiniones: gesto de entrada finito; 3–5 conservan un pulso de estado. Sin destellos. */
 html[data-gx-support-v3] #view-soporte .gx-rb-inline.gx-rb-expanded:not(.gx-rb-complete) .gx-support-art.gx-rb-art-react[data-reaction="1"]{animation:gxOpinionListen 520ms cubic-bezier(.22,.8,.25,1) both}
 @keyframes gxOpinionListen{0%,100%{transform:none}45%{transform:translateY(1px) rotate(-12deg) scale(.96)}}
 html[data-gx-support-v3] #view-soporte .gx-rb-inline.gx-rb-expanded:not(.gx-rb-complete) .gx-support-art.gx-rb-art-react[data-reaction="2"]{animation:gxOpinionUnderstand 560ms cubic-bezier(.22,.8,.25,1) both}
@@ -351,6 +352,14 @@ html[data-gx-support-v3] #view-soporte .gx-rb-inline.gx-rb-expanded:not(.gx-rb-c
 html[data-gx-support-v3] #view-soporte .gx-rb-inline.gx-rb-expanded:not(.gx-rb-complete) .gx-support-art.gx-rb-art-react[data-reaction="4"]{animation:gxOpinionDelight 680ms cubic-bezier(.22,.8,.25,1) both}
 @keyframes gxOpinionDelight{0%,100%{transform:none}20%{transform:scale(.91) rotate(-4deg)}45%{transform:translateY(-9px) scale(1.17) rotate(8deg)}72%{transform:rotate(-4deg) scale(1.04)}}
 html[data-gx-support-v3] #view-soporte .gx-rb-inline.gx-rb-expanded:not(.gx-rb-complete) .gx-support-art.gx-rb-art-react[data-reaction="5"]{animation:gxOpinionCelebrate 900ms cubic-bezier(.22,.8,.25,1) both}
-@keyframes gxOpinionCelebrate{0%,100%{transform:none}15%{transform:scale(.92)}32%{transform:scale(1.24)}48%{transform:scale(.99)}64%{transform:scale(1.19)}82%{transform:scale(1.02)}}
+@keyframes gxOpinionCelebrate{0%{transform:none}15%{transform:scale(.92)}32%{transform:scale(1.24)}48%{transform:scale(.99)}64%{transform:scale(1.19)}82%{transform:scale(1.06)}100%{transform:scale(1.12)}}
+/* Persistent state after the entrance gesture; layout geometry stays fixed. */
+html[data-gx-support-v3] #view-soporte .gx-rb-inline.gx-rb-expanded:not(.gx-rb-complete) .gx-support-art[data-reaction="5"]{transform:scale(1.12)}
+html[data-gx-support-v3] #view-soporte .gx-rb-inline.gx-rb-expanded:not(.gx-rb-complete) .gx-support-art:not(.gx-rb-art-react)[data-reaction="3"]{animation:gxOpinionPulseCalm 2.6s ease-in-out infinite}
+@keyframes gxOpinionPulseCalm{0%,100%{transform:scale(1)}24%{transform:scale(1.055)}46%{transform:scale(1)}}
+html[data-gx-support-v3] #view-soporte .gx-rb-inline.gx-rb-expanded:not(.gx-rb-complete) .gx-support-art:not(.gx-rb-art-react)[data-reaction="4"]{animation:gxOpinionPulseBright 2.05s ease-in-out infinite}
+@keyframes gxOpinionPulseBright{0%,100%{transform:scale(1)}20%{transform:scale(1.115)}38%{transform:scale(1.015)}56%{transform:scale(1.07)}74%{transform:scale(1)}}
+html[data-gx-support-v3] #view-soporte .gx-rb-inline.gx-rb-expanded:not(.gx-rb-complete) .gx-support-art:not(.gx-rb-art-react)[data-reaction="5"]{animation:gxOpinionPulseFull 1.65s ease-in-out infinite}
+@keyframes gxOpinionPulseFull{0%,100%{transform:scale(1.12)}18%{transform:scale(1.28)}34%{transform:scale(1.12)}51%{transform:scale(1.24)}70%{transform:scale(1.12)}}
 @media(prefers-reduced-motion:reduce){html[data-gx-support-v3] #view-soporte .gx-rb-inline *,html[data-gx-support-v3] #view-soporte .gx-rb-inline *::before,html[data-gx-support-v3] #view-soporte .gx-rb-inline *::after{animation:none!important;transition:none!important}}
 

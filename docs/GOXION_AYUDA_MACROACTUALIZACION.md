@@ -149,3 +149,7 @@ Se detectó desviación: X teal sólida y CTA ancho completo introducidos en inl
 
 ### Opiniones · personalidad de estrella
 Cinco reacciones según puntuación: inclinación, comprensión, rebote, entusiasmo y doble palpitar. Sin destellos; mismo emoji, flotación sólo en reposo de Opiniones. No se cambian X, CTA, estructura ni controladores. Respeta movimiento reducido. Smoke comprueba los cinco nombres de animación; pendiente ejecución CI y validación iPhone.
+
+
+### Opiniones · pulso por calificación (25 nov 2026)
+1–2 gesto finito, 3 pulso suave 2.6 s, 4 pulso doble 2.05 s, 5 tamaño base +12% y pulso doble 1.65 s. El estado se conserva mientras la tarjeta esté abierta, no continúa en éxito ni al cerrar; al cambiar calificación se reemplaza; movimiento reducido conserva tamaño estático sin animación. Flotación sólo Opiniones compacta, no otros emojis. Campo comentario 6.5%→8% compartido mediante --gx-support-control-fill con CTA local; sin borde nuevo. Sin cambios de dimensiones o color de X/CTA, sin backend ni otros módulos. Smoke ampliado verifica estado sostenido, transición descendente, reduced-motion, reinicio y opacidad compartida. F3 anterior smoke Opiniones aprobado Chromium/WebKit; F4 pendiente CI y validación iPhone.

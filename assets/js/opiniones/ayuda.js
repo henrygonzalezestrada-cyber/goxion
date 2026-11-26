@@ -162,6 +162,7 @@
       compactButton.setAttribute("aria-expanded",String(open));
     };
     emoji.classList.remove("gx-rb-art-react");
+    delete emoji.dataset.reaction;
     if(animate)animateCard(change);else change();
   }
   function lockBackground(){
@@ -262,12 +263,14 @@
       button.classList.add("is-chosen");
       setTimeout(()=>button.classList.remove("is-chosen"),600);
       $("gx-rb-error").textContent="";
-      if(inlineCard&&!reducedHeroMotion.matches){
+      if(inlineCard){
         emojiMotion?.cancel();
         emoji.classList.remove("gx-rb-art-react");
-        void emoji.offsetWidth;
         emoji.dataset.reaction=String(chosen);
-        emoji.classList.add("gx-rb-art-react");
+        if(!reducedHeroMotion.matches){
+          void emoji.offsetWidth;
+          emoji.classList.add("gx-rb-art-react");
+        }
       }
     });
   });
@@ -351,6 +354,7 @@
       submitEpoch++;cardMotion?.cancel();emojiMotion?.cancel();reset();setInlineOpen(false,false);
     });
     emoji.addEventListener("animationend",event=>{if(/^gxOpinion(?:Listen|Understand|Bounce|Delight|Celebrate)$/.test(event.animationName))emoji.classList.remove("gx-rb-art-react");});
+    reducedHeroMotion.addEventListener?.("change",event=>{if(event.matches)emoji.classList.remove("gx-rb-art-react");});
     inlineCard.addEventListener("keydown",event=>{
       if(event.key==="Escape"&&inlineCard.classList.contains("gx-rb-expanded")&&!sending){event.preventDefault();closeFeedback();}
     });

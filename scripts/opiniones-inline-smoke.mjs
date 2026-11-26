@@ -23,7 +23,7 @@ for(const [name,engine] of Object.entries({chromium,webkit})){
  assert.ok(await card.evaluate(e=>e.getBoundingClientRect().height)>original);
  const submitStyle=await card.locator('#gx-rb-submit').evaluate(e=>{const s=getComputedStyle(e),r=e.getBoundingClientRect();return {height:r.height,width:r.width,bg:s.backgroundColor,font:s.fontSize,padding:s.padding,color:s.color};});
  assert.equal(submitStyle.height,38);assert.equal(originalButton.height,38);
- assert.equal(submitStyle.bg,originalButton.bg);assert.equal(submitStyle.color,originalButton.color);assert.equal(submitStyle.font,originalButton.font);assert.equal(submitStyle.padding,originalButton.padding);
+ assert.equal(submitStyle.bg,originalButton.bg);assert.equal(submitStyle.bg,await card.locator('#gx-rb-text').evaluate(e=>getComputedStyle(e).backgroundColor));assert.equal(submitStyle.color,originalButton.color);assert.equal(submitStyle.font,originalButton.font);assert.equal(submitStyle.padding,originalButton.padding);
  assert.ok(submitStyle.width<(await card.evaluate(e=>e.getBoundingClientRect().width))*.8,'CTA must not span card');
  const close=await card.locator('#gx-rb-close').evaluate(e=>{const s=getComputedStyle(e),svg=e.querySelector('svg');return {width:e.getBoundingClientRect().width,color:s.color,bg:s.backgroundImage,glyph:svg.getBoundingClientRect().width};});
  assert.equal(close.width,44);assert.equal(close.glyph,16);assert.equal(close.color,'rgb(7, 28, 41)');assert.ok(close.bg.includes('121, 230, 252'),'canonical cyan disc');
@@ -31,12 +31,22 @@ for(const [name,engine] of Object.entries({chromium,webkit})){
  await card.locator('[data-score="1"]').click();assert.equal(await card.locator('.is-lit').count(),1);
  assert.equal(await card.locator('.gx-support-art').evaluate(e=>getComputedStyle(e).animationName),'gxOpinionListen');
  await page.waitForFunction(()=>!document.querySelector('.gx-support-art').classList.contains('gx-rb-art-react'));
- for(const [score,name] of [[2,'Understand'],[3,'Bounce'],[4,'Delight'],[5,'Celebrate']]){
+ const art=card.locator('.gx-support-art');
+ assert.equal(await art.evaluate(e=>getComputedStyle(e).animationName),'none');
+ for(const [score,name,pulse] of [[2,'Understand','none'],[3,'Bounce','gxOpinionPulseCalm'],[4,'Delight','gxOpinionPulseBright'],[5,'Celebrate','gxOpinionPulseFull']]){
  await card.locator('[data-score="'+score+'"]').click();
- assert.equal(await card.locator('.gx-support-art').evaluate(e=>getComputedStyle(e).animationName),'gxOpinion'+name);
+ assert.equal(await art.evaluate(e=>getComputedStyle(e).animationName),'gxOpinion'+name);
  await page.waitForFunction(()=>!document.querySelector('.gx-support-art').classList.contains('gx-rb-art-react'));
+ assert.equal(await art.evaluate(e=>getComputedStyle(e).animationName),pulse);
+ if(score>=3)assert.equal(await art.evaluate(e=>getComputedStyle(e).animationIterationCount),'infinite');
  }
+ await card.locator('[data-score="2"]').click();
+ await page.waitForFunction(()=>!document.querySelector('.gx-support-art').classList.contains('gx-rb-art-react'));
+ assert.equal(await art.evaluate(e=>getComputedStyle(e).animationName),'none','Changing rating must stop pulse');
  await page.emulateMedia({reducedMotion:'reduce'});
+ await card.locator('[data-score="5"]').click();
+ assert.equal(await art.evaluate(e=>getComputedStyle(e).animationName),'none');
+ assert.equal(await art.evaluate(e=>new DOMMatrix(getComputedStyle(e).transform).a),1.12);
  await card.locator('[data-score="1"]').click();
  await card.locator('#gx-rb-text').fill('Prueba de experiencia de aceptación.');
  await card.locator('#gx-rb-submit').click();
@@ -52,6 +62,7 @@ for(const [name,engine] of Object.entries({chromium,webkit})){
  await card.locator('#gx-rb-submit').click();
  assert.equal(await card.locator('#gx-rb-form').isVisible(),false);
  assert.equal(await card.locator('#gx-rb-close').isVisible(),false);
+ assert.equal(await art.getAttribute('data-reaction'),null);
  assert.equal(await card.locator('.gx-support-cta').isVisible(),true);
  assert.equal(await page.evaluate(()=>window.calls.length),2);
  await open.click();assert.equal(await card.locator('#gx-rb-text').inputValue(),'');
