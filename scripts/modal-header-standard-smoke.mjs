@@ -15,7 +15,8 @@ async function check(browser,name){
  try{
   await page.goto(base+"/index.html?cliente=prueba",{waitUntil:"domcontentloaded",timeout:18000});
   const bank=await page.evaluate(()=>{
-   document.body.classList.add("gx-payment-v2");
+   // El controlador oficial aplica V2 en html, no body.
+   document.documentElement.classList.add("gx-payment-v2");
    document.getElementById("bank-modal").classList.add("show");
    document.getElementById("payment-modal").classList.add("show");
    return [".gx-bank-static-head",".gx-payment-static-head"].map((sel,i)=>{
@@ -26,14 +27,22 @@ async function check(browser,name){
     const y=head.getBoundingClientRect().y;scroll.scrollTop=130;
     const close=head.querySelector("button"),style=getComputedStyle(close);
     return {scroll:scroll.scrollTop,shift:Math.abs(head.getBoundingClientRect().y-y),
-      width:parseFloat(style.width),height:parseFloat(style.height),color:style.backgroundColor,
-      icon:getComputedStyle(close,"::before").width};
+      width:parseFloat(style.width),height:parseFloat(style.height),
+      gradient:style.backgroundImage,glyph:close.textContent.trim(),fontSize:parseFloat(style.fontSize),
+      foreground:style.color,before:getComputedStyle(close,"::before").display,
+      after:getComputedStyle(close,"::after").display,accessible:close.getAttribute("aria-label")};
    });
   });
   for(const b of bank){
    assert.ok(b.scroll>0&&b.shift<1,name+" · index header does not stay pinned");
    assert.equal(Math.round(b.width),34);assert.equal(Math.round(b.height),34);
-   assert.ok(b.color.includes("0, 242, 254"));assert.equal(Math.round(parseFloat(b.icon)),16);
+   // Index conserva su override intencional: glifo oscuro de 17 px
+   // sobre degradado cian, sin pseudo-barras. Ayuda sigue con su estándar.
+   assert.ok(b.gradient.includes("linear-gradient")&&b.gradient.includes("36, 240, 255")&&b.gradient.includes("97, 220, 255"),JSON.stringify(b));
+   assert.ok(b.foreground.includes("3, 16, 21"),JSON.stringify(b));
+   assert.equal(Math.round(b.fontSize),17);
+   assert.ok(/^[✕×✖]$/.test(b.glyph));assert.equal(b.before,"none");assert.equal(b.after,"none");
+   assert.ok(b.accessible);
   }
   await page.goto(base+"/ayuda.html",{waitUntil:"domcontentloaded",timeout:18000});
   const help=await page.evaluate(()=>{

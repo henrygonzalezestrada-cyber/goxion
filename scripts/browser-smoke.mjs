@@ -1034,60 +1034,38 @@ async function runAyuda(browser, browserName, errors) {
   }
 
 
-  // Soporte: comprobar que el morph realmente tenga geometría intermedia,
-  // no sólo un salto entre estado compacto y expandido.
+  // F17 sustituyó la superficie pública del selector legado: mascota.js
+  // conserva sus IDs dentro de .gxai-original[hidden] sólo por compatibilidad.
+  // No medir ni accionar un elemento deliberadamente invisible. Comprobar
+  // en la superficie actual una sola entrada Goxy y la barrera de sesión.
   await page.evaluate(() => window.switchTab?.('soporte'));
-  await page.waitForTimeout(120);
-  await page.evaluate(() => {
-    window.renderizarSoporteDinamico?.({
-      _goxion_config: { serviciosGlobales: [{ nombre: 'ViX' }] }
+  const goxyOpen = page.locator('#smart-support-card.gxai-card .gxai-open');
+  const oldGrid = page.locator('#smart-support-card .gxai-original #support-platforms-grid');
+  const oldHidden = await oldGrid.count() === 1 && !await oldGrid.isVisible();
+  const supportReady = await goxyOpen.count() === 1 && await goxyOpen.isVisible();
+  if (!oldHidden || !supportReady) {
+    errors.push(`${label}: Soporte F17 no conserva una única entrada de Goxy y el legado oculto.`);
+  } else {
+    const guest = await page.evaluate(() => {
+      const key = window.GOXION_CORE?.STORAGE?.CLIENT_TOKEN;
+      return !!key && !localStorage.getItem(key);
     });
-  });
-
-  const supportBtn = page.locator('#support-platforms-grid .platform-btn').first();
-  const supportBefore = await supportBtn.boundingBox();
-  await page.evaluate(() => {
-    const el = document.querySelector('#support-platforms-grid .platform-btn');
-    window.selectPlatform?.('ViX', el, {
-      preventDefault(){},
-      stopPropagation(){}
-    });
-  });
-  // WebKit puede tardar más en comenzar el primer frame geométrico del morph.
-  // Esperamos una señal de crecimiento real en vez de asumir que ocurrirá
-  // exactamente a los 150 ms del runner.
-  if (supportBefore) {
-    await page.waitForFunction(
-      ({ beforeWidth }) => {
-        const el = document.querySelector('#support-platforms-grid .platform-btn');
-        return el && el.getBoundingClientRect().width > beforeWidth + 20;
-      },
-      { beforeWidth: supportBefore.width },
-      { timeout: 1200 }
-    ).catch(() => {});
-  }
-  const supportOpening = await supportBtn.boundingBox();
-  if (!supportBefore || !supportOpening || supportOpening.width <= supportBefore.width + 20) {
-    errors.push(`${label}: Soporte no inició el crecimiento del morph.`);
-  }
-  await page.waitForTimeout(420);
-  const supportOpen = await supportBtn.boundingBox();
-
-  await page.evaluate(() => window.closeSupportMorph?.());
-  await page.waitForFunction(() =>
-    !document.querySelector('#support-platforms-grid .platform-btn')?.classList.contains('gx-support-expanded'),
-    null,
-    { timeout: 2500 }
-  ).catch(() => {});
-  await page.waitForTimeout(140);
-  const supportClosing = await supportBtn.boundingBox();
-  if (!supportOpen || !supportClosing || supportClosing.width >= supportOpen.width - 20) {
-    errors.push(`${label}: Soporte no mostró contracción intermedia del morph.`);
-  }
-  await page.waitForTimeout(420);
-  const supportAfter = await supportBtn.boundingBox();
-  if (!supportBefore || !supportAfter || Math.abs(supportAfter.width - supportBefore.width) > 4) {
-    errors.push(`${label}: Soporte no regresó a su geometría compacta.`);
+    if (!guest) {
+      errors.push(`${label}: Soporte smoke perdió el contexto de invitado.`);
+    } else {
+      // Click sintético sobre el botón protegido: no crea una sesión ni
+      // abre conversación, y tampoco envía mensajes ni llama a IA.
+      await goxyOpen.evaluate(button => button.click());
+      const authRequested = await page.waitForFunction(() =>
+        document.getElementById('header-action-btn')?.getAttribute('aria-expanded') === 'true',
+        null, {timeout:2500}).then(()=>true).catch(()=>false);
+      const chatOpened = await page.locator('#view-soporte .gxai-chat-layer.gxai-visible').count();
+      if (!authRequested || chatOpened) errors.push(`${label}: Goxy no preservó la barrera de invitado.`);
+      await page.evaluate(() => window.closeAuthSheet?.());
+      await page.waitForFunction(() =>
+        document.getElementById('header-action-btn')?.getAttribute('aria-expanded') !== 'true',
+        null, {timeout:2500}).catch(()=>{});
+    }
   }
 
   await page.evaluate(() => window.switchTab?.('inicio'));
@@ -1733,7 +1711,7 @@ console.log('✓ Index prefiere motor financiero válido y conserva fallback leg
 console.log('✓ Ayuda/Admin consumen selector financiero común con fallback por divergencia');
 console.log('✓ Ayuda quita splash y navega entre vistas');
 console.log('✓ Mi Espacio crece y se contrae a su cápsula original');
-console.log('✓ Soporte conserva crecimiento/contracción intermedia');
+console.log('✓ Soporte F17: Goxy único, selector legado oculto y barrera de sesión');
 console.log('✓ Historial distingue suma/reinicio de lealtad');
 console.log('✓ Registro de bienvenida abre');
 console.log('✓ Admin expone todas las funciones usadas por controles HTML');
