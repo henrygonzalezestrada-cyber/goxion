@@ -28,6 +28,8 @@ async function state(page){
       flipped:root.classList.contains('gx-auth-flip-card'),
       contentOpacity:getComputedStyle(content).opacity,
       parentRestored:root.parentNode===window.__gAuthParent,
+      parentClass:root.parentNode?.className,
+      initialParentClass:window.__gAuthParent?.className,
       style:root.getAttribute('style'),
       placeholders:document.querySelectorAll('.gx-auth-pill-placeholder').length,
       chat:document.querySelectorAll('.gxai-chat-layer.gxai-visible').length,
@@ -38,7 +40,7 @@ async function state(page){
   });
 }
 async function checkOpen(page,closed){
-  await waitFor(async()=>{const v=await state(page);return v.expanded==='true'&&v.visible&&v.overlay&&v.flipped&&v.contentOpacity==='1'},'login opened and committed');
+  await waitFor(async()=>{const v=await state(page);return v.expanded==='true'&&v.visible&&v.overlay&&v.flipped&&v.contentOpacity==='1'},'login opened and committed').catch(async e=>{throw new Error(e.message+' '+JSON.stringify(await state(page)))});
   const v=await state(page);
   assert.equal(v.placeholders,1);assert.equal(v.parentRestored,false);
   assert.ok(v.width>closed.width+80,'Card has real final geometry');
@@ -46,7 +48,7 @@ async function checkOpen(page,closed){
   assert.equal(v.chat,0);assert.equal(v.session,false);
 }
 async function checkClosed(page,closed){
-  await waitFor(async()=>{const v=await state(page);return v.expanded==='false'&&!v.visible&&!v.overlay&&!v.flipped&&v.placeholders===0&&v.parentRestored},'login closed and restored');
+  await waitFor(async()=>{const v=await state(page);return v.expanded==='false'&&!v.visible&&!v.overlay&&!v.flipped&&v.placeholders===0&&v.parentRestored},'login closed and restored').catch(async e=>{throw new Error(e.message+' '+JSON.stringify(await state(page)))});
   const v=await state(page);
   assert.equal(v.style,closed.style);
   assert.ok(Math.abs(v.width-closed.width)<=3&&Math.abs(v.height-closed.height)<=3,'Restore the same capsule geometry');
@@ -65,6 +67,13 @@ async function run(browser,engine,mode,path){
     });
     await page.goto(origin+'/'+path,{waitUntil:'load'});
     await waitFor(()=>page.evaluate(()=>typeof window.openAuthSheet==='function'&&typeof window.closeAuthSheet==='function'&&!!window.GOXION_CORE),'auth script loaded',8000);
+    // Do not race the existing splash/handoff with the login interaction.
+    await waitFor(()=>page.evaluate(()=>['splash-screen','gx-v2-handoff'].every(id=>{
+      const e=document.getElementById(id);
+      if(!e||e.hidden)return true;
+      const cs=getComputedStyle(e);
+      return cs.display==='none'||cs.visibility==='hidden'||Number(cs.opacity)===0;
+    })),'startup handoff finished',15000);
     await page.evaluate(()=>{
       const root=document.getElementById('header-action-btn');window.__gAuthParent=root.parentNode;
     });
