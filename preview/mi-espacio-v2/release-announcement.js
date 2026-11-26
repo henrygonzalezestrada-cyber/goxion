@@ -7,7 +7,7 @@
  // La edición nueva es opt-in por configuración del HTML, no por URL ni storage.
  // La rama candidata la conserva apagada hasta autorización de lanzamiento.
  const mode=document.documentElement.getAttribute("data-gx-release-launch");
- const PILOT="casone",PILOT_VERSION="nov2026-mi-espacio-lanzamiento-pilot-v2";
+ const PILOT="casone",PILOT_VERSION="nov2026-mi-espacio-lanzamiento-pilot-v3";
  const GENERAL_VERSION="nov2026-mi-espacio-lanzamiento-v1",LEGACY_VERSION="nov2026-novedades-apiladas-v2-todos";
  let launch=mode==="enabled",pilot=false,VERSION=launch?GENERAL_VERSION:LEGACY_VERSION;
  const PREFIX="gx-release-seen:";
@@ -69,6 +69,7 @@
  let overlay=null,scroll=null,activeKey="",timer=0,attempts=0,open=false,focusSource=null,keyboard=false;
  let frame=0,lastTick=0,autoDelay=0,autoPosition=0,loopHeight=0,manual=false,scrollY=0;
  let handoff=null,motionPaused=false,goxyPortrait=null,goxySlot=null,goxyAvatar=null,goxyAvatarPaused=null,goxyFlight=null,goxyImpact=null;
+ let colorTimer=0,colorOptions=[],colorStep=0,colorComplete=true;
  function selectEdition(k){
    if(goxyFlight&&goxyFlight.account!==k)stopGoxyFlight(false);
    if(open&&activeKey!==k)dismiss(false);
@@ -209,10 +210,36 @@
  // It is paused and detached outside this chapter; no second visible animated mascot.
  const avatarEl=()=>$("#gxn-avatar");
  const noMotion=()=>motionPaused||reducedMotion()||document.hidden;
+  // Read the actual account palette; never change the saved selection or tint the face.
+  const avatarColor=()=>goxyAvatar?.getAttribute("data-goxy-color")||null;
+  function paintGoxyColor(color){
+    if(!goxySlot)return;
+    if(color)goxySlot.setAttribute("data-goxy-color",color);
+    else goxySlot.removeAttribute("data-goxy-color");
+  }
+  function stopColorPreview(restore=false){
+    clearTimeout(colorTimer);colorTimer=0;
+    if(restore){colorComplete=true;paintGoxyColor(avatarColor());}
+  }
+  function scheduleColorPreview(){
+    stopColorPreview();
+    if(reducedMotion()){stopColorPreview(true);return;}
+    if(noMotion()||colorComplete||goxyFlight||!goxyPortrait?.isConnected)return;
+    colorTimer=setTimeout(()=>{
+      colorTimer=0;
+      if(noMotion()||goxyFlight||!goxyPortrait?.isConnected)return;
+      if(colorStep>=colorOptions.length){stopColorPreview(true);return;}
+      paintGoxyColor(colorOptions[colorStep++]);
+      scheduleColorPreview();
+    },colorStep===0?1450:2050);
+  }
  function syncGoxyMotion(){
    if(goxySlot)goxySlot.setAttribute("data-goxy-paused",String(noMotion()||!goxyPortrait?.isConnected));
+    scheduleColorPreview();
  }
  function releaseGoxy(){
+    stopColorPreview(true);
+    colorOptions=[];colorStep=0;
    if(!goxyPortrait&&!goxyAvatar)return;
    if(goxyPortrait){goxySlot?.setAttribute("data-goxy-paused","true");goxyPortrait.remove();}
    document.body.classList.remove("gx-launch-goxy-active");
@@ -241,10 +268,13 @@
      goxySlot.setAttribute("data-mood","happy");
      goxyPortrait.append(goxySlot);
    }
-   const color=source?.getAttribute("data-goxy-color");
-   if(color)goxySlot.setAttribute("data-goxy-color",color);else goxySlot.removeAttribute("data-goxy-color");
    host.append(goxyPortrait);
    if(source){goxyAvatar=source;goxyAvatarPaused=source.getAttribute("data-goxy-paused");source.setAttribute("data-goxy-paused","true");}
+    const color=avatarColor();paintGoxyColor(color);
+    colorOptions=[...new Set([...document.querySelectorAll("#gxn-goxy-colors [data-goxy-color-choice]")]
+      .map(button=>button.style.getPropertyValue("--swatch").trim().toLowerCase())
+      .filter(value=>/^#[0-9a-f]{6}$/.test(value)&&value!==color?.toLowerCase()))];
+    colorStep=0;colorComplete=colorOptions.length===0;
    document.body.classList.add("gx-launch-goxy-active");
    syncGoxyMotion();
    try{window.GOXY_ROBOT?.mount?.(goxySlot);}catch(_){}
@@ -277,6 +307,8 @@
    if(!avatar||avatar.querySelector(".gxn-avatar-photo:not([hidden])")||!avatar.getClientRects().length||typeof goxyPortrait.animate!=="function")return false;
    const a=goxyPortrait.getBoundingClientRect(),b=avatar.getBoundingClientRect();
    if(!a.width||!a.height||!b.width||!b.height||b.top<0||b.bottom>innerHeight||b.left<0||b.right>innerWidth)return false;
+    // Bring the portrait back to the customer's chosen color before it leaves the card.
+    stopColorPreview(true);
    clearImpact();
    const shell=create("div","gx-launch-goxy-flight");
    shell.setAttribute("aria-hidden","true");
@@ -311,8 +343,8 @@
    const control=$(".gx-launch-motion",overlay);
    if(control){
      control.hidden=reducedMotion();
-     control.setAttribute("aria-label",motionPaused?"Reanudar animaciones":"Pausar animaciones");
-     control.setAttribute("title",motionPaused?"Reanudar animaciones":"Pausar animaciones");
+      control.setAttribute("aria-label",motionPaused?"Reanudar efectos visuales":"Pausar efectos visuales");
+      control.setAttribute("title",motionPaused?"Reanudar movimiento de las ilustraciones":"Pausar movimiento de las ilustraciones");
      control.setAttribute("aria-pressed",String(motionPaused));control.innerHTML=motionIcon(motionPaused);
    }
    syncGoxyMotion();
@@ -355,7 +387,7 @@
    overlay.innerHTML=[
      '<section class="gx-release-v2-card gx-launch-card" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="gx-release-v2-title">',
      '<header class="gx-launch-header"><div class="gx-launch-progress" role="progressbar" aria-label="Paso 1 de 6" aria-valuemin="1" aria-valuemax="6" aria-valuenow="1">'+chapters.map(()=>'<span></span>').join("")+'</div>',
-     '<button type="button" class="gx-launch-motion" aria-label="Pausar animaciones" aria-pressed="false"></button>',
+      '<button type="button" class="gx-launch-motion" aria-label="Pausar efectos visuales" aria-pressed="false"></button>',
      '<button type="button" class="gx-launch-close" aria-label="Posponer novedades"><span>'+closeSvg+'</span></button></header>',
      '<div class="gx-launch-content" aria-live="polite" aria-atomic="true"></div>',
      '<span class="gx-launch-status" role="status"></span>',

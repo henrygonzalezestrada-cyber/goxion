@@ -14,12 +14,16 @@ const version="nov2026-mi-espacio-lanzamiento-v1";
 const oldSeen="gx-release-seen:"+oldVersion+":test-account";
 const seen="gx-release-seen:"+version+":test-account";
 const dir=process.env.GX_LAUNCH_SCREENSHOTS||"";
+let paletteButtons=[];
 for(const name of ["ayuda-espejo-feed-v2.html","ayuda-aceptacion-v2.html"]){
  const html=await readFile(resolve(cwd,name),"utf8");
  assert.ok(html.includes('data-gx-release-launch="'+(name==="ayuda-espejo-feed-v2.html"?"pilot":"off")+'"'));
  assert.match(html,/family=Poppins:/,"el candidato carga la fuente canónica");
  assert.equal((html.match(/release-announcement\.js\?/g)||[]).length,1,"un controlador por página");
+ if(name==="ayuda-espejo-feed-v2.html")paletteButtons=html.match(/<button[^>]*data-goxy-color-choice="[^"]+"[^>]*>.*?<\/button>/g)||[];
 }
+const paletteColors=paletteButtons.map(button=>button.match(/--swatch:(#[0-9a-f]{6})/i)?.[1]);
+assert.equal(paletteColors.length,5,"la prueba usa el selector de colores real del espejo");
 const official=await readFile(resolve(cwd,"ayuda.html"),"utf8");
 assert.doesNotMatch(official,/<html[^>]+data-gx-release-launch="enabled"/);
 const intro="/preview/mi-espacio-v2/official-feed-intro.js",introCss="/preview/mi-espacio-v2/official-feed-intro.css";
@@ -33,13 +37,20 @@ const fixture=(params)=>{
  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
  <link rel="stylesheet" href="${css}">${startup?'<link rel="stylesheet" href="'+introCss+'">':""}<style>html,body{margin:0;background:#030305;color:white;font:16px system-ui}#account{padding:30px}#behind{position:absolute;top:30px;left:30px}#gx-v2-shared-header{position:fixed;left:12px;top:12px;right:12px;height:44px;display:flex;justify-content:space-between;align-items:center}#gxn-avatar{position:relative;display:grid;place-items:center;width:42px;height:42px;border-radius:50%;overflow:hidden;background:#17243d}#gxn-goxy-slot{display:grid;place-items:center;width:46px;height:46px}</style></head><body class="${startup?"gx-v2-private-visible":""}">
  <main id="account"><button id="behind">Mi Espacio</button><section id="view-dashboard" class="${startup?"active":""}"><div id="gx-v2-feed"></div><div id="gx-v2-sync" ${startup?"":"hidden"}></div></section></main><div id="pre-inert" inert>Anteriormente inerte</div>
- <header id="gx-v2-shared-header"><img class="gxn-wordmark" width="34" height="34" src="/Logo individual.png"><span id="gxn-avatar"><span class="gxai-avatar gxn-goxy-real"><span id="gxn-goxy-slot" data-goxy-color="#25887e" data-goxy-paused="false"></span></span></span></header>
+ <header id="gx-v2-shared-header"><img class="gxn-wordmark" width="34" height="34" src="/Logo individual.png"><span id="gxn-avatar"><span class="gxai-avatar gxn-goxy-real"><span id="gxn-goxy-slot" data-goxy-color="#25887e" data-goxy-paused="false"></span></span></span><div id="gxn-goxy-colors" hidden>${paletteButtons.join("")}</div></header>
  ${startup?'<div id="gx-v2-handoff" hidden><div class="gx-v2-handoff-center"><img class="gx-v2-handoff-mark" src="/Logo individual.png"><div class="gx-v2-handoff-wait" hidden></div></div></div>':""}
  <script>
- window.flightTrace=false;window.goxyTrace=false;window.goxyImpactTrace=false;new MutationObserver(()=>{const g=document.querySelector(".gx-launch-goxy-flight .gx-launch-goxy-portrait");if(g&&g===window.goxyOriginal)window.goxyTrace=true;if(document.querySelector(".gx-launch-goxy-impact"))window.goxyImpactTrace=true;const root=document.querySelector("#gx-v2-handoff"),overlay=document.querySelector("#gx-release-overlay");if(root?.classList.contains("is-launch-flight")&&overlay?.dataset.handoff==="flying"&&getComputedStyle(overlay.querySelector(".gx-launch-orbit img")).visibility==="hidden")window.flightTrace=true}).observe(document.body,{subtree:true,attributes:true,childList:true});
+ window.flightTrace=false;window.flightSamples=[];window.goxyTrace=false;window.goxyImpactTrace=false;window.goxyFlightColor=null;window.colorTrace=[];
+ new MutationObserver(()=>{const g=document.querySelector(".gx-launch-goxy-flight .gx-launch-goxy-portrait"),portrait=document.querySelector(".gx-launch-goxy-render"),color=portrait?.getAttribute("data-goxy-color");
+ if(color&&window.colorTrace.at(-1)!==color)window.colorTrace.push(color);
+ if(g&&g===window.goxyOriginal){window.goxyTrace=true;window.goxyFlightColor=g.querySelector(".gx-launch-goxy-render")?.getAttribute("data-goxy-color");}if(document.querySelector(".gx-launch-goxy-impact"))window.goxyImpactTrace=true;
+ const root=document.querySelector("#gx-v2-handoff"),overlay=document.querySelector("#gx-release-overlay");
+ if(!window.flightTrace&&root?.classList.contains("is-launch-flight")&&overlay?.dataset.handoff==="flying"&&getComputedStyle(overlay.querySelector(".gx-launch-orbit img")).visibility==="hidden"){
+ window.flightTrace=true;const sample=()=>{if(root.hidden||!root.classList.contains("is-launch-flight"))return;const a=root.querySelector("img").getBoundingClientRect(),b=overlay.querySelector(".gx-launch-orbit img").getBoundingClientRect();window.flightSamples.push({size:Math.min(a.width,a.height),x:a.x+a.width/2,y:a.y+a.height/2,tx:b.x+b.width/2,ty:b.y+b.height/2,ts:Math.min(b.width,b.height)});requestAnimationFrame(sample);};requestAnimationFrame(sample);}
+ }).observe(document.body,{subtree:true,attributes:true,childList:true});
  window.GOXION_CORE={STORAGE:{CLIENT_TOKEN:"fixture-session"}};
  window.fixtureAccount=${JSON.stringify(account)};
- window.fixtureState={estado:${JSON.stringify(scenario==="pending"?"pendiente":scenario==="rejected"?"rechazado":"aceptado")},deferido:false,modalAbierto:false};
+ window.fixtureState={estado:${JSON.stringify(scenario==="late-legal"?"sin_activar":scenario==="pending"?"pendiente":scenario==="rejected"?"rechazado":"aceptado")},deferido:false,modalAbierto:false};
  window.fixtureAccess={restringido:${scenario==="restricted"},bloquea_operaciones:${scenario==="restricted"||scenario==="rejected"}};
  window.GOXION_LEGAL_V2={getQueueStatus:()=>window.fixtureState,getAccessState:()=>window.fixtureAccess};
  window.getCurrentClientKey=()=>window.fixtureAccount;
@@ -48,7 +59,7 @@ const fixture=(params)=>{
  else localStorage.removeItem("fixture-session");
  window.switchTab=name=>{window.routeCalled=name;document.querySelector("#view-dashboard").classList.add("active")};
  document.getElementById("behind").focus();
- </script><script src="${robot}"></script><script>window.GOXY_ROBOT.mount(document.getElementById("gxn-goxy-slot"))</script><script src="${script}"></script>${startup?'<script src="'+intro+'"></script><script>window.addEventListener("load",()=>{document.querySelector("#gx-v2-sync").hidden=true;window.dispatchEvent(new Event("goxion:v2-feed:rendered"))})</script>':""}</body></html>`;
+ </script><script src="${robot}"></script><script>window.GOXY_ROBOT.mount(document.getElementById("gxn-goxy-slot"))</script><script src="${script}"></script>${startup?'<script src="'+intro+'"></script><script>window.addEventListener("load",()=>{document.querySelector("#gx-v2-sync").hidden=true;window.dispatchEvent(new Event("goxion:v2-feed:rendered"));'+(scenario==='late-legal'?'setTimeout(()=>{window.fixtureState={estado:"aceptado",deferido:false,modalAbierto:false};window.dispatchEvent(new Event("goxion:legal-state"));},1250);':'')+'})</script>':""}</body></html>`;
 };
 const server=createServer(async(req,res)=>{
  const u=new URL(req.url,"http://localhost");
@@ -207,16 +218,27 @@ try{
    }
    assert.equal(await p.locator(".gx-launch-copy").evaluate(el=>getComputedStyle(el).animationName),"none");
    assert.equal(await p.locator(".gx-launch-motion").isVisible(),false);
+   for(let i=0;i<5;i++)await p.locator(".gx-launch-next").click();
+   await p.waitForTimeout(1700);
+   assert.equal(await p.locator(".gx-launch-goxy-render").getAttribute("data-goxy-color"),"#25887e","movimiento reducido sin demostración de color");
    assert.equal(obj.errors.length,0);await responsive.close();
    // Arranque real del espejo, limitado a cuenta piloto sintética: un solo logo en vuelo.
    const pilotContext=await browser.newContext({viewport:{width:390,height:844}});
-   const {page:pilotPage,errors:pilotErrors}=await openFixture(pilotContext,{edition:"pilot",account:"casone",startup:"1"});
+   const {page:pilotPage,errors:pilotErrors}=await openFixture(pilotContext,{edition:"pilot",account:"casone",startup:"1",scenario:"late-legal"});
    await waitOpen(pilotPage);
    await pilotPage.locator("#gx-v2-handoff").waitFor({state:"hidden",timeout:4000});
    assert.equal(await pilotPage.evaluate(()=>window.flightTrace),true,"acople del logo a la tarjeta");
+   const flightSamples=await pilotPage.evaluate(()=>window.flightSamples);
+   assert.ok(flightSamples.length>=5,"el viaje tiene fotogramas intermedios reales");
+   const first=flightSamples[0],last=flightSamples.at(-1);
+   assert.ok(last.size-first.size>45,"el logo crece desde carga hasta portada");
+   assert.ok(Math.hypot(first.x-last.x,first.y-last.y)>25,"el logo viaja, no sólo aumenta tamaño");
+   assert.ok(Math.hypot(last.x-last.tx,last.y-last.ty)<12&&Math.abs(last.size-last.ts)<12,"el destino coincide con el arte final");
    assert.equal(await pilotPage.locator(".gx-launch-orbit img").evaluate(el=>getComputedStyle(el).visibility),"visible");
    assert.equal(await pilotPage.locator("#gx-release-overlay").getAttribute("data-handoff"),null);
-   assert.ok((await pilotPage.locator(".gx-launch-orbit img").boundingBox()).width>=185,"logo con presencia");
+   const logoWidth=(await pilotPage.locator(".gx-launch-orbit img").boundingBox()).width;
+   assert.ok(logoWidth>=165&&logoWidth<=182,"logo proporcionado en móvil: "+logoWidth);
+   if(dir)await pilotPage.screenshot({path:resolve(dir,name+"-pilot-portada.png")});
    await pilotPage.locator(".gx-launch-next").click();
    assert.equal(await pilotPage.locator("#gx-release-overlay").getAttribute("data-accent"),"cyan");
    assert.ok((await pilotPage.locator(".gx-launch-pulso svg").boundingBox()).width>=150);
@@ -231,6 +253,27 @@ try{
    await pilotPage.locator(".gx-launch-goxy-render canvas").waitFor({state:"visible",timeout:4000});
    assert.equal(await pilotPage.locator(".gx-launch-goxy-render").getAttribute("data-goxy-color"),"#25887e");
    assert.equal(await pilotPage.locator("#gxn-goxy-slot").getAttribute("data-goxy-paused"),"true");
+   const portrait=pilotPage.locator(".gx-launch-goxy-render");
+   await pilotPage.waitForFunction(()=>document.querySelector(".gx-launch-goxy-render")?.getAttribute("data-goxy-color")!=="#25887e");
+   const pausedColor=await portrait.getAttribute("data-goxy-color");
+   assert.ok(paletteColors.includes(pausedColor));
+   await pilotPage.waitForTimeout(250);
+   if(dir)await pilotPage.screenshot({path:resolve(dir,name+"-pilot-color-1.png")});
+   await pilotPage.locator(".gx-launch-motion").click();
+   await pilotPage.waitForTimeout(2300);
+   assert.equal(await portrait.getAttribute("data-goxy-color"),pausedColor,"pausa también detiene el cambio de carcasa");
+   assert.equal(await pilotPage.locator(".gx-launch-progress").getAttribute("aria-valuenow"),"6","navegación manual");
+   await pilotPage.locator(".gx-launch-motion").click();
+   await pilotPage.waitForFunction(color=>document.querySelector(".gx-launch-goxy-render")?.getAttribute("data-goxy-color")!==color,pausedColor);
+   await pilotPage.waitForTimeout(250);
+   if(dir)await pilotPage.screenshot({path:resolve(dir,name+"-pilot-color-2.png")});
+   await pilotPage.waitForFunction(colors=>colors.every(c=>window.colorTrace.includes(c))&&document.querySelector(".gx-launch-goxy-render")?.getAttribute("data-goxy-color")==="#25887e",paletteColors,{timeout:12000});
+   await pilotPage.waitForTimeout(2350);
+   assert.equal(await portrait.getAttribute("data-goxy-color"),"#25887e","una sola demostración y vuelve a su color");
+   assert.equal(await pilotPage.locator("#gxn-goxy-slot").getAttribute("data-goxy-color"),"#25887e","no altera preferencia del avatar");
+   await pilotPage.locator(".gx-launch-back").click();
+   await pilotPage.locator(".gx-launch-next").click();
+   await pilotPage.waitForFunction(()=>document.querySelector(".gx-launch-goxy-render")?.getAttribute("data-goxy-color")!=="#25887e");
    await pilotPage.evaluate(()=>{window.goxyOriginal=document.querySelector(".gx-launch-goxy-portrait")});
    // Real renderer, same node flies; no clone and no stale animation.
    await pilotPage.locator(".gx-launch-next").click();
@@ -238,10 +281,12 @@ try{
    await pilotPage.locator(".gx-launch-goxy-flight").waitFor({state:"detached",timeout:3000});
    await pilotPage.locator(".gx-launch-goxy-impact").waitFor({state:"detached",timeout:3000});
    assert.equal(await pilotPage.evaluate(()=>window.goxyTrace&&window.goxyImpactTrace),true,"Goxy aterrizó en el avatar con onda");
+   assert.equal(await pilotPage.evaluate(()=>window.goxyFlightColor),"#25887e","Goxy recupera su color antes de volar");
+   assert.equal(await pilotPage.locator("#gxn-goxy-slot").getAttribute("data-goxy-color"),"#25887e");
    assert.equal(await pilotPage.locator("#gxn-goxy-slot").getAttribute("data-goxy-paused"),"false");
    assert.equal(await pilotPage.locator(".gx-launch-goxy-portrait").count(),0);
    assert.equal(await pilotPage.evaluate(()=>document.body.classList.contains("gx-launch-goxy-active")),false);
-   const pilotSeen="gx-release-seen:nov2026-mi-espacio-lanzamiento-pilot-v2:casone";
+   const pilotSeen="gx-release-seen:nov2026-mi-espacio-lanzamiento-pilot-v3:casone";
    assert.equal(await pilotPage.evaluate(k=>sessionStorage.getItem(k),pilotSeen),"1");
    assert.equal(await pilotPage.evaluate(()=>localStorage.getItem("gx-release-seen:nov2026-mi-espacio-lanzamiento-v1:casone")),null);
    await pilotPage.evaluate(()=>{localStorage.removeItem("fixture-session");window.dispatchEvent(new Event("goxion:client-logout"))});

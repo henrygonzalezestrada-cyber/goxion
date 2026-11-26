@@ -59,7 +59,7 @@ test("versión y cuenta vistas; X diferida de esta pestaña no consume versión"
 });
 
 test("piloto exclusivo para la clave exacta Casone; versión separada, términos y sesión",()=>{
- const pilotVersion="nov2026-mi-espacio-lanzamiento-pilot-v2";
+ const pilotVersion="nov2026-mi-espacio-lanzamiento-pilot-v3";
  const c=fixture({mode:"pilot",account:"casone",priorSeen:version});
  assert.equal(c.status(),"ready");assert.equal(c.version,pilotVersion);assert.equal(c.check(),1);
  for(const account of ["a","Casone","casone2",""]){

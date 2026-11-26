@@ -34,6 +34,22 @@
   if(target==='private')delayTimer=setTimeout(()=>{if(id===sequence&&!completed)wait.hidden=false},480);
   guardTimer=setTimeout(()=>{if(id===sequence){if(target==='private')completed=true;else publicCompleted=true;hide()}},6800);
  }
+ async function resolveLaunchDestination(release,id){
+  let status=release?.handoffStatus?.();
+  if(status!=='waiting')return status;
+  // The feed may finish before the real legal request. Keep the same splash
+  // in place for this eligible account; don't send the logo to the header
+  // after a single early event or a short fixed 480ms race.
+  const deadline=performance.now()+2400;
+  wait.hidden=false;
+  while(status==='waiting'&&id===sequence&&inSpace()&&!root.hidden&&performance.now()<deadline){
+   await new Promise(resolve=>setTimeout(resolve,100));
+   if(id!==sequence||!inSpace()||root.hidden)return 'skip';
+   status=release?.handoffStatus?.();
+  }
+  wait.hidden=true;
+  return status==='waiting'?'skip':status;
+ }
  async function finish(target='private'){
   const isPrivate=target==='private';
   if(isPrivate?completed:publicCompleted)return;
@@ -46,18 +62,21 @@
   clearTimeout(delayTimer);wait.hidden=true;
   document.body.classList.remove('no-scroll');
   const release=window.GOXION_RELEASE_202610;
-  if(isPrivate&&release?.handoffStatus?.()==='waiting'){
-   await new Promise(resolve=>{
-    let timer;const done=()=>{clearTimeout(timer);window.removeEventListener('goxion:legal-state',done);resolve()};
-    window.addEventListener('goxion:legal-state',done,{once:true});timer=setTimeout(done,480);
-   });
-   if(id!==sequence||!inSpace())return;
-  }
-  if(isPrivate&&release?.handoffStatus?.()==='ready'){
+  // Once data is rendered, bound the final handoff independently of loading.
+  clearTimeout(guardTimer);guardTimer=setTimeout(()=>{if(id===sequence)hide()},3700);
+  const status=isPrivate?await resolveLaunchDestination(release,id):'skip';
+  if(id!==sequence||root.hidden||isPrivate&&!inSpace())return;
+  if(status==='ready'){
    root.classList.add('is-launch-flight');
    claim=release.claimHandoff?.()||null;
    if(!claim)root.classList.remove('is-launch-flight');
-   else claim.signal.addEventListener('abort',()=>{if(id===sequence)hide()},{once:true});
+   else{
+    claim.signal.addEventListener('abort',()=>{if(id===sequence)hide()},{once:true});
+    // Give WebKit a paint/layout opportunity while the destination image is
+    // hidden and still motionless; the visible image remains the splash mark.
+    await new Promise(resolve=>requestAnimationFrame(resolve));
+    if(id!==sequence||claim?.signal.aborted||root.hidden||!inSpace())return;
+   }
   }
   const source=mark.getBoundingClientRect(),dest=(claim?.target||destination)?.getBoundingClientRect();
   if(!source.width||!source.height||!dest?.width||!dest.height){hide();return}
@@ -74,11 +93,12 @@
   Object.assign(mark.style,{position:'fixed',left:source.left+'px',top:source.top+'px',width:source.width+'px',height:source.height+'px',margin:'0',transformOrigin:'top left'});
   root.classList.add('is-flying');
   try{
-   flight=mark.animate([{transform:'translate3d(0,0,0) scale(1)',opacity:1},
-    {transform:'translate3d('+dx+'px,'+dy+'px,0) scale('+scale+')',opacity:1}],
-    {duration:620,easing:'cubic-bezier(.2,.8,.2,1)',fill:'forwards'});
+   const start={transform:'translate3d(0,0,0) scale(1)',opacity:1},
+    end={transform:'translate3d('+dx+'px,'+dy+'px,0) scale('+scale+')',opacity:1};
+   flight=mark.animate(claim?[{...start,offset:0},{...start,offset:.12,easing:'cubic-bezier(.22,.8,.24,1)'},{...end,offset:1}]:[start,end],
+    {duration:claim?840:620,easing:claim?'linear':'cubic-bezier(.2,.8,.2,1)',fill:'forwards'});
    if(claim){
-    await Promise.race([flight.finished,new Promise(resolve=>{flightGuard=setTimeout(resolve,1000)})]);
+    await Promise.race([flight.finished,new Promise(resolve=>{flightGuard=setTimeout(resolve,1150)})]);
     if(id!==sequence)return;
     claim.complete();hide();return;
    }

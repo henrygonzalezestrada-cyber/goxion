@@ -146,7 +146,7 @@ body.gx-release-v2-body-lock{overflow:hidden!important}
  height:clamp(150px,31vh,228px);color:var(--gx-launch-accent,#bca9ff);pointer-events:none;
 }
 .gx-launch-art>div{position:relative;z-index:1;display:grid;place-items:center;min-width:0}
-.gx-launch-orbit{width:clamp(145px,53vw,212px);height:clamp(145px,53vw,212px)}
+.gx-launch-orbit{width:clamp(132px,45vw,182px);height:clamp(132px,45vw,182px)}
 .gx-launch-orbit img{display:block;width:100%;height:100%;object-fit:contain;animation:gx-launch-float 5s ease-in-out infinite}
 .gx-launch-pulso{color:var(--gx-launch-accent,#7ee1e7)}
 .gx-launch-pulso svg{width:clamp(126px,44vw,174px);height:clamp(126px,44vw,174px);display:block;overflow:visible}
@@ -230,7 +230,7 @@ body.gx-launch-goxy-active #gxn-avatar :is(.gxn-goxy-real,.gxn-goxy-fallback,.gx
  .gx-launch-content{gap:10px;padding-block:5px 12px}
  .gx-launch-art{height:clamp(105px,28vh,142px)}
  .gx-launch-pulso svg{width:clamp(92px,24vh,136px);height:clamp(92px,24vh,136px)}
- .gx-launch-orbit{width:clamp(98px,26vh,140px);height:clamp(98px,26vh,140px)}
+ .gx-launch-orbit{width:clamp(92px,24vh,130px);height:clamp(92px,24vh,130px)}
  .gx-launch-benefit-icons{font-size:clamp(39px,12.5vw,57px)}
  .gx-launch-goxy-portrait{width:120px;height:120px;--gx-goxy-scale:.44}
  .gx-launch-footer{padding-bottom:13px}
