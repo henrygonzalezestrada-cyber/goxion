@@ -79,12 +79,12 @@
    }
   }
   const source=mark.getBoundingClientRect(),dest=(claim?.target||destination)?.getBoundingClientRect();
-  if(!source.width||!source.height||!dest?.width||!dest.height){hide();return}
+  if(!source.width||!source.height||!dest?.width||!dest.height){claim?.fallback();hide();return}
   const size=34;let scale=size/Math.max(source.width,source.height);
   let dy=dest.top+(dest.height-source.height*scale)/2-source.top;
   let dx=dest.left+3-source.left;
   if(claim){
-   if(!mark.naturalWidth||!mark.naturalHeight||mark.src!==claim.target.src){claim.complete();hide();return}
+   if(!mark.naturalWidth||!mark.naturalHeight||mark.src!==claim.target.src){claim.fallback();hide();return}
    const aspect=mark.naturalWidth/mark.naturalHeight;
    const fit=r=>{const w=Math.min(r.width,r.height*aspect),h=w/aspect;return {w,x:(r.width-w)/2,y:(r.height-h)/2}};
    const a=fit(source),b=fit(dest);scale=b.w/a.w;
@@ -107,7 +107,7 @@
    document.body.classList.remove('gx-v2-handoff-active');
    fade=mark.animate([{opacity:1},{opacity:0}],{duration:175,easing:'ease-out',fill:'forwards'});
    await fade.finished;
-  }catch(_){}
+  }catch(_){if(id===sequence)claim?.fallback()}
   if(id===sequence)hide();
  }
  // Solo en el espejo: la finalización oficial del arranque libera el mismo elemento.

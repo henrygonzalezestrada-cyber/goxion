@@ -56,4 +56,4 @@ body.gx-v2-client-session .gx-client-notif-close svg path{
 
 /* Sólo durante el acople a la portada piloto: el mismo logo sobre la capa. */
 #gx-v2-handoff.is-launch-flight{z-index:10920}
-#gx-v2-handoff.is-launch-flight.is-flying::before{transition-duration:.28s}
+#gx-v2-handoff.is-launch-flight.is-flying::before{transition-duration:.62s}

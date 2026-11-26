@@ -40,17 +40,21 @@ const fixture=(params)=>{
  <header id="gx-v2-shared-header"><img class="gxn-wordmark" width="34" height="34" src="/Logo individual.png"><span id="gxn-avatar"><span class="gxai-avatar gxn-goxy-real"><span id="gxn-goxy-slot" data-goxy-color="#25887e" data-goxy-paused="false"></span></span></span><div id="gxn-goxy-colors" hidden>${paletteButtons.join("")}</div></header>
  ${startup?'<div id="gx-v2-handoff" hidden><div class="gx-v2-handoff-center"><img class="gx-v2-handoff-mark" src="/Logo individual.png"><div class="gx-v2-handoff-wait" hidden></div></div></div>':""}
  <script>
- window.flightTrace=false;window.flightSamples=[];window.goxyTrace=false;window.goxyImpactTrace=false;window.goxyFlightColor=null;window.colorTrace=[];
+ window.entryTrace=[];window.localSamples=[];window.flightTrace=false;window.flightSamples=[];window.goxyTrace=false;window.goxyImpactTrace=false;window.goxyFlightColor=null;window.colorTrace=[];
  new MutationObserver(()=>{const g=document.querySelector(".gx-launch-goxy-flight .gx-launch-goxy-portrait"),portrait=document.querySelector(".gx-launch-goxy-render"),color=portrait?.getAttribute("data-goxy-color");
  if(color&&window.colorTrace.at(-1)!==color)window.colorTrace.push(color);
  if(g&&g===window.goxyOriginal){window.goxyTrace=true;window.goxyFlightColor=g.querySelector(".gx-launch-goxy-render")?.getAttribute("data-goxy-color");}if(document.querySelector(".gx-launch-goxy-impact"))window.goxyImpactTrace=true;
  const root=document.querySelector("#gx-v2-handoff"),overlay=document.querySelector("#gx-release-overlay");
+ if(overlay?.dataset.entry&&window.entryTrace.at(-1)!==overlay.dataset.entry)window.entryTrace.push(overlay.dataset.entry);
+ if(overlay?.dataset.entry==="local"&&window.localSamples.length===0){
+  const sample=()=>{if(overlay.dataset.entry!=="local")return;const r=overlay.querySelector(".gx-launch-orbit img").getBoundingClientRect();window.localSamples.push({size:r.width,x:r.x+r.width/2,y:r.y+r.height/2,opacity:parseFloat(getComputedStyle(overlay.querySelector(".gx-launch-copy")).opacity)});requestAnimationFrame(sample);};sample();
+ }
  if(!window.flightTrace&&root?.classList.contains("is-launch-flight")&&overlay?.dataset.handoff==="flying"&&getComputedStyle(overlay.querySelector(".gx-launch-orbit img")).visibility==="hidden"){
  window.flightTrace=true;const sample=()=>{if(root.hidden||!root.classList.contains("is-launch-flight"))return;const a=root.querySelector("img").getBoundingClientRect(),b=overlay.querySelector(".gx-launch-orbit img").getBoundingClientRect();window.flightSamples.push({size:Math.min(a.width,a.height),x:a.x+a.width/2,y:a.y+a.height/2,tx:b.x+b.width/2,ty:b.y+b.height/2,ts:Math.min(b.width,b.height)});requestAnimationFrame(sample);};requestAnimationFrame(sample);}
  }).observe(document.body,{subtree:true,attributes:true,childList:true});
  window.GOXION_CORE={STORAGE:{CLIENT_TOKEN:"fixture-session"}};
  window.fixtureAccount=${JSON.stringify(account)};
- window.fixtureState={estado:${JSON.stringify(scenario==="late-legal"?"sin_activar":scenario==="pending"?"pendiente":scenario==="rejected"?"rechazado":"aceptado")},deferido:false,modalAbierto:false};
+ window.fixtureState={estado:${JSON.stringify(["late-legal","very-late-legal"].includes(scenario)?"sin_activar":["pending","deferred"].includes(scenario)?"pendiente":scenario==="rejected"?"rechazado":"aceptado")},deferido:${scenario==="deferred"},modalAbierto:false};
  window.fixtureAccess={restringido:${scenario==="restricted"},bloquea_operaciones:${scenario==="restricted"||scenario==="rejected"}};
  window.GOXION_LEGAL_V2={getQueueStatus:()=>window.fixtureState,getAccessState:()=>window.fixtureAccess};
  window.getCurrentClientKey=()=>window.fixtureAccount;
@@ -59,7 +63,8 @@ const fixture=(params)=>{
  else localStorage.removeItem("fixture-session");
  window.switchTab=name=>{window.routeCalled=name;document.querySelector("#view-dashboard").classList.add("active")};
  document.getElementById("behind").focus();
- </script><script src="${robot}"></script><script>window.GOXY_ROBOT.mount(document.getElementById("gxn-goxy-slot"))</script><script src="${script}"></script>${startup?'<script src="'+intro+'"></script><script>window.addEventListener("load",()=>{document.querySelector("#gx-v2-sync").hidden=true;window.dispatchEvent(new Event("goxion:v2-feed:rendered"));'+(scenario==='late-legal'?'setTimeout(()=>{window.fixtureState={estado:"aceptado",deferido:false,modalAbierto:false};window.dispatchEvent(new Event("goxion:legal-state"));},1250);':'')+'})</script>':""}</body></html>`;
+ if(${scenario==="busy"}){const n=document.createElement("div");n.className="gx-auth-sheet show";document.body.append(n);window.addEventListener("load",()=>setTimeout(()=>n.remove(),850));}
+ </script><script src="${robot}"></script><script>window.GOXY_ROBOT.mount(document.getElementById("gxn-goxy-slot"))</script><script src="${script}"></script>${startup?'<script src="'+intro+'"></script><script>window.addEventListener("load",()=>{document.querySelector("#gx-v2-sync").hidden=true;window.dispatchEvent(new Event("goxion:v2-feed:rendered"));'+(['late-legal','very-late-legal'].includes(scenario)?'setTimeout(()=>{window.fixtureState={estado:"aceptado",deferido:false,modalAbierto:false};window.dispatchEvent(new Event("goxion:legal-state"));},'+(scenario==='late-legal'?1250:3500)+');':'')+'})</script>':""}</body></html>`;
 };
 const server=createServer(async(req,res)=>{
  const u=new URL(req.url,"http://localhost");
@@ -114,7 +119,8 @@ function rgbAt(png,x,y){
  return [...previous.subarray(x*bpp,x*bpp+3)];
 }
 async function captureCover(page,name){
- await page.waitForTimeout(600);
+ await page.locator("#gx-release-overlay[data-entry]").waitFor({state:"detached",timeout:2000});
+ await page.waitForTimeout(200);
  const rect=await page.locator(".gx-launch-card").boundingBox();
  assert.ok(rect);
  const screenshot=await page.screenshot(dir?{path:resolve(dir,name+".png")}:{});
@@ -236,6 +242,8 @@ try{
    assert.ok(Math.hypot(last.x-last.tx,last.y-last.ty)<12&&Math.abs(last.size-last.ts)<12,"el destino coincide con el arte final");
    assert.equal(await pilotPage.locator(".gx-launch-orbit img").evaluate(el=>getComputedStyle(el).visibility),"visible");
    assert.equal(await pilotPage.locator("#gx-release-overlay").getAttribute("data-handoff"),null);
+   assert.deepEqual(await pilotPage.evaluate(()=>window.entryTrace),["handoff"],"una única entrada especial");
+   assert.equal(await pilotPage.locator("#gx-release-overlay").getAttribute("data-entry"),null);
    const logoWidth=(await pilotPage.locator(".gx-launch-orbit img").boundingBox()).width;
    assert.ok(logoWidth>=165&&logoWidth<=182,"logo proporcionado en móvil: "+logoWidth);
    if(dir)await pilotPage.screenshot({path:resolve(dir,name+"-pilot-portada.png")});
@@ -254,9 +262,11 @@ try{
    assert.equal(await pilotPage.locator(".gx-launch-goxy-render").getAttribute("data-goxy-color"),"#25887e");
    assert.equal(await pilotPage.locator("#gxn-goxy-slot").getAttribute("data-goxy-paused"),"true");
    const portrait=pilotPage.locator(".gx-launch-goxy-render");
-   await pilotPage.waitForFunction(()=>document.querySelector(".gx-launch-goxy-render")?.getAttribute("data-goxy-color")!=="#25887e");
+   await pilotPage.waitForFunction(colors=>colors.includes(document.querySelector(".gx-launch-goxy-render")?.getAttribute("data-goxy-color")),paletteColors);
    const pausedColor=await portrait.getAttribute("data-goxy-color");
    assert.ok(paletteColors.includes(pausedColor));
+   const trace=await pilotPage.evaluate(()=>window.colorTrace);
+   assert.ok(trace.filter(c=>c!=="#25887e"&&!paletteColors.includes(c)).length>=5,"mezcla gradual del color real, no saltos discretos");
    await pilotPage.waitForTimeout(250);
    if(dir)await pilotPage.screenshot({path:resolve(dir,name+"-pilot-color-1.png")});
    await pilotPage.locator(".gx-launch-motion").click();
@@ -264,16 +274,16 @@ try{
    assert.equal(await portrait.getAttribute("data-goxy-color"),pausedColor,"pausa también detiene el cambio de carcasa");
    assert.equal(await pilotPage.locator(".gx-launch-progress").getAttribute("aria-valuenow"),"6","navegación manual");
    await pilotPage.locator(".gx-launch-motion").click();
-   await pilotPage.waitForFunction(color=>document.querySelector(".gx-launch-goxy-render")?.getAttribute("data-goxy-color")!==color,pausedColor);
+   await pilotPage.waitForFunction(({color,colors})=>{const c=document.querySelector(".gx-launch-goxy-render")?.getAttribute("data-goxy-color");return c!==color&&colors.includes(c);},{color:pausedColor,colors:paletteColors});
    await pilotPage.waitForTimeout(250);
    if(dir)await pilotPage.screenshot({path:resolve(dir,name+"-pilot-color-2.png")});
-   await pilotPage.waitForFunction(colors=>colors.every(c=>window.colorTrace.includes(c))&&document.querySelector(".gx-launch-goxy-render")?.getAttribute("data-goxy-color")==="#25887e",paletteColors,{timeout:12000});
+   await pilotPage.waitForFunction(colors=>colors.every(c=>window.colorTrace.includes(c))&&document.querySelector(".gx-launch-goxy-render")?.getAttribute("data-goxy-color")==="#25887e",paletteColors,{timeout:16000});
    await pilotPage.waitForTimeout(2350);
    assert.equal(await portrait.getAttribute("data-goxy-color"),"#25887e","una sola demostración y vuelve a su color");
    assert.equal(await pilotPage.locator("#gxn-goxy-slot").getAttribute("data-goxy-color"),"#25887e","no altera preferencia del avatar");
    await pilotPage.locator(".gx-launch-back").click();
    await pilotPage.locator(".gx-launch-next").click();
-   await pilotPage.waitForFunction(()=>document.querySelector(".gx-launch-goxy-render")?.getAttribute("data-goxy-color")!=="#25887e");
+   await pilotPage.waitForFunction(colors=>colors.includes(document.querySelector(".gx-launch-goxy-render")?.getAttribute("data-goxy-color")),paletteColors);
    await pilotPage.evaluate(()=>{window.goxyOriginal=document.querySelector(".gx-launch-goxy-portrait")});
    // Real renderer, same node flies; no clone and no stale animation.
    await pilotPage.locator(".gx-launch-next").click();
@@ -281,12 +291,12 @@ try{
    await pilotPage.locator(".gx-launch-goxy-flight").waitFor({state:"detached",timeout:3000});
    await pilotPage.locator(".gx-launch-goxy-impact").waitFor({state:"detached",timeout:3000});
    assert.equal(await pilotPage.evaluate(()=>window.goxyTrace&&window.goxyImpactTrace),true,"Goxy aterrizó en el avatar con onda");
-   assert.equal(await pilotPage.evaluate(()=>window.goxyFlightColor),"#25887e","Goxy recupera su color antes de volar");
+   assert.equal(await pilotPage.evaluate(()=>window.goxyFlightColor),"#25887e","Goxy recupera su color al aterrizar");
    assert.equal(await pilotPage.locator("#gxn-goxy-slot").getAttribute("data-goxy-color"),"#25887e");
    assert.equal(await pilotPage.locator("#gxn-goxy-slot").getAttribute("data-goxy-paused"),"false");
    assert.equal(await pilotPage.locator(".gx-launch-goxy-portrait").count(),0);
    assert.equal(await pilotPage.evaluate(()=>document.body.classList.contains("gx-launch-goxy-active")),false);
-   const pilotSeen="gx-release-seen:nov2026-mi-espacio-lanzamiento-pilot-v3:casone";
+   const pilotSeen="gx-release-seen:nov2026-mi-espacio-lanzamiento-pilot-v4:casone";
    assert.equal(await pilotPage.evaluate(k=>sessionStorage.getItem(k),pilotSeen),"1");
    assert.equal(await pilotPage.evaluate(()=>localStorage.getItem("gx-release-seen:nov2026-mi-espacio-lanzamiento-v1:casone")),null);
    await pilotPage.evaluate(()=>{localStorage.removeItem("fixture-session");window.dispatchEvent(new Event("goxion:client-logout"))});
@@ -303,6 +313,31 @@ try{
    await pendingPilot.locator("#gx-v2-handoff").waitFor({state:"hidden",timeout:4000});
    await notOpen(pendingPilot);assert.equal(await pendingPilot.evaluate(()=>window.flightTrace),false);
    await pendingContext.close();
+   // Regresión de la grabación: aceptación diferida o capa transitoria no
+   // separan la animación de inicio de la apertura elegible.
+   for(const scenario of ["deferred","busy"]){
+    const c=await browser.newContext({viewport:{width:390,height:844}});
+    const {page:q,errors}=await openFixture(c,{edition:"pilot",account:"casone",scenario,startup:"1"});
+    await waitOpen(q);await q.locator("#gx-v2-handoff").waitFor({state:"hidden",timeout:4000});
+    assert.equal(await q.evaluate(()=>window.flightTrace),true,scenario);
+    assert.deepEqual(await q.evaluate(()=>window.entryTrace),["handoff"]);
+    await captureCover(q,name+"-pilot-"+scenario);
+    assert.deepEqual(errors,[]);await c.close();
+   }
+   // Si legal tarda más que la espera segura, el encabezado conserva prioridad;
+   // al abrir después, la misma portada tiene su entrada editorial una sola vez.
+   const lateContext=await browser.newContext({viewport:{width:390,height:844}});
+   const {page:late,errors:lateErrors}=await openFixture(lateContext,{edition:"pilot",account:"casone",scenario:"very-late-legal",startup:"1"});
+   await late.locator("#gx-v2-handoff").waitFor({state:"hidden",timeout:4000});
+   assert.equal(await late.evaluate(()=>window.flightTrace),false);
+   await late.locator("#gx-release-overlay[data-entry=local]").waitFor({state:"visible",timeout:6000});
+   await captureCover(late,name+"-pilot-apertura-tardia");
+   const local=await late.evaluate(()=>window.localSamples);
+   assert.ok(local.length>=5&&local.at(-1).size-local[0].size>40&&Math.abs(local.at(-1).y-local[0].y)>25,"entrada tardía visible con fotogramas reales");
+   assert.ok(local.some(f=>f.opacity<.65)&&local.at(-1).opacity>.95,"texto revelado gradualmente");
+   await late.locator(".gx-launch-next").click();await late.locator(".gx-launch-back").click();
+   assert.equal(await late.locator("#gx-release-overlay").getAttribute("data-entry"),null,"volver a portada no repite entrada");
+   assert.deepEqual(lateErrors,[]);await lateContext.close();
    console.log(name+": PASS activación deshabilitada, sesión/cola, seis capítulos y retroceso, foco, X/reintento, visto por cuenta, logout, reduced-motion, 8 tamaños");
   }finally{await browser.close();}
  }

@@ -7,7 +7,7 @@
  // La edición nueva es opt-in por configuración del HTML, no por URL ni storage.
  // La rama candidata la conserva apagada hasta autorización de lanzamiento.
  const mode=document.documentElement.getAttribute("data-gx-release-launch");
- const PILOT="casone",PILOT_VERSION="nov2026-mi-espacio-lanzamiento-pilot-v3";
+ const PILOT="casone",PILOT_VERSION="nov2026-mi-espacio-lanzamiento-pilot-v4";
  const GENERAL_VERSION="nov2026-mi-espacio-lanzamiento-v1",LEGACY_VERSION="nov2026-novedades-apiladas-v2-todos";
  let launch=mode==="enabled",pilot=false,VERSION=launch?GENERAL_VERSION:LEGACY_VERSION;
  const PREFIX="gx-release-seen:";
@@ -69,7 +69,14 @@
  let overlay=null,scroll=null,activeKey="",timer=0,attempts=0,open=false,focusSource=null,keyboard=false;
  let frame=0,lastTick=0,autoDelay=0,autoPosition=0,loopHeight=0,manual=false,scrollY=0;
  let handoff=null,motionPaused=false,goxyPortrait=null,goxySlot=null,goxyAvatar=null,goxyAvatarPaused=null,goxyFlight=null,goxyImpact=null;
- let colorTimer=0,colorOptions=[],colorStep=0,colorComplete=true;
+ let colorTimer=0,colorOptions=[],colorStep=0,colorComplete=true,colorFrame=0,colorTween=null;
+ let entryTimer=0,entryAnimation=null;
+ // Una sola decisión para el vuelo inicial, la apertura normal y la salida.
+ function launchGate(state,access){
+   if(state.modalAbierto||access?.restringido||access?.bloquea_operaciones)return "skip";
+   if(state.estado==="sin_activar")return "waiting";
+   return state.estado==="aceptado"||state.estado==="pendiente"&&state.deferido?"ready":"skip";
+ }
  function selectEdition(k){
    if(goxyFlight&&goxyFlight.account!==k)stopGoxyFlight(false);
    if(open&&activeKey!==k)dismiss(false);
@@ -178,6 +185,7 @@
    if(!overlay||!open)return;
    const closingKey=activeKey;
    const interrupted=handoff;handoff=null;
+   if(launch)finishEntry();
    stopAuto(true);open=false;overlay.hidden=true;
    overlay.setAttribute("aria-hidden","true");
    document.body.classList.remove("gx-release-v2-body-lock");
@@ -217,21 +225,58 @@
     if(color)goxySlot.setAttribute("data-goxy-color",color);
     else goxySlot.removeAttribute("data-goxy-color");
   }
-  function stopColorPreview(restore=false){
+  const defaultShell="#3552b1";
+  const shellHex=color=>/^#[0-9a-f]{6}$/i.test(color||"")?color.toLowerCase():defaultShell;
+  const mixShell=(a,b,t)=>{
+    const mix=(offset)=>Math.round(parseInt(a.slice(offset,offset+2),16)*(1-t)+parseInt(b.slice(offset,offset+2),16)*t).toString(16).padStart(2,"0");
+    return "#"+mix(1)+mix(3)+mix(5);
+  };
+  function suspendColorPreview(){
     clearTimeout(colorTimer);colorTimer=0;
+    cancelAnimationFrame(colorFrame);colorFrame=0;
+    if(colorTween)colorTween.last=0;
+  }
+  function stopColorPreview(restore=false){
+    suspendColorPreview();colorTween=null;
     if(restore){colorComplete=true;paintGoxyColor(avatarColor());}
   }
+  function advanceColor(time){
+    colorFrame=0;
+    const t=colorTween;
+    if(!t||noMotion()||!goxyPortrait?.isConnected)return;
+    if(t.last)t.elapsed+=Math.max(0,time-t.last);
+    t.last=time;
+    const progress=Math.min(t.elapsed/t.duration,1);
+    // Ease in/out, 30fps maximum; update only the actual shell material,
+    // never filter the face, create a second renderer, or write a preference.
+    if(progress===1||time-t.painted>=32){
+      t.painted=time;
+      const value=progress===1?t.target:mixShell(t.from,shellHex(t.target),progress*progress*(3-2*progress));
+      if(goxySlot?.getAttribute("data-goxy-color")!==value)paintGoxyColor(value);
+    }
+    if(progress<1){colorFrame=requestAnimationFrame(advanceColor);return;}
+    colorTween=null;
+    if(!t.flight)scheduleColorPreview();
+  }
+  function tweenColor(target,duration,flight=false){
+    colorTween={from:shellHex(goxySlot?.getAttribute("data-goxy-color")),target,duration,elapsed:0,last:0,painted:0,flight};
+    colorFrame=requestAnimationFrame(advanceColor);
+  }
   function scheduleColorPreview(){
-    stopColorPreview();
+    suspendColorPreview();
     if(reducedMotion()){stopColorPreview(true);return;}
-    if(noMotion()||colorComplete||goxyFlight||!goxyPortrait?.isConnected)return;
+    if(noMotion()||goxyFlight||!goxyPortrait?.isConnected)return;
+    if(colorTween){colorFrame=requestAnimationFrame(advanceColor);return;}
+    if(colorComplete)return;
     colorTimer=setTimeout(()=>{
       colorTimer=0;
       if(noMotion()||goxyFlight||!goxyPortrait?.isConnected)return;
-      if(colorStep>=colorOptions.length){stopColorPreview(true);return;}
-      paintGoxyColor(colorOptions[colorStep++]);
-      scheduleColorPreview();
-    },colorStep===0?1450:2050);
+      if(colorStep>=colorOptions.length){
+        // Return at the same calm pace; no abrupt reset after the preview.
+        colorComplete=true;tweenColor(avatarColor(),760);return;
+      }
+      tweenColor(colorOptions[colorStep++],760);
+    },colorStep===0?1450:1350);
   }
  function syncGoxyMotion(){
    if(goxySlot)goxySlot.setAttribute("data-goxy-paused",String(noMotion()||!goxyPortrait?.isConnected));
@@ -273,7 +318,7 @@
     const color=avatarColor();paintGoxyColor(color);
     colorOptions=[...new Set([...document.querySelectorAll("#gxn-goxy-colors [data-goxy-color-choice]")]
       .map(button=>button.style.getPropertyValue("--swatch").trim().toLowerCase())
-      .filter(value=>/^#[0-9a-f]{6}$/.test(value)&&value!==color?.toLowerCase()))];
+      .filter(value=>/^#[0-9a-f]{6}$/.test(value)&&value!==shellHex(color)))];
     colorStep=0;colorComplete=colorOptions.length===0;
    document.body.classList.add("gx-launch-goxy-active");
    syncGoxyMotion();
@@ -307,8 +352,8 @@
    if(!avatar||avatar.querySelector(".gxn-avatar-photo:not([hidden])")||!avatar.getClientRects().length||typeof goxyPortrait.animate!=="function")return false;
    const a=goxyPortrait.getBoundingClientRect(),b=avatar.getBoundingClientRect();
    if(!a.width||!a.height||!b.width||!b.height||b.top<0||b.bottom>innerHeight||b.left<0||b.right>innerWidth)return false;
-    // Bring the portrait back to the customer's chosen color before it leaves the card.
-    stopColorPreview(true);
+    // Smoothly recover the selected shell during the first part of the flight.
+    stopColorPreview();
    clearImpact();
    const shell=create("div","gx-launch-goxy-flight");
    shell.setAttribute("aria-hidden","true");
@@ -319,6 +364,7 @@
      scale=Math.min(b.width/a.width,b.height/a.height);
    const t=(x,y,z)=>"translate3d("+x+"px,"+y+"px,0) scale("+z+")";
    const f={shell,avatar,account:activeKey,anim:null,timer:0};goxyFlight=f;
+   colorComplete=true;tweenColor(avatarColor(),320,true);
    try{
      f.anim=shell.animate([
        {transform:t(0,0,1),offset:0,easing:"cubic-bezier(.4,0,.8,.5)"},
@@ -377,7 +423,7 @@
    const current=key();
    if(!current||current!==activeKey){dismiss(false);return;}
    const state=queue(),access=window.GOXION_LEGAL_V2?.getAccessState?.();
-   if(!["aceptado","pendiente"].includes(state.estado)||state.modalAbierto||(state.estado==="pendiente"&&!state.deferido)||access?.restringido||access?.bloquea_operaciones){dismiss(false);return;}
+   if(launchGate(state,access)!=="ready"){dismiss(false);return;}
    exitLaunch(true);
    if(!$("#view-dashboard")?.classList.contains("active"))window.switchTab?.("inicio");
  }
@@ -393,7 +439,7 @@
      '<span class="gx-launch-status" role="status"></span>',
      '<footer class="gx-launch-footer"><button type="button" class="gx-launch-back">Atrás</button><button type="button" class="gx-launch-next">Comenzar</button></footer></section>'
    ].join("");
-   const render=(i,direction)=>{showChapter(i,direction);$(".gx-launch-progress",overlay).setAttribute("aria-valuenow",String(chapterIndex+1));};
+   const render=(i,direction)=>{if(i!==0&&overlay.dataset.entry){const pending=handoff;handoff=null;finishEntry();pending?.abort();}showChapter(i,direction);$(".gx-launch-progress",overlay).setAttribute("aria-valuenow",String(chapterIndex+1));};
    const next=()=>{if(chapterIndex===chapters.length-1)finishLaunch();else render(chapterIndex+1,1);};
    const back=()=>{if(chapterIndex>0)render(chapterIndex-1,-1);};
    overlay.addEventListener("click",e=>{
@@ -468,17 +514,43 @@
    });
    return overlay;
  }
+ // No transformar la caja del diálogo: WebKit debe mantener su geometría y
+ // objetivos táctiles. Sólo se revela la superficie; el logo real se acopla.
+ function finishEntry(){
+   clearTimeout(entryTimer);entryTimer=0;
+   try{entryAnimation?.cancel();}catch(_){}entryAnimation=null;
+   if(overlay){delete overlay.dataset.entry;delete overlay.dataset.handoff;overlay.dataset.docked="true";}
+ }
+ function localEntry(){
+   if(reducedMotion()||document.hidden){finishEntry();return;}
+   const logo=$(".gx-launch-orbit img",overlay);
+   if(!logo||typeof logo.animate!=="function"){finishEntry();return;}
+   const rect=logo.getBoundingClientRect();
+   if(!rect.width||!rect.height){finishEntry();return;}
+   const x=innerWidth/2-rect.left-rect.width/2,y=innerHeight/2-rect.top-rect.height/2;
+   const scale=Math.min(110/rect.width,1);
+   overlay.dataset.entry="local";
+   try{
+     entryAnimation=logo.animate([
+       {transform:"translate3d("+x+"px,"+y+"px,0) scale("+scale+")",opacity:.85},
+       {transform:"translate3d(0,0,0) scale(1)",opacity:1}
+     ],{duration:840,easing:"cubic-bezier(.24,.75,.24,1)",fill:"both"});
+     entryTimer=setTimeout(finishEntry,1050);
+     entryAnimation.finished.then(finishEntry,()=>{});
+   }catch(_){finishEntry();}
+ }
  function present(claim=false){
    const k=key(),state=queue();
    selectEdition(k);
    const access=launch?window.GOXION_LEGAL_V2?.getAccessState?.():null;
-   if(!eligible(k)||open||modalBusy(claim)||state.estado==="sin_activar"||
-      (launch&&(!["aceptado","pendiente"].includes(state.estado)||access?.restringido||access?.bloquea_operaciones))||
-      state.estado==="rechazado"||state.modalAbierto||
+   if(!eligible(k)||open||modalBusy(claim))return false;
+   if(launch?launchGate(state,access)!=="ready":
+      state.estado==="sin_activar"||state.estado==="rechazado"||state.modalAbierto||
       (state.estado==="pendiente"&&!state.deferido))return false;
    mount();
    if(open)return false;
-   if(claim)overlay.dataset.handoff="flying";
+   if(claim){overlay.dataset.handoff="flying";overlay.dataset.entry="handoff";}
+   else if(launch&&!reducedMotion())overlay.dataset.entry="preparing";
    activeKey=k;focusSource=document.activeElement;
    scrollY=Number(window.scrollY)||0;
    if(!launch){manual=false;stopAuto(true);scroll.scrollTop=0;}
@@ -487,6 +559,7 @@
    if(launch)holdBackground();
    (launch?$(".gx-launch-card",overlay):overlay).focus({preventScroll:true});
    if(!launch)scheduleAuto();
+   else if(!claim)localEntry();
    return true;
  }
  function schedule(delay=450){
@@ -505,10 +578,12 @@
  }
  function handoffStatus(){
    const k=key();selectEdition(k);
-   if(!launch||!eligible(k)||open||modalBusy(true))return "skip";
-   const state=queue(),access=window.GOXION_LEGAL_V2?.getAccessState?.();
-   if(state.modalAbierto||access?.restringido||access?.bloquea_operaciones)return "skip";
-   return state.estado==="aceptado"?"ready":state.estado==="sin_activar"?"waiting":"skip";
+   if(!launch||!eligible(k)||open||document.hidden)return "skip";
+   const state=queue(),access=window.GOXION_LEGAL_V2?.getAccessState?.(),gate=launchGate(state,access);
+   if(gate!=="ready")return gate;
+   // Legal conserva prioridad. Una capa transitoria de login/notificación
+   // no debe decidir definitivamente el destino antes de que se cierre.
+   return modalBusy(true)?"waiting":"ready";
  }
  function claimHandoff(){
    const root=$("#gx-v2-handoff");
@@ -518,10 +593,14 @@
    const complete=()=>{
      if(handoff!==controller)return;
      handoff=null;
-     if(overlay){overlay.dataset.docked="true";delete overlay.dataset.handoff;}
+     finishEntry();
    };
    if(!target){complete();return null;}
-   return {target,signal:controller.signal,complete,cancel:complete};
+   const fallback=()=>{
+     if(handoff!==controller)return;
+     handoff=null;delete overlay.dataset.handoff;overlay.dataset.entry="preparing";localEntry();
+   };
+   return {target,signal:controller.signal,complete,cancel:complete,fallback};
  }
  function logout(resetPilot=false){
    clearTimeout(timer);timer=0;attempts=0;
@@ -562,14 +641,14 @@
    if(!document.hidden&&!open)schedule(700);
  });
  document.addEventListener("visibilitychange",()=>{
-   if(document.hidden){stopGoxyFlight(false);updateMotion();cancelAnimationFrame(frame);frame=0;lastTick=0;return;}
+   if(document.hidden){if(overlay?.dataset.entry){const pending=handoff;handoff=null;finishEntry();pending?.abort();}stopGoxyFlight(false);updateMotion();cancelAnimationFrame(frame);frame=0;lastTick=0;return;}
    updateMotion();
    if(open&&!manual&&!launch)scheduleAuto();
    else schedule(700);
  });
  window.addEventListener("resize",()=>stopGoxyFlight(false));
  const motionPreference=window.matchMedia?.("(prefers-reduced-motion: reduce)");
- motionPreference?.addEventListener?.("change",()=>{stopGoxyFlight(false);updateMotion();});
+ motionPreference?.addEventListener?.("change",()=>{if(reducedMotion()&&overlay?.dataset.entry){const pending=handoff;handoff=null;finishEntry();pending?.abort();}stopGoxyFlight(false);updateMotion();});
  window.GOXION_RELEASE_202610=Object.freeze({
    get version(){return VERSION;},handoffStatus,claimHandoff,close:()=>dismiss(!launch,launch),refresh:()=>schedule(250)
  });

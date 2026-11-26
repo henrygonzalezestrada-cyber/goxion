@@ -59,16 +59,20 @@ test("versión y cuenta vistas; X diferida de esta pestaña no consume versión"
 });
 
 test("piloto exclusivo para la clave exacta Casone; versión separada, términos y sesión",()=>{
- const pilotVersion="nov2026-mi-espacio-lanzamiento-pilot-v3";
+ const pilotVersion="nov2026-mi-espacio-lanzamiento-pilot-v4";
  const c=fixture({mode:"pilot",account:"casone",priorSeen:version});
  assert.equal(c.status(),"ready");assert.equal(c.version,pilotVersion);assert.equal(c.check(),1);
  for(const account of ["a","Casone","casone2",""]){
   const other=fixture({mode:"pilot",account,priorSeen:oldVersion});
   assert.equal(other.status(),"skip");assert.equal(other.version,oldVersion);assert.equal(other.check(),0);
  }
- for(const input of [{token:false},{profile:false},{estado:"pendiente"},{estado:"rechazado"},{modalAbierto:true},{blocked:true},{dialog:true}]){
+ for(const input of [{token:false},{profile:false},{estado:"pendiente"},{estado:"rechazado"},{modalAbierto:true},{blocked:true}]){
   assert.equal(fixture({mode:"pilot",account:"casone",...input}).status(),"skip");
  }
  assert.equal(fixture({mode:"pilot",account:"casone",estado:"sin_activar"}).status(),"waiting");
+ const deferred=fixture({mode:"pilot",account:"casone",estado:"pendiente",deferido:true});
+ assert.equal(deferred.status(),"ready");assert.equal(deferred.check(),1);
+ assert.equal(fixture({mode:"pilot",account:"casone",dialog:true}).status(),"waiting");
+ assert.equal(fixture({mode:"pilot",account:"casone",estado:"pendiente",deferido:true,blocked:true}).status(),"skip");
 });
 

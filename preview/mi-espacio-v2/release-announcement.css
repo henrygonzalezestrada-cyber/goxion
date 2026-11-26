@@ -111,7 +111,8 @@ body.gx-release-v2-body-lock{overflow:hidden!important}
 .gx-release-v2[data-edition="launch"] .gx-launch-card{
  width:min(100%,420px);height:min(600px,calc(100vh - 24px));height:min(600px,calc(100dvh - 24px));
  max-height:100%;border:0;border-radius:26px;
- background:radial-gradient(ellipse 78% 37% at 50% 30%,rgba(var(--gx-launch-light,130,83,255),.24) 0%,rgba(var(--gx-launch-light,130,83,255),.10) 36%,rgba(var(--gx-launch-light,130,83,255),.025) 63%,transparent 89%),#15151c;
+ --gx-launch-surface:radial-gradient(ellipse 78% 37% at 50% 30%,rgba(var(--gx-launch-light,130,83,255),.24) 0%,rgba(var(--gx-launch-light,130,83,255),.10) 36%,rgba(var(--gx-launch-light,130,83,255),.025) 63%,transparent 89%),#15151c;
+ background:var(--gx-launch-surface);
  box-shadow:0 22px 64px rgba(0,0,0,.36);animation:none;
 }
 .gx-release-v2[data-edition="launch"] .gx-launch-header{
@@ -256,4 +257,28 @@ body.gx-launch-goxy-active #gxn-avatar :is(.gxn-goxy-real,.gxn-goxy-fallback,.gx
 .gx-release-v2[data-docked="true"] .gx-launch-content[data-chapter="cover"] .gx-launch-art{animation:none}
 @media(prefers-reduced-motion:reduce){
  .gx-launch-goxy-flight,.gx-launch-goxy-impact{display:none!important}
+}
+
+/* Entrada editorial única: la superficie se materializa alrededor del logo.
+   Ni la caja fixed ni los objetivos táctiles se escalan (WebKit). */
+.gx-release-v2[data-entry]{animation:gx-launch-dim .84s ease-out both}
+.gx-release-v2[data-edition="launch"][data-entry] .gx-launch-card{background:none;box-shadow:none}
+.gx-release-v2[data-entry] .gx-launch-card::before{
+ content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;pointer-events:none;
+ background:var(--gx-launch-surface);animation:gx-launch-surface-in .84s cubic-bezier(.2,.7,.25,1) both;
+}
+.gx-release-v2[data-entry] .gx-launch-header,.gx-release-v2[data-entry] .gx-launch-copy,
+.gx-release-v2[data-entry] .gx-launch-footer{animation:gx-launch-reveal .62s cubic-bezier(.2,.75,.25,1) .16s both}
+.gx-release-v2[data-entry] .gx-launch-art,.gx-release-v2[data-entry] .gx-launch-orbit img{animation:none}
+.gx-release-v2[data-entry="preparing"] .gx-launch-orbit img{visibility:hidden}
+@keyframes gx-launch-dim{from{background-color:rgba(3,3,5,.32)}to{background-color:rgba(3,3,5,.86)}}
+@keyframes gx-launch-surface-in{0%{opacity:0;transform:scale(1.14)}35%{opacity:.55}100%{opacity:1;transform:none}}
+@keyframes gx-launch-reveal{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+/* La portada queda en reposo al aterrizar, luego flota apenas 3px. */
+.gx-launch-orbit img{animation-name:gx-launch-cover-breathe}
+@keyframes gx-launch-cover-breathe{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@media(prefers-reduced-motion:reduce){
+ .gx-release-v2[data-entry],.gx-release-v2[data-entry] .gx-launch-card::before,
+ .gx-release-v2[data-entry] .gx-launch-header,.gx-release-v2[data-entry] .gx-launch-copy,
+ .gx-release-v2[data-entry] .gx-launch-footer{animation:none!important}
 }
