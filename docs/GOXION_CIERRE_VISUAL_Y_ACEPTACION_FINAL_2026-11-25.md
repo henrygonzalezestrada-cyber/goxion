@@ -1,4 +1,9 @@
 # GOXION · Cierre visual y aceptación final
+
+## Actualización 26/11/2026 — piloto explícitamente autorizado
+
+Sólo `ayuda-espejo-feed-v2.html` usa modo `pilot`, con clave de cliente exacta `casone`, sesión y perfil cargados. La aceptación aislada continúa `off`; la ayuda oficial y sus recursos mantienen los blobs de main. El controlador y CSS del piloto pertenecen a `preview/mi-espacio-v2/release-announcement.{js,css}`: no se cargan junto al controlador oficial. La versión piloto y la marca de sesión son independientes de la campaña general; cerrar sesión permite repetir la experiencia. El logo real viaja desde el arranque a la portada sólo si términos aceptados, no hay otro modal y la presentación es elegible; de otro modo conserva el viaje habitual, respeta movimiento reducido y presenta después de términos si corresponde. No hay cambios de backend ni de operaciones. No autoriza la promoción general ni sustituye los pendientes sensibles de E y la aceptación real en Safari. Estado histórico anterior debajo, sujeto a esta excepción de alcance.
+
 25 noviembre 2026 · candidato único · sin autorización de promoción aún.
 
 ## Referencias
@@ -81,3 +86,7 @@ Commit de código probado: [36bf568021d08cefe18a3cbf49079320c28c105c](https://gi
 
 ## Bloque E · operaciones sensibles, 26 nov 2026
 [Expediente de aceptación sensible y hallazgo B2](GOXION_BLOQUE_E_ACEPTACION_SENSIBLE_2026-11-26.md). **E no cerrado**. HTTP real QA: login, calendarios independientes, cotización de prórroga, subida de evidencia inequívocamente sintética, revisión persistida en Index/Mi Espacio/historial, sin acreditación. Un archivo privado y un reporte con cero aplicaciones. RPC de acreditación V1 falla en cargo vencido (`MOTOR_V1_CARGO_B2_DESACTUALIZADO`): el precheck compara saldo materializado de 8900 con cotización válida 10235 antes de devengar la mora; las cuatro definiciones PostgreSQL relevantes tienen mismo hash QA/producción (sólo metadatos). El intento no dejó efectos financieros; no tocar motor sin revisión y autorización. Accesos lectura HTTP 200 sin credenciales, revelación ausente en QA; Trato Justo 500/configuración y Admin HTTP pendiente. Corrección exclusiva del guard QA para que X vuelva a aceptación sin permitir navegación oficial; prueba simulada dedicada aprobada localmente. No repetir carrito ni cancelaciones ya aprobadas, no desplegar Edge, no cambiar datos reales ni diseño, no promocionar todavía. CI/Pages de la corrección QA pendientes. 
+
+
+## Bloque F · presentación de novedades (candidato, 26 nov)
+Preparación autorizada tras corrección de motor B2 en QA; **no habilitar campaña ni promover**, porque E aún tiene puertas abiertas. Se integra en la misma rama de código del espejo y aceptación, con opt-in HTML explícito `off`, controlador existente y nueva edición visual por capítulos. Ver [contrato, revisión y rollback de F](GOXION_BLOQUE_F_PRESENTACION_2026-11-26.md). No se alteran los flujos, avisos legales ni la oficial. Pruebas de navegador en rama de revisión; Safari físico y aprobación visual del usuario pendientes.

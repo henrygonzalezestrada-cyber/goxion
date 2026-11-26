@@ -110,3 +110,26 @@ jobs:
       - run: npx playwright install --with-deps chromium webkit
       - name: GOXION · Encabezados inmóviles y X global (Chromium/WebKit)
         run: npm run test:modales:estandar
+
+  launch-announcement:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-save playwright
+      - run: npx playwright install --with-deps chromium webkit
+      - name: GOXION · Guardas de activación y cola legal (VM)
+        run: node --test scripts/launch-announcement-policy.test.mjs
+      - name: GOXION · Novedades por capítulos (Chromium/WebKit, local)
+        run: node scripts/launch-announcement-smoke.mjs
+        env:
+          GX_LAUNCH_SCREENSHOTS: launch-screenshots
+      - name: Capturas de revisión (sin datos reales)
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: goxion-block-f-screenshots
+          path: launch-screenshots/*.png
+          if-no-files-found: ignore

@@ -1,5 +1,10 @@
 # GOXION · Mapa canónico de funciones, propietarios y dependencias
 
+## Actualización 26/11/2026 — piloto explícitamente autorizado
+
+Sólo `ayuda-espejo-feed-v2.html` usa modo `pilot`, con clave de cliente exacta `casone`, sesión y perfil cargados. La aceptación aislada continúa `off`; la ayuda oficial y sus recursos mantienen los blobs de main. El controlador y CSS del piloto pertenecen a `preview/mi-espacio-v2/release-announcement.{js,css}`: no se cargan junto al controlador oficial. La versión piloto y la marca de sesión son independientes de la campaña general; cerrar sesión permite repetir la experiencia. El logo real viaja desde el arranque a la portada sólo si términos aceptados, no hay otro modal y la presentación es elegible; de otro modo conserva el viaje habitual, respeta movimiento reducido y presenta después de términos si corresponde. No hay cambios de backend ni de operaciones. No autoriza la promoción general ni sustituye los pendientes sensibles de E y la aceptación real en Safari. Estado histórico anterior debajo, sujeto a esta excepción de alcance.
+
+
 Fecha de revisión: 11/oct/2026. **Conservamos toda la organización actual.** No proponer una cuarta reorganización visual. Conservar Inicio, Clientes, Operaciones y Gestión, además del comportamiento aprobado de Admin/Ayuda/Index.
 
 **Regla de continuidad entre chats y equipos:** además de este registro funcional, consultar `AGENTS.md`, `docs/GOXION_VISUAL_CONTRACT.md` para preservar identidades de Admin/Ayuda/Index y `docs/GOXION_MULTI_DATE_ROADMAP.md` antes de implementar calendarios por perfil. Los cambios visuales pendientes no se consideran cerrados por el mero hecho de pasar pruebas estáticas.
@@ -292,3 +297,7 @@ La RPC bloquea al cliente para serializar operaciones, lee el estado oficial des
 Backend: \`goxion_preparar_obligaciones_calendario_sombra\` valida por omisión sin insertar; registra sólo cuando Admin confirma expresamente y todos los accesos, fechas, precios y período cuadran **sin ajustes sin atribuir**. \`goxion_confirmar_imputacion_sombra\` bloquea dinero confirmado por recibo aprobado y verifica versión actual de calendario, sin alterar \`pagos\`, \`pagos_parciales\` o \`clientes\`; \`goxion_resumen_imputacion_sombra\` devuelve saldos **proyectados, no oficiales**. Bloquear cualquier intento de acreditar por acceso cuando existan descuentos, beneficios, cupones, mora o comprobantes parciales pendientes.
 
 Protecciones y pruebas: migraciones \`202610120007\`, \`008\`, \`009\`; \`scripts/confirmar-imputacion-b2-smoke.mjs\` y \`scripts/obligaciones-b2-integracion-smoke.mjs\`, incorporadas a \`npm run verify\`. No hubo aceptación de extremo a extremo sobre comprobante real por limitación de seguridad; el conjunto de tablas B2 sigue vacío y \`mi_estado\` no cambia. **No es momento de integración visual**: primero cerrar aprobación atómica de pago total (hoy \`periodo-cobro\` v3 tiene múltiples escrituras) y atribución individual de lealtad, cupones y mora.
+
+
+### Novedades informativas · candidato de lanzamiento F (26 nov 2026)
+Propietario único: `assets/js/ayuda/20-release-announcement.js` / `GOXION_RELEASE_202610`, con stylesheet `assets/css/goxion-release-v2.css`. Consume `getCurrentClientKey`, perfil cargado, token de runtime central y cola `GOXION_LEGAL_V2`; no es escritor comercial ni de consentimiento. La presentación por capítulos es una variante excluyente del mismo controlador, sólo con opt-in en HTML; espejo y aceptación permanecen `off`. No duplicar modales ni handlers. `nov2026-mi-espacio-lanzamiento-v1` queda reservado (sin visto ni activación hasta autorización). Reversión de la rama y cache bust al promover según contrato de F; legado permanece únicamente para consumidores de edición anterior.

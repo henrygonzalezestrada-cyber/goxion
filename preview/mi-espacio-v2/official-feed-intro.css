@@ -53,3 +53,6 @@ body.gx-v2-client-session .gx-client-notif-close svg path{
  stroke:currentColor!important;stroke-width:2.5!important;stroke-linecap:round!important;
  fill:none!important;transform:none!important
 }
+
+/* Sólo durante el acople a la portada piloto: el mismo logo sobre la capa. */
+#gx-v2-handoff.is-launch-flight{z-index:10920}
