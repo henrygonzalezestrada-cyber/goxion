@@ -1,13 +1,19 @@
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, extname, join, normalize, relative, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 
 const ROOT = process.cwd();
 const failures = [];
 const PAGES = ['index', 'ayuda', 'admin'];
 // Comunicaciones es una superficie oficial de Gestión enlazada desde Admin.
 // La verificación de su comportamiento permanece en test:comunicaciones.
-const ALLOWED_ROOT_HTML = new Set([...PAGES.map((page) => page + '.html'), 'comunicaciones.html']);
+const CANDIDATE = 'ayuda-espejo-feed-v2.html';
+const QA_PAGES = ['ayuda-aceptacion-v2.html', 'index-aceptacion-v2.html', 'index-b2-aceptacion-v2.html'];
+const ALLOWED_ROOT_HTML = new Set([...PAGES.map((page) => page + '.html'), 'comunicaciones.html', CANDIDATE, ...QA_PAGES]);
+// El rescate de arranque oficial es intencionalmente independiente de los
+// recursos externos. Sólo se admite esta copia exacta, no cualquier script inline.
+const APPROVED_SPLASH_RESCUE = 'a2f0ba914880c4f93a5ec28b88a237815e119e0868640f6c630111770b3eac61';
 
 function fail(message) {
   failures.push(message);
@@ -53,11 +59,41 @@ function localReferencePath(fromFile, reference) {
   return absolute;
 }
 
-// Root HTML must stay limited to the three production surfaces.
+// Root HTML must stay limited to enumerated production and approved QA surfaces.
 for (const name of readdirSync(ROOT)) {
   const absolute = join(ROOT, name);
   if (statSync(absolute).isFile() && extname(name).toLowerCase() === '.html' && !ALLOWED_ROOT_HTML.has(name)) {
     fail('HTML huérfano en raíz: ' + name);
+  }
+}
+
+// Los candidatos aprobados no son nuevas superficies oficiales. Verificar
+// exclusión de buscadores, guardia QA y aislamiento de origen sin relajar PAGES.
+for (const name of [CANDIDATE, ...QA_PAGES]) {
+  const htmlPath = join(ROOT, name);
+  if (!existsSync(htmlPath)) { fail('Falta candidato registrado: ' + name); continue; }
+  const html = readFileSync(htmlPath, 'utf8');
+  if (!/<meta\s+name="robots"\s+content="noindex,nofollow"/i.test(html)) {
+    fail(name + ': falta noindex,nofollow.');
+  }
+  const qa = QA_PAGES.includes(name);
+  const guardAt = html.indexOf('./preview/mi-espacio-v2/aceptacion/guard.js');
+  if (qa) {
+    const csp = html.match(/<meta[^>]*http-equiv="Content-Security-Policy"[^>]*>/i)?.[0] || '';
+    if (guardAt < 0 || !csp.includes('https://nsvybyvvdpdgbgtvydfb.supabase.co') || csp.includes('hmpevcwodcgbkviarfic.supabase.co')) {
+      fail(name + ': falta aislamiento QA de guardia/origen.');
+    }
+    const scripts = [...html.matchAll(/<script\b[^>]*>/gi)];
+    if (!scripts[0]?.[0].includes('/aceptacion/guard.js')) fail(name + ': guardia QA no es el primer script.');
+  } else if (guardAt >= 0 || html.includes('/aceptacion/data.js')) {
+    fail(name + ': el espejo no debe incorporar el runtime QA.');
+  }
+  if (name.startsWith('ayuda-') && !(html.includes('data-gx-feed-performance') && html.includes('/official-feed-host.js'))) {
+    fail(name + ': falta el contrato de continuidad/rendimiento del feed candidato.');
+  }
+  for (const match of html.matchAll(/\b(?:src|href)\s*=\s*["']([^"']+)["']/gi)) {
+    const target = localReferencePath(htmlPath, match[1]);
+    if (target && !existsSync(target)) fail(name + ': referencia local inexistente: ' + match[1]);
   }
 }
 
@@ -81,8 +117,13 @@ for (const page of PAGES) {
 
   const inlineScripts = [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)]
     .filter((match) => !/\bsrc\s*=/.test(match[1] || ''));
-  if (inlineScripts.length) {
+  const validRescue = page === 'ayuda' && inlineScripts.length === 1 &&
+    createHash('sha256').update(inlineScripts[0][2]).digest('hex') === APPROVED_SPLASH_RESCUE;
+  if (inlineScripts.length && !validRescue) {
     fail(page + ': reaparecieron scripts inline (' + inlineScripts.length + ').');
+  }
+  if (html.includes('data-gx-feed-performance')) {
+    fail(page + ': flag de candidato activado en página oficial sin promoción.');
   }
 
   const runtime = './assets/js/core/runtime.js';
@@ -950,7 +991,7 @@ if (failures.length) {
 }
 
 console.log('GOXION · integridad OK');
-console.log('✓ sólo existen los tres HTML oficiales en raíz');
+console.log('✓ sólo existen las superficies oficiales y los cuatro candidatos autorizados en raíz');
 console.log('✓ referencias locales válidas');
 console.log('✓ CSS/JS externalizados');
 console.log('✓ runtime central preservado');

@@ -1,10 +1,22 @@
 import {chromium,webkit} from 'playwright';
 import {readFileSync} from 'node:fs';
+import {createServer} from 'node:http';
 import assert from 'node:assert/strict';
 const root='preview/mi-espacio-v2/';
 const file=p=>readFileSync(p,'utf8');
 const html=file('ayuda-espejo-feed-v2.html').replace(/<script\b[\s\S]*?<\/script>/gi,'').replace(/<link\b[^>]*>/gi,'');
-const fixture='http://goxion.test/ayuda-espejo-feed-v2.html';
+// Use a real local origin; never reach the production API. Broken image fallbacks
+// in the candidate can repeatedly request the same missing asset, so return a
+// valid image fixture rather than a 404 and wait only for the DOM.
+const image='<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><rect width="40" height="40" fill="transparent"/></svg>';
+const server=createServer((req,res)=>{
+ if(req.url==='/ayuda-espejo-feed-v2.html'){res.writeHead(200,{'Content-Type':'text/html; charset=utf-8'});res.end(html)}
+ else{res.writeHead(404);res.end()}
+});
+await new Promise((resolve,reject)=>{server.once('error',reject);server.listen(0,'127.0.0.1',resolve)});
+const origin='http://127.0.0.1:'+server.address().port;
+const fixture=origin+'/ayuda-espejo-feed-v2.html';
+try{
 const engines=process.env.GOXION_TEST_CHROMIUM?[['chromium',chromium]]:[['chromium',chromium],['webkit',webkit]];
 for(const [name,engine] of engines){
  const browser=await engine.launch({headless:true,...(process.env.GOXION_TEST_CHROMIUM?{executablePath:process.env.GOXION_TEST_CHROMIUM,args:['--no-sandbox']}: {})});
@@ -14,17 +26,18 @@ for(const [name,engine] of engines){
   let services=[{id:'s1',nombre:'Netflix',monto:100,activo:true}],requests=[],delayMain=150;
   await page.route('**/*',async route=>{
    const url=new URL(route.request().url());
-   if(url.href===fixture)return route.fulfill({contentType:'text/html',body:html});
-   if(url.origin==='http://goxion.test'&&url.pathname.startsWith('/api/')){
+   if(url.href===fixture)return route.continue();
+   if(url.origin===origin&&url.pathname.startsWith('/api/')){
     const endpoint=url.pathname.split('/').at(-1),token=route.request().headers()['x-client-token'];
     requests.push(endpoint);
     if(endpoint==='mi-espacio'&&delayMain)await new Promise(r=>setTimeout(r,delayMain));
     const response={ok:true,cliente:{id:'customer-'+token,nombre:'Cliente '+token,estado:'pagado'},servicios:services,pagos:[],gamificacion:null,misiones_progreso:[],referidos:[],solicitudes:[],entregas:[],novedades:[],accesos:[],estado_cuenta:{estado:'pagado',esta_pagado_periodo:true}};
     return route.fulfill({contentType:'application/json',body:JSON.stringify(response)});
    }
-   return route.fulfill({status:404,body:''});
+   if(route.request().resourceType()==='image')return route.fulfill({contentType:'image/svg+xml',body:image});
+   return route.abort();
   });
-  await page.goto(fixture);
+  await page.goto(fixture,{waitUntil:'domcontentloaded'});
   await page.addStyleTag({content:file('assets/css/ayuda.css')});
   await page.addStyleTag({content:file(root+'official-feed.css')});
   await page.evaluate(()=>{
@@ -86,3 +99,4 @@ for(const [name,engine] of engines){
   console.log(name+': contextual routes, session isolation, no stale navigation and reduced-motion frame budget OK');
  }finally{await browser.close()}
 }
+}finally{await new Promise(resolve=>server.close(resolve))}

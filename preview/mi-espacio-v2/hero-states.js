@@ -76,7 +76,7 @@ function create({card,logo,openCancellation,storage=true,seconds=5}){
  function drain(){if(account&&queued&&!opened&&!closing&&visible()){const item=queued;queued=null;show(item,true)}}
  function update(view,primaryCode){const id=String(view?.cliente?.id||'');if(!id){reset();return}read(id);const raw=view.alertas,a=globalItem(raw,logo);items=collect(view,primaryCode,logo);
  if(a){if(a.sig!==seen&&a.sig!==queued?.sig)queued=a;last=a;save()}
- else if(raw?.activa===false&&last&&norm(raw.plataforma||'Todos los servicios')===norm(last.name)){const r={id:'resolved',kind:'resolved',sig:'resolved:'+last.sig,title:isAll(last.name)?'Incidencia finalizada':last.name+' · Incidencia finalizada',meta:'Aviso cerrado por GOXION',detail:'Si todavía tienes dificultades, puedes acudir a Soporte.',tone:'success'};if(seen!==r.sig){queued=r;seen='closed:'+last.sig}last=null;save()}
+ else if(raw?.activa===false&&last&&norm(raw.plataforma||'Todos los servicios')===norm(last.name)){const r={id:'resolved',kind:'resolved',sig:'resolved:'+last.sig,title:all(last.name)?'Incidencia finalizada':last.name+' · Incidencia finalizada',meta:'Aviso cerrado por GOXION',detail:'Si todavía tienes dificultades, puedes acudir a Soporte.',tone:'success'};if(seen!==r.sig){queued=r;seen='closed:'+last.sig}last=null;save()}
  else if(raw?.activa===false){last=null;if(queued?.kind==='global')queued=null;save()}else if(!raw&&queued?.kind==='global')queued=null;
  render();if(opened?.kind==='global'&&(!a||a.sig!==opened.sig))hide(true);if(opened?.kind==='cancel'&&!items.some(x=>x.id===opened.id))hide(true);drain();
  }

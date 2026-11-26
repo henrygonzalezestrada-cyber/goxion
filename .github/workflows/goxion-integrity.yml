@@ -44,6 +44,7 @@ jobs:
 
       # Run the changed beta first so iPhone regressions surface immediately.
       - name: Opiniones 2.0 beta (local-only)
+        if: ${{ !cancelled() }}
         run: npm run test:opiniones
 
       - name: Opiniones oficiales · flujo seguro simulado
