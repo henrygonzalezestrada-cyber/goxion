@@ -74,6 +74,12 @@ async function run(browser,engine,mode,path){
       const cs=getComputedStyle(e);
       return cs.display==='none'||cs.visibility==='hidden'||Number(cs.opacity)===0;
     })),'startup handoff finished',15000);
+    // Notifications owns the approved header-actions host; it is mounted
+    // independently of the splash, especially when reduced motion is active.
+    await waitFor(()=>page.evaluate(()=>
+      document.getElementById('header-action-btn')?.parentElement?.classList.contains('gx-header-actions')===true &&
+      !!document.getElementById('gx-client-notif-launch')
+    ),'approved header host mounted',12000);
     await page.evaluate(()=>{
       const root=document.getElementById('header-action-btn');window.__gAuthParent=root.parentNode;
     });
