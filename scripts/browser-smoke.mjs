@@ -1055,16 +1055,50 @@ async function runAyuda(browser, browserName, errors) {
     } else {
       // Click sintético sobre el botón protegido: no crea una sesión ni
       // abre conversación, y tampoco envía mensajes ni llama a IA.
+      // Distinguir la solicitud de login de un acceso al chat. WebKit headless
+      // puede suspender el poller RAF de waitForFunction aunque el DOM esté listo.
+      // Misma condición y timeout; no se acepta una apertura parcial.
+      await page.evaluate(() => {
+        const base = window.openAuthSheet;
+        window.__gxGuestAuthProbe = { calls:0, settled:false, rejected:false };
+        window.__gxGuestAuthProbeRestore = () => { window.openAuthSheet = base; };
+        window.openAuthSheet = function(...args) {
+          window.__gxGuestAuthProbe.calls++;
+          const result = base.apply(this,args);
+          Promise.resolve(result).then(
+            () => { window.__gxGuestAuthProbe.settled = true; },
+            () => { window.__gxGuestAuthProbe.rejected = true; }
+          );
+          return result;
+        };
+      });
       await goxyOpen.evaluate(button => button.click());
-      const authRequested = await page.waitForFunction(() =>
+      const authRequested = await waitForDom(page, () =>
         document.getElementById('header-action-btn')?.getAttribute('aria-expanded') === 'true',
-        null, {timeout:2500}).then(()=>true).catch(()=>false);
+        2500).then(()=>true).catch(()=>false);
       const chatOpened = await page.locator('#view-soporte .gxai-chat-layer.gxai-visible').count();
-      if (!authRequested || chatOpened) errors.push(`${label}: Goxy no preservó la barrera de invitado.`);
+      const guestProbe = await page.evaluate(() => {
+        const root = document.getElementById('header-action-btn');
+        const overlay = document.getElementById('auth-overlay');
+        return {
+          ...window.__gxGuestAuthProbe,
+          ariaExpanded:root?.getAttribute('aria-expanded'),
+          loginVisible:root?.classList.contains('gx-auth-login-visible'),
+          overlayVisible:overlay?.classList.contains('show'),
+          flip:root?.classList.contains('gx-auth-flip-card'),
+          animations:root?.getAnimations?.().map(a=>a.playState) || [],
+          reduceMotion:matchMedia('(prefers-reduced-motion: reduce)').matches,
+          visibility:document.visibilityState
+        };
+      });
+      await page.evaluate(() => window.__gxGuestAuthProbeRestore?.());
+      if (!authRequested) errors.push(`${label}: Goxy invitado no abrió el login. ${JSON.stringify(guestProbe)}`);
+      if (chatOpened) errors.push(`${label}: Goxy invitado abrió chat sin sesión. ${JSON.stringify(guestProbe)}`);
+      if (guestProbe.calls !== 1 || guestProbe.rejected) errors.push(`${label}: solicitud de login Goxy inválida. ${JSON.stringify(guestProbe)}`);
       await page.evaluate(() => window.closeAuthSheet?.());
-      await page.waitForFunction(() =>
+      await waitForDom(page, () =>
         document.getElementById('header-action-btn')?.getAttribute('aria-expanded') !== 'true',
-        null, {timeout:2500}).catch(()=>{});
+        2500).catch(()=>{});
     }
   }
 
