@@ -4,6 +4,8 @@
   "use strict";
   const endpoint=()=>window.GOXION_CORE?.endpoint?.("goxy-ai-beta");
   const isQA=()=>location.pathname.endsWith("/ayuda-aceptacion-v2.html");
+  const isMirrorPilot=()=>location.pathname.endsWith("/ayuda-espejo-feed-v2.html")&&
+    !window.GOXION_QA_ISOLATED&&endpoint()?.endsWith("/goxy-ai-beta");
   const sensitive=/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b|\b(?:\d[\s.-]?){9,16}\b|\b\d{4,8}\b/iu;
   function token(){
     const key=window.GOXION_CORE?.STORAGE?.CLIENT_TOKEN;
@@ -38,7 +40,7 @@
     }
   }
   async function status(){
-    try{return await send({mode:"status"});}
+    try{return await send(isMirrorPilot()?{mode:"status",feedbackPilot:true}:{mode:"status"});}
     catch{return {ok:false,configured:false,code:"NETWORK_ERROR"};}
   }
   async function account(topic,{signal,message=''}={}){
@@ -66,7 +68,7 @@
         message:'No fue posible consultar el cálculo oficial ahora.'};
     }
   }
-  // QA only: production gateway does not expose these modes.
+  // Interpretation and reviewed routes remain QA-only; feedback has a server-gated mirror pilot.
   async function interpret(message,topic,{signal}={}){
     if(!isQA()||!window.GOXION_QA_ISOLATED)return {ok:false,code:'ENVIRONMENT_MISMATCH'};
     const text=String(message||'').trim();
@@ -74,7 +76,7 @@
     try{return await send({mode:'interpret',message:text,topic},{signal});}catch(e){return {ok:false,code:e?.name==='AbortError'?'ABORTED':'NETWORK_ERROR'};}
   }
   async function feedback({responseId,topic,source,vote,reason}){
-    if(!isQA()||!window.GOXION_QA_ISOLATED)return {ok:false,code:'ENVIRONMENT_MISMATCH'};
+    if(!(isQA()&&window.GOXION_QA_ISOLATED)&&!isMirrorPilot())return {ok:false,code:'ENVIRONMENT_MISMATCH'};
     try{return await send({mode:'feedback',responseId,topic,source,vote,reason});}catch{return {ok:false,code:'NETWORK_ERROR'};}
   }
   async function verifiedRoute(message,platform,{signal}={}){
