@@ -85,7 +85,7 @@
        No outgoing WAAPI animation, no queue, no page-scale.
        ========================================================= */
 
-    window.switchTab = function(tabName) {
+    window.switchTab = function(tabName, options) {
         if (!['inicio', 'catalogo', 'soporte'].includes(tabName)) return;
 
         ['inicio', 'catalogo', 'soporte'].forEach(name => {
@@ -133,7 +133,7 @@
         if (bar) bar.classList.remove('show');
 
         // Same behavior as production: page reset is independent of view animation.
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        if(!document.documentElement.hasAttribute('data-gx-feed-performance')||options?.preserveScroll!==true)window.scrollTo({ top: 0, behavior: 'smooth' });
 
         if (tabName !== 'catalogo') {
             document.getElementById('floating-cart')?.classList.remove('show');

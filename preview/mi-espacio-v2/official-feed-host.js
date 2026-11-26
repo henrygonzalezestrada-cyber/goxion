@@ -9,7 +9,7 @@ const feed=document.getElementById('gx-v2-feed');
 const headerHost=document.getElementById('gx-v2-shared-header'),navHost=document.getElementById('gx-v2-shared-nav');
 const nav=document.getElementById('gxn-nav'),bell=document.getElementById('gxn-bell');
 if(!dash||!home||!catalog||!support||!feed||!headerHost||!navHost||!nav||!bell)return;
-let authorized=false,rendered=false,accountKey='';
+let authorized=false,rendered=false,accountKey='',sessionToken='';
 const veil=document.createElement('div');
 veil.id='gx-v2-sync';
 veil.className='gx-v2-sync';
@@ -59,6 +59,7 @@ function syncView(){
  const first=nav.querySelector('[data-gxn-target="space"]'),label=authorized?'Mi Espacio':'Inicio',emoji=authorized?'👤':'🏠';
  if(first){const t=first.querySelector('.gxn-tab-label'),e=first.querySelector('.gxn-emoji');if(t.textContent!==label)t.textContent=label;if(e.textContent!==emoji)e.textContent=emoji;first.setAttribute('aria-label',label)}
  const current=atSpace||atHome?'space':atCatalog?'catalog':atSupport?'support':'space';
+ window.GOXION_V2_SYNC_TAB?.(current);
  for(const button of nav.querySelectorAll('.gxn-tab')){
   if(button.dataset.gxnTarget===current)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current')
  }
@@ -68,8 +69,9 @@ function syncView(){
 function onOfficialReady(){
  const key=typeof getCurrentClientKey==='function'?String(getCurrentClientKey()||''):String(window.goxionCurrentClientKey||'');
  const token=window.GOXION_CORE?.STORAGE?.CLIENT_TOKEN;
- if(!key||!token||!localStorage.getItem(token))return;
- if(key!==accountKey){rendered=false;accountKey=key}
+ const current=token?localStorage.getItem(token):null;
+ if(!key||!current)return;
+ if(key!==accountKey||current!==sessionToken){rendered=false;accountKey=key;sessionToken=current;const shell=document.getElementById('gxi-shell');if(shell)shell.hidden=true}
  authorized=true;
  veilCopy.textContent='Sincronizando tu espacio…';
  retry.hidden=true;
@@ -95,7 +97,7 @@ window.addEventListener('goxion:v2-feed:error',event=>{
 });
 window.addEventListener('goxion:client-logout',()=>{
  clearTimeout(syncTimeout);
- authorized=false;rendered=false;accountKey='';feed.hidden=true;
+ authorized=false;rendered=false;accountKey='';sessionToken='';feed.hidden=true;
  document.body.classList.remove('gx-v2-private-visible','gx-v2-client-session');
  headerHost.hidden=true;nav.dataset.mode='expanded';dash.classList.remove('gx-v2-rendered');syncView();
 });

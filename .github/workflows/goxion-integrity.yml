@@ -62,6 +62,14 @@ jobs:
         if: ${{ !cancelled() }}
         run: node scripts/feed-continuity.test.mjs
 
+      - name: Rendimiento del feed · consultas agrupadas y sesión
+        if: ${{ !cancelled() }}
+        run: node scripts/feed-performance.test.mjs
+
+      - name: Rendimiento del feed · destinos y movimiento (Chromium/WebKit)
+        if: ${{ !cancelled() }}
+        run: node scripts/feed-performance-browser-smoke.mjs
+
       - name: Incidencias · sin aviso heredado en el candidato
         if: ${{ !cancelled() }}
         run: node scripts/hero-global-alert-guard.test.mjs

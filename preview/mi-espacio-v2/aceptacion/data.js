@@ -25,7 +25,8 @@
     return '';
   };
   async function post(endpoint,body,token){
-    const res=await fetch(core.endpoint(endpoint),{
+    const reader=window.GOXION_FEED_READS;
+    const res=reader?await reader.request(core.endpoint(endpoint),body,token):await fetch(core.endpoint(endpoint),{
       method:'POST',cache:'no-store',
       headers:Object.assign({'Content-Type':'application/json'},token?{'X-Client-Token':token}:{}),
       body:JSON.stringify(body||{})
@@ -64,7 +65,9 @@
       ['finanzas_b2','estado-financiero-b2-beta',{accion:'mi_estado',datos:{}}],
       ['historial','historial-cliente',{}]
     ];
-    const extra=await Promise.allSettled(reqs.map(r=>post(r[1],r[2],token)));
+    // Sin tarjetas activas, no consultar contenido exclusivo de esas tarjetas.
+    const hasServices=window.GOXION_FEED_READS?.hasServices(main)??true;
+    const extra=await Promise.allSettled(reqs.map(r=>!hasServices&&['credenciales_entregas','novedades_servicio','cliente_accesos'].includes(r[0])?Promise.resolve({}):post(r[1],r[2],token)));
     if(extra.some(r=>r.status==='rejected'&&r.reason?.status===401))throw Object.assign(new Error('No se pudo verificar la sesión.'),{status:401});
     const value=(index,key)=>extra[index].status==='fulfilled'&&Array.isArray(extra[index].value?.[key])?extra[index].value[key]:[];
     const cancellations=value(0,'solicitudes');
@@ -97,14 +100,14 @@
   async function load(){
     const token=takeToken();if(!token)return null;
     try{return await restore(token)}
-    catch(e){if(e.status===401){localStorage.removeItem(TOKEN_KEY);return null}throw e}
+    catch(e){if(e.status===401){if(takeToken()===token)localStorage.removeItem(TOKEN_KEY);return null}throw e}
   }
   async function login(name,pin){
     const res=await post('login-goxion',{nombre:String(name||'').trim(),pin:String(pin||'').trim()},'');
     if(!res.session_token)throw new Error('El acceso no devolvió una sesión válida.');
     const old=takeToken();localStorage.setItem(TOKEN_KEY,res.session_token);
     try{return await restore(res.session_token)}
-    catch(e){if(old)localStorage.setItem(TOKEN_KEY,old);else localStorage.removeItem(TOKEN_KEY);throw e}
+    catch(e){if(takeToken()===res.session_token){if(old)localStorage.setItem(TOKEN_KEY,old);else localStorage.removeItem(TOKEN_KEY)}throw e}
   }
   function logout(){localStorage.removeItem(TOKEN_KEY)}
   function savings(view,references){

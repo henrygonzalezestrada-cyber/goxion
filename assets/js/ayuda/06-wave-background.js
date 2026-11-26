@@ -187,7 +187,8 @@
     const uMotion = gl.getUniformLocation(program, 'u_motion');
 
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
-    let width = 0, height = 0, raf = 0, visible = true, paused = false;
+    const optimize = document.documentElement.hasAttribute('data-gx-feed-performance');
+    let width = 0, height = 0, raf = 0, visible = !optimize || !document.hidden, paused = false;
     const start = performance.now();
 
     function resize() {
@@ -204,12 +205,13 @@
     }
 
     function frame(now) {
+        raf = 0;
         if (!visible || paused) return;
         resize();
         gl.uniform1f(uTime, (now - start) / 1000);
         gl.uniform1f(uMotion, reduced.matches ? 0.0 : 1.0);
         gl.drawArrays(gl.TRIANGLES, 0, 6);
-        raf = requestAnimationFrame(frame);
+        if (!optimize || !reduced.matches) raf = requestAnimationFrame(frame);
     }
 
     document.addEventListener('visibilitychange', () => {
@@ -230,7 +232,12 @@
         }
     };
 
-    window.addEventListener('resize', resize, {passive:true});
+    function redraw(){
+        cancelAnimationFrame(raf);raf=0;
+        if(visible&&!paused)raf=requestAnimationFrame(frame);
+    }
+    window.addEventListener('resize', () => {resize();if(optimize&&reduced.matches)redraw()}, {passive:true});
+    if(optimize){if(reduced.addEventListener)reduced.addEventListener('change',redraw);else reduced.addListener?.(redraw)}
     resize();
-    raf = requestAnimationFrame(frame);
+    if(visible)raf = requestAnimationFrame(frame);
 })();

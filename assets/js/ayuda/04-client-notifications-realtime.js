@@ -539,6 +539,7 @@
     if(typeof window.switchTab==="function")window.switchTab("inicio");
   }
 
+  let notificationActionRevision=0;
   async function goAction(button){
     const id=button?.dataset?.gxNotifId||"";
     const source=button?.dataset?.gxNotifSource||"general";
@@ -546,13 +547,15 @@
     const ref=button?.dataset?.gxNotifRef||"";
 
     const actionToken=token(),actionEpoch=state.sessionEpoch;
+    const actionRevision=++notificationActionRevision;
     if(id)await markOne(id,source);
-    if(actionToken!==token()||actionEpoch!==state.sessionEpoch)return;
+    if(actionToken!==token()||actionEpoch!==state.sessionEpoch||(window.GOXION_FEED_READS&&actionRevision!==notificationActionRevision))return;
     closeSheet();
 
     if(action==="legal"){
       // Si está pendiente/rechazado, abrir decisión; si ya aceptó, abrir lector.
       setTimeout(()=>{
+        if(window.GOXION_FEED_READS&&(actionToken!==token()||actionEpoch!==state.sessionEpoch||actionRevision!==notificationActionRevision))return;
         const legal=window.GOXION_LEGAL_V2;
         if(!legal?.openNotification){
           console.warn("GOXION: módulo de términos aún no disponible");
@@ -568,13 +571,12 @@
       if(typeof window.irAlTicket==="function")window.irAlTicket();
       return;
     }
+    // El candidato V2 resuelve sus propios destinos sin abrir nodos legacy ocultos.
+    if(window.GOXION_V2_NOTIFICATION_DESTINATION?.(action,ref)===true)return;
     if(action==="catalog"){
       if(typeof window.switchTab==="function")window.switchTab("catalogo");
       return;
     }
-
-    // El candidato V2 resuelve sus propios destinos sin abrir nodos legacy ocultos.
-    if(window.GOXION_V2_NOTIFICATION_DESTINATION?.(action,ref)===true)return;
     showDashboard();
     setTimeout(()=>{
       if(action==="referral"&&typeof window.openGamif==="function"){
@@ -759,7 +761,7 @@
   if(typeof baseRender==="function"){
     window.renderDashboard=function(...args){
       const r=baseRender.apply(this,args);
-      setTimeout(()=>{ensureUi();load();},0);
+      if(!window.GOXION_FEED_READS||!args[1]?.skipNotifications)setTimeout(()=>{ensureUi();load();},0);
       return r;
     };
   }
@@ -784,7 +786,7 @@
   document.addEventListener("visibilitychange",()=>{
     if(document.hidden)return;
     syncNotificationSession();
-    if(token())load();
+    if(token()&&(!window.GOXION_FEED_READS||window.GOXION_REALTIME?.getStatus?.()!=="SUBSCRIBED"))load();
   });
 
   const baseLogout=window.cerrarSesion;

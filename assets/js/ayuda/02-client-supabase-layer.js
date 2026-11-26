@@ -63,7 +63,8 @@ const LOGIN_URL = GXCORE.endpoint("login-goxion");
             if(!data || !token) return data;
 
             const request = async (url, accion="listar") => {
-                const r=await fetch(url,{
+                const reader=window.GOXION_FEED_READS;
+                const r=reader?await reader.request(url,{accion,datos:{}},token):await fetch(url,{
                     method:"POST",
                     headers:{"Content-Type":"application/json","X-Client-Token":token},
                     body:JSON.stringify({accion,datos:{}}),
@@ -74,12 +75,13 @@ const LOGIN_URL = GXCORE.endpoint("login-goxion");
                 return json;
             };
 
+            const emptyServices=!!window.GOXION_FEED_READS&&Array.isArray(data.servicios)&&data.servicios.length===0;
             const [cancelaciones,credenciales,novedades,estadoCuenta,accesosCliente,estadoFinanciero]=await Promise.allSettled([
                 request(CANCELACIONES_CLIENTE_URL),
-                request(CREDENCIALES_CLIENTE_URL),
-                request(NOVEDADES_CLIENTE_URL),
+                emptyServices?Promise.resolve({}):request(CREDENCIALES_CLIENTE_URL),
+                emptyServices?Promise.resolve({}):request(NOVEDADES_CLIENTE_URL),
                 request(ESTADO_CUENTA_URL,"mi_estado"),
-                request(ACCESOS_CLIENTE_URL),
+                emptyServices?Promise.resolve({}):request(ACCESOS_CLIENTE_URL),
                 window.GOXION_FINANCIAL?.clientState?.() ?? Promise.resolve(null)
             ]);
 
@@ -310,7 +312,8 @@ function goxionViewModelAdapter(data) {
             const token = localStorage.getItem(TOKEN_KEY) || "";
             if (!token) return null;
 
-            const r = await fetch(MI_URL, {
+            const reader=window.GOXION_FEED_READS;
+            const r = reader?await reader.request(MI_URL,{},token):await fetch(MI_URL, {
                 method:"POST",
                 headers:{"Content-Type":"application/json","X-Client-Token":token},
                 body:JSON.stringify({}),
@@ -324,8 +327,11 @@ function goxionViewModelAdapter(data) {
                 throw error;
             }
 
-            window.goxionCurrentClientKey = String(json?.cliente?.clave || getCurrentClientKey() || "");
+            if(reader&&localStorage.getItem(TOKEN_KEY)!==token)return null;
+            if(!reader)window.goxionCurrentClientKey = String(json?.cliente?.clave || getCurrentClientKey() || "");
             await cargarExtrasPrivados(json,token);
+            if(reader&&localStorage.getItem(TOKEN_KEY)!==token)return null;
+            if(reader)window.goxionCurrentClientKey = String(json?.cliente?.clave || getCurrentClientKey() || "");
 
             const viewModel = goxionViewModelAdapter(json);
             const key = String(window.goxionCurrentClientKey || json?.cliente?.clave || "");

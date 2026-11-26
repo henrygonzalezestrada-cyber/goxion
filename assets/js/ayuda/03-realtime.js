@@ -69,10 +69,14 @@
     }
 
     busy = true;
-    const ui = captureUi();
+    const candidate=window.GOXION_FEED_READS;
+    const tokenKey=window.GOXION_CORE?.STORAGE?.CLIENT_TOKEN;
+    const session=candidate?localStorage.getItem(tokenKey):null;
+    const ui = candidate?null:captureUi();
 
     try {
       const snapshot = await window.goxionReloadPrivateClientView();
+      if(candidate&&(!snapshot||!session||localStorage.getItem(tokenKey)!==session))return;
       const key = String(snapshot?.key || (typeof getCurrentClientKey === "function" ? getCurrentClientKey() : ""));
       const fresh = snapshot?.cliente || (key ? snapshot?.viewModel?.[key] : null);
 
@@ -83,13 +87,14 @@
         ...fresh
       };
 
-      renderDashboard(key);
-      restoreUi(ui);
+      if(candidate)renderDashboard(key,{skipNotifications:true});
+      else{renderDashboard(key);restoreUi(ui)}
 
       window.dispatchEvent(new CustomEvent("goxion:client-space:updated", {
         detail: { scope: scope || "resync", at: Date.now() }
       }));
     } catch (error) {
+      if (candidate&&localStorage.getItem(tokenKey)!==session)return;
       if (error?.status === 401 || error?.status === 403) {
         window.dispatchEvent(new CustomEvent("goxion:realtime:client-session", {
           detail: { status: error.status }
@@ -118,7 +123,8 @@
     };
   }
 
-  window.addEventListener("goxion:realtime", (event) => {
+  if(window.GOXION_FEED_READS)window.GOXION_FEED_READS.subscribe(refreshClientSpace);
+  else window.addEventListener("goxion:realtime", (event) => {
     const scope = event.detail?.scope || "";
     if (!["account_state", "rewards", "referrals", "client_state", "client_access", "cancellations", "resync"].includes(scope)) return;
     refreshClientSpace(scope);

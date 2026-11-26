@@ -20,28 +20,38 @@ const spinner={hidden:true},shell=$('gxi-shell'),loading={hidden:true};
 let iconHandle=null;
 function firstName(){return String(state.view?.cliente?.nombre||'Cliente').trim().split(/\s+/)[0]||'Cliente'}
 const TOKEN=data.takeToken;
-let loadingOfficial=false;
-async function load(){
- if(loadingOfficial||!TOKEN())return;
+let loadFlight=null,refreshFlight=null,sessionToken='';
+const reader=window.GOXION_FEED_READS;
+const notifications=()=>window.GOXION_V2_NOTIFICATIONS||window.GOXION_CLIENT_NOTIFICATIONS;
+function load(){
+ const token=TOKEN();
+ if(!token||navigator.onLine===false)return Promise.resolve();
  const identity=typeof getCurrentClientKey==='function'?getCurrentClientKey():window.goxionCurrentClientKey;
- if(!identity)return;
- loadingOfficial=true;
- const tokenAtStart=TOKEN();
- try{
-  const view=await data.load();
-  if(!view||!TOKEN()||TOKEN()!==tokenAtStart)return;
-  await showClient(view);
- }catch(e){
-  if(TOKEN()===tokenAtStart){
-   window.dispatchEvent(new CustomEvent('goxion:v2-feed:error',{detail:{message:'No se pudo sincronizar tu información. Puedes reintentar sin cerrar sesión.'}}));
-   console.warn('GOXION: el nuevo feed no pudo sincronizarse',e);
-  }
- }finally{loadingOfficial=false}
+ if(!identity)return Promise.resolve();
+ if(loadFlight?.token===token)return loadFlight.promise;
+ if(state.view&&sessionToken===token)return refreshClient();
+ const flight={token,promise:null};loadFlight=flight;
+ flight.promise=(async()=>{
+  try{
+   const view=await data.load();
+   if(!view){if(!TOKEN()&&loadFlight===flight){window.cerrarSesion?.();window.dispatchEvent(new Event('goxion:client-logout'))}return}
+   if(TOKEN()!==token||loadFlight!==flight)return;
+   await showClient(view,token);
+  }catch(e){
+   if(TOKEN()===token&&loadFlight===flight){
+    window.dispatchEvent(new CustomEvent('goxion:v2-feed:error',{detail:{message:'No se pudo sincronizar tu información. Puedes reintentar sin cerrar sesión.'}}));
+    console.warn('GOXION: el nuevo feed no pudo sincronizarse',e);
+   }
+  }finally{if(loadFlight===flight)loadFlight=null}
+ })();
+ return flight.promise;
 }
-async function showClient(view){
- const sameAccount=state.view&&String(state.view.cliente.id)===String(view.cliente.id);
+async function showClient(view,token){
+ const sameAccount=state.view&&sessionToken===token&&String(state.view.cliente.id)===String(view.cliente.id);
+ sessionToken=token;
  if(sameAccount){state.view=continuity?.merge(state.view,view)||view;snapshotError=false;renderClient();window.dispatchEvent(new CustomEvent('goxion:v2-feed:rendered',{detail:{clientId:String(view.cliente.id||'')}}));return}
  benefitRevision++;
+ wipeServiceSecrets();serviceOperation=null;heroStates?.reset();
  tabScroll?.reset();historyDigest='';snapshotError=false;
  state.view=continuity?.merge(null,view)||view;
  state.lastState='';
@@ -57,10 +67,9 @@ async function showClient(view){
  spinner.hidden=true;loading.hidden=true;shell.hidden=false;
  $('gxi-account-name').textContent=String(view.cliente.nombre||'Mi Espacio')+' · Mi Espacio';
  renderClient();
- state.tab='space';
  window.dispatchEvent(new CustomEvent('goxion:v2-feed:rendered',{detail:{clientId:String(view.cliente.id||'')}}));
  void loadPrices();
- void window.GOXION_V2_NOTIFICATIONS?.refresh();
+ if(!reader)void notifications()?.refresh();
 }
 function heroState(view){
  const c=view.cliente,review=clean(c.pago_revision_estado),st=clean(c.estado),account=view.estado_cuenta||{};
@@ -758,7 +767,7 @@ function renderServices(){
  const v=state.view,services=v.servicios||[];
  const digest=JSON.stringify(services);if(state.serviceDigest===digest)return;
  if(serviceOperation)return;
- if(heldSecrets.size){if([...heldSecrets.keys()].every(id=>services.some(s=>String(s.id)===id)))return;wipeServiceSecrets()}
+ if(heldSecrets.size){if([...heldSecrets.keys()].every(id=>services.some(s=>String(s.id)===id&&s.lecturas?.cliente_accesos!==false&&s.lecturas?.credenciales_entregas!==false)))return;wipeServiceSecrets()}
 
  state.serviceDigest=digest;const host=$('gxs-list');
  const previous=[...host.querySelectorAll('.gxs-card')].find(el=>el.dataset.service===state.openService);
@@ -775,8 +784,8 @@ function renderServices(){
  $('gxs-count').textContent=services.length+' '+(services.length===1?'plataforma':'plataformas');
  if(!services.length){host.innerHTML='<div class="gxm-empty">Todavía no tienes servicios activos.</div>';return}
  services.forEach((s,index)=>{
-  const status=serviceDetail(s),accesses=Array.isArray(s.accesos)&&s.accesos.length?s.accesos:[s];
-  const isInvite=accesses.every(a=>clean(a.modo_acceso).includes('invit')||/youtube|microsoft/i.test(a.servicio||s.nombre));
+  const status=serviceDetail(s),accesses=s.lecturas?.cliente_accesos===false?[]:Array.isArray(s.accesos)&&s.accesos.length?s.accesos:[s];
+  const isInvite=(accesses.length?accesses:[s]).every(a=>clean(a.modo_acceso).includes('invit')||/youtube|microsoft/i.test(a.servicio||s.nombre));
   const id='gxi-service-'+index,article=document.createElement('article');
   article.className='gxs-card gxc-surface';article.dataset.service=String(s.id||index);article.dataset.tone=status[1];article.dataset.index=String(index);article.dataset.stage='detail';
   const access=accesses.map((a,i)=>{
@@ -914,6 +923,7 @@ $('gxs-list').addEventListener('click',async event=>{
   navigator.clipboard?.writeText(v).then(()=>feedback.textContent='Correo copiado.',()=>feedback.textContent='No se pudo copiar.');return}
  if(kind==='pin'&&row){
    const currentService=serviceById(tile.dataset.service);
+   if(snapshotError||navigator.onLine===false||sessionToken!==TOKEN()||currentService?.lecturas?.cliente_accesos===false){feedback.textContent='El acceso está pendiente de sincronización.';return}
    const ai=Number(row.closest('[data-access-index]')?.dataset.accessIndex||0);
    const currentAccess=currentService?.accesos?.length?currentService.accesos[ai]:currentService;
    const secret=String(currentAccess?.perfil_pin||'');
@@ -1104,6 +1114,7 @@ function observeSavings(){
 }
 function renderSavings(){
  const sum=data.savings(state.view,state.prices);state.savings=sum;
+ const previousTarget=savingTarget;
  const card=$('gxv-savings');let details=$('gxi-saving-note');
  if(!sum||sum.difference<=0){card.hidden=true;if(details)details.hidden=true;stopSavingsMotion();savingSeen=false;return}
  card.hidden=false;
@@ -1141,7 +1152,7 @@ function renderSavings(){
   details.querySelector('p').textContent='Comparamos el precio mensual de contratación directa con lo que pagas en GOXION por los servicios con referencia disponible. Los perfiles, invitaciones y almacenamiento compartido pueden diferir de una suscripción completa; Google One usa como referencia la oferta pública de 2 TB con AI Plus, sin implicar que tu acceso incluya IA. No se incluyen promociones ni anualidades. Tarifas revisadas: '+(newest||'fecha no disponible')+'.';
  }
  if(!savingObserver){showSavingAmount(savingTarget);observeSavings();}
- else if(card.classList.contains('is-visible')&&savingSeen&&Math.abs(savingTarget-savingCurrent)>.01)animateSavings(savingTarget);
+ else if(card.classList.contains('is-visible')&&savingSeen&&Math.abs(savingTarget-savingCurrent)>.01&&(!savingFrame||previousTarget!==savingTarget))animateSavings(savingTarget);
  else if(card.classList.contains('is-visible')&&!savingSeen){animateSavings(savingTarget,true);savingSeen=true}
  else if(!card.classList.contains('is-visible')){stopSavingsMotion();savingCurrent=savingTarget;showSavingAmount(savingTarget)}
 }
@@ -1159,7 +1170,7 @@ function navigate(name,skipScroll){
  if(name!=='space')wipeServiceSecrets();
  const generation=++scrollGeneration;
  state.tab=name;
- if(typeof window.switchTab==='function')window.switchTab(name==='space'?'inicio':name==='catalog'?'catalogo':'soporte');
+ if(typeof window.switchTab==='function')window.switchTab(name==='space'?'inicio':name==='catalog'?'catalogo':'soporte',{preserveScroll:skipScroll||changed});
  document.querySelectorAll('#gxn-nav .gxn-tab').forEach(b=>{
   if(b.dataset.gxnTarget===name)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')
  });
@@ -1169,26 +1180,36 @@ function navigate(name,skipScroll){
 window.GOXION_V2_OPEN_OFFICIAL=name=>navigate(name==='catalog'?'catalog':name==='support'?'support':'space');
 window.GOXION_V2_GO_SPACE=()=>navigate('space');
 window.GOXION_V2_NOTIFICATION_DESTINATION=(action,ref)=>{
- if(!state.view||!TOKEN()||!['referral','coupon','service'].includes(action))return false;
- const token=TOKEN();navigate('space',true);
+ if(!TOKEN()||!['referral','coupon','service','services','catalog'].includes(action))return false;
+ const token=TOKEN();
+ if(action==='catalog'){navigate('catalog');return true}
+ navigate('space',true);
+ const generation=scrollGeneration;
+ const valid=()=>TOKEN()===token&&sessionToken===token&&state.tab==='space'&&scrollGeneration===generation;
+ const scroll=(node,block='start')=>{if(valid())node?.scrollIntoView({behavior:reduced()?'auto':'smooth',block})};
+ const tileFor=()=>[...$('gxs-list').querySelectorAll('.gxs-card')].find(el=>el.dataset.service===String(ref));
  void (async()=>{
+  if(!state.view||sessionToken!==token)await load();
+  if(!valid())return;
   if(action==='referral'||action==='coupon'){
-   await window.GOXION_V2_OPEN_BENEFIT?.(action==='referral'?'referral':'mission');
-   if(TOKEN()===token)$('gxb-panel').scrollIntoView({behavior:reduced()?'auto':'smooth',block:'start'});return
+   const opened=await window.GOXION_V2_OPEN_BENEFIT?.(action==='referral'?'referral':'mission');
+   scroll(opened?$('gxb-panel'):document.querySelector('.gxb-wrap'));return
   }
-  let tile=[...$('gxs-list').querySelectorAll('.gxs-card')].find(el=>el.dataset.service===String(ref));
-  if(!tile){await refreshClient();if(TOKEN()!==token)return;tile=[...$('gxs-list').querySelectorAll('.gxs-card')].find(el=>el.dataset.service===String(ref))}
-  if(TOKEN()!==token)return;
-  if(tile){if(!tile.classList.contains('is-open'))tile.querySelector('.gxs-trigger').click();tile.scrollIntoView({behavior:reduced()?'auto':'smooth',block:'center'})}
-  else $('gxs-list').scrollIntoView({behavior:reduced()?'auto':'smooth',block:'start'});
- })().catch(()=>{});
+  let tile=ref?tileFor():null;
+  if(ref&&!tile){await refreshClient();if(!valid())return;tile=tileFor()}
+  if(!valid())return;
+  if(tile&&!serviceOperation){
+   if(!tile.classList.contains('is-open'))tile.querySelector('.gxs-trigger').click();
+   scroll(tile,'center');
+  }else scroll($('gxs-list'));
+ })().catch(()=>{scroll($('gxs-list'))});
  return true;
 };
-window.GOXION_V2_SYNC_TAB=name=>{if(name!=='space')wipeServiceSecrets();state.tab=name};
+window.GOXION_V2_SYNC_TAB=name=>{if(name!=='space')wipeServiceSecrets();if(state.tab!==name)scrollGeneration++;state.tab=name};
 document.querySelectorAll('#gxn-nav [data-gxn-target]').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.gxnTarget)));
 $('gxn-profile-trigger').addEventListener('click',()=>{
  const menu=$('gxn-profile-menu'),next=menu.hidden;
- window.GOXION_V2_NOTIFICATIONS?.close();menu.hidden=!next;
+ notifications()?.close();menu.hidden=!next;
  $('gxn-profile-trigger').setAttribute('aria-expanded',String(next));
 });
 document.addEventListener('pointerdown',e=>{
@@ -1223,15 +1244,29 @@ function mountGoxy(){
 }
 function syncNotice(){const card=$('focus');let notice=$('gx-feed-stale');const stale=snapshotError||Boolean(state.view?.staleReads?.length);if(!notice){notice=document.createElement('p');notice.id='gx-feed-stale';notice.className='gx-feed-stale';notice.setAttribute('role','status');card.insertAdjacentElement('afterend',notice)}const message=snapshotError?'No pudimos actualizar tu información. Último estado disponible.':stale?'Algunos datos están pendientes de sincronización.':'';if(notice.textContent!==message)notice.textContent=message;notice.hidden=!stale;}
 function renderClient(){renderHero();renderBenefits();renderServices();drawHistory();renderSavings();syncNotice()}
-async function refreshClient(){
- if(!state.view||document.hidden)return;
- if(state.refreshing){state.refreshAgain=true;return}
- state.refreshing=true;const current=TOKEN(),id=state.view.cliente.id,revision=benefitRevision;
- try{const next=await data.restore(current);if(TOKEN()!==current||!next||next.cliente.id!==id)return;
-  if(revision!==benefitRevision){state.refreshAgain=true;return}
-  state.view=continuity?.merge(state.view,next)||next;snapshotError=false;renderClient()}
- catch(error){if(TOKEN()===current&&state.view&&String(state.view.cliente.id)===String(id)){if(error?.status===401){wipeServiceSecrets();window.dispatchEvent(new CustomEvent('goxion:realtime:client-session',{detail:{status:401}}));if(typeof window.cerrarSesion==='function')window.cerrarSesion();window.dispatchEvent(new Event('goxion:client-logout'))}else{snapshotError=true;wipeServiceSecrets();syncNotice()}}}
- finally{state.refreshing=false;if(state.refreshAgain){state.refreshAgain=false;queueMicrotask(()=>void refreshClient())}}
+function refreshClient(){
+ const token=TOKEN();
+ if(!state.view||!token||sessionToken!==token||document.hidden||navigator.onLine===false)return Promise.resolve();
+ if(refreshFlight?.token===token){refreshFlight.again=true;return refreshFlight.promise}
+ const flight={token,again:false,promise:null};refreshFlight=flight;
+ flight.promise=(async()=>{
+  do{
+   flight.again=false;
+   const id=state.view?.cliente?.id,revision=benefitRevision;
+   if(!id||TOKEN()!==token||refreshFlight!==flight||sessionToken!==token||document.hidden||navigator.onLine===false)break;
+   try{
+    const next=await data.restore(token);
+    if(TOKEN()!==token||refreshFlight!==flight||sessionToken!==token||!next||String(next.cliente.id)!==String(id))break;
+    if(revision!==benefitRevision){flight.again=true;continue}
+    state.view=continuity?.merge(state.view,next)||next;snapshotError=false;renderClient();
+   }catch(error){
+    if(TOKEN()!==token||refreshFlight!==flight||sessionToken!==token)break;
+    if(error?.status===401){wipeServiceSecrets();window.dispatchEvent(new CustomEvent('goxion:realtime:client-session',{detail:{status:401}}));window.cerrarSesion?.();window.dispatchEvent(new Event('goxion:client-logout'));break}
+    snapshotError=true;wipeServiceSecrets();syncNotice();
+   }
+  }while(flight.again);
+ })().finally(()=>{if(refreshFlight===flight)refreshFlight=null});
+ return flight.promise;
 }
 $('focus-icon').dataset.motionPaused=String(document.hidden);
  document.querySelector('.gxb-wrap').dataset.motionPaused=String(document.hidden);
@@ -1239,17 +1274,19 @@ $('focus-icon').dataset.motionPaused=String(document.hidden);
  setupBenefits();bindOfficialMissionReceipts();mountGoxy();
 document.addEventListener('goxion:prorroga-activada',()=>void refreshClient());
 let realtimeTimer=0;
-window.addEventListener('goxion:realtime',event=>{if(!['account_state','rewards','referrals','client_state','client_access','cancellations','resync'].includes(event.detail?.scope||''))return;clearTimeout(realtimeTimer);realtimeTimer=setTimeout(()=>void refreshClient(),220)});
+if(reader)reader.subscribe(()=>void refreshClient());
+else window.addEventListener('goxion:realtime',event=>{if(!['account_state','rewards','referrals','client_state','client_access','cancellations','resync'].includes(event.detail?.scope||''))return;clearTimeout(realtimeTimer);realtimeTimer=setTimeout(()=>void refreshClient(),220)});
 window.GOXION_V2_RETRY_FEED=()=>load();
 window.addEventListener('goxion:client-ready',()=>{void load()});
-window.addEventListener('goxion:client-logout',()=>{tabScroll?.reset();historyDigest='';snapshotError=false;scrollGeneration++;heroStates?.reset();wipeServiceSecrets();serviceOperation=null;clearInterval(greetingTimer);greetingTimer=0;stopSavingsMotion();state.view=null;shell.hidden=true;window.GOXION_V2_CLIENT_ID=''});
+window.addEventListener('goxion:client-logout',()=>{loadFlight=null;refreshFlight=null;sessionToken='';clearTimeout(realtimeTimer);tabScroll?.reset();historyDigest='';snapshotError=false;scrollGeneration++;heroStates?.reset();wipeServiceSecrets();serviceOperation=null;clearInterval(greetingTimer);greetingTimer=0;stopSavingsMotion();state.view=null;state.serviceDigest='';$('gxs-list').replaceChildren();$('gxm-list').replaceChildren();shell.hidden=true;window.GOXION_V2_CLIENT_ID=''});
 if(typeof getCurrentClientKey==='function'&&getCurrentClientKey())void load();
 // Se conserva Morphicons del laboratorio aprobado; icono SVG nativo si no hay red.
 if(!reduced())import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
  if(typeof mod.createMorph==='function')iconHandle=mod.createMorph($('state-path'),paths[$('focus-icon').dataset.icon]||paths.check,{reducedMotion:'user'});
 }).catch(()=>{});
-window.addEventListener('online',()=>{if(state.view&&!document.hidden){void refreshClient();void window.GOXION_V2_NOTIFICATIONS?.refresh({realtime:true})}});
+window.addEventListener('online',()=>{if(TOKEN()&&!document.hidden&&(!state.view||sessionToken!==TOKEN())){void load();return}if(state.view&&!document.hidden){if(reader)reader.schedule('resync');else void refreshClient();void notifications()?.refresh({realtime:true})}});
 window.addEventListener('offline',()=>{if(state.view){snapshotError=true;wipeServiceSecrets();syncNotice()}});
-setInterval(()=>{if(!document.hidden&&state.view&&navigator.onLine!==false){void refreshClient();void window.GOXION_V2_NOTIFICATIONS?.refresh({realtime:true})}},45000);
-document.addEventListener('visibilitychange',()=>{if(document.hidden)wipeServiceSecrets();if(!document.hidden&&state.view){void refreshClient();void window.GOXION_V2_NOTIFICATIONS?.refresh({realtime:true})}});
+setInterval(()=>{if(!document.hidden&&state.view&&navigator.onLine!==false){void refreshClient();void notifications()?.refresh({realtime:true})}},45000);
+document.addEventListener('visibilitychange',()=>{if(document.hidden){wipeServiceSecrets();return}if(state.view&&(!reader||window.GOXION_REALTIME?.getStatus?.()!=='SUBSCRIBED')){if(reader)reader.schedule('resync');else void refreshClient()}});
+window.addEventListener('storage',event=>{if(reader&&(event.key===window.GOXION_CORE?.STORAGE?.CLIENT_TOKEN||event.key===null)&&sessionToken&&TOKEN()!==sessionToken){window.dispatchEvent(new Event('goxion:client-logout'))}});
 })();
