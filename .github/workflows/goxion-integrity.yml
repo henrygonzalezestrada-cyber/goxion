@@ -54,6 +54,10 @@ jobs:
         if: ${{ !cancelled() }}
         run: node scripts/opiniones-inline-smoke.mjs
 
+      - name: Goxy identidad visual · paleta y presencia única
+        if: ${{ !cancelled() }}
+        run: node scripts/goxy-identity-smoke.mjs
+
       - name: Browser smoke
         if: ${{ !cancelled() }}
         run: npm run test:smoke

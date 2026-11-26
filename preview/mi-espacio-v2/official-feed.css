@@ -1683,3 +1683,26 @@ body.gx-v2-client-session #gx-client-notif-sheet .gx-client-notif-head button{to
 
 /* Los mensajes de éxito intermedios se anuncian sin añadir una fila que desplace la tarjeta. */
 #gx-v2-feed .gxs-cancel-panel:has(.gx-action-success) .gxs-feedback{position:absolute!important;width:1px!important;height:1px!important;margin:0!important;padding:0!important;overflow:hidden!important;clip-path:inset(50%);white-space:nowrap!important}
+
+
+/* Identidad Goxy · sólo candidato. La silueta mantiene el acceso al perfil. */
+html[data-gx-support-v3] .gxn-goxy-silhouette{position:absolute;inset:0;display:grid;place-items:center;opacity:0;pointer-events:none;color:#a8b5c9;transition:opacity .20s ease;z-index:2}
+html[data-gx-support-v3] .gxn-goxy-silhouette svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round}
+html[data-gx-support-v3] .gxn-avatar.gx-goxy-away .gxn-goxy-silhouette{opacity:.72}
+html[data-gx-support-v3] .gxn-avatar.gx-goxy-away .gxn-goxy-real,
+html[data-gx-support-v3] .gxn-avatar.gx-goxy-away .gxn-goxy-fallback{opacity:0;transform:translateX(9px);transition:opacity .14s ease,transform .22s ease}
+html[data-gx-support-v3] .gxn-avatar:not(.gx-goxy-away) .gxn-goxy-real,
+html[data-gx-support-v3] .gxn-avatar:not(.gx-goxy-away) .gxn-goxy-fallback{transform:translateX(0);transition:opacity .22s ease,transform .22s ease}
+html[data-gx-support-v3] #gxn-goxy-colors{padding:8px 10px 6px}
+html[data-gx-support-v3] #gxn-goxy-colors[hidden]{display:none!important}
+html[data-gx-support-v3] #gxn-goxy-colors .gxn-goxy-color-title{font:600 12px/1.4 Poppins,sans-serif;color:#f5f8ff;margin:0 0 5px}
+html[data-gx-support-v3] .gxn-goxy-palette{display:flex;align-items:center;justify-content:space-between;gap:2px}
+html[data-gx-support-v3] #gxn-profile-menu .gxn-goxy-palette button{width:40px;min-width:40px;max-width:40px;height:44px;min-height:44px;border:0;border-radius:999px;background:transparent;box-shadow:none;display:grid;place-items:center;padding:0;position:relative}
+html[data-gx-support-v3] .gxn-goxy-palette button span{display:grid;place-items:center;width:27px;height:27px;border-radius:50%;background:var(--swatch);color:#fff;transition:transform .22s ease}
+html[data-gx-support-v3] .gxn-goxy-palette button[aria-pressed=true] span{transform:scale(1.13)}
+html[data-gx-support-v3] .gxn-goxy-palette button[aria-pressed=true] span::after{content:"";display:block;width:11px;height:6px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:translateY(-1px) rotate(-45deg)}
+html[data-gx-support-v3] .gxn-goxy-palette button:focus-visible{outline:2px solid #7ee1e7;outline-offset:1px}
+html[data-gx-support-v3] #gxn-goxy-color-status{display:block;font:400 10px/1.45 Poppins,sans-serif;color:#a8b5c9;min-height:0;margin:3px 0 0}
+html[data-gx-support-v3] #gxn-goxy-color-status:empty{display:none}
+html[data-gx-support-v3] .gxn-goxy-fallback #gxn-robot-case stop{stop-color:var(--gx-goxy-case,#3552b1)}
+@media(prefers-reduced-motion:reduce){html[data-gx-support-v3] :is(.gxn-goxy-silhouette,.gxn-goxy-real,.gxn-goxy-fallback,.gxn-goxy-palette button span){transition:none!important}}

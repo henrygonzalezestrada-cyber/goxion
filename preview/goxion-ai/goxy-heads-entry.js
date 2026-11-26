@@ -22,19 +22,23 @@ function mount(host) {
   let prevMood = null;
   const refresh = () => {
     const mood = host.getAttribute("data-mood") || "idle";
-    if (prevMood === mood) return;
-    prevMood = mood;
+    const requested=host.getAttribute("data-goxy-color")||"";
+    const shellColor=/^#[0-9a-f]{6}$/i.test(requested)?requested:color;
+    const paused=host.getAttribute("data-goxy-paused")==="true";
+    const signature=mood+"|"+shellColor+"|"+paused;
+    if (prevMood === signature) return;
+    prevMood = signature;
     root.render(React.createElement(RobotHead, {
       model:"tv", shape:"rectangle", size,
       state:mapState(mood),
-      color, trimColor, screenColor,
+      color:shellColor, trimColor, screenColor, paused,
       speed:0.94, floorShadow:!avatar, antenna:!avatar,
       interactive:!avatar,
       "aria-label": "Goxy, cabeza robótica tridimensional animada"
     }));
   };
   const observer = new MutationObserver(refresh);
-  observer.observe(host, {attributes:true,attributeFilter:["data-mood"]});
+  observer.observe(host, {attributes:true,attributeFilter:["data-mood","data-goxy-color","data-goxy-paused"]});
   mounts.set(host, {root, observer});
   refresh();
 }

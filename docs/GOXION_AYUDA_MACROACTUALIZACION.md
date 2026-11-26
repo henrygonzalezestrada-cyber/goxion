@@ -153,3 +153,7 @@ Cinco reacciones según puntuación: inclinación, comprensión, rebote, entusia
 
 ### Opiniones · pulso por calificación (25 nov 2026)
 1–2 gesto finito, 3 pulso suave 2.6 s, 4 pulso doble 2.05 s, 5 tamaño base +12% y pulso doble 1.65 s. El estado se conserva mientras la tarjeta esté abierta, no continúa en éxito ni al cerrar; al cambiar calificación se reemplaza; movimiento reducido conserva tamaño estático sin animación. Flotación sólo Opiniones compacta, no otros emojis. Campo comentario 6.5%→8% compartido mediante --gx-support-control-fill con CTA local; sin borde nuevo. Sin cambios de dimensiones o color de X/CTA, sin backend ni otros módulos. Smoke ampliado verifica estado sostenido, transición descendente, reduced-motion, reinicio y opacidad compartida. F3 anterior smoke Opiniones aprobado Chromium/WebKit; F4 pendiente CI y validación iPhone.
+
+
+### Goxy · identidad visual y paleta (25 nov 2026)
+Opiniones aprobado visualmente, baseline 08998a75. Candidato y aceptación: cinco colores de carcasa, render original con atributos de color/pausa (fuente y adaptador al final del bundle actual modificados juntos; biblioteca intacta), perfil compacto, silueta estática en Soporte, transición lateral breve; mismo color en avatar/hero/chat. Preferencia local aislada por cliente, reseteada visualmente al salir; sincronización cuenta/dispositivos pendiente. No se toca IA, ni la tarjeta inteligente, ni Admin, ni ayuda oficial. Prueba de identidad aislada sin red. Validación visual iPhone pendiente.
