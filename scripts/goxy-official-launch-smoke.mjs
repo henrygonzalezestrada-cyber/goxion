@@ -35,9 +35,7 @@ assert.equal(login.match(/goxion:client-ready/g)?.length,2);
 assert.ok(login.includes("goxion:client-logout"));
 assert.ok(css.includes(".gx-release-v2-card")&&css.includes("overscroll-behavior:contain"));
 assert.ok(css.includes("mask-image:linear-gradient")&&css.includes(".gx-release-stack-peek"));
-const legacyNews=news.slice(news.indexOf("const news=["),news.indexOf("const chapters=["));
-assert.ok(legacyNews.startsWith("const news=["),"Debe conservarse la edición histórica");
-assert.equal((legacyNews.match(/title:"/g)||[]).length,6,"Deben mostrarse las seis novedades históricas");
+assert.equal((news.match(/title:"/g)||[]).length,6,"Deben mostrarse las seis novedades");
 assert.ok(news.includes("autoPosition=(autoPosition+elapsed*0.030)%loopHeight"));
 assert.ok(news.includes("scroll.scrollTop=Math.floor(autoPosition)"));
 assert.ok(news.includes('scroll.addEventListener("touchstart",claim'));
@@ -45,7 +43,7 @@ assert.ok(news.includes('scroll.querySelectorAll("[data-gx-release-clone]").forE
 assert.ok(legal.includes('new CustomEvent("goxion:legal-opened"'));
 assert.ok(legal.includes('new CustomEvent("goxion:legal-dismissed"'));
 assert.ok(legal.includes("if(serverState?.estado===\"pendiente\"&&token())postpone();"));
-assert.ok(news.includes('"nov2026-novedades-apiladas-v2-todos"'));
+assert.ok(news.includes('const VERSION="nov2026-novedades-apiladas-v2-todos"'));
 assert.ok(news.includes('typeof globalClientesData!=="undefined"'),"Debe leer estado global lexical real");
 
 // Prueba de flujo con DOM reducido: toda la sesión es informativa.
@@ -91,7 +89,6 @@ const localStorage={
 };
 const document={
  hidden:false,readyState:"complete",activeElement:null,body:new FakeElement("body"),
- documentElement:{getAttribute:()=>null},
  querySelector:()=>null,
  createElement:tag=>new FakeElement(tag),
  addEventListener(){}
@@ -114,7 +111,6 @@ new Function(
  "window","document","localStorage","setTimeout","clearTimeout",
  "requestAnimationFrame","cancelAnimationFrame","globalClientesData",news
 )(window,document,localStorage,setTimeout,clearTimeout,requestAnimationFrame,cancelAnimationFrame,globalClientesData);
-assert.equal(window.GOXION_RELEASE_202610.version,"nov2026-novedades-apiladas-v2-todos","Oficial sin opt-in conserva edición histórica");
 const emit=event=>(handlers[event]||[]).forEach(fn=>fn({detail:{estado:state.estado}}));
 function flush(n=4){
  for(let i=0;i<n&&timeouts.size;i++){

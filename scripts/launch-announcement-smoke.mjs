@@ -7,8 +7,8 @@ import { resolve } from "node:path";
 import { inflateSync } from "node:zlib";
 import { chromium, webkit } from "playwright";
 
-const cwd=process.cwd(), script="/assets/js/ayuda/20-release-announcement.js",
- css="/assets/css/goxion-release-v2.css", logo="/Logo individual.png";
+const cwd=process.cwd(), script="/preview/mi-espacio-v2/release-announcement.js",
+ css="/preview/mi-espacio-v2/release-announcement.css", logo="/Logo individual.png";
 const oldVersion="nov2026-novedades-apiladas-v2-todos";
 const version="nov2026-mi-espacio-lanzamiento-v1";
 const oldSeen="gx-release-seen:"+oldVersion+":test-account";
@@ -16,22 +16,25 @@ const seen="gx-release-seen:"+version+":test-account";
 const dir=process.env.GX_LAUNCH_SCREENSHOTS||"";
 for(const name of ["ayuda-espejo-feed-v2.html","ayuda-aceptacion-v2.html"]){
  const html=await readFile(resolve(cwd,name),"utf8");
- assert.match(html,/<html[^>]+data-gx-release-launch="off"/);
+ assert.ok(html.includes('data-gx-release-launch="'+(name==="ayuda-espejo-feed-v2.html"?"pilot":"off")+'"'));
  assert.match(html,/family=Poppins:/,"el candidato carga la fuente canónica");
- assert.equal((html.match(/20-release-announcement\.js\?/g)||[]).length,1,"un controlador por página");
+ assert.equal((html.match(/release-announcement\.js\?/g)||[]).length,1,"un controlador por página");
 }
 const official=await readFile(resolve(cwd,"ayuda.html"),"utf8");
 assert.doesNotMatch(official,/<html[^>]+data-gx-release-launch="enabled"/);
-const allowed=new Map([[script,"text/javascript"],[css,"text/css"],[logo,"image/png"]]);
+const intro="/preview/mi-espacio-v2/official-feed-intro.js",introCss="/preview/mi-espacio-v2/official-feed-intro.css";
+const allowed=new Map([[intro,"text/javascript"],[introCss,"text/css"],[script,"text/javascript"],[css,"text/css"],[logo,"image/png"]]);
 const fixture=(params)=>{
- const enabled=params.get("edition")==="enabled",scenario=params.get("scenario")||"accepted";
- const account=params.get("account")==="b"?"test-account-b":"test-account";
+ const edition=params.get("edition")==="pilot"?"pilot":params.get("edition")==="enabled"?"enabled":"off",startup=params.get("startup")==="1",scenario=params.get("scenario")||"accepted";
+ const account=params.get("account")==="casone"?"casone":params.get("account")==="b"?"test-account-b":"test-account";
  // Las variables se limitan a constantes de prueba; no hay endpoints reales.
- return `<!doctype html><html lang="es" ${enabled?'data-gx-release-launch="enabled"':'data-gx-release-launch="off"'}><head>
+ return `<!doctype html><html lang="es" data-gx-release-launch="${edition}"><head>
  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
- <link rel="stylesheet" href="${css}"><style>html,body{margin:0;background:#030305;color:white;font:16px system-ui}#account{padding:30px}#behind{position:absolute;top:30px;left:30px}</style></head><body>
- <main id="account"><button id="behind">Mi Espacio</button><section id="view-dashboard"></section></main><div id="pre-inert" inert>Anteriormente inerte</div>
+ <link rel="stylesheet" href="${css}">${startup?'<link rel="stylesheet" href="'+introCss+'">':""}<style>html,body{margin:0;background:#030305;color:white;font:16px system-ui}#account{padding:30px}#behind{position:absolute;top:30px;left:30px}</style></head><body class="${startup?"gx-v2-private-visible":""}">
+ <main id="account"><button id="behind">Mi Espacio</button><section id="view-dashboard" class="${startup?"active":""}"><div id="gx-v2-feed"></div><div id="gx-v2-sync" ${startup?"":"hidden"}></div></section></main><div id="pre-inert" inert>Anteriormente inerte</div>
+ ${startup?'<header id="gx-v2-shared-header"><img class="gxn-wordmark" width="34" height="34" src="/Logo individual.png"></header><div id="gx-v2-handoff" hidden><div class="gx-v2-handoff-center"><img class="gx-v2-handoff-mark" src="/Logo individual.png"><div class="gx-v2-handoff-wait" hidden></div></div></div>':""}
  <script>
+ window.flightTrace=false;new MutationObserver(()=>{const root=document.querySelector("#gx-v2-handoff"),overlay=document.querySelector("#gx-release-overlay");if(root?.classList.contains("is-launch-flight")&&overlay?.dataset.handoff==="flying"&&getComputedStyle(overlay.querySelector(".gx-launch-orbit img")).visibility==="hidden")window.flightTrace=true}).observe(document.body,{subtree:true,attributes:true,childList:true});
  window.GOXION_CORE={STORAGE:{CLIENT_TOKEN:"fixture-session"}};
  window.fixtureAccount=${JSON.stringify(account)};
  window.fixtureState={estado:${JSON.stringify(scenario==="pending"?"pendiente":scenario==="rejected"?"rechazado":"aceptado")},deferido:false,modalAbierto:false};
@@ -43,7 +46,7 @@ const fixture=(params)=>{
  else localStorage.removeItem("fixture-session");
  window.switchTab=name=>{window.routeCalled=name;document.querySelector("#view-dashboard").classList.add("active")};
  document.getElementById("behind").focus();
- </script><script src="${script}"></script></body></html>`;
+ </script><script src="${script}"></script>${startup?'<script src="'+intro+'"></script><script>window.addEventListener("load",()=>{document.querySelector("#gx-v2-sync").hidden=true;window.dispatchEvent(new Event("goxion:v2-feed:rendered"))})</script>':""}</body></html>`;
 };
 const server=createServer(async(req,res)=>{
  const u=new URL(req.url,"http://localhost");
@@ -57,11 +60,11 @@ await new Promise(r=>server.listen(0,"127.0.0.1",r));
 const base="http://127.0.0.1:"+server.address().port;
 if(dir)await mkdir(dir,{recursive:true});
 const waitOpen=async(page)=>{await page.locator("#gx-release-overlay[data-edition=launch]").waitFor({state:"visible",timeout:4000});};
-const openFixture=async(context,{edition="enabled",scenario="accepted",account="a"}={})=>{
+const openFixture=async(context,{edition="enabled",scenario="accepted",account="a",startup="0"}={})=>{
  const p=await context.newPage();
  await p.route("**/*",r=>r.request().url().startsWith(base)?r.continue():r.abort());
  const errors=[];p.on("pageerror",e=>errors.push(String(e)));
- await p.goto(base+"/fixture?"+new URLSearchParams({edition,scenario,account}));
+ await p.goto(base+"/fixture?"+new URLSearchParams({edition,scenario,account,startup}));
  await p.evaluate(()=>window.GOXION_RELEASE_202610.refresh());
  return {page:p,errors};
 };
@@ -199,6 +202,32 @@ try{
    }
    assert.equal(await p.locator(".gx-launch-copy").evaluate(el=>getComputedStyle(el).animationName),"none");
    assert.equal(obj.errors.length,0);await responsive.close();
+   // Arranque real del espejo, limitado a cuenta piloto sintética: un solo logo en vuelo.
+   const pilotContext=await browser.newContext({viewport:{width:390,height:844}});
+   const {page:pilotPage,errors:pilotErrors}=await openFixture(pilotContext,{edition:"pilot",account:"casone",startup:"1"});
+   await waitOpen(pilotPage);
+   await pilotPage.locator("#gx-v2-handoff").waitFor({state:"hidden",timeout:4000});
+   assert.equal(await pilotPage.evaluate(()=>window.flightTrace),true,"acople del logo a la tarjeta");
+   assert.equal(await pilotPage.locator(".gx-launch-orbit img").evaluate(el=>getComputedStyle(el).visibility),"visible");
+   assert.equal(await pilotPage.locator("#gx-release-overlay").getAttribute("data-handoff"),null);
+   for(let i=0;i<6;i++)await pilotPage.locator(".gx-launch-next").click();
+   const pilotSeen="gx-release-seen:nov2026-mi-espacio-lanzamiento-pilot-v1:casone";
+   assert.equal(await pilotPage.evaluate(k=>sessionStorage.getItem(k),pilotSeen),"1");
+   assert.equal(await pilotPage.evaluate(()=>localStorage.getItem("gx-release-seen:nov2026-mi-espacio-lanzamiento-v1:casone")),null);
+   await pilotPage.evaluate(()=>{localStorage.removeItem("fixture-session");window.dispatchEvent(new Event("goxion:client-logout"))});
+   assert.equal(await pilotPage.evaluate(k=>sessionStorage.getItem(k),pilotSeen),null);
+   assert.deepEqual(pilotErrors,[]);
+   await pilotContext.close();
+   const otherContext=await browser.newContext();
+   const {page:otherPage}=await openFixture(otherContext,{edition:"pilot",account:"b",startup:"1"});
+   await otherPage.locator("#gx-v2-handoff").waitFor({state:"hidden",timeout:4000});
+   await notOpen(otherPage);assert.equal(await otherPage.evaluate(()=>window.flightTrace),false);
+   await otherContext.close();
+   const pendingContext=await browser.newContext();
+   const {page:pendingPilot}=await openFixture(pendingContext,{edition:"pilot",account:"casone",scenario:"pending",startup:"1"});
+   await pendingPilot.locator("#gx-v2-handoff").waitFor({state:"hidden",timeout:4000});
+   await notOpen(pendingPilot);assert.equal(await pendingPilot.evaluate(()=>window.flightTrace),false);
+   await pendingContext.close();
    console.log(name+": PASS activación deshabilitada, sesión/cola, seis capítulos y retroceso, foco, X/reintento, visto por cuenta, logout, reduced-motion, 8 tamaños");
   }finally{await browser.close();}
  }

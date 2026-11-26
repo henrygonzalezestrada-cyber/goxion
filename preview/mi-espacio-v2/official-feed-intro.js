@@ -9,15 +9,18 @@
  if(!feed||!dash||!header||!wordmark||!root)return;
  const mark=root.querySelector('.gx-v2-handoff-mark'),wait=root.querySelector('.gx-v2-handoff-wait');
  const reduced=()=>!!window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
- let completed=false,publicCompleted=false,active=false,mode='',sequence=0,delayTimer=0,guardTimer=0,flight=null,fade=null;
+ let completed=false,publicCompleted=false,active=false,mode='',sequence=0,delayTimer=0,guardTimer=0,flight=null,fade=null,claim=null,flightGuard=0;
  const inSpace=()=>document.body.classList.contains('gx-v2-private-visible')&&!feed.hidden&&dash.classList.contains('active');
  function clearTimers(){clearTimeout(delayTimer);clearTimeout(guardTimer)}
  function hide(){
-  sequence++;active=false;mode='';clearTimers();clearTimeout(window.GOXION_V2_BOOT_TIMER);
+  const wasVisible=!root.hidden;
+  sequence++;active=false;mode='';clearTimers();clearTimeout(flightGuard);clearTimeout(window.GOXION_V2_BOOT_TIMER);
+  const pending=claim;claim=null;pending?.cancel();
   try{flight?.cancel();fade?.cancel()}catch(_){}flight=null;fade=null;
-  root.hidden=true;root.classList.remove('is-flying');
+  root.hidden=true;root.classList.remove('is-flying','is-launch-flight');
   document.body.classList.remove('gx-v2-handoff-active','no-scroll');
   mark.removeAttribute('style');wait.hidden=true;
+  if(wasVisible)window.dispatchEvent(new Event('goxion:v2-handoff:finished'));
  }
  function begin(target='private'){
   if(target==='private'?(completed||!inSpace()):publicCompleted)return;
@@ -25,7 +28,7 @@
   if(reduced()){if(target==='private')completed=true;else publicCompleted=true;hide();return}
   active=true;mode=target;clearTimeout(window.GOXION_V2_BOOT_TIMER);
   const id=++sequence;
-  root.hidden=false;root.classList.remove('is-flying');wait.hidden=true;
+  root.hidden=false;root.classList.remove('is-flying','is-launch-flight');wait.hidden=true;
   mark.removeAttribute('style');document.body.classList.add('gx-v2-handoff-active');
   clearTimers();
   if(target==='private')delayTimer=setTimeout(()=>{if(id===sequence&&!completed)wait.hidden=false},480);
@@ -42,17 +45,43 @@
   const id=sequence;
   clearTimeout(delayTimer);wait.hidden=true;
   document.body.classList.remove('no-scroll');
-  const source=mark.getBoundingClientRect(),dest=destination?.getBoundingClientRect();
+  const release=window.GOXION_RELEASE_202610;
+  if(isPrivate&&release?.handoffStatus?.()==='waiting'){
+   await new Promise(resolve=>{
+    let timer;const done=()=>{clearTimeout(timer);window.removeEventListener('goxion:legal-state',done);resolve()};
+    window.addEventListener('goxion:legal-state',done,{once:true});timer=setTimeout(done,480);
+   });
+   if(id!==sequence||!inSpace())return;
+  }
+  if(isPrivate&&release?.handoffStatus?.()==='ready'){
+   root.classList.add('is-launch-flight');
+   claim=release.claimHandoff?.()||null;
+   if(!claim)root.classList.remove('is-launch-flight');
+   else claim.signal.addEventListener('abort',()=>{if(id===sequence)hide()},{once:true});
+  }
+  const source=mark.getBoundingClientRect(),dest=(claim?.target||destination)?.getBoundingClientRect();
   if(!source.width||!source.height||!dest?.width||!dest.height){hide();return}
-  const size=34,scale=size/Math.max(source.width,source.height);
-  const dy=dest.top+(dest.height-source.height*scale)/2-source.top;
-  const dx=dest.left+3-source.left;
+  const size=34;let scale=size/Math.max(source.width,source.height);
+  let dy=dest.top+(dest.height-source.height*scale)/2-source.top;
+  let dx=dest.left+3-source.left;
+  if(claim){
+   if(!mark.naturalWidth||!mark.naturalHeight||mark.src!==claim.target.src){claim.complete();hide();return}
+   const aspect=mark.naturalWidth/mark.naturalHeight;
+   const fit=r=>{const w=Math.min(r.width,r.height*aspect),h=w/aspect;return {w,x:(r.width-w)/2,y:(r.height-h)/2}};
+   const a=fit(source),b=fit(dest);scale=b.w/a.w;
+   dx=dest.left+b.x-source.left-a.x*scale;dy=dest.top+b.y-source.top-a.y*scale;
+  }
   Object.assign(mark.style,{position:'fixed',left:source.left+'px',top:source.top+'px',width:source.width+'px',height:source.height+'px',margin:'0',transformOrigin:'top left'});
   root.classList.add('is-flying');
   try{
    flight=mark.animate([{transform:'translate3d(0,0,0) scale(1)',opacity:1},
     {transform:'translate3d('+dx+'px,'+dy+'px,0) scale('+scale+')',opacity:1}],
     {duration:620,easing:'cubic-bezier(.2,.8,.2,1)',fill:'forwards'});
+   if(claim){
+    await Promise.race([flight.finished,new Promise(resolve=>{flightGuard=setTimeout(resolve,1000)})]);
+    if(id!==sequence)return;
+    claim.complete();hide();return;
+   }
    await flight.finished;
    if(id!==sequence)return;
    document.body.classList.remove('gx-v2-handoff-active');

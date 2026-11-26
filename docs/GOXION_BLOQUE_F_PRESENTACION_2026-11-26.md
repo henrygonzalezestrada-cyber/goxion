@@ -1,4 +1,9 @@
 # GOXION · Bloque F — una nueva experiencia
+
+## Actualización 26/11/2026 — piloto explícitamente autorizado
+
+Sólo `ayuda-espejo-feed-v2.html` usa modo `pilot`, con clave de cliente exacta `casone`, sesión y perfil cargados. La aceptación aislada continúa `off`; la ayuda oficial y sus recursos mantienen los blobs de main. El controlador y CSS del piloto pertenecen a `preview/mi-espacio-v2/release-announcement.{js,css}`: no se cargan junto al controlador oficial. La versión piloto y la marca de sesión son independientes de la campaña general; cerrar sesión permite repetir la experiencia. El logo real viaja desde el arranque a la portada sólo si términos aceptados, no hay otro modal y la presentación es elegible; de otro modo conserva el viaje habitual, respeta movimiento reducido y presenta después de términos si corresponde. No hay cambios de backend ni de operaciones. No autoriza la promoción general ni sustituye los pendientes sensibles de E y la aceptación real en Safari. Estado histórico anterior debajo, sujeto a esta excepción de alcance.
+
 26 nov 2026 · **preparación en rama de revisión, NO LANZAMIENTO**
   
 ## Alcance
