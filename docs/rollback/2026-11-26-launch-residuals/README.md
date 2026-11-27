@@ -6,3 +6,5 @@
 - Admin operaciones v14 y credenciales cliente v6: respaldo exacto de producción. Si aparece regresión, revertir sólo la función del proyecto afectado; conservar autenticación HMAC interna y repetir guardas 401/lectura autenticada. No revertir motores, datos, Vault ni piloto.
 
 - C9: `15-promotions-catalog-c1-before-c9.js` es la fuente exacta anterior a la corrección de cierre. Revertir sólo ese controlador y el cache-bust correspondiente en los tres HTML si reaparece una regresión; no sustituir el HTML oficial con el espejo. CI focal 45922465017 PASS del smoke original.
+
+- C9 segunda corrección: si hay regresión, restaurar sólo `assets/js/ayuda/15-promotions-catalog-c1.js` y `assets/css/ayuda.css` desde base estable o revertir el commit específico `db6eaa00f3d1ccbae592451ec5174944663cee60`; restaurar sus cache-bust, nunca reset/force ni promover todo el espejo. CI focal 45923415744 y completo 45923415871 PASS 3/3.
