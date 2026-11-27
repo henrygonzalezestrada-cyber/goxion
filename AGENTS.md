@@ -1,5 +1,7 @@
 # GOXION · Guía para cualquier asistente que trabaje en el repositorio
 
+> **K1b · PUSH AUTOMÁTICO CON APP CERRADA APROBADO (27/NOV/2026):** Henry confirmó «Si funcionó 😱». Cuenta sintética dedicada con único dispositivo activo, un aviso QA, cron de 2 min, 1 entrega aceptada y sin duplicados. [Registro K1](docs/GOXION_BLOQUE_K_PUSH_QA_2026-11-26.md). K1a/K1b cerrados, no repetir. Navegación directa no detallada por separado; siguiente piloto Casona sólo con gate, TTL, privacidad, política de envío y autorización explícita. No producción, no A–J.
+
 > **K1a · AVISO PUSH RECIBIDO EN IPHONE (27/NOV/2026):** Henry confirmó «EXCELENTE!!!! Funcionó» en GOXION QA. SQL de sólo lectura 1 dispositivo registrado/vigente y 1 solicitud de prueba. [Registro K1](docs/GOXION_BLOQUE_K_PUSH_QA_2026-11-26.md). No repetir el aviso manual; siguiente comprobación separada: app cerrada, recepción automática y apertura de campana; previa autorización de prueba dirigida únicamente a su dispositivo QA. Producción y Casona no habilitadas.
 
 > **K1 · PUSH QA PUBLICADO (27/NOV/2026):** [Continuidad K1](docs/GOXION_BLOQUE_K_PUSH_QA_2026-11-26.md). Henry autorizó únicamente aceptación aislada. Pages 45950204603 SUCCESS; QA HTTP 200, Edge v3, SQL 1/0 rollback, CI focal e Integrity PASS. Main `dadf8904`, respaldo `backup/pre-push-qa-publication-20261127`, las tres HTML oficiales idénticas. Ruta `ayuda-aceptacion-v2.html?v=push-k1-20261127` sólo QA, pendiente recepción física iPhone, click y despacho automático. No habilitar piloto Casona ni producción, ni repetir A–J.
