@@ -1,10 +1,9 @@
-/* GOXION · Visión, fase de aceptación. No almacenamiento ni URLs remotas.
- * El servicio de imágenes sólo se consulta en el proyecto QA, nunca en producción.
- */
+/* GOXION · Visión QA y piloto H2 exclusivo del espejo. No almacenamiento ni URLs remotas. */
 (()=>{
  'use strict';
- const endpoint=()=>window.GOXION_CORE?.endpoint?.('goxy-vision-qa');
+ const endpoint=()=>window.GOXION_CORE?.endpoint?.(isMirrorPilot()?'goxy-support-pilot':'goxy-vision-qa');
  const isQA=()=>location.pathname.endsWith('/ayuda-aceptacion-v2.html');
+ const isMirrorPilot=()=>location.pathname.endsWith('/ayuda-espejo-feed-v2.html')&&!window.GOXION_QA_ISOLATED;
  const token=()=>{try{return localStorage.getItem(window.GOXION_CORE?.STORAGE?.CLIENT_TOKEN||'')||''}catch{return ''}};
  const maxBytes=750000, maxSide=1440;
  async function prepare(file){
@@ -26,8 +25,10 @@
    }finally{URL.revokeObjectURL(url)}
  }
  async function send(payload,signal){
-   if(!isQA()||!window.GOXION_QA_ISOLATED)return {ok:false,code:'VISION_QA_ONLY'};
-   const url=endpoint();if(!url||!url.endsWith('/goxy-vision-qa'))return {ok:false,code:'ENVIRONMENT_MISMATCH'};
+   const mirror=isMirrorPilot();
+   if(!mirror&&(!isQA()||!window.GOXION_QA_ISOLATED))return {ok:false,code:'VISION_QA_ONLY'};
+   if(mirror&&!['status','incident','analyze'].includes(payload.mode))return {ok:false,code:'VISION_DISABLED'};
+   const url=endpoint();if(!url||!url.endsWith(mirror?'/goxy-support-pilot':'/goxy-vision-qa'))return {ok:false,code:'ENVIRONMENT_MISMATCH'};
    const auth=token();if(!auth)return {ok:false,code:'SESSION_INVALID'};
    try{
      const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json','X-Client-Token':auth},body:JSON.stringify(payload),signal,cache:'no-store'});
@@ -38,6 +39,7 @@
  }
  const status=signal=>send({mode:'status'},signal);
  const analyze=(image,message,signal,testConsent=false)=>send({mode:'analyze',image,message:String(message||'').trim(),consent:true,testConsent:testConsent===true},signal);
+ const incident=signal=>isMirrorPilot()?send({mode:'incident'},signal):Promise.resolve({ok:false,code:'ENVIRONMENT_MISMATCH'});
  const example=signal=>send({mode:'example',consent:true},signal);
- window.GOXY_VISION=Object.freeze({prepare,status,analyze,example,isQA});
+ window.GOXY_VISION=Object.freeze({prepare,status,analyze,example,isQA,isMirrorPilot,incident});
 })();
