@@ -27,6 +27,11 @@ jobs:
           node --experimental-strip-types scripts/goxy-feedback-pilot-gateway.test.mjs
           node --test scripts/goxy-feedback-pilot-client.test.mjs
 
+      - name: Goxy H2 · incidencias y visión piloto (servicios simulados)
+        run: |
+          node --test scripts/goxy-support-pilot-client.test.mjs
+          node --experimental-strip-types --test scripts/goxy-support-pilot-gateway.test.mjs
+
       - name: Install browser test
         run: npm install --no-save playwright
 
