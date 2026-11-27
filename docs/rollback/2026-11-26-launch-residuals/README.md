@@ -4,3 +4,5 @@
 - Edge experiencia-servicio-admin v1 original exacto en este respaldo. Si la corrección falla, desplegar esa fuente sólo en el proyecto afectado con verify_jwt=false (autenticación HMAC interna), nunca revelar ni regenerar secretos. Restaurar JS Admin desde base y cambiar cache-bust. Escritor de compensaciones, validación de reportes y finanzas permanecen intactos. Verificar 401 visitante y 200 sesión Admin legítima después de restaurar. No reenviar/calificar/compensar datos reales para probar.
 
 - Admin operaciones v14 y credenciales cliente v6: respaldo exacto de producción. Si aparece regresión, revertir sólo la función del proyecto afectado; conservar autenticación HMAC interna y repetir guardas 401/lectura autenticada. No revertir motores, datos, Vault ni piloto.
+
+- C9: `15-promotions-catalog-c1-before-c9.js` es la fuente exacta anterior a la corrección de cierre. Revertir sólo ese controlador y el cache-bust correspondiente en los tres HTML si reaparece una regresión; no sustituir el HTML oficial con el espejo. CI focal 45922465017 PASS del smoke original.
