@@ -8,6 +8,7 @@ try{
     const context=await browser.newContext({viewport:{width:375,height:812},userAgent:mode.startsWith("iphone")?"Mozilla/5.0 (iPhone; CPU iPhone OS 18_4 like Mac OS X) AppleWebKit/605.1.15 Version/18.4 Mobile/15E148 Safari/604.1":"Mock Chromium"});
     await context.addInitScript(({mode})=>{
       window.GOXION_QA_ISOLATED=true;
+      Object.defineProperty(navigator,"userAgent",{value:mode.startsWith("iphone")?"iPhone Safari":"Mock Chromium"});
       window.GOXION_CORE={STORAGE:{CLIENT_TOKEN:"qa-token"}};
       if(mode!=="guest")localStorage.setItem("qa-token","fixture-session");
       window.PushManager=function(){};
@@ -29,6 +30,8 @@ try{
     await page.goto("https://qa.invalid/ayuda-aceptacion-v2.html");
     const panel=page.locator(".gx-push-qa");
     await panel.waitFor({state:"attached"});
+    console.log("fixture",mode,JSON.stringify(await page.evaluate(()=>({ua:navigator.userAgent,standalone:navigator.standalone,mode:matchMedia("(display-mode: standalone)").matches,secure:isSecureContext,token:!!localStorage.getItem("qa-token"),panel:document.querySelector(".gx-push-qa")?.innerText,hidden:document.querySelector(".gx-push-qa")?.hidden}))),errors);
+    page.setDefaultTimeout(8000);
     if(mode==="guest"){assert.equal(await panel.isVisible(),false);assert.equal(actions.length,0)}
     else if(mode==="iphone-web"){
       await panel.getByRole("button",{name:"Cómo activar"}).click();
