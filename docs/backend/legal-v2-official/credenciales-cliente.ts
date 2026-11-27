@@ -9,7 +9,16 @@ const cors={
 function res(body:Record<string,unknown>,status=200){return new Response(JSON.stringify(body),{status,headers:{...cors,"Content-Type":"application/json","Cache-Control":"no-store, private, max-age=0","Pragma":"no-cache","Expires":"0"}})}
 function b64b(t:string){const b=t.replace(/-/g,"+").replace(/_/g,"/").padEnd(Math.ceil(t.length/4)*4,"=");const x=atob(b);return Uint8Array.from(x,c=>c.charCodeAt(0))}
 function b64t(t:string){return new TextDecoder().decode(b64b(t))}
-async function verify(token:string,secret:string){const p=token.trim().split(".");if(p.length!==2)return null;const key=await crypto.subtle.importKey("raw",new TextEncoder().encode(secret),{name:"HMAC",hash:"SHA-256"},false,["verify"]);if(!(await crypto.subtle.verify("HMAC",key,b64b(p[1]),new TextEncoder().encode(p[0]))))return null;try{const j=JSON.parse(b64t(p[0]));return j.role==="goxion_client"&&j.cliente_id&&j.exp>Math.floor(Date.now()/1000)?j:null}catch{return null}}
+async function verify(token:string,secret:string){
+  const p=token.trim().split(".");
+  if(token.length>8192||p.length!==2||!p.every(x=>/^[A-Za-z0-9_-]+$/.test(x)))return null;
+  try{
+    const key=await crypto.subtle.importKey("raw",new TextEncoder().encode(secret),{name:"HMAC",hash:"SHA-256"},false,["verify"]);
+    if(!(await crypto.subtle.verify("HMAC",key,b64b(p[1]),new TextEncoder().encode(p[0]))))return null;
+    const j=JSON.parse(b64t(p[0]));
+    return j?.role==="goxion_client"&&j.cliente_id&&Number.isFinite(Number(j.exp))&&Number(j.exp)>Math.floor(Date.now()/1000)?j:null;
+  }catch{return null}
+}
 
 async function exigirClienteActivo(sb:any,clienteId:string){
   const q=await sb.from("clientes").select("estado").eq("id",clienteId).maybeSingle();
@@ -66,8 +75,10 @@ Deno.serve(async(req)=>{
       const cq=await sb.from("clientes").select("id,codigo_hash").eq("id",clienteId).single();if(cq.error)throw cq.error;
       if(!cq.data.codigo_hash||!bcrypt.compareSync(pin,String(cq.data.codigo_hash)))return res({ok:false,error:"PIN incorrecto"},401);
 
-      const q=await sb.from("credenciales_entregas").select("id,credencial_id,cliente_id,cliente_servicio_id,estado,expira_at,credenciales_plataforma(vault_secret_id,plataforma,cuenta_login,version,activa),cliente_servicios(nombre,activo)").eq("id",entregaId).eq("cliente_id",clienteId).single();
-      if(q.error)throw q.error;const row:any=q.data;
+      const q=await sb.from("credenciales_entregas").select("id,credencial_id,cliente_id,cliente_servicio_id,estado,expira_at,credenciales_plataforma(vault_secret_id,plataforma,cuenta_login,version,activa),cliente_servicios(nombre,activo)").eq("id",entregaId).eq("cliente_id",clienteId).maybeSingle();
+      if(q.error)throw q.error;
+      if(!q.data)return res({ok:false,error:"Entrega no disponible"},404);
+      const row:any=q.data;
       if(row.estado!=="pendiente")return res({ok:false,error:"Esta contraseña ya no está disponible"},409);
       if(row.expira_at&&new Date(row.expira_at).getTime()<Date.now()){
         await sb.from("credenciales_entregas").update({estado:"expirada",updated_at:new Date().toISOString()}).eq("id",entregaId).eq("estado","pendiente");

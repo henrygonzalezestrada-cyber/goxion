@@ -24,6 +24,8 @@ jobs:
 
       - name: Admin experience · signed authorization and recovery (fixtures)
         run: node --experimental-strip-types --test scripts/admin-experience-auth.test.mjs
+      - name: Admin operations and credential guards (fixtures)
+        run: node --experimental-strip-types --test scripts/sensitive-session-guards.test.mjs
 
       - name: Auth resilience · deterministic WAAPI/RAF
         run: node --test scripts/auth-morph-resilience.test.mjs

@@ -10,11 +10,14 @@ function res(body:Record<string,unknown>,status=200){return new Response(JSON.st
 function b64b(t:string){const b=t.replace(/-/g,"+").replace(/_/g,"/").padEnd(Math.ceil(t.length/4)*4,"=");const x=atob(b);return Uint8Array.from(x,c=>c.charCodeAt(0))}
 async function auth(req:Request){
   const token=(req.headers.get("X-Admin-Token")||"").trim(),p=token.split(".");
-  if(p.length!==2)return false;
+  if(token.length>8192||p.length!==2||!p.every(x=>/^[A-Za-z0-9_-]+$/.test(x)))return false;
   const s=Deno.env.get("ADMIN_SESSION_SECRET"); if(!s)throw new Error("ADMIN_SESSION_SECRET no configurado");
-  const key=await crypto.subtle.importKey("raw",new TextEncoder().encode(s),{name:"HMAC",hash:"SHA-256"},false,["verify"]);
-  if(!(await crypto.subtle.verify("HMAC",key,b64b(p[1]),new TextEncoder().encode(p[0]))))return false;
-  try{const j=JSON.parse(new TextDecoder().decode(b64b(p[0])));return j.role==="goxion_admin"&&j.exp>Math.floor(Date.now()/1000)}catch{return false}
+  try{
+    const key=await crypto.subtle.importKey("raw",new TextEncoder().encode(s),{name:"HMAC",hash:"SHA-256"},false,["verify"]);
+    if(!(await crypto.subtle.verify("HMAC",key,b64b(p[1]),new TextEncoder().encode(p[0]))))return false;
+    const j=JSON.parse(new TextDecoder().decode(b64b(p[0])));
+    return j?.role==="goxion_admin"&&Number.isFinite(Number(j.exp))&&Number(j.exp)>Math.floor(Date.now()/1000);
+  }catch{return false}
 }
 const num=(v:unknown,d=0)=>Number.isFinite(Number(v))?Number(v):d;
 const clamp3=(v:unknown)=>Math.max(0,Math.min(3,Math.trunc(num(v,0))));
