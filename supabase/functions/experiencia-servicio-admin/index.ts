@@ -13,22 +13,23 @@ const bytes=(s:string)=>{
   const b=s.replace(/-/g,"+").replace(/_/g,"/").padEnd(Math.ceil(s.length/4)*4,"=");
   return Uint8Array.from(atob(b),x=>x.charCodeAt(0));
 };
-async function signed(token:string,secret:string,role:string){
-  if(!secret||!token||token.length>8192)return null;
+async function signedAdmin(token:string,secret:string){
+  if(!token.trim())return {payload:null,reason:"missing_token"};
+  if(token.length>8192)return {payload:null,reason:"invalid_format"};
   const parts=token.trim().split(".");
-  if(parts.length!==2)return null;
+  if(parts.length!==2)return {payload:null,reason:"invalid_format"};
   try{
     const key=await crypto.subtle.importKey("raw",new TextEncoder().encode(secret),
       {name:"HMAC",hash:"SHA-256"},false,["verify"]);
     const valid=await crypto.subtle.verify("HMAC",key,bytes(parts[1]),
       new TextEncoder().encode(parts[0]));
-    if(!valid)return null;
+    if(!valid)return {payload:null,reason:"invalid_signature"};
     const payload=JSON.parse(new TextDecoder().decode(bytes(parts[0])));
-    if(payload.role!==role||!Number.isFinite(Number(payload.exp))||
-       Number(payload.exp)<=Math.floor(Date.now()/1000))return null;
-    if(role==="goxion_client"&&!/^[0-9a-f-]{36}$/i.test(String(payload.cliente_id||"")))return null;
-    return payload;
-  }catch{return null}
+    if(payload?.role!=="goxion_admin")return {payload:null,reason:"invalid_role"};
+    if(!Number.isFinite(Number(payload.exp))||Number(payload.exp)<=Math.floor(Date.now()/1000))
+      return {payload:null,reason:"expired"};
+    return {payload,reason:null};
+  }catch{return {payload:null,reason:"invalid_format"}}
 }
 
 const uuid=(v:unknown)=>/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(v||""));
@@ -38,9 +39,18 @@ Deno.serve(async(req)=>{
  if(req.method==="OPTIONS")return new Response("ok",{headers:cors});
  if(req.method!=="POST")return answer({ok:false,error:"Método no permitido."},405);
  try{
-  const key=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")||"",url=Deno.env.get("SUPABASE_URL")||"";
-  const admin=await signed(req.headers.get("X-Admin-Token")||"",Deno.env.get("ADMIN_SESSION_SECRET")||"","goxion_admin");
-  if(!admin)return answer({ok:false,error:"Sesión administrativa inválida o expirada."},401);
+  const key=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")||"",url=Deno.env.get("SUPABASE_URL")||"",secret=Deno.env.get("ADMIN_SESSION_SECRET")||"";
+  if(!key||!url||!secret){
+    console.warn("GX_ADMIN_EXPERIENCE_AUTH:configuration_missing");
+    return answer({ok:false,code:"ADMIN_SERVICE_UNAVAILABLE",error:"El servicio administrativo no está disponible por ahora."},503);
+  }
+  const auth=await signedAdmin(req.headers.get("X-Admin-Token")||"",secret);
+  if(!auth.payload){
+    // Categorical diagnostics only: never token, identity, secret, or request payload.
+    console.warn("GX_ADMIN_EXPERIENCE_AUTH:"+auth.reason);
+    return answer({ok:false,code:"ADMIN_SESSION_INVALID",error:"Sesión administrativa inválida o expirada."},401);
+  }
+  const admin=auth.payload;
   const sb=createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}});
   const body=await req.json().catch(()=>({})),action=String(body.accion||""),d=body.datos||{};
   const reports=sb.from("goxion_reportes_trato_justo"),incidents=sb.from("goxion_garantia_incidencias");

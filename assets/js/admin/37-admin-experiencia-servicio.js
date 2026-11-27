@@ -4,10 +4,31 @@
 const gx=window.GOXION_CORE;if(!gx)return;
 const $=id=>document.getElementById(id);
 const token=()=>localStorage.getItem(gx.STORAGE.ADMIN_TOKEN)||"";
-async function request(accion,datos={}){
- const session=token();if(!session)throw Error("Inicia sesión en Admin.");
- const res=await fetch(gx.endpoint("experiencia-servicio-admin"),{method:"POST",cache:"no-store",headers:{"Content-Type":"application/json","X-Admin-Token":session},body:JSON.stringify({accion,datos})});
- const json=await res.json().catch(()=>({}));if(token()!==session)throw Error("La sesión cambió.");if(!res.ok||json.ok!==true)throw Error(json.error||"No se pudo completar la solicitud.");return json;
+let rejectedSession=null;
+const reads=new Map();
+function request(accion,datos={},options={}){
+ const session=token();
+ if(!session)return Promise.reject(Error("Inicia sesión en Admin."));
+ const read=accion==="reportes"||accion==="calificaciones";
+ if(options.retry===true&&read&&rejectedSession===session)rejectedSession=null;
+ if(rejectedSession!==null&&rejectedSession!==session)rejectedSession=null;
+ if(rejectedSession===session)return Promise.reject(Error("La sesión administrativa no pudo verificarse. Vuelve a iniciar sesión o pulsa Actualizar para reintentar."));
+ const prior=read?reads.get(accion):null;
+ if(prior&&prior.session===session)return prior.promise;
+ const task=(async()=>{
+  const res=await fetch(gx.endpoint("experiencia-servicio-admin"),{method:"POST",cache:"no-store",headers:{"Content-Type":"application/json","X-Admin-Token":session},body:JSON.stringify({accion,datos})});
+  const json=await res.json().catch(()=>({}));
+  if(token()!==session)throw Error("La sesión cambió.");
+  if(res.status===401){rejectedSession=session;throw Error("La sesión administrativa no pudo verificarse. Vuelve a iniciar sesión o pulsa Actualizar para reintentar.")}
+  if(!res.ok||json.ok!==true)throw Error(json.error||"No se pudo completar la solicitud.");
+  return json;
+ })();
+ if(read){
+  const entry={session,promise:task};reads.set(accion,entry);
+  const clean=()=>{if(reads.get(accion)===entry)reads.delete(accion)};
+  void task.then(clean,clean);
+ }
+ return task;
 }
 window.GOXION_ADMIN_EXPERIENCE=Object.freeze({request});
 const list=$("gx-tj-reports-list"),status=$("gx-tj-reports-status");if(!list||!status)return;
@@ -61,15 +82,21 @@ function cardFor(r){
  }
  return card;
 }
-async function load(focus=""){
+async function load(focus="",retry=false){
  const rev=++revision;status.textContent="Consultando reportes…";list.replaceChildren();
- try{const result=await request("reportes");if(rev!==revision)return;
+ try{const result=await request("reportes",{},{retry});if(rev!==revision)return;
  const rows=result.reportes||[];rows.forEach(r=>list.append(cardFor(r)));status.textContent=rows.length?rows.length+" por atender"+(result.limitado?" · listado limitado":""):"Sin reportes pendientes.";
  if(focus){const n=[...list.children].find(n=>n.dataset.reportId===focus);if(n)n.scrollIntoView({behavior:"smooth",block:"center"});else status.textContent+=" El reporte seleccionado ya no está pendiente."}
  }catch(e){if(rev===revision)status.textContent=e.message}
 }
-$("gx-tj-reports-refresh")?.addEventListener("click",()=>load());
-const view=list.closest("[data-settings-view]");if(view){const observer=new MutationObserver(()=>{if(view.classList.contains("active")&&!view.hidden)void load()});observer.observe(view,{attributes:true,attributeFilter:["class","hidden"]})}
+$("gx-tj-reports-refresh")?.addEventListener("click",()=>load("",true));
+const view=list.closest("[data-settings-view]");if(view){
+ const visible=()=>view.classList.contains("active")&&!view.hidden;
+ let wasVisible=visible();
+ const observer=new MutationObserver(()=>{const now=visible();if(now&&!wasVisible)void load();wasVisible=now;});
+ observer.observe(view,{attributes:true,attributeFilter:["class","hidden"]});
+ if(wasVisible)void load();
+}
 const old=window.gxOpenNotificationClient;
 window.gxOpenNotificationClient=function(key,tipo,id=""){
  const n=(window.gxAdminNotifications||[]).find(x=>String(x.id)===String(id));

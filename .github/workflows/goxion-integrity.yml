@@ -22,6 +22,12 @@ jobs:
         with:
           node-version: 22
 
+      - name: Admin experience · signed authorization and recovery (fixtures)
+        run: node --experimental-strip-types --test scripts/admin-experience-auth.test.mjs
+
+      - name: Auth resilience · deterministic WAAPI/RAF
+        run: node --test scripts/auth-morph-resilience.test.mjs
+
       - name: Goxy H1 · piloto del espejo (controlador firmado simulado y alcance del cliente)
         run: |
           node --experimental-strip-types scripts/goxy-feedback-pilot-gateway.test.mjs
@@ -37,6 +43,9 @@ jobs:
 
       - name: Install Chromium and WebKit
         run: npx playwright install --with-deps chromium webkit
+
+      - name: Auth resilience · Chromium/WebKit guest login and injected faults
+        run: node scripts/auth-morph-resilience-smoke.mjs
 
       - name: Goxy · interpretación y diagnóstico contextual
         run: node --test scripts/goxy-dialog-routing.test.mjs scripts/goxy-diagnosis.test.mjs scripts/goxy-conversation-context.test.mjs scripts/goxy-learning-ui.test.mjs scripts/goxy-verified-learning.test.mjs scripts/goxy-learning-integration.test.mjs
