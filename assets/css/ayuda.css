@@ -12606,6 +12606,12 @@ body.gx-promo-morph-open{overflow:hidden!important}
     touch-action:none;
 }
 
+/* Watchdog only: complete a suspended return before reinsertion. */
+.gx-promo-deck-card.gx-promo-return-settled,
+.gx-promo-deck-card.gx-promo-return-settled *{
+    transition:none!important;
+}
+
 /* Transiciones */
 .gx-promo-card-logos,
 .gx-promo-card-logos .gx-promo-logo-item,

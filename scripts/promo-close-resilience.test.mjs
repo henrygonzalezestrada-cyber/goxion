@@ -21,13 +21,13 @@ test('C9 commits the original geometry before any animation frame is delivered',
     dataset:{gxPromoIndex:'0'},isConnected:true,style,
     classList:{add:(...v)=>v.forEach(x=>classes.add(x)),remove:(...v)=>v.forEach(x=>classes.delete(x)),contains:k=>classes.has(k)},
     querySelector(){return null},get offsetWidth(){return parseFloat(style.width)},
-    getAnimations(){return []},setAttribute(k,v){this[k]=v},removeEventListener(){},
+    getAnimations(){return []},getBoundingClientRect(){return {width:parseFloat(style.width),height:parseFloat(style.height)}},setAttribute(k,v){this[k]=v},removeEventListener(){},
   };
   const state={expandedCard:card,expandedPlaceholder:placeholder,
     expandedOrigin:{top:100,left:36,width:300,height:348,cssWidth:300,cssHeight:348},renderedPromotions:[{}]};
   const classList={remove(){}};
   const scope={state,v3:true,setPromoActionState(){},
-    document:{documentElement:{classList},body:{classList}},applyDeckPositions(){},startAuto(){},
+    document:{hidden:false,documentElement:{classList},body:{classList}},performance:{now:()=>0},applyDeckPositions(){},startAuto(){},
     settleStalledPromoMorph(node,height){assert.equal(node,card);assert.equal(height,348);settled++},
     setTimeout(fn,delay){tasks.push({fn,delay});return tasks.length},
     requestAnimationFrame(){frames++;return frames},
@@ -48,7 +48,7 @@ test('C9 commits the original geometry before any animation frame is delivered',
   assert.ok(final);
   const finalPromise=final.fn();
   await new Promise(r=>setImmediate(r));
-  const liveness=tasks.find(x=>x.delay===120);
+  const liveness=tasks.find(x=>x.delay===1000);
   assert.ok(liveness,'bounded final frame fallback');
   liveness.fn();
   await finalPromise;
@@ -57,4 +57,38 @@ test('C9 commits the original geometry before any animation frame is delivered',
   assert.equal(state.expandedCard,null);
   assert.equal(classes.has('is-returning'),false);
   assert.equal(card['aria-expanded'],'false');
+});
+
+test('C9 does not reinsert a card whose compositor remains at an intermediate size',async()=>{
+  const classes=new Set(['is-expanded']);
+  const tasks=[];
+  let clock=0,restored=0,measuredAtRestore=0;
+  const style={height:'526px',width:'352px',setProperty(k,v){this[k]=v},removeProperty(k){delete this[k]}};
+  const card={
+    dataset:{gxPromoIndex:'0'},isConnected:true,style,
+    classList:{add:(...v)=>v.forEach(x=>classes.add(x)),remove:(...v)=>v.forEach(x=>classes.delete(x)),contains:k=>classes.has(k)},
+    querySelector(){return null},get offsetWidth(){return this.getBoundingClientRect().width},
+    getBoundingClientRect(){return classes.has('gx-promo-return-settled')?
+      {width:300,height:348}:{width:330,height:427}},
+    getAnimations(){return []},setAttribute(k,v){this[k]=v},removeEventListener(){}
+  };
+  const deck={insertBefore(node){
+    assert.equal(node,card); measuredAtRestore=node.getBoundingClientRect().height;restored++;
+  }};
+  const state={expandedCard:card,expandedPlaceholder:{parentNode:deck,remove(){}},
+    expandedOrigin:{top:100,left:36,width:300,height:348,cssWidth:300,cssHeight:348},renderedPromotions:[{}]};
+  const classList={remove(){}};
+  const scope={state,v3:true,setPromoActionState(){},document:{hidden:false,documentElement:{classList},body:{classList}},
+    applyDeckPositions(){},startAuto(){},settleStalledPromoMorph(){},performance:{now:()=>clock},
+    setTimeout(fn,delay){if(delay===110||delay===820)tasks.push({fn,delay});else{clock+=delay;queueMicrotask(fn)}},
+    requestAnimationFrame(){return 1}
+  };
+  vm.runInNewContext(close+'\nclosePromoDetail();',scope);
+  tasks.find(x=>x.delay===110).fn();
+  assert.equal(restored,0);
+  await tasks.find(x=>x.delay===820).fn();
+  assert.equal(measuredAtRestore,348,'never reparent at a partially transitioned height');
+  assert.equal(restored,1);
+  assert.equal(classes.has('gx-promo-return-settled'),false,'escape hatch must not affect future transitions');
+  assert.equal(state.expandedCard,null);
 });

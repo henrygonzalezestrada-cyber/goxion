@@ -729,6 +729,8 @@
     const sourceStyle=getComputedStyle(card);
     const sourceCssWidth=parseFloat(sourceStyle.width);
     const sourceCssHeight=parseFloat(sourceStyle.height);
+    const closedAction=card.querySelector('[data-gx-promo-action]')?.getBoundingClientRect();
+    const closedValue=card.querySelector('.gx-promo-value-stack')?.getBoundingClientRect();
     state.expandedCard=card;
     state.expandedOrigin={
       top:rect.top,
@@ -737,6 +739,8 @@
       height:rect.height,
       cssWidth:Number.isFinite(sourceCssWidth)?sourceCssWidth:rect.width,
       cssHeight:Number.isFinite(sourceCssHeight)?sourceCssHeight:rect.height,
+      actionBottomGap:closedAction?rect.bottom-closedAction.bottom:null,
+      valueTop:closedValue?closedValue.top-rect.top:null,
       scrollY:window.scrollY
     };
     state.pendingPromoRender=false;
@@ -815,7 +819,11 @@
       card.style.setProperty('height',targetHeight+'px','important');
       requestAnimationFrame(()=>syncPromoAvailabilityMarquee(card));
       setTimeout(()=>{ if(card===state.expandedCard) syncPromoAvailabilityMarquee(card); },520); // gxMarqueeFinal
-      setTimeout(()=>settleStalledPromoMorph(card,targetHeight),850);
+      setTimeout(()=>{
+        // Opening watchdog must never finish the newer closing transition.
+        if(card.classList.contains('is-expanded')&&!card.classList.contains('is-closing'))
+          settleStalledPromoMorph(card,targetHeight);
+      },850);
     };
     requestAnimationFrame(()=>requestAnimationFrame(commitExpansion));
     setTimeout(commitExpansion,140);
@@ -860,35 +868,69 @@
     // Al terminar, sólo devolvemos el mismo nodo al deck: ya no hay cambio de composición.
     setTimeout(async()=>{
       if(card!==state.expandedCard) return;
-      // WebKit puede iniciar los frames después del temporizador: terminar el
-      // retorno geométrico antes de mover el nodo evita un salto al reinsertarlo.
-      // The normal return transition has had 710ms (CSS geometry: 460ms).
-      // Finish a genuinely stalled transition before reparenting, not after.
-      if(origin)settleStalledPromoMorph(card,origin.cssHeight??origin.height);
-      void card.offsetWidth;
-      const transitions=card.getAnimations().filter(animation=>
-        Number.isFinite(animation.effect?.getComputedTiming().endTime)
+      // A timer is not proof of completed movement. On a busy WebKit
+      // process the compositor may still be halfway through the return.
+      // Leave the same card fixed until its measured geometry AND the finite
+      // layout transitions are settled. Do not interrupt a merely late frame.
+      const targetHeight=origin?.cssHeight??origin?.height;
+      const targetWidth=origin?.cssWidth??origin?.width;
+      const geometryReady=()=>{
+        if(!origin)return true;
+        const r=card.getBoundingClientRect();
+        const action=card.querySelector('[data-gx-promo-action]')?.getBoundingClientRect();
+        const value=card.querySelector('.gx-promo-value-stack')?.getBoundingClientRect();
+        const details=card.querySelector('.gx-promo-morph-detail');
+        return Math.abs(r.height-targetHeight)<=2&&Math.abs(r.width-targetWidth)<=2&&
+          (origin.actionBottomGap==null||!action||Math.abs(r.bottom-action.bottom-origin.actionBottomGap)<=10)&&
+          (origin.valueTop==null||!value||Math.abs(value.top-r.top-origin.valueTop)<=12)&&
+          (!details||Number(getComputedStyle(details).opacity)<=.12);
+      };
+      const finiteTransitions=()=>card.getAnimations({subtree:true}).filter(animation=>
+        Number.isFinite(animation.effect?.getComputedTiming()?.endTime)&&
+        (animation.playState==='running'||animation.pending)
       );
-      // On backgrounded/headless WebKit, CSS transitions and even RAF may stop
-      // resolving. The visual morph normally ends long before this deadline.
-      const finished=await Promise.race([
-        Promise.allSettled(transitions.map(animation=>animation.finished)).then(()=>true),
-        new Promise(resolve=>setTimeout(()=>resolve(false),350))
-      ]);
-      if(!finished){
-        for(const animation of transitions){
-          try{animation.finish()}catch(_){}
-        }
+      const deadline=performance.now()+1250;
+      while(card===state.expandedCard&&(!geometryReady()||finiteTransitions().length)&&performance.now()<deadline){
+        await Promise.race([
+          new Promise(resolve=>requestAnimationFrame(resolve)),
+          new Promise(resolve=>setTimeout(resolve,60))
+        ]);
       }
-      // Flush the finished geometry and give the browser a frame to render
-      // the closed layout while it is still the same fixed node. The timeout
-      // remains a bounded liveness fallback for hidden/suspended tabs.
+      if(card!==state.expandedCard)return;
+      // Bounded liveness for an actually suspended compositor: finish only
+      // the finite transitions, with no change to the regular easing/layout.
+      for(const animation of finiteTransitions()){
+        try{animation.finish()}catch(_){}
+      }
+      if(origin)settleStalledPromoMorph(card,targetHeight);
       void card.offsetWidth;
+      let suppressed=false;
+      if(!geometryReady()||finiteTransitions().length){
+        // Last resort AFTER the normal transition plus grace period: remove
+        // a suspended transition while the card is still at its fixed target.
+        // Never move the node at an intermediate size.
+        card.classList.add('gx-promo-return-settled');
+        suppressed=true;
+        void card.offsetWidth;
+      }
+      // Wait for a painted settled frame, rather than removing the fixed
+      // node just because a timer fired. Foreground WebKit can starve RAF
+      // for hundreds of milliseconds under concurrent browser tests.
       await Promise.race([
         new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))),
-        new Promise(resolve=>setTimeout(resolve,120))
+        new Promise(resolve=>setTimeout(resolve,document.hidden?120:1000))
       ]);
-      if(card!==state.expandedCard) return;
+      if(card!==state.expandedCard)return;
+      if(!geometryReady()){
+        card.classList.add('gx-promo-return-settled');
+        suppressed=true;
+        void card.offsetWidth;
+        await Promise.race([
+          new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))),
+          new Promise(resolve=>setTimeout(resolve,document.hidden?120:500))
+        ]);
+      }
+      if(card!==state.expandedCard)return;
 
       card.classList.remove('is-closing','is-returning');
       if(state.expandedClickHandler) card.removeEventListener('click',state.expandedClickHandler);
@@ -910,6 +952,7 @@
         card.style.removeProperty(prop);
       }
       card.setAttribute('aria-expanded','false');
+      if(suppressed){void card.offsetWidth;card.classList.remove('gx-promo-return-settled');}
 
       document.documentElement.classList.remove('gx-promo-morph-open');
       document.body.classList.remove('gx-promo-morph-open');
