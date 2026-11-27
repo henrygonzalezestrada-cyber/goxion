@@ -1,0 +1,26 @@
+name: GOXION · J release residual checks
+on:
+  push:
+    branches: [release/mi-espacio-oficial-20261126]
+    paths:
+      - 'scripts/opiniones-oficial-smoke.mjs'
+      - 'scripts/cart-v2-smoke.mjs'
+      - '.github/workflows/goxion-release-j-check.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  residual:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        script: [opiniones-oficial-smoke, cart-v2-smoke]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-save playwright
+      - run: npx playwright install --with-deps chromium webkit
+      - run: node scripts/${{ matrix.script }}.mjs

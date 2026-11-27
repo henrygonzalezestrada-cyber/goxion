@@ -66,9 +66,20 @@ try{
     console.log('Layout',layout);
     assert.ok(layout.rows.every(h=>h<135)); assert.ok(layout.footer<layout.viewport);
     assert.match(await page.locator('#gx-cart-total').innerText(),/377/);
-    assert.match(await page.locator('#gx-cart-lines').innerText(),/2 perfiles/);
-    assert.match(await page.locator('#gx-cart-lines').innerText(),/1 cuenta completa/);
-    assert.match(await page.locator('#gx-cart-lines').innerText(),/Paquete · 3 meses/);
+    const cartRows=await page.locator('#gx-cart-lines .gx-cart-line').evaluateAll(rows=>rows.map(row=>({
+      title:row.querySelector('h3').textContent,
+      description:row.querySelector('.gx-cart-copy p').textContent,
+      qty:row.querySelector('.gx-cart-stepper span').textContent,
+      price:row.querySelector('.gx-cart-price').textContent,
+      capped:row.querySelector('[data-delta="1"]').disabled
+    })));
+    // The approved layout separates the quantity from the type of access.
+    assert.equal(cartRows.length,3);
+    assert.deepEqual(cartRows[0],{title:'Disney+ Premium',description:'perfiles · Mensual',qty:'2',price:'$178.00',capped:true});
+    assert.deepEqual(cartRows[1],{title:'Crunchyroll cuenta completa',description:'cuenta completa · Mensual',qty:'1',price:'$100.00',capped:true});
+    assert.equal(cartRows[2].qty,'1');
+    assert.match(cartRows[2].description,/Paquete · 3 meses/);
+    assert.equal(cartRows[2].price,'$99.00');
     await page.locator('#gx-cart-phone').fill('123');
     await submitCart(page);
     assert.equal(posts.length,0);

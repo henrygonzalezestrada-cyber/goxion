@@ -34,14 +34,22 @@ try{
         row('22222222-2222-4222-8222-222222222222',4,'La experiencia es sencilla y el catálogo es claro.')
       ];
       const pending=row('33333333-3333-4333-8333-333333333333',5,'La ayuda fue amable y respondió mis dudas.','pending');
-      let all=[...published,pending],submission=0,adminActions=0,missionCompletes=0;
+      let all=[...published,pending],submission=0,adminActions=0,missionCompletes=0,supportVisits=0;
       const handler=async route=>{
         const url=route.request().url();
         let body={};try{body=JSON.parse(route.request().postData()||'{}')}catch{}
         const h=route.request().headers();
         if(url.includes('/mi-espacio')&&body.modo==='completar_mision_tipo'){
           assert.equal(h['x-client-token'],'test-client-token','Misión solo con sesión de cliente');
-          assert.equal(body.tipo,'FEEDBACK','Solo completar misión de opinión');
+          // Navegar a Soporte (opinión inline) activa su misión independiente.
+          // Este fixture sólo tiene una misión FEEDBACK; SOPORTE no modifica
+          // ni completa esa misión, ni elimina la exigencia de guardar primero.
+          if(body.tipo==='SOPORTE'){
+            supportVisits++;
+            return route.fulfill({status:200,contentType:'application/json',
+              body:JSON.stringify({ok:true,completadas:[],progreso:[]})});
+          }
+          assert.equal(body.tipo,'FEEDBACK','Solo completar misión de opinión tras enviar');
           assert(submission>0,'Prohibido completar misión sin haber guardado la opinión');
           missionCompletes++;
           return route.fulfill({status:200,contentType:'application/json',
@@ -115,6 +123,7 @@ try{
       });
       await page.locator('#gx-rb-submit').evaluate(b=>b.click());
       await until(page,()=>document.getElementById('gx-rb-error')?.textContent.length>0);
+      assert.ok(supportVisits>=1,'La visita a Soporte conserva su misión independiente');
       assert.equal(submission,0,'No guardar formulario vacío');
       assert.equal(missionCompletes,0,'La misión debe continuar pendiente si falla la validación');
       await page.locator('.gx-rb-star[data-score="5"]').evaluate(b=>b.click());
