@@ -45,7 +45,7 @@
   const m=u.pathname.match(/^\/functions\/v1\/([a-z0-9-]+)$/);
   if(!m||method!=='POST'||!allowed.has(m[1]))return denied();
   let b={};try{if(typeof init?.body==='string')b=JSON.parse(init.body)}catch{return denied()}
-  if(m[1]==='login-goxion'&&!/^qa-v2-(finanzas|b2|beneficios|beneficios-retest|vencido|suspendido|nuevo)$/i.test(String(b.nombre||'')))return denied();
+  if(m[1]==='login-goxion'&&!/^qa-v2-(finanzas|b2|beneficios|beneficios-retest|vencido|suspendido|nuevo|push-k1)$/i.test(String(b.nombre||'')))return denied();
   // Goxy QA: sólo los contratos explícitos de texto y visión; el servidor autentica,
   // limita cuota y autoriza los adjuntos. Nunca redirigir tráfico a producción.
   if(m[1]==='goxy-ai-qa'){

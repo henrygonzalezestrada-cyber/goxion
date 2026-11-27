@@ -34,3 +34,15 @@ test('manifest and worker scoped strictly to QA',()=>{
   const w=readFileSync(new URL('../push-qa-sw.js',import.meta.url),'utf8');
   assert(!w.includes('addEventListener("fetch"'));assert(w.includes('ayuda-aceptacion-v2.html?push=1'));
 });
+
+test('dedicated synthetic push account is authorized end-to-end, not production',()=>{
+  const read=path=>readFileSync(new URL(path,import.meta.url),'utf8');
+  const edge=read('../supabase/functions/push-cliente-qa/index.ts');
+  const sql=read('../docs/sql/push_qa_k1_dedicated_account.sql');
+  const guard=read('../preview/mi-espacio-v2/aceptacion/guard.js');
+  assert(edge.includes('"qa-v2-push-k1"'));
+  assert(sql.includes("'qa-v2-push-k1'"));
+  assert(guard.includes('nuevo|push-k1'));
+  assert(edge.includes('url!==qaOrigin'));
+  assert(sql.includes('security invoker'));
+});

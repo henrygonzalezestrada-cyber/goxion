@@ -58,7 +58,7 @@ Deno.serve(async(req)=>{
     const session=await signed(req.headers.get("x-client-token"),key);
     if(!session)return fail(401,"Inicia sesión nuevamente");
     const cliente=check(await sb.from("clientes").select("id,usuario_acceso,estado").eq("id",session.cliente_id).maybeSingle());
-    if(!cliente||!["qa-v2-finanzas","qa-v2-b2","qa-v2-beneficios","qa-v2-beneficios-retest","qa-v2-vencido","qa-v2-nuevo"].includes(String(cliente.usuario_acceso).toLowerCase())||String(cliente.estado).toLowerCase()==="suspendido")return fail(403,"Piloto no disponible");
+    if(!cliente||!["qa-v2-finanzas","qa-v2-b2","qa-v2-beneficios","qa-v2-beneficios-retest","qa-v2-vencido","qa-v2-nuevo","qa-v2-push-k1"].includes(String(cliente.usuario_acceso).toLowerCase())||String(cliente.estado).toLowerCase()==="suspendido")return fail(403,"Piloto no disponible");
     const cid=cliente.id,devices=()=>sb.from("goxion_push_qa_devices");
     if(action==="config"){
       const c=await cfg(sb,true);
