@@ -21,11 +21,13 @@ try{
     },{mode});
     const page=await context.newPage();const errors=[],actions=[];
     page.on("pageerror",e=>errors.push(e.message));
-    await page.route("https://qa.invalid/ayuda-aceptacion-v2.html",route=>route.fulfill({contentType:"text/html",body:'<button id="gx-client-notif-launch">Notificaciones</button><section><div id="gx-client-notif-list"></div></section><script>'+source+'</script>'}));
+    await page.route("https://qa.invalid/ayuda-aceptacion-v2.html",route=>route.fulfill({contentType:"text/html; charset=utf-8",body:'<button id="gx-client-notif-launch">Notificaciones</button><section><div id="gx-client-notif-list"></div></section><script>'+source+'</script>'}));
     await page.route("https://nsvybyvvdpdgbgtvydfb.supabase.co/functions/v1/push-cliente-qa",async route=>{
+      const headers={"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"content-type,x-client-token","Access-Control-Allow-Methods":"POST, OPTIONS"};
+      if(route.request().method()==="OPTIONS"){await route.fulfill({status:204,headers});return;}
       const a=JSON.parse(route.request().postData()).accion;actions.push(a);
       const bodies={config:{publicKey:"BA"},activar:{deviceId:"12345678-abcd-4321-abcd-123456789012"},estado:{active:true},probar:{accepted:true},desactivar:{}};
-      await route.fulfill({json:{ok:true,...bodies[a]}});
+      await route.fulfill({json:{ok:true,...bodies[a]},headers});
     });
     await page.goto("https://qa.invalid/ayuda-aceptacion-v2.html");
     const panel=page.locator(".gx-push-qa");
@@ -49,7 +51,7 @@ try{
         await panel.getByRole("button",{name:"Desactivar"}).click();
         await panel.getByText("Avisos desactivados.",{exact:true}).waitFor();
       }else{
-        await page.evaluate(()=>{window.dispatchEvent(new Event("goxion:client-logout"));localStorage.removeItem("qa-token")});
+        await Promise.all([page.waitForRequest(r=>r.method()==="POST"&&r.postData()?.includes('"desactivar"')),page.evaluate(()=>{window.dispatchEvent(new Event("goxion:client-logout"));localStorage.removeItem("qa-token")})]);
         await page.waitForFunction(()=>!localStorage.getItem("goxion_push_qa_device"));
       }
       assert(actions.includes("activar")&&actions.includes("probar")&&actions.includes("desactivar"));
