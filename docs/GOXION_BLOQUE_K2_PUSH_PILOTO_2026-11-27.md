@@ -1,0 +1,15 @@
+# K2 · piloto controlado de Web Push · 27/nov/2026
+
+K1a/K1b físicos en iPhone aprobados; no repetir. K2 extiende exclusivamente el espejo existente. No modifica ayuda.html, Index, Admin, K1, motor ni escritores de notificaciones. El piloto no es despliegue global.
+
+## Contrato
+- La Edge `push-cliente` autentica la misma sesión HMAC cliente, consulta una autorización individual del servidor con caducidad y revalida estado/legal al reclamar y antes de enviar. Gate vacío por defecto, sin selección por nombre en runtime. Casona identificado como único candidato de prueba activo; enrolamiento por UUID confirmado en servidor, 14 días, no por token de navegador.
+- Opt-in por dispositivo, máximo dos bajo bloqueo del gate, nunca reasignar endpoints. Categorías cuenta, servicios e importante seleccionadas inicialmente, beneficios opcional. Desactivación y logout revocan el dispositivo; cambiar preferencias no reenvía avisos anteriores. Ningún dato de pago, servicio, nombre, acceso o recompensa en pantalla bloqueada. No campañas, promociones compulsivas ni nuevas fuentes financieras/recordatorios.
+- Sólo avisos existentes no leídos, posteriores a consentimiento/preferencias y de las últimas 24h. Registro por dispositivo y aviso; hasta 3 intentos, espera 2/6 min sólo para HTTP 429/5xx explícitos. Resultado incierto (timeout/crash) terminal sin repetición; 404/410 revoca endpoint. Tag estable. Se retiran dispositivos expirados y bitácora de más de 7 días; no se borran avisos oficiales. Sin entrega garantizada, ACK del proveedor no es recepción.
+- VAPID privado y secreto de despachador cifrados en Vault, RPCs de seguridad invoker sólo service_role, no secretos en repositorio. Cuatro tablas RLS + ACL sin acceso de clientes. Sin caché de páginas privadas. Scope y destino de click exactos del espejo. Manifest e icono independientes del QA y de la oficial; la futura migración al icono oficial se documentará, no se reutiliza silenciosamente otra suscripción.
+- UI en la campana, botones del manual, desplegable de tipos sólo a petición; invitado o cuenta fuera de gate no ve panel ni registra service worker. iPhone requiere agregar a Inicio; Android compatible tiene opt-in directo. El permiso requiere gesto real, no pop-up forzado.
+
+## Evidencias
+- QA: schema separado de K1 instalado, gate vacío. Fixture en transacción con prueba de selección, antigüedad, cotas de dispositivo, reintentos y revocación: PASS; rollback, 0 K2 grants/devices/deliveries/fixture notices. RLS en 4 tablas, RPCs no accesibles a anon/auth, servicio puede consultar configuración Vault (sin recuperar secretos).
+- Edge QA `push-cliente-k2-qa` v1 ACTIVE. Peticiones HTTP invitado, token inválido y dispatch sin secreto: 401/401/401. Política pura 4/4 PASS local; sintaxis TS y workers verificada. Playwright local no dispone del binario Chromium real; CI focal requerido antes de publicar.
+- No se ha enviado un segundo aviso al iPhone ni se ha enrolado Casona. No se ha desplegado K2 en producción. Android físico sigue pendiente. Siguiente: CI, comprobar fuente QA, revisión de alcance y piloto Casona con autorización, TTL 14 días y opt-in en espejo.
