@@ -119,6 +119,8 @@
   let active = false;
   let closeTimer = null;
   const vision=refined?window.GOXY_VISION:null;
+  const incidents=refined?window.GOXY_INCIDENTS:null;
+  let pilotSupport=false,pilotDenied=false,incidentLast=null;
   const diagnosis=refined?window.GOXY_DIAGNOSIS?.create():null;
   const dialogue=refined?window.GOXY_DIALOG_ROUTING?.createConversation?.():null;
   const learning=refined?window.GOXY_FEEDBACK:null;
@@ -127,7 +129,7 @@
   const gallery=layer.querySelector('.gxai-image-picker'),camera=layer.querySelector('.gxai-camera-picker');
   const exampleButton=layer.querySelector('.gxai-tool-example');
   let imageDraft=null,visionReady=false,visionTestOnly=false,exampleImage=null,preparingImage=false,imageGeneration=0;
-  const imageNotice=()=>visionReady?(visionTestOnly?'Prueba QA · Sólo capturas sin datos privados. Se enviará a Groq.':'Oculta datos personales, contraseñas y códigos antes de enviar. La imagen se enviará a Groq para su análisis.'):'Vista previa local · El análisis todavía no está habilitado.';
+  const imageNotice=()=>visionReady?(visionTestOnly?(vision?.isMirrorPilot?.()?'Piloto · Sólo capturas de prueba sin datos privados. Se enviará a Groq.':'Prueba QA · Sólo capturas sin datos privados. Se enviará a Groq.'):'Oculta datos personales, contraseñas y códigos antes de enviar. La imagen se enviará a Groq para su análisis.'):'Vista previa local · El análisis todavía no está habilitado.';
   const syncSend = () => {
     if(!refined)return;
     const ready=imageDraft?(imageDraft.example?Boolean(exampleImage):visionReady)&&!preparingImage:!preparingImage&&Boolean(messageInput.value.trim());
@@ -431,7 +433,8 @@
     const source=refined?heroTrigger.querySelector('.gxai-mascot').getBoundingClientRect():null;
     active = true; requestId++;
     cancelFlow();diagnosis?.reset();dialogue?.reset();
-    if(vision){clearImage();visionReady=false;visionTestOnly=false;exampleImage=null;exampleButton.hidden=true;const visionId=requestId;if(vision.isQA())vision.status().then(state=>{if(active&&visionId===requestId){visionReady=state.ok===true&&state.ready===true;visionTestOnly=state.testOnly===true;exampleImage=state.ok===true&&state.exampleReady===true&&typeof state.exampleImage==='string'&&/^data:image\/png;base64,[A-Za-z0-9+/=]+$/.test(state.exampleImage)?state.exampleImage:null;exampleButton.hidden=!exampleImage;if(imageDraft&&!imageDraft.example)renderAttachment(imageNotice());syncSend();}});}
+    pilotSupport=false;pilotDenied=false;incidentLast=null;
+    if(vision){clearImage();visionReady=false;visionTestOnly=false;exampleImage=null;exampleButton.hidden=true;const visionId=requestId;if(vision.isQA()||vision.isMirrorPilot?.())vision.status().then(state=>{if(active&&visionId===requestId&&authenticated()){pilotSupport=pilotSupport||state.pilotReady===true;pilotDenied=pilotDenied||Boolean(vision.isMirrorPilot?.()&&state.code==='PILOT_REQUIRED');visionReady=state.ok===true&&state.ready===true&&(!vision.isMirrorPilot?.()||state.testOnly===true);visionTestOnly=state.testOnly===true;exampleImage=state.ok===true&&state.exampleReady===true&&typeof state.exampleImage==='string'&&/^data:image\/png;base64,[A-Za-z0-9+/=]+$/.test(state.exampleImage)?state.exampleImage:null;exampleButton.hidden=!exampleImage;if(imageDraft&&!imageDraft.example)renderAttachment(imageNotice());syncSend();}});}
     aiConfigured = false;
     feedbackReady=false;semanticReady=false;verifiedReady=false;
     aiMode = false;
@@ -1129,24 +1132,59 @@
     rateResponse(answer,res.ok===true?'ai':'local',decision.topic);showChoices(decision.choices||[]);
     later(flow,300,()=>chatTransition('listening'));
   }
-  function handleText(query) {
+  async function readIncident(query,req,fallback=null){
+    cancelFlow();const flow=++activeFlow;
+    const current=requestId,identity=String(window.getCurrentClientKey?.()||''),token=localStorage.getItem(window.GOXION_CORE?.STORAGE?.CLIENT_TOKEN||'')||'';
+    setBusy(true);chatTransition('thinking');
+    const controller=new AbortController();aiController=controller;
+    const timer=setTimeout(()=>controller.abort(),6500);
+    let state;try{state=await vision.incident(controller.signal);}catch{state={ok:false};}finally{clearTimeout(timer);}
+    if(!active||flow!==activeFlow||current!==requestId||!authenticated())return;
+    if(identity!==String(window.getCurrentClientKey?.()||'')||token!==(localStorage.getItem(window.GOXION_CORE?.STORAGE?.CLIENT_TOKEN||'')||'')){closeChat();return;}
+    aiController=null;setBusy(false);chatTransition('listening');
+    const resume=()=>fallback?fallback():handleText(query,true);
+    if(state?.code==='PILOT_REQUIRED'){pilotDenied=true;resume();return;}
+    if(state?.ok)pilotSupport=true;
+    if(!pilotSupport){resume();return;}
+    const decision=incidents.reply(state,req,query);
+    if(!decision){resume();return;}
+    if(decision.platform&&decision.platform!==chosenPlatform)clearSupportContext(decision.platform);
+    if(decision.platform){chosenPlatform=decision.platform;awaitingSymptom=true;}
+    keepTurn(query,decision.answer);respondFree(query,decision.answer,fallback&&decision.platform?[{kind:'issues',platform:decision.platform,label:'Ver situaciones conocidas'}]:decision.choices);
+  }
+  function handleText(query,skipIncident=false) {
     // La información que ya administra GOXION y los saludos no consumen IA.
     const words = knowledge.normalize(query);
     if(refined&&(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i.test(query)||/^(?:\d[\s-]?){4,16}$/.test(query.trim()))){
       bubble('Por seguridad, no compartas correos, PIN ni códigos en este chat. Describe lo que aparece sin incluir esos datos.',false);return;
     }
     const route=contextualRoute(query);
+    // First consult the official incident source only for a new support case or explicit status question.
+    const mirrorPilot=Boolean(vision?.isMirrorPilot?.()&&!pilotDenied&&incidents);
+    if(mirrorPilot&&!skipIncident){
+      const req=incidents.request(query,chosenPlatform,route?.kind);
+      if(req&&(req.explicit||incidentLast!==req.platform)){
+        incidentLast=req.platform;void readIncident(query,req);return;
+      }
+    }
+    if(mirrorPilot&&pilotSupport&&incidents.photoOffer(query,route?.brand||chosenPlatform)){
+      if(route?.brand&&route.brand!==chosenPlatform)clearSupportContext(route.brand);
+      const stage=diagnosis?.get()?.stage;
+      const definiteAuthorization=stage==='await-human'&&lastGuide?.requiresHuman===true;
+      const answer=definiteAuthorization?'No hace falta otra captura para esa autorización: nuestro equipo debe finalizarla. Puedo preparar el contexto sin pedir códigos.':visionReady?'Sí, una captura del aviso puede ayudarnos a distinguir el problema. Oculta los códigos, correos y datos privados antes de compartirla.':'Por ahora no puedo analizar una imagen en esta sesión. Dime qué aviso aparece, sin compartir datos privados, y revisamos el siguiente paso.';
+      keepTurn(query,answer);respondFree(query,answer,definiteAuthorization?[{kind:'human',label:'Preparar ficha de soporte'}]:visionReady?[{kind:'diagnosis-image',label:'Compartir captura'}]:[]);return;
+    }
     if(route?.kind==='thanks'){
       bubble(query.slice(0,240),true);bubble('¡Con gusto! Si necesitas algo más, aquí estoy.',false);chatTransition('listening');
       return;
     }
     if(route?.kind==='resolved'){
-      clearSupportContext();
+      incidentLast=null;clearSupportContext();
       respondFree(query,'¡Qué bueno que ya funciona! Si vuelve a ocurrir, podemos revisarlo juntos.',[{kind:'platforms',label:'Ayuda con otra plataforma'},{kind:'account',label:'Ir a Mi Espacio'}]);
       return;
     }
     if(route?.kind==='farewell'){
-      clearSupportContext();
+      incidentLast=null;clearSupportContext();
       respondFree(query,'¡Hasta pronto! Aquí estaré cuando me necesites.',[]);
       return;
     }
@@ -1496,8 +1534,12 @@
       chosenGuide = null;
       lastGuide = null;
       aiMode = false;
-      runDemo({prompt:platform,step:'searching',
+      const openIssues=()=>runDemo({prompt:platform,step:'searching',
         response:'Estas son las situaciones de soporte registradas para '+platform+':',finish:'happy'},null,()=>showIssues(platform));
+      if(vision?.isMirrorPilot?.()&&!pilotDenied&&incidents&&incidentLast!==platform){
+        incidentLast=platform;void readIncident(platform,{platform,explicit:false},openIssues);return;
+      }
+      openIssues();
     } else if (type === 'issues' && knowledge.platforms().includes(platform)) {
       chosenPlatform = platform;
       runDemo({prompt:'Ver otras situaciones',step:'searching',
@@ -1645,7 +1687,7 @@
     const example=imageDraft.example===true;
     const testOnly=visionTestOnly;
     if(!example&&(query.length>240||/[<>]/.test(query)||/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b|\b(?:\d[\s.-]?){9,16}\b|\b\d{4,8}\b/iu.test(query))){renderAttachment('Describe el problema sin correos, números privados, PIN ni códigos (máximo 240 caracteres).');return;}
-    if(!window.confirm(example?'¿Enviar esta captura ficticia a Groq para comprobar el análisis visual?':testOnly?'Prueba aislada: confirma que la captura no contiene datos personales, contraseñas, PIN ni códigos. Se enviará a Groq, que puede conservarla excepcionalmente hasta 30 días. ¿Autorizas el envío?':'¿Confirmas que la imagen no contiene información privada, contraseñas, PIN ni códigos y autorizas enviarla a Groq para analizarla?'))return;
+    if(!window.confirm(example?'¿Enviar esta captura ficticia a Groq para comprobar el análisis visual?':testOnly?(vision.isMirrorPilot?.()?'Piloto de prueba: utiliza únicamente una captura sin datos de clientes, correos, contraseñas, PIN, QR ni códigos. Se enviará a Groq, que puede conservarla excepcionalmente hasta 30 días. ¿Confirmas que está libre de datos privados y autorizas enviarla?':'Prueba aislada: confirma que la captura no contiene datos personales, contraseñas, PIN ni códigos. Se enviará a Groq, que puede conservarla excepcionalmente hasta 30 días. ¿Autorizas el envío?'):'¿Confirmas que la imagen no contiene información privada, contraseñas, PIN ni códigos y autorizas enviarla a Groq para analizarla?'))return;
     if(pendingAI)cancelFlow();
     const image=imageDraft.data;clearImage();messageInput.value='';syncSend();
     clearChoices();const sent=bubble(example?'Analiza esta captura de prueba':query||'Analiza esta imagen',true);
@@ -1653,13 +1695,14 @@
     setBusy(true);chatTransition('thinking');chatPhase.textContent='Analizando tu imagen…';showTyping();
     const flow=++activeFlow,identity=String(window.getCurrentClientKey?.()||'');
     aiController=new AbortController();
-    const reply=await (example?vision.example(aiController.signal):vision.analyze(image,query,aiController.signal,testOnly));
+    const visualPrompt=vision.isMirrorPilot?.()&&chosenPlatform&&knowledge.platforms().includes(chosenPlatform)?('Ayuda con '+chosenPlatform+'. '+query).slice(0,240):query;
+    const reply=await (example?vision.example(aiController.signal):vision.analyze(image,visualPrompt,aiController.signal,testOnly));
     if(!active||flow!==activeFlow||!authenticated()||identity!==String(window.getCurrentClientKey?.()||''))return;
     aiController=null;hideTyping();setBusy(false);
     let diagnosed=false;
     if(reply.ok&&typeof reply.answer==='string'){
       chatTransition('speaking');
-      if(diagnosis){clearSupportContext();const decision=diagnosis.fromVision(reply.diagnosis);if(decision){if(!decision.answer){const answer=bubble(reply.answer,false);answer.classList.add('gxai-ai-answer');rateResponse(answer,'vision','support');}diagnosed=applyDiagnosis(decision);if(!decision.answer)keepTurn('Se analizó una imagen del problema.',reply.answer);}}
+      if(diagnosis){const known=chosenPlatform;clearSupportContext();const decision=diagnosis.fromVision(vision.isMirrorPilot?.()&&reply.diagnosis&&!reply.diagnosis.platform&&known?{...reply.diagnosis,platform:known}:reply.diagnosis);if(decision){if(!decision.answer){const answer=bubble(reply.answer,false);answer.classList.add('gxai-ai-answer');rateResponse(answer,'vision','support');}diagnosed=applyDiagnosis(decision);if(!decision.answer)keepTurn('Se analizó una imagen del problema.',reply.answer);}}
       if(!diagnosed){const answer=bubble(reply.answer,false);answer.classList.add('gxai-ai-answer');rateResponse(answer,'vision','support');}
     }
     else if(reply.code!=='ABORTED'){chatTransition('error');bubble(reply.code==='RATE_LIMIT'?'La cuota de IA requiere una pausa. Puedes intentar de nuevo cuando esté disponible.':reply.code==='INVALID_IMAGE'?'No pude validar la imagen o el texto. Prueba con una captura JPG o PNG sin información privada.':reply.code==='VISION_DISABLED'?'El análisis no está autorizado para esta sesión.':'No pude analizar la imagen ahora. Puedes describir la falla o acudir a nuestro equipo.',false);}
@@ -1683,7 +1726,7 @@
       // Consultas gratuitas y cambio de plataforma siguen disponibles sin esperar IA.
       const local=knowledge.normalize(text);
       const route=contextualRoute(text);
-      if((route&&['thanks','resolved','farewell','ack','human','multiple','brand','device'].includes(route.kind))||(refined&&window.GOXY_POLICY_V2?.reply(text))||accountTopic(text) ||
+      if((vision?.isMirrorPilot?.()&&!pilotDenied&&incidents&&(incidents.request(text,chosenPlatform,route?.kind)?.explicit||incidents.photoOffer(text,route?.brand||chosenPlatform)))||(route&&['thanks','resolved','farewell','ack','human','multiple','brand','device'].includes(route.kind))||(refined&&window.GOXY_POLICY_V2?.reply(text))||accountTopic(text) ||
         /\b(contrasena|password|clave de acceso|clave de inicio)\b/.test(local) ||
         (/\b(contrato|contratar|cotizar|cuanto cuesta|cuanto pagaria|precio|costo|mensual)\b/.test(local)&&knowledge.resolvePlatform(text)) ||
         /^(hola(?: goxy)?|que puedes hacer|que puedo hacer|que haces|buenos dias|buenas tardes|buenas noches)$/.test(local) ||
