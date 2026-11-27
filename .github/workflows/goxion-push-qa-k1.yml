@@ -1,0 +1,31 @@
+name: GOXION · Push QA K1
+on:
+  push:
+    branches: [feat/push-qa-k1-20261126]
+  pull_request:
+    branches: [main]
+    paths:
+      - 'assets/js/ayuda/23-push-qa.js'
+      - 'push-qa*'
+      - 'supabase/functions/push-cliente-qa/**'
+      - 'scripts/push-qa*'
+  workflow_dispatch:
+jobs:
+  isolated:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Server policy, isolation, JS syntax
+        run: |
+          node --test scripts/push-qa-policy.test.mjs
+          node --check assets/js/ayuda/23-push-qa.js
+          node --check push-qa-sw.js
+      - name: Install browser fixtures
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Guide, opt-in, denial, logout (mocked provider)
+        run: node scripts/push-qa-browser.test.mjs

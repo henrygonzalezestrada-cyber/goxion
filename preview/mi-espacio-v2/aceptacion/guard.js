@@ -29,7 +29,7 @@
   isolated=true;
  }catch(e){console.error('GOXION aceptación: aislamiento de sesión no disponible',e)}
  Object.defineProperty(window,'GOXION_QA_ISOLATED',{value:isolated,writable:false});
- const allowed=new Set(['login-goxion','mi-espacio','estado-cuenta-beta','estado-financiero','estado-financiero-b2-beta','cancelaciones-cliente','notificaciones-cliente','novedades-cliente','accesos-cliente-beta','inventario-publico','periodo-cobro','trato-justo','legal-consent-v2','comprobantes-b2-beta','historial-cliente','experiencia-servicio','opiniones-goxion','goxy-ai-qa','goxy-vision-qa']);
+ const allowed=new Set(['login-goxion','mi-espacio','estado-cuenta-beta','estado-financiero','estado-financiero-b2-beta','cancelaciones-cliente','notificaciones-cliente','novedades-cliente','accesos-cliente-beta','inventario-publico','periodo-cobro','trato-justo','legal-consent-v2','comprobantes-b2-beta','historial-cliente','experiencia-servicio','opiniones-goxion','goxy-ai-qa','goxy-vision-qa','push-cliente-qa']);
  window.fetch=async function(input,init){
   if(!isolated)return denied();
   const raw=typeof input==='string'||input instanceof URL?String(input):input?.url||'';
@@ -60,6 +60,7 @@
      !(b.reason==null||(b.vote===-1&&['understanding','incorrect','unresolved','repetitive','other'].includes(b.reason))))return denied();
    }
   }
+  if(m[1]==='push-cliente-qa'&&(location.pathname.split('/').pop()!=='ayuda-aceptacion-v2.html'||!['config','estado','activar','desactivar','probar'].includes(b.accion)))return denied();
   if(m[1]==='goxy-vision-qa'&&!['status','example','analyze'].includes(b.mode))return denied();
   // Las únicas escrituras de esta ruta son operaciones de la cuenta sintética
   // en APIs oficiales aisladas. No se admiten compras ni comunicaciones externas.

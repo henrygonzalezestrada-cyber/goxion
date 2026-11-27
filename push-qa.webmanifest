@@ -1,0 +1,12 @@
+{
+  "id": "./ayuda-aceptacion-v2.html",
+  "name": "GOXION QA · Mi Espacio",
+  "short_name": "GOXION QA",
+  "start_url": "./ayuda-aceptacion-v2.html",
+  "scope": "./ayuda-aceptacion-v2.html",
+  "display": "standalone",
+  "lang": "es-MX",
+  "background_color": "#030305",
+  "theme_color": "#030305",
+  "icons": [{"src":"./Logo individual.png","sizes":"491x491","type":"image/png","purpose":"any"}]
+}
