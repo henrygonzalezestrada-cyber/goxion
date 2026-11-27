@@ -34,9 +34,11 @@
     function gxAuthAnimateGeometry(element, from, to, duration, easing) {
         let cancelled = false;
         let raf = 0;
+        let finish;
         const ease = gxAuthCubicBezier(...easing);
 
         const finished = new Promise(resolve => {
+            finish = resolve;
             const start = performance.now();
             const radiusFrom = parseFloat(from.borderRadius) || 0;
             const radiusTo = parseFloat(to.borderRadius) || 0;
@@ -72,8 +74,29 @@
             cancel() {
                 cancelled = true;
                 if (raf) cancelAnimationFrame(raf);
+                finish?.();
             }
         };
+    }
+
+    // An animation is presentation, never the sole authority for modal state.
+    // WebKit may visually finish WAAPI without resolving .finished. Preserve
+    // normal timings and commit the existing target geometry on a bounded wait.
+    const gxAuthAnimationGrace = 200;
+    async function gxAuthAwaitAnimations(animations, duration) {
+        const pending = animations.filter(Boolean);
+        if (!pending.length) return;
+        let timer;
+        try {
+            await Promise.race([
+                Promise.allSettled(pending.map(animation => animation.finished)),
+                new Promise(resolve => {
+                    timer = setTimeout(resolve, duration + gxAuthAnimationGrace);
+                })
+            ]);
+        } finally {
+            clearTimeout(timer);
+        }
     }
 
     /* =========================================================
@@ -226,6 +249,7 @@
     let gxAuthSourceStyle = null;
     let gxAuthBaseCardRect = null;
     let gxAuthResizeAnim = null;
+    let gxAuthResizeEpoch = 0;
 
     function gxAuthCardStyle() {
         return {
@@ -338,13 +362,21 @@
         const root = document.getElementById('header-action-btn');
         const content = root?.querySelector('.gx-auth-inline-content');
 
-        if (!root || !content || !gxAuthOpen) return;
+        if (!root || !content || !gxAuthOpen || gxAuthBusy) return;
 
+        const epoch = ++gxAuthResizeEpoch;
         try { gxAuthResizeAnim?.cancel(); } catch (_) {}
         gxAuthResizeAnim = null;
 
-        // Let the DOM settle after hidden was toggled.
-        await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+        // Let the DOM settle, but do not depend on RAF for modal recovery.
+        let raf1 = 0, raf2 = 0;
+        const layout = { finished:new Promise(resolve => {
+            raf1 = requestAnimationFrame(() => { raf2 = requestAnimationFrame(resolve); });
+        }) };
+        await gxAuthAwaitAnimations([layout], 0);
+        cancelAnimationFrame(raf1);
+        cancelAnimationFrame(raf2);
+        if (epoch !== gxAuthResizeEpoch || !gxAuthOpen || gxAuthBusy) return;
 
         const current = root.getBoundingClientRect();
 
@@ -375,7 +407,7 @@
             return;
         }
 
-        gxAuthResizeAnim = root.animate([
+        const resize = gxAuthResizeAnim = root.animate([
             {
                 top: `${current.top}px`,
                 height: `${current.height}px`
@@ -390,13 +422,14 @@
             fill: 'forwards'
         });
 
-        await gxAuthResizeAnim.finished.catch(() => {});
+        await gxAuthAwaitAnimations([resize], 285);
+        if (epoch !== gxAuthResizeEpoch || gxAuthResizeAnim !== resize || !gxAuthOpen || gxAuthBusy) return;
 
         // Commit final size before cancelling fill:forwards.
         root.style.top = `${targetTop}px`;
         root.style.height = `${targetHeight}px`;
 
-        try { gxAuthResizeAnim.cancel(); } catch (_) {}
+        try { resize.cancel(); } catch (_) {}
         gxAuthResizeAnim = null;
     }
 
@@ -437,17 +470,7 @@
 
         if (!root || !overlay || !pillLabel || !content) return;
 
-        if (reduceMotion() || !Element.prototype.animate) {
-            gxAuthOpen = true;
-            overlay.classList.add('show');
-            root.classList.add('gx-auth-login-visible');
-            content.style.visibility = 'visible';
-            content.style.opacity = '1';
-            pillLabel.style.display = 'none';
-            document.body.style.overflow = 'hidden';
-            return;
-        }
-
+        const animate = !reduceMotion() && !!Element.prototype.animate;
         gxAuthBusy = true;
         gxAuthResetLoginExtras();
 
@@ -497,7 +520,7 @@
 
         void root.offsetWidth;
 
-        const shape = useLayoutMorph
+        const shape = !animate ? null : useLayoutMorph
             ? gxAuthAnimateGeometry(root, {
                 left: gxAuthSourceRect.left,
                 top: gxAuthSourceRect.top,
@@ -533,7 +556,7 @@
         // Safari/WebKit: geometry is tweened manually, so color needs its own
         // short transition. Finish it early so the expanding surface already
         // reads as the dark login card instead of a large cyan pill.
-        const colorMorph = useLayoutMorph
+        const colorMorph = animate && useLayoutMorph
             ? root.animate([
                 {
                     backgroundColor: gxAuthSourceStyle.backgroundColor,
@@ -550,10 +573,7 @@
             })
             : null;
 
-        await Promise.allSettled([
-            shape.finished,
-            colorMorph?.finished || Promise.resolve()
-        ]);
+        await gxAuthAwaitAnimations([shape, colorMorph], 430);
 
         // Commit the final card BEFORE showing any login UI.
         Object.assign(root.style, {
@@ -568,26 +588,26 @@
             boxShadow: cardStyle.boxShadow,
             willChange: ''
         });
-        try { shape.cancel(); } catch (_) {}
+        try { shape?.cancel(); } catch (_) {}
         try { colorMorph?.cancel(); } catch (_) {}
 
         root.classList.add('gx-auth-login-visible');
         content.style.visibility = 'visible';
         content.style.pointerEvents = 'auto';
 
-        const contentIn = content.animate([
+        const contentIn = animate ? content.animate([
             { opacity: 0, transform: 'translateY(8px)' },
             { opacity: 1, transform: 'translateY(0)' }
         ], {
             duration: 220,
             easing: 'cubic-bezier(.16,1,.3,1)',
             fill: 'forwards'
-        });
+        }) : null;
 
-        await contentIn.finished.catch(() => {});
+        await gxAuthAwaitAnimations([contentIn], 220);
         content.style.opacity = '1';
         content.style.transform = 'none';
-        try { contentIn.cancel(); } catch (_) {}
+        try { contentIn?.cancel(); } catch (_) {}
 
         root.setAttribute('aria-expanded', 'true');
         gxAuthOpen = true;
@@ -608,34 +628,26 @@
 
         if (!root || !overlay || !pillLabel || !content || !destination) return;
 
-        if (reduceMotion() || !Element.prototype.animate) {
-            overlay.classList.remove('show');
-            content.style.visibility = '';
-            content.style.opacity = '';
-            pillLabel.style.display = '';
-            gxAuthOpen = false;
-            document.body.style.overflow = 'auto';
-            return;
-        }
-
+        const animate = !reduceMotion() && !!Element.prototype.animate;
         gxAuthBusy = true;
+        ++gxAuthResizeEpoch;
 
         try { gxAuthResizeAnim?.cancel(); } catch (_) {}
         gxAuthResizeAnim = null;
 
-        const contentOut = content.animate([
+        const contentOut = animate ? content.animate([
             { opacity: 1, transform: 'translateY(0)' },
             { opacity: 0, transform: 'translateY(6px)' }
         ], {
             duration: 130,
             easing: 'ease-in',
             fill: 'forwards'
-        });
+        }) : null;
 
-        await contentOut.finished.catch(() => {});
+        await gxAuthAwaitAnimations([contentOut], 130);
         content.style.visibility = 'hidden';
         content.style.pointerEvents = 'none';
-        try { contentOut.cancel(); } catch (_) {}
+        try { contentOut?.cancel(); } catch (_) {}
 
         root.classList.remove('gx-auth-login-visible');
 
@@ -649,7 +661,7 @@
             root.style.willChange = 'left, top, width, height, border-radius, background-color';
         }
 
-        const shapeBack = useLayoutMorph
+        const shapeBack = !animate ? null : useLayoutMorph
             ? gxAuthAnimateGeometry(root, {
                 left: cardRect.left,
                 top: cardRect.top,
@@ -682,9 +694,10 @@
                 fill: 'forwards'
             });
 
-        setTimeout(() => overlay.classList.remove('show'), 235);
-
-        await shapeBack.finished.catch(() => {});
+        const overlayTimer = animate ? setTimeout(() => overlay.classList.remove('show'), 235) : null;
+        await gxAuthAwaitAnimations([shapeBack], 390);
+        clearTimeout(overlayTimer);
+        overlay.classList.remove('show');
 
         // Exact source geometry before returning to header.
         Object.assign(root.style, {
@@ -698,7 +711,7 @@
             borderColor: gxAuthSourceStyle.borderColor,
             boxShadow: gxAuthSourceStyle.boxShadow
         });
-        try { shapeBack.cancel(); } catch (_) {}
+        try { shapeBack?.cancel(); } catch (_) {}
 
         if (gxAuthOriginalParent && gxAuthPlaceholder) {
             gxAuthOriginalParent.insertBefore(root, gxAuthPlaceholder);

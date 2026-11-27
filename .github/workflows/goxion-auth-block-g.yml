@@ -1,0 +1,29 @@
+name: GOXION · Bloque G login estable
+on:
+  push:
+    branches:
+      - fix/bloque-g-auth-webkit-20261126
+      - fix/launch-residuals-20261126
+  pull_request:
+    branches: [main]
+    paths:
+      - 'assets/js/ayuda/07-production-interactions-js.js'
+      - 'scripts/auth-morph-resilience*.mjs'
+      - '.github/workflows/goxion-auth-block-g.yml'
+permissions:
+  contents: read
+jobs:
+  auth-morph:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Deterministic WAAPI/RAF and reduced motion
+        run: node --test scripts/auth-morph-resilience.test.mjs
+      - run: npm install --no-save playwright
+      - run: npx playwright install --with-deps chromium webkit
+      - name: Guest login, reopen, geometry and injected fault (no external network)
+        run: node scripts/auth-morph-resilience-smoke.mjs
