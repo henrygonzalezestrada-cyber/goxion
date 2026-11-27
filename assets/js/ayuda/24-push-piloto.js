@@ -2,9 +2,9 @@
   "use strict";
   // Only the existing preproduction mirror; official and QA remain unchanged.
   if(location.pathname.split("/").pop()!=="ayuda-espejo-feed-v2.html"||window.GOXION_QA_ISOLATED===true)return;
-  const endpoint="https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/push-cliente";
-  const key=window.GOXION_CORE?.STORAGE?.CLIENT_TOKEN;
-  if(!key)return;
+  const core=window.GOXION_CORE,key=core?.STORAGE?.CLIENT_TOKEN;
+  if(!key||typeof core.endpoint!=="function")return;
+  const endpoint=core.endpoint("push-cliente");
   const token=()=>localStorage.getItem(key)||"",savedKey="goxion_push_pilot_device";
   const base=new URL("./",location.href),route=new URL("ayuda-espejo-feed-v2.html",base);
   const defaults=["cuenta","servicios","importante"],types=[["cuenta","Mi cuenta y pagos"],["servicios","Mis servicios"],["beneficios","Misiones y recompensas"],["importante","Avisos importantes"]];

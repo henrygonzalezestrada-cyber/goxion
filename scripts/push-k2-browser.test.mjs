@@ -9,7 +9,7 @@ try {
  for(const mode of ['guest','outside-gate','iphone-web','iphone-installed','android','denied']){
   const context=await browser.newContext({viewport:{width:375,height:812}});
   await context.addInitScript(({mode})=>{
-    window.GOXION_CORE={STORAGE:{CLIENT_TOKEN:'test-token'}};
+    window.GOXION_CORE={STORAGE:{CLIENT_TOKEN:'test-token'},endpoint:name=>{if(name!=='push-cliente')throw Error('Unexpected endpoint');return 'https://api.fixture.invalid/functions/v1/'+name}};
     if(mode!=='guest')localStorage.setItem('test-token','fixture-session');
     Object.defineProperty(navigator,'userAgent',{value:mode.startsWith('iphone')?'iPhone Safari':'Chrome Android'});
     Object.defineProperty(navigator,'standalone',{value:mode==='iphone-installed'});
@@ -21,7 +21,7 @@ try {
   },{mode});
   const page=await context.newPage(),actions=[],errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.route('https://fixture.invalid/ayuda-espejo-feed-v2.html',r=>r.fulfill({contentType:'text/html; charset=utf-8',body:'<button id="gx-client-notif-launch">Notificaciones</button><section><div id="gx-client-notif-list"></div></section><script>'+source+'</script>'}));
-  await page.route('https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/push-cliente',async r=>{
+  await page.route('https://api.fixture.invalid/functions/v1/push-cliente',async r=>{
     const headers={'Access-Control-Allow-Origin':'*','Access-Control-Allow-Headers':'content-type,x-client-token','Access-Control-Allow-Methods':'POST, OPTIONS'};
     if(r.request().method()==='OPTIONS'){await r.fulfill({status:204,headers});return}
     const body=JSON.parse(r.request().postData());actions.push(body);
