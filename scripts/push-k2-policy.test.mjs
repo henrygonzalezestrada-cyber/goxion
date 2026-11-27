@@ -37,3 +37,11 @@ test('worker and manifest are restricted to the existing mirror; no cache interc
   assert(!w.includes('addEventListener("fetch"'));assert(w.includes('ayuda-espejo-feed-v2.html?push=1'));
   assert(!w.includes('p.body.slice'));assert(!w.includes('p.title.slice'));
 });
+test('cron transports only a short-lived ticket, never a reusable Vault secret',()=>{
+  const schedule=readFileSync(new URL('../docs/sql/push_k2_schedule.sql',import.meta.url),'utf8');
+  const ddl=readFileSync(new URL('../docs/sql/push_k2_dispatch_ticket.sql',import.meta.url),'utf8');
+  const edge=readFileSync(new URL('../supabase/functions/push-cliente/index.ts',import.meta.url),'utf8');
+  assert(schedule.includes('goxion_push_issue_ticket()'));assert(!schedule.includes('decrypted_secret'));
+  assert(ddl.includes("interval '90 seconds'"));assert(ddl.includes('delete from public.goxion_push_tickets where digest='));
+  assert(edge.includes('goxion_push_consume_ticket'));assert(!edge.includes('!==c.dispatch_secret'));
+});

@@ -42,8 +42,9 @@ Deno.serve(async(req)=>{
     if(!b||typeof b!=="object"||Array.isArray(b))return fail(400,"Solicitud inválida");
     const action=b.accion,d=b.datos||{};
     if(action==="dispatch"){
+      const ticket=req.headers.get("x-gx-dispatch");
+      if(!ticket||check(await sb.rpc("goxion_push_consume_ticket",{p_ticket:ticket}))!==true)return fail(401,"No autorizado");
       const c=await config(sb);
-      if(!req.headers.get("x-gx-dispatch")||req.headers.get("x-gx-dispatch")!==c.dispatch_secret)return fail(401,"No autorizado");
       const rows=check(await sb.rpc("goxion_push_claim"))||[];
       let accepted=0,retry=0,failed=0;
       for(let i=0;i<rows.length;i+=4)await Promise.all(rows.slice(i,i+4).map(async(n:any)=>{
