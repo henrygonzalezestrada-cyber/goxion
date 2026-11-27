@@ -51,7 +51,13 @@ function attachDiagnostics(page, label, errors) {
 // BEFORE endpoint fixtures (Playwright's later handlers take precedence).
 // Never let a new API endpoint fall through to production or QA.
 async function isolateSupabase(page) {
-  await page.route('**/*.supabase.co/**', route => route.fulfill({
+  await page.route('**/*.supabase.co/**', route => {
+    // Unmocked requests have no legitimate session. Preserve the existing
+    // fail-closed authorization contract rather than inventing successful data.
+    // Log only the route (no query strings, headers, or credentials).
+    const path = new URL(route.request().url()).pathname;
+    console.info('[smoke isolated] unmocked route denied:', path);
+    return route.fulfill({
     status: route.request().method()==='OPTIONS' ? 204 : 401,
     headers: {
       'access-control-allow-origin':'*',
@@ -59,8 +65,9 @@ async function isolateSupabase(page) {
       'access-control-allow-headers':'authorization,apikey,content-type,x-admin-token,x-client-token,x-client-info',
       'content-type':'application/json',
     },
-    body: route.request().method()==='OPTIONS' ? '' : JSON.stringify({ok:false,error:'Endpoint de pruebas sin fixture (aislado)'})
-  }));
+    body: route.request().method()==='OPTIONS' ? '' : JSON.stringify({ok:false,error:'Sesión administrativa inválida o expirada'})
+    });
+  });
   await page.routeWebSocket('wss://*.supabase.co/**', socket => socket.close());
 }
 
