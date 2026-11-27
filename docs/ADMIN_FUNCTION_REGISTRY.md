@@ -300,3 +300,8 @@ Protecciones y pruebas: migraciones \`202610120007\`, \`008\`, \`009\`; \`script
 
 ### Novedades informativas · candidato de lanzamiento F (26 nov 2026)
 Propietario único: `assets/js/ayuda/20-release-announcement.js` / `GOXION_RELEASE_202610`, con stylesheet `assets/css/goxion-release-v2.css`. Consume `getCurrentClientKey`, perfil cargado, token de runtime central y cola `GOXION_LEGAL_V2`; no es escritor comercial ni de consentimiento. La presentación por capítulos es una variante excluyente del mismo controlador, sólo con opt-in en HTML; espejo y aceptación permanecen `off`. No duplicar modales ni handlers. `nov2026-mi-espacio-lanzamiento-v1` queda reservado (sin visto ni activación hasta autorización). Reversión de la rama y cache bust al promover según contrato de F; legado permanece únicamente para consumidores de edición anterior.
+
+
+### Residuales de salida · 26 nov 2026
+- `experiencia-servicio-admin` v2 producción / v7 QA: propietario de consultas de expediente y calificaciones y su revisión; Admin consumidor único `37-admin-experiencia-servicio.js`, sesión HMAC interna, agrupación de lecturas, detención 401, diagnósticos categóricos sin secretos. No crear otra fuente financiera ni otra ruta de compensación. QA 200/200, prod invitado 401; falta sesión auténtica productiva.
+- `admin-operaciones` v15 y `credenciales-cliente` v7 producción: decodificación segura de token, rechazo inválido 401; credencial ajena/inexistente 404, vista única preservada. QA rechazo y vista única (200/409 concurrente) certificados con datos ficticios. No usar rutas de aprobación retiradas, ni alterar fórmula/solicitar secretos. Véase [registro §12](GOXION_ESTADO_CANONICO_Y_REGISTRO_PRUEBAS_2026-11-26.md).
