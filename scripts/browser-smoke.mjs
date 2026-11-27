@@ -47,6 +47,30 @@ function attachDiagnostics(page, label, errors) {
   page.on('dialog', dialog => dialog.dismiss().catch(() => {}));
 }
 
+// Every browser-smoke page uses synthetic data only. Install the catch-all
+// BEFORE endpoint fixtures (Playwright's later handlers take precedence).
+// Never let a new API endpoint fall through to production or QA.
+async function isolateSupabase(page) {
+  await page.route('**/*.supabase.co/**', route => {
+    // Unmocked requests have no legitimate session. Preserve the existing
+    // fail-closed authorization contract rather than inventing successful data.
+    // Log only the route (no query strings, headers, or credentials).
+    const path = new URL(route.request().url()).pathname;
+    console.info('[smoke isolated] unmocked route denied:', path);
+    return route.fulfill({
+    status: route.request().method()==='OPTIONS' ? 204 : 401,
+    headers: {
+      'access-control-allow-origin':'*',
+      'access-control-allow-methods':'GET,POST,OPTIONS',
+      'access-control-allow-headers':'authorization,apikey,content-type,x-admin-token,x-client-token,x-client-info',
+      'content-type':'application/json',
+    },
+    body: route.request().method()==='OPTIONS' ? '' : JSON.stringify({ok:false,error:'Sesión administrativa inválida o expirada'})
+    });
+  });
+  await page.routeWebSocket('wss://*.supabase.co/**', socket => socket.close());
+}
+
 async function assertFunction(page, name, errors, label) {
   const type = await page.evaluate(fn => typeof window[fn], name);
   if (type !== 'function') errors.push(`${label}: falta función global ${name} (typeof=${type})`);
@@ -54,7 +78,8 @@ async function assertFunction(page, name, errors, label) {
 
 async function runIndex(browser, browserName, errors) {
   const label = `${browserName} · Index`;
-  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 }, serviceWorkers:'block' });
+  await isolateSupabase(page);
   attachDiagnostics(page, label, errors);
   await page.goto(origin + '/index.html?cliente=prueba', { waitUntil: 'load' });
   await page.waitForTimeout(500);
@@ -161,7 +186,8 @@ async function runIndex(browser, browserName, errors) {
 
 async function runAyuda(browser, browserName, errors) {
   const label = `${browserName} · Ayuda`;
-  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 }, serviceWorkers:'block' });
+  await isolateSupabase(page);
   // Headless WebKit can pause requestAnimationFrame despite an updated DOM.
   // Poll the real condition on a clock, without relaxing any assertion.
   if (browserName === 'WebKit') {
@@ -272,10 +298,12 @@ async function runAyuda(browser, browserName, errors) {
     errors.push(`${label}: selector financiero no hizo fallback ante diferencia de revisión.`);
   }
 
-  const splashHidden = await page.locator('#splash-screen').evaluate(el => {
-    const s = getComputedStyle(el);
-    return s.visibility === 'hidden' || s.display === 'none' || Number(s.opacity) === 0;
-  }).catch(() => false);
+  const splashHidden = await waitForDom(page,()=>{
+    const el=document.getElementById('gx-v2-handoff');
+    if(!el)return false;
+    const s=getComputedStyle(el);
+    return el.hidden || s.visibility==='hidden' || s.display==='none' || Number(s.opacity)===0;
+  },15000).then(()=>true).catch(()=>false);
   if (!splashHidden) errors.push(`${label}: el splash no desapareció.`);
 
   for (const fn of ['switchTab','openAuthSheet','closeAuthSheet','solicitarCuenta','renderizarSoporteDinamico','cargarCatalogo','gxPaymentHistoryMeta']) {
@@ -1113,8 +1141,21 @@ async function runAyuda(browser, browserName, errors) {
 
 async function runAdminViewport(browser, browserName, errors, viewport, suffix) {
   const label = `${browserName} · Admin · ${suffix}`;
-  const page = await browser.newPage({ viewport });
+  const page = await browser.newPage({ viewport, serviceWorkers:'block' });
+  await isolateSupabase(page);
   attachDiagnostics(page, label, errors);
+
+  const experienceRequests = [];
+  await page.route('**/functions/v1/experiencia-servicio-admin', async route => {
+    const request=route.request();
+    const body=request.postDataJSON();
+    const action=body?.accion;
+    experienceRequests.push({action,token:request.headers()['x-admin-token']||''});
+    const response=action==='reportes' ? {ok:true,reportes:[],limitado:false} :
+      action==='calificaciones' ? {ok:true,calificaciones:[],limitado:false} :
+      {ok:false,error:'Acción no simulada'};
+    await route.fulfill({status:response.ok?200:400,contentType:'application/json',body:JSON.stringify(response)});
+  });
 
   const financialActionRequests = [];
   await page.route('**/functions/v1/acciones-financieras', async route => {
@@ -1288,6 +1329,17 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
       ) {
         errors.push(`${label}: contrato HTTP de aprobación financiera incorrecto.`);
       }
+    }
+
+    const experience=await page.evaluate(async()=>{
+      const api=window.GOXION_ADMIN_EXPERIENCE;
+      if(!api)return null;
+      const [reports,ratings]=await Promise.all([api.request('reportes'),api.request('calificaciones')]);
+      return {reports:reports.ok&&Array.isArray(reports.reportes),ratings:ratings.ok&&Array.isArray(ratings.calificaciones)};
+    }).catch(()=>null);
+    if(!experience?.reports||!experience?.ratings||
+       !['reportes','calificaciones'].every(action=>experienceRequests.some(x=>x.action===action&&x.token==='smoke.admin.token'))){
+      errors.push(`${label}: expediente/calificaciones Admin no quedaron aislados y operativos.`);
     }
 
     const fairDealResults = await page.evaluate(async () => ({

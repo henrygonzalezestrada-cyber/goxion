@@ -108,7 +108,8 @@ try{
         document.body.appendChild(mission);
       });
       await page.evaluate(()=>window.openFeedbackModal(0,'TEST-01'));
-      await until(page,()=>document.querySelector('#modal-feedback')?.classList.contains('show'));
+      await until(page,()=>document.querySelector('#view-soporte .gx-support-opinion')?.classList.contains('gx-rb-expanded'));
+      assert.equal(await page.locator('#modal-feedback #gx-rb-form').count(),0,'Opinión en la misma tarjeta, no modal legado');
       const initialStyle=await page.locator('#gx-rb-submit').evaluate(b=>{
         let c=getComputedStyle(b);return {bg:c.backgroundImage,color:c.color};
       });
@@ -132,7 +133,7 @@ try{
       });
       assert.deepEqual(finalStyle,initialStyle,'El CTA conserva el mismo acabado azul/cian');
       await page.locator('#gx-rb-submit').evaluate(b=>b.click());
-      await until(page,()=>!document.querySelector('#modal-feedback')?.classList.contains('show'));
+      await until(page,()=>!document.querySelector('#view-soporte .gx-support-opinion')?.classList.contains('gx-rb-expanded'));
       await page.evaluate(()=>window.openFeedbackModal());
       assert.equal(await page.locator('.gx-rb-emblem.gx-rb-morph-done').count(),0);
       await page.close();

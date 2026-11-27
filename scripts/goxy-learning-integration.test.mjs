@@ -29,5 +29,11 @@ test('client returns learned route to existing canonical guide, never loops',()=
  assert.match(s,/verifiedReady&&!skipVerified&&!Number\.isInteger\(issueIndex\)&&!lastGuide&&!aiMode/);
  assert.match(s,/showGuide\(platform,reply\.guideId,query\)/);
  assert.match(s,/escalateAutomatically\(query,platform,undefined,true\)/);
- const official=readFileSync('ayuda.html','utf8');assert.doesNotMatch(official,/data-gx-support-v3|goxy-feedback\.js/);
+ const official=readFileSync('ayuda.html','utf8');assert.match(official,/data-gx-support-v3/);
+ assert.match(official,/goxy-feedback\.js/);
+ // The script is present in the promoted interface, but learning and vision
+ // remain fail-closed in the official route; H1/H2 route tests assert real calls.
+ assert.match(s,/feedbackReady=Boolean\(learning&&\(window\.GOXION_QA_ISOLATED\|\|location\.pathname\.endsWith\('\/ayuda-espejo-feed-v2\.html'\)/);
+ assert.match(s,/semanticReady=Boolean\(learning&&window\.GOXION_QA_ISOLATED/);
+ assert.match(s,/verifiedReady=Boolean\(refined&&window\.GOXION_QA_ISOLATED/);
 });

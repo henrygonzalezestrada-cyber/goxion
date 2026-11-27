@@ -34,16 +34,18 @@ function fixture({enabled=true,mode=enabled?"enabled":"off",account="a",query=""
  };
  return {check,get version(){return win.GOXION_RELEASE_202610.version;},status:()=>win.GOXION_RELEASE_202610.handoffStatus(),held:()=>win.GOXION_RELEASE_202610.holdsLegalOffer()};
 }
-test("sólo espejo modo piloto; aceptación apagada y oficial sin opt-in",()=>{
+test("espejo piloto, aceptación apagada, y oficial promoción exacta",()=>{
  execFileSync(process.execPath,["scripts/build-goxy-mirror-bundle.mjs","--check"]);
  for(const path of ["ayuda-espejo-feed-v2.html","ayuda-aceptacion-v2.html"]){
   const html=fs.readFileSync(path,"utf8");
   assert.ok(html.includes('data-gx-release-launch="'+(path==="ayuda-espejo-feed-v2.html"?"pilot":"off")+'"'));
   assert.equal((html.match(/release-announcement\.js\?/g)||[]).length,1);
  }
- assert.doesNotMatch(fs.readFileSync("ayuda.html","utf8"),/<html[^>]+data-gx-release-launch="enabled"/);
- assert.match(fs.readFileSync("ayuda.html","utf8"),/preview\/goxion-ai\/goxy-heads.bundle.js/);
- assert.doesNotMatch(fs.readFileSync("ayuda.html","utf8"),/goxy-heads-mirror.bundle/);
+ const official=fs.readFileSync("ayuda.html","utf8");
+ assert.match(official,/<html[^>]+data-gx-release-launch="enabled"/);
+ assert.match(official,/preview\/mi-espacio-v2\/goxy-heads-mirror.bundle.js/);
+ assert.doesNotMatch(official,/preview\/goxion-ai\/goxy-heads.bundle.js/);
+ assert.equal((official.match(/release-announcement\.js\?/g)||[]).length,1);
  assert.match(fs.readFileSync("ayuda-espejo-feed-v2.html","utf8"),/preview\/mi-espacio-v2\/goxy-heads-mirror.bundle.js/);
  const off=fixture({enabled:false,query:"?launch=enabled&release-preview=1",priorSeen:oldVersion});
  assert.equal(off.version,oldVersion);assert.equal(off.check(),0);
@@ -87,3 +89,13 @@ test("piloto exclusivo para la clave exacta Casone; versión separada, términos
  assert.equal(fixture({mode:"pilot",account:"casone",estado:"pendiente",deferido:true,blocked:true}).status(),"skip");
 });
 
+
+test("edición oficial: reserva legal sólo durante novedades pendientes y cuenta elegible",()=>{
+ const pending=fixture({mode:"enabled",account:"ordinary",estado:"pendiente"});
+ assert.equal(pending.status(),"ready");assert.equal(pending.held(),true);
+ assert.equal(pending.check(),1);
+ assert.equal(fixture({mode:"enabled",estado:"pendiente",priorSeen:version}).held(),false);
+ assert.equal(fixture({mode:"enabled",estado:"pendiente",modalAbierto:true}).held(),false);
+ assert.equal(fixture({mode:"enabled",estado:"pendiente",deferido:true}).held(),false);
+ assert.equal(fixture({mode:"enabled",estado:"pendiente",blocked:true}).held(),false);
+});

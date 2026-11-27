@@ -13,7 +13,7 @@ const QA_PAGES = ['ayuda-aceptacion-v2.html', 'index-aceptacion-v2.html', 'index
 const ALLOWED_ROOT_HTML = new Set([...PAGES.map((page) => page + '.html'), 'comunicaciones.html', CANDIDATE, ...QA_PAGES]);
 // El rescate de arranque oficial es intencionalmente independiente de los
 // recursos externos. Sólo se admite esta copia exacta, no cualquier script inline.
-const APPROVED_SPLASH_RESCUE = 'a2f0ba914880c4f93a5ec28b88a237815e119e0868640f6c630111770b3eac61';
+const APPROVED_SPLASH_RESCUE = '74b4605b27413d8f9f71890a30e060f1c167ce63f4e0ccd9ef7538bca429a6a7';
 
 function fail(message) {
   failures.push(message);
@@ -122,8 +122,14 @@ for (const page of PAGES) {
   if (inlineScripts.length && !validRescue) {
     fail(page + ': reaparecieron scripts inline (' + inlineScripts.length + ').');
   }
-  if (html.includes('data-gx-feed-performance')) {
-    fail(page + ': flag de candidato activado en página oficial sin promoción.');
+  if (page === 'ayuda') {
+    const expected = readFileSync(join(ROOT,CANDIDATE),'utf8')
+      .replace('data-gx-release-launch="pilot"','data-gx-release-launch="enabled"')
+      .replace('<title>ESPEJO · GOXION','<title>GOXION')
+      .replace('<meta name="robots" content="noindex,nofollow">\n','');
+    if (html !== expected) fail('Ayuda: promoción debe coincidir exactamente con el espejo aprobado (sólo modo, título y robots).');
+  } else if (html.includes('data-gx-feed-performance')) {
+    fail(page + ': flag de feed fuera de Mi Espacio.');
   }
 
   const runtime = './assets/js/core/runtime.js';

@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - fix/launch-residuals-20261126
+      - release/mi-espacio-oficial-20261126
   pull_request:
     branches:
       - main

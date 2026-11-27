@@ -13,9 +13,8 @@ for(const smart of [true,false]){
  if(smart){assert.equal(banner.hidden,true);assert.equal(banner.style.display,'none');assert.equal(content.textContent,'');assert.equal(content.innerHTML,'')}
  else{assert.equal(banner.style.display,'flex');assert.match(content.innerHTML,/ViX Premium/)}
 }
-for(const path of ['ayuda-espejo-feed-v2.html','ayuda-aceptacion-v2.html']){
+for(const path of ['ayuda.html','ayuda-espejo-feed-v2.html','ayuda-aceptacion-v2.html']){
  const html=read(path);assert.match(html,/<html[^>]*data-gx-smart-hero/);assert.match(html,/id="dynamic-alert" hidden/);
 }
-assert.doesNotMatch(read('ayuda.html'),/<html[^>]*data-gx-smart-hero/);
 assert.match(read('preview/mi-espacio-v2/official-feed.css'),/data-gx-smart-hero.*#dynamic-alert.*display:none!important/);
-console.log('Legacy alert: candidate guard active in all tabs; official renderer preserved');
+console.log('Legacy alert: smart-hero guard active in official and all candidate tabs; legacy fallback tested');

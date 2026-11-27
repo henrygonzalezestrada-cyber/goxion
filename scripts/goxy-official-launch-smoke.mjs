@@ -18,15 +18,20 @@ const sources=[
 ];
 let last=-1;
 for(const name of sources){
- const location="./preview/goxion-ai/"+name+"?v=official-f17";
+ const location=name==="goxy-heads.bundle.js"?"./preview/mi-espacio-v2/goxy-heads-mirror.bundle.js?":"./preview/goxion-ai/"+name+"?v=";
  const pos=html.indexOf(location);
  assert.ok(pos>last,"Orden de GOXY incorrecto: "+name);
  last=pos;
 }
-assert.ok(html.includes("mascota.css?v=official-f17"));
-assert.ok(html.includes("goxion-release-v2.css?v=oficial-v1"));
-assert.ok(html.includes("20-release-announcement.js?v=oficial-v2-todos"));
-assert.ok(html.includes("21-legal-v2-documents.js?v=cola-v1"));
+assert.ok(html.includes("mascota.css?v=learning-v2-20261125"));
+assert.ok(html.includes("preview/mi-espacio-v2/release-announcement.css?v=pilot-v5-light-20261126"));
+assert.ok(html.includes("preview/mi-espacio-v2/release-announcement.js?v=pilot-sequence-v5-20261126"));
+assert.ok(html.includes("21-legal-v2-documents.js?v=pilot-sequence-v5-20261126"));
+assert.ok(html.includes('data-gx-release-launch="enabled"'));
+assert.ok(!html.includes("20-release-announcement.js"));
+assert.equal((html.match(/release-announcement\.js\?/g)||[]).length,1);
+// Keep regression of the old announcement source for a possible rollback;
+// new chapter/consent/flight behavior is tested in launch-announcement-{policy,smoke}.
 assert.ok(!html.includes("avisos-apilados-beta"));
 assert.ok(!html.includes('iframe id="gxai-app"'));
 assert.ok(goxy.includes("if (!section || !card || card.classList.contains('gxai-card')) return;"));
@@ -147,4 +152,4 @@ assert.ok(!overlay.hidden,"Al posponer términos aparece novedades");
 window.GOXION_RELEASE_202610.close();
 assert.ok([...local.keys()].some(k=>k.endsWith(":casone")&&k.includes("v2-todos")));
 assert.equal(scrollValue,35,"Restaurar posición del documento");
-console.log("GOXION Goxy F17 + avisos oficiales apilados: PASS");
+console.log("GOXION Goxy official loader + legacy rollback announcement contract: PASS");

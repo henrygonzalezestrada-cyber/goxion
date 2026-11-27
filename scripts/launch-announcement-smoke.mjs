@@ -25,7 +25,8 @@ for(const name of ["ayuda-espejo-feed-v2.html","ayuda-aceptacion-v2.html"]){
 const paletteColors=paletteButtons.map(button=>button.match(/--swatch:(#[0-9a-f]{6})/i)?.[1]);
 assert.equal(paletteColors.length,5,"la prueba usa el selector de colores real del espejo");
 const official=await readFile(resolve(cwd,"ayuda.html"),"utf8");
-assert.doesNotMatch(official,/<html[^>]+data-gx-release-launch="enabled"/);
+assert.match(official,/<html[^>]+data-gx-release-launch="enabled"/);
+assert.equal((official.match(/release-announcement\.js\?/g)||[]).length,1);
 const intro="/preview/mi-espacio-v2/official-feed-intro.js",introCss="/preview/mi-espacio-v2/official-feed-intro.css";
 const robot="/preview/mi-espacio-v2/goxy-heads-mirror.bundle.js",legal="/assets/js/ayuda/21-legal-v2-documents.js";
 const allowed=new Map([[robot,"text/javascript"],[legal,"text/javascript"],[intro,"text/javascript"],[introCss,"text/css"],[script,"text/javascript"],[css,"text/css"],[logo,"image/png"]]);

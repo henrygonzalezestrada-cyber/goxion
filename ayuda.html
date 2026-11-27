@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html data-goxion-version="1.3.0" lang="es">
+<html data-goxion-version="1.3.0" lang="es" data-gx-catalog-v3 data-gx-support-v3 data-gx-smart-hero data-gx-feed-performance data-gx-release-launch="enabled">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
@@ -40,36 +40,30 @@
 <link rel="stylesheet" href="./preview/ayuda-prorroga/prorroga-auto.css?v=f5-1">
 <link rel="stylesheet" href="./preview/integracion-b2/prorroga-visual.css?v=f5-1">
 <!-- Goxy F17: componentes probados; una sola fuente compartida con la beta -->
-<link rel="stylesheet" href="./preview/goxion-ai/mascota.css?v=official-f17">
-<link rel="stylesheet" href="./assets/css/goxion-release-v2.css?v=oficial-v1">
+<link rel="stylesheet" href="./preview/goxion-ai/mascota.css?v=learning-v2-20261125">
+<link rel="stylesheet" href="./preview/mi-espacio-v2/release-announcement.css?v=pilot-v5-light-20261126">
 <link rel="stylesheet" href="./assets/css/goxion-modal-headers.css?v=standard-v1">
 <link rel="stylesheet" href="./assets/css/goxion-legal-v2.css?v=purple-cyan-5">
 <link rel="stylesheet" href="./assets/css/goxion-legal-access.css?v=legal-general-1">
+<link rel="stylesheet" href="./preview/mi-espacio-v2/official-feed.css?v=continuity-20261126">
+<link rel="stylesheet" href="./preview/mi-espacio-v2/official-feed-intro.css?v=pilot-sequence-v5-20261126">
+<link rel="stylesheet" href="./preview/mi-espacio-v2/catalog-refinement.css?v=cart-composition-20261124">
+<link rel="stylesheet" href="./preview/mi-espacio-v2/support-refinement.css?v=opiniones-inline-f4-20261126">
 </head>
 <body class="no-scroll">
-<div id="splash-screen">
-<div class="splash-content">
-<img alt="GOXION" class="splash-logo" onerror="this.src='logo2.PNG'" src="Logo individual.png"/>
-</div>
+<!-- Única superficie de carga del espejo: el mismo símbolo desde arranque hasta cabecera. -->
+<div id="gx-v2-handoff" role="status" aria-label="Preparando GOXION">
+ <div class="gx-v2-handoff-center">
+  <img class="gx-v2-handoff-mark" src="./Logo individual.png" alt="GOXION" onerror="this.onerror=null;this.src='./logo2.PNG'">
+  <div class="gx-v2-handoff-wait" hidden><span class="gx-v2-handoff-track" aria-hidden="true"><span></span></span><span class="gx-v2-handoff-copy">Preparando tu espacio</span></div>
+ </div>
 </div>
 <script>
-/* Rescate de arranque: independiente de window.load y de scripts externos.
-   Si un recurso/CDN nunca termina de cargar, el logo no puede tapar la página indefinidamente. */
-(function(){
-  "use strict";
-  var splash=document.getElementById("splash-screen");
-  if(!splash)return;
-  function liberar(){
-    if(splash.style.visibility==="hidden")return;
-    splash.style.opacity="0";
-    splash.style.pointerEvents="none";
-    splash.style.visibility="hidden";
-    document.body.classList.remove("no-scroll");
-  }
-  splash.addEventListener("click",liberar,{once:true});
-  window.addEventListener("pageshow",function(e){if(e.persisted)liberar();});
-  window.setTimeout(liberar,5500);
-})();
+/* Salvaguarda independiente de CDN y scripts: ninguna pantalla puede bloquear el acceso. */
+window.GOXION_V2_BOOT_TIMER=setTimeout(function(){
+ var s=document.getElementById('gx-v2-handoff');if(s)s.hidden=true;
+ document.body.classList.remove('no-scroll','gx-v2-handoff-active');
+},10500);
 </script>
 <div class="sticky-client-bar" id="sticky-client-bar">
 <div class="sticky-client-title">Tu Espacio, <span id="sticky-client-name"></span></div>
@@ -200,7 +194,7 @@
 <canvas class="gx-wave-canvas" id="gx-wave-canvas"></canvas>
 </div>
 <div class="container">
-<div class="glass-card alert-banner" id="dynamic-alert">
+<div class="glass-card alert-banner" id="dynamic-alert" hidden>
 <span style="font-size: 20px;">⚠️</span><div id="alert-content" style="font-size: 13px; color: #fff;"></div>
 </div>
 <div class="glass-card tab-container" id="goxion-main-nav">
@@ -217,6 +211,52 @@
 <span class="gx-nav-label">Soporte</span>
 </button>
 </div>
+<!-- Cápsula única pública y privada: no se recrea al cambiar secciones ni al autenticar. -->
+<div id="gx-v2-shared-header" hidden><div class="gxn-stage" id="gxn-stage">
+ <div class="gxn-top" id="gxn-top">
+  <div class="gxn-header">
+   <span class="gxn-brand" aria-label="GOXION">
+    <img class="gxn-wordmark" src="./logo2.PNG" alt="GOXION">
+    <img class="gxn-brand-mark" src="./Logo individual.png" alt="" aria-hidden="true">
+   </span>
+   <div class="gxn-actions">
+    <button class="gxn-bell" id="gxn-bell" type="button" aria-label="Notificaciones" aria-expanded="false" aria-controls="gx-client-notif-sheet">
+     <span class="gx-client-notif-icon" aria-hidden="true"><svg class="gx-client-notif-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path class="gx-client-notif-clapper" d="M10 21h4"/></svg></span>
+    </button>
+    <button class="gxn-profile-trigger" id="gxn-profile-trigger" type="button" aria-label="Abrir menú de perfil, avatar Goxy" aria-expanded="false" aria-controls="gxn-profile-menu">
+     <span class="gxn-avatar" id="gxn-avatar" aria-hidden="true">
+      <span class="gxn-goxy-fallback">
+       <svg viewBox="0 0 52 52" focusable="false" aria-hidden="true">
+        <defs><linearGradient id="gxn-robot-case" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#5873cc"/><stop offset="1" stop-color="#233e85"/></linearGradient></defs>
+        <rect x="5.5" y="9" width="41" height="35" rx="12" fill="url(#gxn-robot-case)" stroke="#a9bce5" stroke-width="1.5"/>
+        <rect x="10.5" y="14.5" width="31" height="25" rx="8" fill="#eaf8ff"/>
+        <rect x="16.5" y="24" width="7.5" height="6.5" rx="3.1" fill="#2c438c"/>
+        <rect x="28" y="24" width="7.5" height="6.5" rx="3.1" fill="#2c438c"/>
+        <path d="M21 34q5 3 10 0" fill="none" stroke="#8ca9d9" stroke-width="1.8" stroke-linecap="round"/>
+       </svg>
+      </span>
+      <span class="gxn-goxy-real"><span class="gxai-avatar"><span id="gxn-goxy-slot" class="gxai-canvas-slot" data-mood="idle"></span></span></span>
+      <span class="gxn-goxy-silhouette" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="14" rx="5"/><path d="M8 12h2m4 0h2M10 16h4"/></svg></span>
+      <img class="gxn-avatar-photo" id="gxn-avatar-photo" alt="" hidden>
+     </span>
+    </button>
+   </div>
+  </div>
+  <div class="gxn-menu gxn-profile-menu" id="gxn-profile-menu" hidden>
+   <div class="gxn-menu-head"><strong id="gxi-account-name">Mi Espacio</strong><small>Sesión verificada</small></div>
+   
+   
+<div id="gxn-goxy-colors" hidden><p class="gxn-goxy-color-title">Personaliza tu Goxy</p><div class="gxn-goxy-palette" role="group" aria-label="Color de Goxy"><button type="button" data-goxy-color-choice="original" aria-label="Azul original" aria-pressed="true" style="--swatch:#3552b1"><span aria-hidden="true"></span></button><button type="button" data-goxy-color-choice="violeta" aria-label="Violeta" aria-pressed="false" style="--swatch:#7753a8"><span aria-hidden="true"></span></button><button type="button" data-goxy-color-choice="menta" aria-label="Menta" aria-pressed="false" style="--swatch:#25887e"><span aria-hidden="true"></span></button><button type="button" data-goxy-color-choice="rosa" aria-label="Rosa" aria-pressed="false" style="--swatch:#b35e84"><span aria-hidden="true"></span></button><button type="button" data-goxy-color-choice="grafito" aria-label="Grafito" aria-pressed="false" style="--swatch:#515c70"><span aria-hidden="true"></span></button></div><small id="gxn-goxy-color-status" aria-live="polite"></small></div>
+   <div class="gxn-menu-rule"></div>
+   <button type="button" class="gxn-logout" id="gxn-logout"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4H5v16h4M12 12h9m-4-4 4 4-4 4"/></svg>Salir</button>
+  </div>
+  </div>
+</div></div>
+<div id="gx-v2-shared-nav"><nav class="gxn-nav" id="gxn-nav" data-mode="expanded" aria-label="Navegación principal">
+   <button type="button" class="gxn-tab" data-gxn-target="space" aria-label="Inicio" aria-current="page"><span class="gxn-emoji" aria-hidden="true">🏠</span><span class="gxn-tab-label">Inicio</span></button>
+   <button type="button" class="gxn-tab" data-gxn-target="catalog" aria-label="Abrir Catálogo oficial" title="Abrir Catálogo oficial"><span class="gxn-emoji" aria-hidden="true">🛒</span><span class="gxn-tab-label">Catálogo</span></button>
+   <button type="button" class="gxn-tab" data-gxn-target="support" aria-label="Abrir Soporte oficial" title="Abrir Soporte oficial"><span class="gxn-emoji" aria-hidden="true">🛠️</span><span class="gxn-tab-label">Soporte</span></button>
+  </nav></div>
 <div class="view-section" id="view-inicio">
 <div class="reveal" style="text-align: center; margin-top: 10px;">
 <h2 class="hero-title">Tus apps premium<br/><span>al mejor precio</span></h2>
@@ -377,6 +417,104 @@
 </div>
 <!-- DASHBOARD -->
 <div class="view-section" id="view-dashboard">
+<!-- Feed privado V2, único lugar con diseño nuevo -->
+<div id="gx-v2-feed" hidden><div id="gxi-shell" class="shell">
+
+
+
+
+<output class="gxn-toast" id="gxn-toast" role="status" aria-live="polite" hidden></output>
+<section id="gxi-space" aria-label="Resumen contextual de cliente">
+<div class="greeting"><h1 id="greeting" aria-label="Hola"><span class="greeting-line">Hola</span></h1></div>
+<div class="glass-stage" id="glass-stage">
+<!-- No copiar la luz experimental del laboratorio; onda oficial como fondo. -->
+<div class="focus" id="focus" data-tone="muted" data-glass="on" data-material="neutral" data-layout="compact" aria-labelledby="focus-title" aria-describedby="focus-meta">
+ <div class="focus-copy"><div class="focus-title" id="focus-title" aria-live="polite">Consultando tu estado</div><span class="focus-meta" id="focus-meta">Sincronizando datos</span></div>
+ <span class="focus-icon" id="focus-icon" aria-hidden="true">
+  <svg viewBox="0 0 24 24" focusable="false">
+   <path id="state-path" d="M20 6 9 17l-5-5"/>
+   <path class="gx-focus-detail gx-focus-clock-fixed" d="M12 7v5"/>
+   <path class="gx-focus-detail gx-focus-clock-hand" d="M12 12l3 2"/>
+   <path class="gx-focus-detail gx-focus-alert-mark" d="M12 8v5M12 16v1"/>
+   <path class="gx-focus-detail gx-focus-calendar-date" d="M9 13h6v5H9z"/>
+   <path class="gx-focus-detail gx-focus-layer-middle" d="M3 12l9 5 9-5"/>
+   <path class="gx-focus-detail gx-focus-layer-low" d="M3 16l9 5 9-5"/>
+  </svg>
+ </span>
+ <div class="focus-bottom">
+  <button class="focus-action" id="focus-action" type="button" aria-label="Ver mi cuenta">Ver mi cuenta</button>
+ </div>
+</div>
+</div>
+
+<section class="gxi-account gxc-surface" id="gxi-account" aria-live="polite" hidden><h2>Tu estado de cuenta</h2><p id="gxi-account-info">Cargando datos oficiales…</p></section>
+<section class="gxb-wrap" aria-label="Tus beneficios">
+ <div class="gxb-row" id="gxb-row" role="group" aria-label="Lealtad, Referidos y Misiones">
+  <button type="button" class="gxb-tile gxc-surface" data-gxb="loyalty" aria-expanded="false" aria-controls="gxb-panel" aria-label="Lealtad, avance pendiente de sincronizar, abrir detalle">
+   <span class="gxb-label">Lealtad<span class="gxb-level" hidden></span></span><span class="gxb-metric-row"><strong class="gxb-number">—</strong><span class="gxb-emoji" aria-hidden="true">⭐</span></span><span class="gxb-unit">pagos seguidos</span><span class="gxb-mini-progress" aria-hidden="true"><span style="--gxb-pct:0%"></span></span>
+  </button>
+  <button type="button" class="gxb-tile gxc-surface" data-gxb="referral" aria-expanded="false" aria-controls="gxb-panel" aria-label="Referidos, avance pendiente de sincronizar, abrir detalle">
+   <span class="gxb-label">Referidos</span><span class="gxb-metric-row"><strong class="gxb-number">—</strong><span class="gxb-emoji" aria-hidden="true">🎁</span></span><span class="gxb-unit">meses válidos</span><span class="gxb-mini-progress" aria-hidden="true"><span style="--gxb-pct:0%"></span></span>
+  </button>
+  <button type="button" class="gxb-tile gxc-surface" data-gxb="mission" aria-expanded="false" aria-controls="gxb-panel" aria-label="Misiones, avance pendiente de sincronizar, abrir detalle">
+   <span class="gxb-label">Misiones</span><span class="gxb-metric-row"><strong class="gxb-number">—</strong><span class="gxb-emoji" aria-hidden="true">🎯</span></span><span class="gxb-unit">completadas</span><span class="gxb-mini-progress" aria-hidden="true"><span style="--gxb-pct:0%"></span></span>
+  </button>
+ </div>
+ <div id="gxb-panel" class="gxb-panel gxc-surface" role="region" aria-label="Detalle de beneficio" hidden>
+  <button id="gxb-dismiss" type="button" class="gxb-dismiss" aria-label="Volver a los beneficios"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+  <div class="gxb-panel-inner">
+   <div class="gxb-head">
+    <h3 id="gxb-title"></h3>
+   </div>
+   <p id="gxb-copy" class="gxb-copy"></p>
+   <div id="gxb-content"></div>
+  </div>
+  <div class="gxb-foot">
+   <div class="gxb-foot-action"><button type="button" id="gxb-action" class="gxb-action"></button><button type="button" id="gxb-rules" class="gxb-rules" aria-expanded="false" aria-controls="gxb-inline-conditions" aria-label="Ver condiciones" title="Información del beneficio"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8h.01"></path></svg></button></div>
+  </div>
+
+  <span class="gxb-panel-emoji" id="gxb-panel-emoji" aria-hidden="true">⭐</span>
+  <span id="gxb-feedback" class="gxb-feedback" aria-live="polite"></span>
+ </div>
+</section>
+<section class="gxv-savings gxc-surface" id="gxv-savings" aria-label="Comparación de precios mensuales" hidden>
+ <div class="gxv-logos" id="gxv-logos" aria-label="Plataformas contratadas"></div>
+ <div class="gxv-value">
+  <strong class="gxv-amount" id="gxv-amount">—</strong>
+  <span class="gxv-meaning">de ahorro estimado al mes</span>
+  <span class="gxv-context" id="gxv-context">Frente al precio de contratación directa</span>
+ </div>
+</section>
+<section class="gxs-services" id="gxs-services" aria-labelledby="gxs-title">
+ <header class="gxs-header"><h2 id="gxs-title">Tus servicios</h2><small id="gxs-count">4 plataformas</small></header>
+ <div class="gxs-list" id="gxs-list" aria-label="Plataformas contratadas"></div>
+ 
+ 
+</section>
+
+<section class="gxm-history" id="gxm-history" aria-labelledby="gxm-title">
+ <header class="gxm-head">
+  <h2 id="gxm-title">Historial de movimientos</h2>
+  <button class="gxm-filter-toggle" id="gxm-filter-toggle" type="button" aria-expanded="false" aria-controls="gxm-filters" data-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 6h16M7 12h10M10 18h4"/></svg><span id="gxm-filter-label">Filtrar</span></button>
+  <div class="gxm-filters" id="gxm-filters" role="group" aria-label="Filtrar movimientos" hidden>
+  <button type="button" data-gxm-filter="all" aria-pressed="true">Todos</button>
+  <button type="button" data-gxm-filter="payment" aria-pressed="false">Pagos</button>
+  <button type="button" data-gxm-filter="service" aria-pressed="false">Servicios</button>
+  </div>
+ </header>
+ <div class="gxm-list gxc-surface" id="gxm-list" aria-label="Movimientos registrados"></div>
+ <button type="button" class="gxm-more" id="gxm-more" hidden>Ver todos los movimientos</button>
+ <p class="gxm-footnote">Movimientos registrados en GOXION.</p>
+</section>
+
+
+</section>
+
+
+
+</div></div>
+<!-- Datos y handlers del dashboard anterior: compatibilidad temporal, no-visible tras V2 -->
+<div id="gx-v2-legacy-host">
 <div class="dash-greeting-box" id="dash-greeting-container">
 <h1 id="dynamic-greeting-text">¡Hola, <span id="dash-name">Cliente</span>! 👋</h1>
 </div>
@@ -431,13 +569,12 @@
 </div>
 <div id="dash-history"></div>
 </div>
+</div>
 <div class="view-section" id="view-catalogo">
 <section class="gx-promo-showcase" id="gx-promo-showcase" hidden aria-label="Promociones destacadas">
 <div class="gx-promo-showcase-head">
 <div>
-<span class="gx-promo-kicker">DESTACADO EN GOXION</span>
-<h2>Ofertas que vale la pena mirar</h2>
-<p>Promociones seleccionadas del catálogo, disponibles por tiempo limitado.</p>
+<h2>Promociones</h2>
 </div>
 <div class="gx-promo-deck-status" id="gx-promo-deck-status" aria-live="polite"></div>
 </div>
@@ -454,7 +591,7 @@
 <section class="gx-catalog-curated" id="gx-catalog-curated" hidden>
 <div class="gx-catalog-curated-section">
 <div class="gx-catalog-curated-head">
-<div><span class="gx-promo-kicker">PARA EMPEZAR</span><h3>Lo que más te conviene</h3></div>
+<div><h3>Lo que más te conviene</h3></div>
 <div class="gx-catalog-curated-switch" role="tablist" aria-label="Orden del catálogo">
 <button class="active" data-gx-curated-mode="popular" type="button">Populares</button>
 <button data-gx-curated-mode="saving" type="button">Mayor ahorro</button>
@@ -465,16 +602,14 @@
 
 <div class="gx-catalog-curated-section gx-catalog-discover-section">
 <div class="gx-catalog-curated-head">
-<div><span class="gx-promo-kicker">DESCUBRE MÁS</span><h3>Algo diferente para ti</h3></div>
+<div><h3>Descubre más</h3></div>
 </div>
 <div class="gx-catalog-mini-rail" id="gx-catalog-discover-rail"></div>
 </div>
 </section>
 
 <div class="gx-catalog-all-head" id="gx-catalog-all-head">
-<span class="gx-promo-kicker">CATÁLOGO COMPLETO</span>
-<h3>Explora todas las plataformas</h3>
-<p>Busca una plataforma o abre su tarjeta para ver planes y disponibilidad.</p>
+<h3>Todas las plataformas</h3>
 </div>
 <div class="gx-catalog-toolbar gx-seek-toolbar">
 <div class="gx-seek" id="gx-seek" data-open="false" data-press="false" data-busy="false">
@@ -531,61 +666,35 @@
 </div>
 </div>
 </div>
-<div class="direct-contact-box">
-<div style="font-size: 20px; margin-bottom: 5px;">💬</div>
-<div style="font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 5px;">¿Tu problema es distinto?</div>
-<div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Si presentas una situación especial o no encuentras tu falla en la lista superior, contáctanos directamente.</div>
-<button class="btn-primary" onclick="window.open(`https://wa.me/${NUMERO_GOXION}?text=Hola,%20requiero%20asistencia%20especial%20con%20mi%20cuenta.%20Mi%20ID%20de%20cliente%20es:%20`, '_blank')" style="background: transparent; border: 1px solid rgba(255, 51, 102, 0.5); color: #fff; box-shadow: none; padding: 10px;">
-                    Hablar con Asesor Humano
-                </button>
+<div class="direct-contact-box gx-support-access gx-support-human">
+<div><h3>Estamos para <span>ayudarte</span></h3><p>Habla directamente con nuestro equipo.</p></div>
+<span class="gx-support-art" aria-hidden="true">💬</span>
+<button type="button" class="btn-primary gx-support-cta" onclick="window.open(`https://wa.me/${NUMERO_GOXION}?text=Hola,%20requiero%20asistencia%20especial%20con%20mi%20cuenta.%20Mi%20ID%20de%20cliente%20es:%20`, '_blank')">Hablar con un asesor</button>
 </div>
-<div class="glass-card" style="margin-top: 15px; text-align: center; padding: 15px;">
-<div style="font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 5px;">¿Tienes alguna sugerencia?</div>
-<div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Ayúdanos a mejorar nuestro servicio dejándonos un comentario o califica tu experiencia.</div>
-<button class="btn-primary" onclick="openFeedbackModal()" style="background: rgba(0, 242, 254, 0.1); border: 1px solid var(--neon-blue); color: var(--text-main); box-shadow: none; padding: 10px;">
-                    Dejar Comentario
-                </button>
+<div class="glass-card gx-support-access gx-support-opinion">
+<div><h3>Tu opinión <span>cuenta</span></h3><p>Cuéntanos cómo ha sido tu experiencia.</p></div>
+<span class="gx-support-art" aria-hidden="true">⭐</span>
+<button type="button" class="btn-primary gx-support-cta" onclick="openFeedbackModal()">Dejar una opinión</button>
 </div>
 <div class="faq-container">
-<div class="section-title">Preguntas Frecuentes (FAQ)</div>
-<div class="faq-item">
-<div class="faq-header" onclick="toggleFAQ(this)">
-<span>¿Cuáles son los métodos de pago?</span>
-<span class="icon">▼</span>
-</div>
-<div class="faq-body">Aceptamos transferencias bancarias interbancarias (SPEI) y depósitos en efectivo mediante tiendas OXXO. Los datos de la cuenta te serán proporcionados por soporte cuando vayas a renovar.</div>
-</div>
-<div class="faq-item">
-<div class="faq-header" onclick="toggleFAQ(this)">
-<span>¿Qué pasa si me atraso un día en mi pago?</span>
-<span class="icon">▼</span>
-</div>
-<div class="faq-body">Si te atrasas sin dar aviso, se genera un recargo del 5% diario. Si tienes un imprevisto, ¡no te preocupes! Solo envíanos un mensaje antes de tu fecha de corte y te otorgaremos una prórroga sin penalización.</div>
-</div>
-<div class="faq-item">
-<div class="faq-header" onclick="toggleFAQ(this)">
-<span>¿Puedo cambiar la contraseña de mi perfil?</span>
-<span class="icon">▼</span>
-</div>
-<div class="faq-body">Si tu servicio incluye un perfil privado (ej. Netflix, Disney+), sí puedes y te recomendamos ponerle un PIN. Sin embargo, <strong>NUNCA</strong> debes cambiar la contraseña general o correo de la cuenta principal, ya que perderías tu garantía.</div>
-</div>
-<div class="faq-item">
-<div class="faq-header" onclick="toggleFAQ(this)">
-<span>¿Cómo reclamo mi mes gratis por referido?</span>
-<span class="icon">▼</span>
-</div>
-<div class="faq-body">Al invitar a alguien con tu enlace, asegúrate de que nos mencione tu nombre al contratar. Cuando tu referido cumpla 3 meses activos pagando, el sistema automáticamente te bonificará el 100% de descuento en tu cuarta mensualidad.</div>
-</div>
+<h2 class="section-title">Preguntas frecuentes</h2>
+<div class="faq-item"><button type="button" class="faq-header" aria-expanded="false" aria-controls="gx-support-faq-0" onclick="toggleFAQ(this);this.setAttribute('aria-expanded',String(this.parentElement.classList.contains('open')))"><span>Métodos de pago</span><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 12h12"/><path class="gx-faq-plus-v" d="M12 6v12"/></svg></span></button><div class="faq-body" id="gx-support-faq-0">Aceptamos transferencias SPEI y depósitos en efectivo en OXXO. Consulta los datos de pago al renovar tu servicio.</div></div>
+<div class="faq-item"><button type="button" class="faq-header" aria-expanded="false" aria-controls="gx-support-faq-1" onclick="toggleFAQ(this);this.setAttribute('aria-expanded',String(this.parentElement.classList.contains('open')))"><span>Retrasos y prórrogas</span><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 12h12"/><path class="gx-faq-plus-v" d="M12 6v12"/></svg></span></button><div class="faq-body" id="gx-support-faq-1">La mora es del 5% diario simple sobre el saldo vencido, hasta un máximo del 50%. Puedes solicitar una prórroga desde tu fecha de vencimiento y hasta tres días después; consulta las condiciones en Mi Espacio.</div></div>
+<div class="faq-item"><button type="button" class="faq-header" aria-expanded="false" aria-controls="gx-support-faq-2" onclick="toggleFAQ(this);this.setAttribute('aria-expanded',String(this.parentElement.classList.contains('open')))"><span>Contraseñas y accesos</span><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 12h12"/><path class="gx-faq-plus-v" d="M12 6v12"/></svg></span></button><div class="faq-body" id="gx-support-faq-2">Si tu servicio admite un perfil privado, puedes protegerlo con un PIN. No modifiques el correo ni la contraseña general de la cuenta principal.</div></div>
+<div class="faq-item"><button type="button" class="faq-header" aria-expanded="false" aria-controls="gx-support-faq-3" onclick="toggleFAQ(this);this.setAttribute('aria-expanded',String(this.parentElement.classList.contains('open')))"><span>Beneficios por referidos</span><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 12h12"/><path class="gx-faq-plus-v" d="M12 6v12"/></svg></span></button><div class="faq-body" id="gx-support-faq-3">Comparte tu invitación. Tu referido debe contratar al menos dos perfiles y mantenerlos activos y pagados durante tres meses consecutivos. Consulta los requisitos y el estado de tu recompensa en Mi Espacio.</div></div>
 </div>
 </div>
 <div class="footer-info">
 <div class="schedule">
-<div class="schedule-title" style="font-weight: 700; color: var(--neon-purple); margin-bottom: 5px;">🕒 Atención Asistida</div>
+<div class="schedule-title" style="font-weight: 700; color: var(--neon-purple); margin-bottom: 5px;"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/></svg> Atención Asistida</div>
 <div class="schedule-time" style="font-size: 13px; color: var(--text-muted);">Lunes a Sábado • 09:00 AM - 11:00 PM</div>
 </div>
-<div style="font-size: 11px; color: var(--text-muted); margin-top: 15px;">
+<div class="gx-v2-copyright" style="font-size: 11px; color: var(--text-muted); margin-top: 15px;">
                 © 2026 GOXION. Todos los derechos reservados.
             </div>
+<div class="goxion-release-version" aria-label="Versión de GOXION">
+    GOXION · Ayuda · v1.3.0
+</div>
 </div>
 </div>
 <div class="auth-overlay gx-auth-backdrop-only" id="auth-overlay" onclick="closeAuthSheetEvent(event)"></div>
@@ -594,7 +703,7 @@
 <span class="cart-total" id="cart-total-price">$0 MXN</span>
 <span class="cart-items" id="cart-items-count">0 perfiles</span>
 </div>
-<button class="cart-btn" onclick="enviarPedido()">Ver mi carrito →</button>
+<button class="cart-btn" onclick="enviarPedido()">Ver mi carrito</button>
 </div>
 <div class="modal" id="modal-terminos">
 <div class="glass-card modal-content gx-standard-legacy-modal">
@@ -705,6 +814,7 @@
 </div>
 
 <script src="./assets/js/core/runtime.js?v=legal-v2-1"></script>
+<script src="./preview/mi-espacio-v2/feed-reads.js?v=20261126"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.91.0/dist/umd/supabase.min.js"></script>
 <script src="./assets/js/core/realtime.js?v=20261008a"></script>
 <script src="./assets/js/core/financial-engine.js"></script>
@@ -716,20 +826,18 @@
 <script src="./assets/js/ayuda/01c-rewards-referrals.js"></script>
 <script src="./assets/js/ayuda/01d-experience-session.js?v=splash-fix-20261118"></script>
 <script src="./assets/js/ayuda/01e-client-dashboard.js"></script>
-<script src="./assets/js/ayuda/01f-catalog-orders.js?v=cart2"></script>
+<script src="./assets/js/ayuda/01f-catalog-orders.js?v=hero-guard-20261126"></script>
 <script src="./assets/js/ayuda/01g-support-runtime.js"></script>
 <!-- GOXION // CLIENTE + CATÁLOGO + SOPORTE EN SUPABASE -->
-<script id="goxion-client-supabase-layer" src="./assets/js/ayuda/02-client-supabase-layer.js?v=20261007c"></script>
+<script id="goxion-client-supabase-layer" src="./assets/js/ayuda/02-client-supabase-layer.js?v=performance-20261126"></script>
 <script id="goxion-nav-controller" src="./assets/js/ayuda/03-nav-controller.js"></script>
 <script id="goxion-support-lock-feedback" src="./assets/js/ayuda/04-support-lock-feedback.js"></script>
 <script id="goxion-gamification-shared-morph-js" src="./assets/js/ayuda/05-gamification-shared-morph-js.js"></script>
-<script id="goxion-wave-background" src="./assets/js/ayuda/06-wave-background.js"></script>
+<script id="goxion-wave-background" src="./assets/js/ayuda/06-wave-background.js?v=performance-20261126"></script>
 
-<div class="goxion-release-version" aria-label="Versión de GOXION">
-    GOXION · Ayuda · v1.3.0
-</div>
 
-<script id="goxion-production-interactions-js" src="./assets/js/ayuda/07-production-interactions-js.js?v=cart2"></script>
+
+<script id="goxion-production-interactions-js" src="./assets/js/ayuda/07-production-interactions-js.js?v=auth-resilience-20261126"></script>
 
 
 
@@ -860,28 +968,44 @@
 
 
 <script id="goxion-ui-harmony-production-script" src="./assets/js/ayuda/14-ui-harmony-production-script.js"></script>
-<script id="goxion-promotions-catalog-c1" src="./assets/js/ayuda/15-promotions-catalog-c1.js?v=c9-settled-geometry-20261126"></script>\n
+<script id="goxion-promotions-catalog-c1" src="./assets/js/ayuda/15-promotions-catalog-c1.js?v=c9-settled-geometry-20261126"></script>
 
-<script src="./assets/js/ayuda/16-cart-v2.js?v=glass1"></script>
-<script id="goxion-ayuda-realtime" src="./assets/js/ayuda/03-realtime.js?v=20261008a"></script>
-<script id="goxion-client-notifications-realtime" src="./assets/js/ayuda/04-client-notifications-realtime.js?v=terms-wide-1"></script>
+
+<script src="./assets/js/ayuda/16-cart-v2.js?v=cart-composition-20261124"></script>
+<script id="goxion-ayuda-realtime" src="./assets/js/ayuda/03-realtime.js?v=performance-20261126"></script>
+<script id="goxion-client-notifications-realtime" src="./assets/js/ayuda/04-client-notifications-realtime.js?v=performance-20261126"></script>
 <script src="./assets/js/opiniones/store.js?v=20261009a"></script>
-<script src="./assets/js/opiniones/ayuda.js?v=20261009a"></script>
-<script src="./assets/js/ayuda/17-b2-prorroga-oficial.js?v=policies-v2-3"></script>
+<script src="./assets/js/opiniones/ayuda.js?v=opiniones-inline-f4-20261126"></script>
+<script src="./preview/mi-espacio-v2/official-feed-prorroga.js?v=feed-20261123"></script>
 <script src="./assets/js/ayuda/18-b2-index-ruta-oficial.js?v=f5-1"></script>
 <script src="./assets/js/ayuda/19-b2-proximo-pago.js?v=20261014"></script>
 <!-- GOXION · GOXY F17 OFICIAL: loader ordenado, sin iframe ni segundo asistente -->
-<script src="./preview/goxion-ai/goxy-heads.bundle.js?v=official-f17"></script>
+<script src="./preview/mi-espacio-v2/goxy-heads-mirror.bundle.js?v=pilot-material-v5-20261126"></script>
 <script src="./preview/goxion-ai/goxy-support-knowledge.js?v=official-f17"></script>
 <script src="./preview/goxion-ai/goxy-client-context.js?v=official-f17"></script>
 <script src="./preview/goxion-ai/goxy-access-routing.js?v=official-f17"></script>
 <script src="./preview/goxion-ai/goxy-whatsapp-handoff.js?v=official-f17"></script>
-<script src="./preview/goxion-ai/goxy-ai-client.js?v=official-f17"></script>
-<script src="./preview/goxion-ai/goxy-payment-read.js?v=official-f17"></script>
-<script id="goxion-goxy-official" src="./preview/goxion-ai/mascota.js?v=official-f17"></script>
+<script src="./preview/goxion-ai/goxy-ai-client.js?v=feedback-pilot-h1-20261126"></script>
+<script src="./preview/goxion-ai/goxy-policy-v2.js?v=legal-v2-20261125"></script>
+<script src="./preview/goxion-ai/goxy-dialog-routing.js?v=conversation-v3a-20261125"></script>
+<script src="./preview/goxion-ai/goxy-diagnosis.js?v=diagnosis-v2a-20261125"></script>
+<script src="./preview/goxion-ai/goxy-payment-read.js?v=legal-v2-20261125"></script>
+<script src="./preview/goxion-ai/goxy-vision-client.js?v=support-h2-pilot-20261126"></script>
+<script src="./preview/goxion-ai/goxy-feedback.js?v=learning-v2-20261125"></script>
+<script src="./preview/goxion-ai/goxy-incidents.js?v=support-h2-pilot-20261126"></script>
+<script id="goxion-goxy-official" src="./preview/goxion-ai/mascota.js?v=support-h2-pilot-20261126"></script>
 <!-- Anuncio de lanzamiento: solo sesiones confirmadas de Mi Espacio -->
-<script id="goxion-release-launch" src="./assets/js/ayuda/20-release-announcement.js?v=oficial-v2-todos"></script>
-<script id="goxion-legal-v2" src="./assets/js/ayuda/21-legal-v2-documents.js?v=cola-v1"></script>
-<script src="./assets/js/ayuda/22-legal-access.js?v=legal-general-1"></script>
+<script id="goxion-release-launch" src="./preview/mi-espacio-v2/release-announcement.js?v=pilot-sequence-v5-20261126"></script>
+<script id="goxion-legal-v2" src="./assets/js/ayuda/21-legal-v2-documents.js?v=pilot-sequence-v5-20261126"></script>
+<script src="./assets/js/ayuda/22-legal-access.js?v=session-runtime-20261126"></script>
+<script src="./preview/mi-espacio-v2/v2-data.js?v=performance-20261126"></script>
+<script src="./preview/mi-espacio-v2/hero-states.js?v=resolution-20261126"></script>
+<script src="./preview/mi-espacio-v2/feed-continuity.js?v=20261126"></script>
+<script src="./preview/mi-espacio-v2/official-feed-runtime.js?v=performance-20261126"></script>
+<script src="./preview/mi-espacio-v2/official-feed-host.js?v=performance-20261126"></script>
+<script src="./preview/mi-espacio-v2/official-feed-intro.js?v=pilot-sequence-v5-20261126"></script>
+<script src="./preview/mi-espacio-v2/goxy-identity.js?v=pilot-polish-20261126"></script>
+<script defer src="./preview/mi-espacio-v2/pulsoicon-preview.js?v=hero-states-f2-20261126"></script>
 </body>
 </html>
+
