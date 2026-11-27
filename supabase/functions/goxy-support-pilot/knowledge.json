@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "source": "preview/goxion-ai/goxy-dialog-routing.js (chat-safe adapter of official support guides)",
+  "guides": {
+    "Netflix": [
+      {
+        "id": 0,
+        "issue": "🔑 Solicitar Código de Acceso",
+        "instructions": "Selecciona «Iniciar Sesión con Código». El código se enviará al correo administrado por GOXION. Solicita asistencia al equipo por el canal oficial.",
+        "requires_human": true
+      },
+      {
+        "id": 1,
+        "issue": "📺 Tu TV pide Actualizar Hogar",
+        "instructions": "En tu TV selecciona «Actualizar Hogar». La pantalla enviará una solicitud al correo administrado por GOXION; el equipo debe autorizarla.",
+        "requires_human": true
+      },
+      {
+        "id": 2,
+        "issue": "⚠️ Límite de Pantallas",
+        "instructions": "Cada perfil individual corresponde a una pantalla, salvo condiciones expresas de tu modalidad. Comprueba que no haya otra TV usando tu perfil. Si continúa, solicita una revisión.",
+        "requires_human": true
+      }
+    ],
+    "Disney+": [
+      {
+        "id": 0,
+        "issue": "🔑 Código de Verificación",
+        "instructions": "Ingresa a la app y pulsa «Continuar» con el correo asignado. La plataforma enviará un código al correo administrado por GOXION. Solicita ayuda al equipo.",
+        "requires_human": true
+      },
+      {
+        "id": 1,
+        "issue": "🏠 Mensaje de 'Hogar Principal'",
+        "instructions": "Selecciona «Actualizar Hogar». Se enviará una solicitud de autorización al correo maestro; el equipo debe gestionarla.",
+        "requires_human": true
+      }
+    ],
+    "Max": [
+      {
+        "id": 0,
+        "issue": "🔑 Iniciar Sesión con Código",
+        "instructions": "En tu TV selecciona «Iniciar Sesión con un Código». Aparecerá un código en pantalla. El equipo debe completar la vinculación por el canal oficial.",
+        "requires_human": true
+      },
+      {
+        "id": 1,
+        "issue": "❌ Contraseña Incorrecta",
+        "instructions": "Comprueba que no hayas dejado espacios al copiar tus datos. Si no puedes entrar, revisa tus accesos en Mi Espacio o solicita ayuda al equipo.",
+        "requires_human": true
+      }
+    ],
+    "Prime Video": [
+      {
+        "id": 0,
+        "issue": "📺 Registrar Dispositivo",
+        "instructions": "Abre Prime Video y pulsa «Identifícate». Aparecerá un código de registro; el equipo debe enlazar tu dispositivo.",
+        "requires_human": true
+      }
+    ],
+    "YouTube": [
+      {
+        "id": 0,
+        "issue": "📩 No me llegó la invitación",
+        "instructions": "Revisa la carpeta de spam de Gmail y comprueba que no estés en otro grupo familiar activo. Si no llegó la invitación, solicita que el equipo la revise.",
+        "requires_human": true
+      }
+    ],
+    "ViX": [
+      {
+        "id": 0,
+        "issue": "🔑 Vincular TV o Iniciar Sesión",
+        "instructions": "Selecciona «Iniciar Sesión». Si aparece un código alfanumérico en tu TV, el equipo debe gestionar la vinculación.",
+        "requires_human": true
+      }
+    ],
+    "Crunchyroll": [
+      {
+        "id": 0,
+        "issue": "🔑 Vincular Consola o TV",
+        "instructions": "Abre «Activar dispositivo» en tu consola o TV. Si aparece un código, el equipo debe autorizar el dispositivo.",
+        "requires_human": true
+      }
+    ],
+    "Microsoft": [
+      {
+        "id": 0,
+        "issue": "💻 Reenviar Invitación familiar",
+        "instructions": "Solicita al equipo que revise la invitación familiar y, si corresponde, la reenvíe por el canal oficial.",
+        "requires_human": true
+      }
+    ],
+    "Google One": [
+      {
+        "id": 0,
+        "issue": "☁️ Espacio no reflejado",
+        "instructions": "Comprueba que hayas aceptado la invitación de familia en Gmail. Si no aparecen los beneficios, solicita una revisión.",
+        "requires_human": true
+      }
+    ]
+  }
+}
