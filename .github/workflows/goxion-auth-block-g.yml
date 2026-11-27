@@ -25,9 +25,14 @@ jobs:
         run: node --experimental-strip-types --test scripts/admin-experience-auth.test.mjs
       - name: Admin operations and credential guards (fixtures)
         run: node --experimental-strip-types --test scripts/sensitive-session-guards.test.mjs
+      - name: C9 return geometry when RAF is delayed
+        run: node --test scripts/promo-close-resilience.test.mjs
       - name: Deterministic WAAPI/RAF and reduced motion
         run: node --test scripts/auth-morph-resilience.test.mjs
       - run: npm install --no-save playwright
       - run: npx playwright install --with-deps chromium webkit
       - name: Guest login, reopen, geometry and injected fault (no external network)
         run: node scripts/auth-morph-resilience-smoke.mjs
+
+      - name: Browser smoke · preserve C9 frame geometry in Chromium and WebKit
+        run: npm run test:smoke

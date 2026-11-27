@@ -27,6 +27,9 @@ jobs:
       - name: Admin operations and credential guards (fixtures)
         run: node --experimental-strip-types --test scripts/sensitive-session-guards.test.mjs
 
+      - name: C9 return geometry when RAF is delayed
+        run: node --test scripts/promo-close-resilience.test.mjs
+
       - name: Auth resilience · deterministic WAAPI/RAF
         run: node --test scripts/auth-morph-resilience.test.mjs
 

@@ -845,18 +845,16 @@
       card.classList.add('is-closed','is-returning');
       void card.offsetWidth;
 
-      requestAnimationFrame(()=>{
-        if(card!==state.expandedCard||!origin) return;
-        card.style.top=origin.top+'px';
-        card.style.left=origin.left+'px';
-        card.style.setProperty('width',(origin.cssWidth??origin.width)+'px','important');
-        card.style.setProperty('height',(origin.cssHeight??origin.height)+'px','important');
-      });
-      setTimeout(()=>{
-        if(card===state.expandedCard&&card.classList.contains('is-returning')){
-          settleStalledPromoMorph(card,origin.cssHeight??origin.height);
-        }
-      },850);
+      // The previous offsetWidth flush establishes the expanded-size start
+      // of the CSS transition. Commit the destination in THIS task: WebKit
+      // may defer RAF on the reparented fixed card past the teardown timer.
+      // No geometry or easing is changed, and the target cannot be missed.
+      if(!origin)return;
+      card.style.top=origin.top+'px';
+      card.style.left=origin.left+'px';
+      card.style.setProperty('width',(origin.cssWidth??origin.width)+'px','important');
+      card.style.setProperty('height',(origin.cssHeight??origin.height)+'px','important');
+      void card.offsetWidth;
     },110);
 
     // Al terminar, sólo devolvemos el mismo nodo al deck: ya no hay cambio de composición.
@@ -864,6 +862,10 @@
       if(card!==state.expandedCard) return;
       // WebKit puede iniciar los frames después del temporizador: terminar el
       // retorno geométrico antes de mover el nodo evita un salto al reinsertarlo.
+      // The normal return transition has had 710ms (CSS geometry: 460ms).
+      // Finish a genuinely stalled transition before reparenting, not after.
+      if(origin)settleStalledPromoMorph(card,origin.cssHeight??origin.height);
+      void card.offsetWidth;
       const transitions=card.getAnimations().filter(animation=>
         Number.isFinite(animation.effect?.getComputedTiming().endTime)
       );
@@ -878,9 +880,13 @@
           try{animation.finish()}catch(_){}
         }
       }
+      // Flush the finished geometry and give the browser a frame to render
+      // the closed layout while it is still the same fixed node. The timeout
+      // remains a bounded liveness fallback for hidden/suspended tabs.
+      void card.offsetWidth;
       await Promise.race([
-        new Promise(resolve=>requestAnimationFrame(resolve)),
-        new Promise(resolve=>setTimeout(resolve,90))
+        new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))),
+        new Promise(resolve=>setTimeout(resolve,120))
       ]);
       if(card!==state.expandedCard) return;
 
