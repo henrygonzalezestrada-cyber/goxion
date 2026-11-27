@@ -1,0 +1,31 @@
+name: GOXION · Push K2 piloto
+on:
+  push:
+    branches: [feat/push-k2-pilot-20261127]
+  pull_request:
+    branches: [main]
+    paths:
+      - 'assets/js/ayuda/24-push-piloto.js'
+      - 'goxion-push-pilot*'
+      - 'supabase/functions/push-cliente/**'
+      - 'scripts/push-k2*'
+  workflow_dispatch:
+jobs:
+  isolated:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Policy and JavaScript
+        run: |
+          node --test scripts/push-k2-policy.test.mjs
+          node --check assets/js/ayuda/24-push-piloto.js
+          node --check goxion-push-pilot-sw.js
+      - name: Install browser
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Server-gated UI, iOS guide, Android, preferences and logout
+        run: node scripts/push-k2-browser.test.mjs

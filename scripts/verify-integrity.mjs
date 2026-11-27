@@ -9,6 +9,12 @@ const PAGES = ['index', 'ayuda', 'admin'];
 // Comunicaciones es una superficie oficial de Gestión enlazada desde Admin.
 // La verificación de su comportamiento permanece en test:comunicaciones.
 const CANDIDATE = 'ayuda-espejo-feed-v2.html';
+const K2_MIRROR_ONLY_LINES = Object.freeze([
+  '<link rel="manifest" href="./goxion-push-pilot.webmanifest">',
+  '<link rel="apple-touch-icon" href="./Logo individual.png">',
+  '<link rel="stylesheet" href="./assets/css/push-pilot.css?v=k2-20261127">',
+  '<script src="./assets/js/ayuda/24-push-piloto.js?v=k2-20261127"></script>',
+]);
 const QA_PAGES = ['ayuda-aceptacion-v2.html', 'index-aceptacion-v2.html', 'index-b2-aceptacion-v2.html'];
 const ALLOWED_ROOT_HTML = new Set([...PAGES.map((page) => page + '.html'), 'comunicaciones.html', CANDIDATE, ...QA_PAGES]);
 // El rescate de arranque oficial es intencionalmente independiente de los
@@ -123,11 +129,21 @@ for (const page of PAGES) {
     fail(page + ': reaparecieron scripts inline (' + inlineScripts.length + ').');
   }
   if (page === 'ayuda') {
-    const expected = readFileSync(join(ROOT,CANDIDATE),'utf8')
+    let expected = readFileSync(join(ROOT,CANDIDATE),'utf8');
+    // K2 remains strictly mirror-only; allow exactly these four complete lines.
+    // Every other byte must continue to match the official page after normalization.
+    for (const line of K2_MIRROR_ONLY_LINES) {
+      const count = expected.split('\n').filter((value) => value === line).length;
+      if (count !== 1 || html.includes(line)) {
+        fail('Ayuda: contrato K2 del espejo incumplido: ' + line);
+      }
+      expected = expected.replace(line + '\n', '');
+    }
+    expected = expected
       .replace('data-gx-release-launch="pilot"','data-gx-release-launch="enabled"')
       .replace('<title>ESPEJO · GOXION','<title>GOXION')
       .replace('<meta name="robots" content="noindex,nofollow">\n','');
-    if (html !== expected) fail('Ayuda: promoción debe coincidir exactamente con el espejo aprobado (sólo modo, título y robots).');
+    if (html !== expected) fail('Ayuda: promoción debe coincidir exactamente con el espejo aprobado (sólo modo, título, robots y referencias K2 exclusivas).');
   } else if (html.includes('data-gx-feed-performance')) {
     fail(page + ': flag de feed fuera de Mi Espacio.');
   }

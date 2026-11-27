@@ -1,0 +1,12 @@
+{
+  "id":"./ayuda-espejo-feed-v2.html",
+  "name":"GOXION · Piloto",
+  "short_name":"GOXION Piloto",
+  "start_url":"./ayuda-espejo-feed-v2.html",
+  "scope":"./ayuda-espejo-feed-v2.html",
+  "display":"standalone",
+  "lang":"es-MX",
+  "background_color":"#030305",
+  "theme_color":"#030305",
+  "icons":[{"src":"./Logo individual.png","sizes":"491x491","type":"image/png","purpose":"any"}]
+}
