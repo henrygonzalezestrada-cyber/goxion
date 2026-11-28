@@ -94,9 +94,9 @@ try {
         await shot(page,'iphone-step-'+(i+1));if(i<4)await panel.getByRole('button',{name:'Siguiente'}).click();
       }
       await info.click();assert(await panel.locator('[data-step-hint]').isVisible());await info.click();
-      await page.setViewportSize({width:375,height:480});await page.waitForTimeout(400);
+      await page.setViewportSize({width:375,height:400});await page.waitForTimeout(400);
       const geometry=await panel.evaluate(el=>({scroll:el.scrollHeight,client:el.clientHeight,room:parseFloat(getComputedStyle(el.closest('.gx-client-notif-sheet')).maxHeight),base:parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--gx-notif-panel-max'))}));
-      assert(geometry.room>geometry.base+40);assert(geometry.scroll>geometry.client);assert.equal(await page.getByRole('slider',{name:'Altura del centro de notificaciones'}).getAttribute('aria-valuenow'),'2');
+      console.log('Settings geometry',geometry);assert(geometry.room>geometry.base+40);assert(geometry.scroll>geometry.client);assert.equal(await page.getByRole('slider',{name:'Altura del centro de notificaciones'}).getAttribute('aria-valuenow'),'2');
       const guard=await panel.evaluate(el=>{
         el.scrollTop=3;
         const touch=(type,y)=>{const e=new Event(type,{bubbles:true,cancelable:true});Object.defineProperty(e,'touches',{value:[{clientX:25,clientY:y}]});el.dispatchEvent(e);return e.defaultPrevented};
