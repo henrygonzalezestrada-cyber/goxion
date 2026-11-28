@@ -96,7 +96,7 @@ function wireSheet(){
  const handle=sheet.querySelector('.gx-client-notif-handle'),items=sheet.querySelector('#gx-client-notif-list');
  const toolbar=sheet.querySelector('.gx-client-notif-toolbar');
  if(!handle||!items||!toolbar)return;
- let level=1,inboxLevel=1,drag=null,skipClick=false;
+ let level=1,inboxLevel=1,drag=null,lastPointerEnd=-Infinity;
  // Existing controller accounts for browser chrome in bottom position. Height uses visible viewport only.
  const heights=()=>{const v=window.visualViewport?.height||window.innerHeight;const max=Math.max(100,Math.min(800,v-28));return [Math.min(max,Math.max(150,v*.43)),Math.min(max,Math.max(190,v*.71)),max]};
  function setHeight(px){sheet.style.setProperty('--gx-v2-sheet-height',Math.round(px)+'px')}
@@ -105,7 +105,7 @@ function wireSheet(){
  snap(level);
  handle.addEventListener('pointerdown',e=>{
   if(!sheet.classList.contains('show')||e.button!==0||drag)return;
-  skipClick=false;drag={id:e.pointerId,y:e.clientY,height:sheet.getBoundingClientRect().height,moved:false};
+  drag={id:e.pointerId,y:e.clientY,height:sheet.getBoundingClientRect().height,moved:false};
   try{handle.setPointerCapture?.(e.pointerId)}catch(_){}sheet.classList.add('gx-v2-sheet-dragging');
  });
  handle.addEventListener('pointermove',e=>{
@@ -116,10 +116,14 @@ function wireSheet(){
  function end(e,cancel=false){
   if(!drag||drag.id!==e.pointerId)return;
   const d=drag;drag=null;if(handle.hasPointerCapture?.(e.pointerId))try{handle.releasePointerCapture(e.pointerId)}catch(_){}if(sheet.classList.contains('gx-v2-sheet-dragging'))sheet.classList.remove('gx-v2-sheet-dragging');
-  if(d.moved&&!cancel){const delta=d.y-e.clientY,now=d.height+delta,s=heights();let n=s.reduce((best,x,i)=>Math.abs(x-now)<Math.abs(s[best]-now)?i:best,0);if(Math.abs(delta)>25&&n===level)n=level+(delta>0?1:-1);snap(n);skipClick=true;setTimeout(()=>{skipClick=false},350)}else snap(level);
+  lastPointerEnd=performance.now();
+  if(cancel){snap(level);return}
+  if(d.moved){const delta=d.y-e.clientY,now=d.height+delta,s=heights();let n=s.reduce((best,x,i)=>Math.abs(x-now)<Math.abs(s[best]-now)?i:best,0);if(Math.abs(delta)>25&&n===level)n=level+(delta>0?1:-1);snap(n)}
+  else snap(level===2?1:2);
  }
  handle.addEventListener('pointerup',e=>end(e));handle.addEventListener('pointercancel',e=>end(e,true));handle.addEventListener('lostpointercapture',e=>end(e,true));
- handle.addEventListener('click',()=>{if(!skipClick)snap(level===2?1:2)});
+ // Pointerup handles both a tap and a drag. Do not rely on Safari/Chrome's delayed synthetic click.
+ handle.addEventListener('click',e=>{if(e.detail===0&&performance.now()-lastPointerEnd>450)snap(level===2?1:2)});
  handle.addEventListener('keydown',e=>{const n={ArrowUp:level+1,ArrowDown:level-1,Home:0,End:2,Enter:level===2?1:2,' ':level===2?1:2}[e.key];if(n!==undefined){e.preventDefault();snap(n)}});
  // K3: the ORIGINAL height owner also fits settings/tutorial content, preserving its own slider.
  // Observe intrinsic content, not the height of the drawer: manual resizing must never trigger a new auto-snap.
