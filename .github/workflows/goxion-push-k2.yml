@@ -27,9 +27,10 @@ jobs:
           node-version: 22
       - name: Policy and JavaScript
         run: |
-          node --test scripts/push-k2-policy.test.mjs
+          node --test scripts/push-k2-policy.test.mjs scripts/push-k2-mission-pilot.test.mjs
           node --check assets/js/ayuda/24-push-piloto.js
           node --check goxion-push-pilot-sw.js
+          node --check preview/mi-espacio-v2/official-feed-runtime-k3.js
           node --check preview/mi-espacio-v2/hero-states-k3.js
           node --check preview/mi-espacio-v2/release-announcement-k3.js
       - name: Install browser

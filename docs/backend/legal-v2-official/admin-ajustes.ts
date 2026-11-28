@@ -33,6 +33,31 @@ Deno.serve(async(req)=>{
    const existente=existentes?.[0]??null,nombreEntrante=String(datos.nombre??"").trim();const payload={cliente_id:clienteId,nombre:nombreEntrante||existente?.nombre||"",plataformas:numeroSeguro(datos.plataformas,Number(existente?.plataformas??1)),meses:numeroSeguro(datos.meses,Number(existente?.meses??1)),activo:datos.activo===undefined?true:Boolean(datos.activo)};
    let resultado;if(existente?.id)resultado=await supabase.from("referidos").update(payload).eq("id",existente.id).select().single();else resultado=await supabase.from("referidos").insert(payload).select().single();if(resultado.error)throw resultado.error;return responder({ok:true,referido:resultado.data});
   }
+  // K4a: only the existing pilot account may start this real visual round. No financial reward is issued here.
+  if(accion==="activar_mision_push_piloto"){
+   const clienteId=String(datos.cliente_id??"").trim();
+   if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(clienteId))return responder({ok:false,error:"Cliente no válido"},400);
+   const {data:cliente,error:clienteError}=await supabase.from("clientes").select("id,clave").eq("id",clienteId).eq("clave","casone").maybeSingle();
+   if(clienteError)throw clienteError;
+   if(!cliente)return responder({ok:false,error:"Disponible exclusivamente para Casone."},403);
+   const legal=await supabase.rpc("goxion_legal_estado_acceso",{p_cliente_id:clienteId});if(legal.error)throw legal.error;
+   if(legal.data?.bloquea_operaciones===true||legal.data?.restringido===true)return responder({ok:false,error:"Acepta los términos vigentes antes de activar beneficios."},409);
+   const gate=await supabase.rpc("goxion_push_eligible",{p_cliente_id:clienteId});if(gate.error)throw gate.error;
+   if(gate.data!==true)return responder({ok:false,error:"El piloto de avisos no está habilitado."},409);
+   const tareas="Conoce tus avisos [PUSH_PILOTO_GUIA]\nActiva los avisos en tu teléfono [PUSH_PILOTO_ACTIVAR]\nComparte tu experiencia [PUSH_PILOTO_FEEDBACK]";
+   const {data:g,error:buscarError}=await supabase.from("gamificacion").select("id,misiones_activas,descuento,tareas,misiones_version,cupon_ciclo,cupon_reclamado_ciclo").eq("cliente_id",clienteId).maybeSingle();
+   if(buscarError)throw buscarError;
+   if(!g)return responder({ok:false,error:"No hay una ronda anterior para preservar."},409);
+   if(g.tareas===tareas&&g.misiones_activas===true&&Number(g.descuento)===20)return responder({ok:true,ya_activa:true,misiones_version:g.misiones_version,cupon_ciclo:g.cupon_ciclo});
+   if(Number(g.cupon_reclamado_ciclo)<Number(g.cupon_ciclo))return responder({ok:false,error:"Hay una ronda anterior pendiente. No se reemplazará."},409);
+   const version=Number(g.misiones_version)+1,ciclo=Number(g.cupon_ciclo)+1;
+   let changes=supabase.from("gamificacion").update({misiones_activas:true,descuento:20,tareas,misiones_version:version,cupon_ciclo:ciclo,cupon_reclamado:false,cupon_reclamado_at:null})
+     .eq("id",g.id).eq("cliente_id",clienteId).eq("misiones_version",g.misiones_version).eq("cupon_ciclo",g.cupon_ciclo).eq("cupon_reclamado_ciclo",g.cupon_reclamado_ciclo).eq("misiones_activas",g.misiones_activas).eq("descuento",g.descuento);
+   changes=g.tareas===null?changes.is("tareas",null):changes.eq("tareas",g.tareas);
+   const {data,error}=await changes.select("misiones_version,cupon_ciclo").maybeSingle();
+   if(error)throw error;if(!data)return responder({ok:false,error:"La ronda cambió. Actualiza Admin e inténtalo de nuevo."},409);
+   return responder({ok:true,misiones_version:data.misiones_version,cupon_ciclo:data.cupon_ciclo});
+  }
   if(accion==="reiniciar_misiones_cliente"){
    const clienteId=String(datos.cliente_id??"").trim();if(!clienteId)return responder({ok:false,error:"Falta cliente_id"},400);const{data:gamif,error:buscarError}=await supabase.from("gamificacion").select("id,misiones_version,cupon_ciclo,cupon_reclamado_ciclo").eq("cliente_id",clienteId).maybeSingle();if(buscarError)throw buscarError;if(!gamif)return responder({ok:false,error:"El cliente no tiene configuración de misiones"},404);
    const nuevaVersion=Math.max(1,Number(gamif.misiones_version||1)+1);const{data,error}=await supabase.from("gamificacion").update({misiones_version:nuevaVersion}).eq("id",gamif.id).select("id,misiones_version,cupon_ciclo,cupon_reclamado_ciclo").single();if(error)throw error;return responder({ok:true,misiones_version:nuevaVersion,cupon_ciclo:data.cupon_ciclo,cupon_reclamado_ciclo:data.cupon_reclamado_ciclo});
