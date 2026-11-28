@@ -11,3 +11,10 @@ Henry pidió trabajar primero el espejo existente y aprobar la presentación ant
 
 ## Pendientes antes de oficial
 Validación visual Henry/iPhone, Android físico; K4 feedback persistente/admin/misión real; ruta manifest/worker oficial estable independiente y enrolamiento claro (no pasarlo silenciosamente desde el piloto); autorización expresa para extender gate y publicar oficial. K6 calendario/mora posterior con motor financiero existente, objetivo 13/dic para avisos del 15.
+
+## Evidencia de publicación
+- Respaldo previo: `backup/pre-k3-visual-mirror-20261127` → `6e0d9be657bb7ac652739c5472fd1b4bb9530e72`.
+- PR #242, candidato certificado `a2150d113a26c8bf556473968df6447f9235c061`, merge `9df5721905ac2d82373d596d212b6ad007d9e3e1`. Comparación contra candidato: cero diferencias; alcance sólo espejo y pruebas/documentación.
+- [Push K2/K3](https://github.com/henrygonzalezestrada-cyber/goxion/actions/runs/46096187065): Chromium y WebKit aprobados (fixtures y capturas, sin credenciales ni envíos reales). [Integridad y encabezados](https://github.com/henrygonzalezestrada-cyber/goxion/actions/runs/46095904234): ambos jobs aprobados; [Novedades y cola legal](https://github.com/henrygonzalezestrada-cyber/goxion/actions/runs/46096187082) aprobadas tras corregir una aserción de la prueba VM (sin cambiar runtime).
+- Publicación HTTPS verificada por SHA de blob en los doce archivos: HTML espejo, cuatro assets K3, HTML oficial/Index/Admin, controladores canónicos, manifest y service worker. Los siete últimos idénticos al respaldo. No se cambió Supabase, Edge ni cron.
+- [Espejo K3](https://henrygonzalezestrada-cyber.github.io/goxion/ayuda-espejo-feed-v2.html?v=k3-20261127). Prueba visual física por Henry (Casona) pendiente; no promover oficial sin aprobación expresa. Tutorial basado en [Apple México](https://support.apple.com/es-mx/guide/iphone/iphea86e5236/ios) y [WebKit](https://webkit.org/blog/13878/web-push-for-web-apps-on-ios-and-ipados/).
