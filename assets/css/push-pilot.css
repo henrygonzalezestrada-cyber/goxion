@@ -82,7 +82,7 @@
 @keyframes gx-k3-tap{0%,20%,100%{transform:scale(.84);opacity:1}40%{transform:scale(1.13);opacity:.72}65%{transform:scale(1);opacity:1}}
 .gx-k3-art-share{flex-direction:column;gap:10px}
 .gx-k3-share-flyout{align-self:center;display:flex;justify-content:center;align-items:center;gap:8px;padding:11px 18px;color:#eff6fa;font-size:14px}
-.gx-k3-guide-arrow{position:absolute;left:32%;bottom:64px;color:#7ee1e7;font-size:22px;line-height:1;text-shadow:0 2px 8px #030305}
+.gx-k3-step-number{position:absolute;right:-7px;top:-7px;width:17px;height:17px;border-radius:50%;display:grid;place-items:center;background:#7ee1e7;color:#10202a;font-size:10px;font-weight:750;box-shadow:0 0 0 2px #252531}
 .gx-k3-app-menu{width:100%;max-width:275px;box-sizing:border-box;border-radius:17px;padding:12px;background:#232530;box-shadow:0 12px 26px rgba(0,0,0,.32);color:#eef1f8;display:grid;gap:7px;font-size:12px}
 .gx-k3-handle{width:34px;height:4px;margin:0 auto 2px;border-radius:9px;background:#676979}
 .gx-k3-share-preview{display:flex;align-items:center;gap:10px;padding:2px 5px 5px}
@@ -106,7 +106,7 @@
 .gx-k3-home-app .gx-k3-app-icon{width:clamp(50px,15vw,64px);height:auto;aspect-ratio:1}
 .gx-k3-home-app b{font-size:10px;line-height:1.2;white-space:nowrap}
 .gx-k3-home-handle{position:absolute;bottom:13px;width:81px;height:3px}
-.gx-k3-art-permit{flex-direction:column;gap:12px}
+.gx-k3-art-permit{flex-direction:column;gap:8px}.gx-k3-activate-example{width:100%;max-width:270px;display:flex;align-items:center;justify-content:center;gap:5px;padding:8px;border-radius:999px;background:rgba(255,255,255,.08);color:#7ee1e7;font-size:12px;font-weight:650}.gx-k3-activate-example svg{width:15px;height:15px;transform:rotate(180deg)}
 .gx-k3-go-header{display:flex;align-items:center;justify-content:flex-end;gap:10px;width:100%;max-width:270px;color:#c1cfe0}
 .gx-k3-go-header img{width:35px;height:35px;object-fit:contain;margin-right:auto}
 .gx-k3-go-header span{width:33px;height:33px;display:grid;place-items:center}
@@ -115,11 +115,11 @@
 .gx-k3-permit-example>b{font-size:14px;line-height:1.4}
 .gx-k3-permit-choice{display:flex;align-items:center;justify-content:center;gap:15px;font-size:12px;width:100%;color:#c1cfe0}
 .gx-k3-permit-choice b{padding:8px 12px}
-#gx-release-overlay .gx-k3-launch-controls{display:flex;align-items:center;gap:8px;margin-top:10px}
+#gx-release-overlay .gx-k3-launch-controls{display:flex;align-items:center;gap:8px;margin-top:10px;position:relative}
 #gx-release-overlay .gx-k3-launch-cta{margin:0;min-height:44px;position:relative;isolation:isolate;padding:9px 15px;border:0;border-radius:999px;background:transparent;font:600 12px/1.3 Poppins,system-ui,sans-serif;color:#7ee1e7}
 #gx-release-overlay .gx-k3-launch-cta::before{content:"";position:absolute;inset:3px 0;border-radius:999px;background:rgba(255,255,255,.08);z-index:-1}
 #gx-release-overlay .gx-k3-launch-cta[disabled]{opacity:.7}
-#gx-release-overlay .gx-k3-launch-note{margin:0;font-size:12px;line-height:1.5;color:#c1cfe0;background:rgba(255,255,255,.055);padding:10px 12px;border-radius:13px}
+#gx-release-overlay .gx-k3-launch-note{position:absolute;z-index:4;bottom:calc(100% + 6px);left:0;width:min(100%,270px);margin:0;font-size:12px;line-height:1.5;color:#eff2fa;background:#272833;box-shadow:0 8px 22px rgba(0,0,0,.35);padding:12px 14px;border-radius:14px}
 #gx-release-overlay .gx-launch-bell{color:var(--gx-launch-accent,#7ee1e7)}
 #gx-release-overlay .gx-pulso-bell-body{transform-origin:12px 3px;animation:gx-k3-pulso-ring 4.3s ease-in-out infinite}
 #gx-release-overlay .gx-pulso-bell-wave{animation:gx-k3-pulso-wave 4.3s ease-in-out infinite;transform-origin:center;--wave-x:1.5px}

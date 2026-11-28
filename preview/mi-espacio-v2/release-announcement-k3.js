@@ -445,7 +445,7 @@
      info.onclick=()=>{tip.hidden=!tip.hidden;info.setAttribute("aria-expanded",String(!tip.hidden));};
      cta.type="button";cta.disabled=!window.GOXION_PUSH_K3?.canInvite();
      cta.onclick=()=>{if(window.GOXION_PUSH_K3?.deferSettings()){cta.textContent="Listo · al terminar";cta.disabled=true;}};
-     controls.append(cta,info);$(".gx-launch-copy",body).append(controls,tip);
+     controls.append(cta,info,tip);$(".gx-launch-copy",body).append(controls);
    }
    if(c.id==="support")mountGoxyChapter($(".gx-launch-goxy-mount",body));
    body.scrollTop=0;
