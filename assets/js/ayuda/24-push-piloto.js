@@ -68,7 +68,7 @@
   function syncMissionPreview(){
     const host=document.getElementById("gxb-panel"),content=document.getElementById("gxb-content");if(!host||!content)return;
     const existing=content.querySelector(".gx-k3-mission");
-    if(!canInvite()||host.hidden||host.dataset.benefit!=="mission"){existing?.remove();return}
+    if(!canInvite()||host.hidden||host.dataset.benefit!=="mission"||host.hasAttribute("data-gxb-push-pilot")){existing?.remove();return}
     if(existing){for(const row of existing.querySelectorAll("[data-mission-preview]")){const isDone=row.dataset.missionPreview==="feedback"?["yes","no"].includes(survey()?.answer):active;row.classList.toggle("done",isDone)}return}
     const m=document.createElement("section");m.className="gx-k3-mission";
     m.innerHTML='<p class="gx-k3-mini-caption">Vista previa de misión de lanzamiento</p><div class="gx-k3-mission-title"><b>Conéctate a GOXION</b><strong>20% <small>OFF</small></strong></div><p>Propuesta: hasta $35 MXN. Aún no disponible para canje.</p><div class="gx-k3-mission-steps"><span data-mission-preview="learn">Conoce la función</span><span data-mission-preview="configure">Configura tus avisos</span><span data-mission-preview="feedback">Comparte tu experiencia</span></div><button type="button" class="gx-k3-action">Conoce los avisos</button>';
@@ -102,7 +102,7 @@
         gear.onclick=()=>{settingsOpen=true;guide=false;guideStep=0;hideInfo();render();headerBack.focus({preventScroll:true})};
       }
       if(sheet.classList.contains("gx-client-notif-sheet"))new MutationObserver(()=>{if(!sheet.classList.contains("show")){if(settingsOpen){settingsOpen=false;guide=false;guideStep=0;hideInfo();render()}}}).observe(sheet,{attributes:true,attributeFilter:["class"]});
-      const missions=document.querySelector(".gxb-wrap");if(missions){missionObserver=new MutationObserver(syncMissionPreview);missionObserver.observe(missions,{childList:true,subtree:true,attributes:true,attributeFilter:["hidden","data-benefit"]});}
+      const missions=document.querySelector(".gxb-wrap");if(missions){missionObserver=new MutationObserver(syncMissionPreview);missionObserver.observe(missions,{childList:true,subtree:true,attributes:true,attributeFilter:["hidden","data-benefit","data-gxb-push-pilot"]});}
     }
     render();
   }

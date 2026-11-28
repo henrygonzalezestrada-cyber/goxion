@@ -26,6 +26,21 @@
             return body;
         }
 
+        window.gxActivatePushMissionPilot = async function() {
+            const button=document.getElementById("gx-push-mission-activate"), status=document.getElementById("gx-push-mission-status");
+            const cliente=Object.entries(typeof clientesDict==="undefined"?{}:clientesDict).find(([key])=>key.toLowerCase()==="casone")?.[1];
+            if(!cliente?._id){if(status)status.textContent="No se encontró Casone. Actualiza Admin.";return;}
+            if(!confirm("¿Activar Conéctate a GOXION únicamente en Casone?\n\nSe creará una nueva ronda de prueba del 20%. El cupón anterior se conserva y el canje nuevo queda bloqueado."))return;
+            if(button)button.disabled=true;
+            if(status)status.textContent="Preparando la ronda…";
+            try{
+                const result=await ajusteAdmin("activar_mision_push_piloto",{cliente_id:cliente._id});
+                if(status)status.textContent="Ronda "+result.cupon_ciclo+" activa en Casone. Canje bloqueado.";
+                if(button)button.textContent="Ronda activa";
+                try{await cargarAdminDatos()}catch(e){console.warn("Ronda activa; falló el refresco visual",e)}
+            }catch(e){if(status)status.textContent=e.message||"No se pudo activar la ronda.";if(button)button.disabled=false;}
+        };
+
         async function cargarStockManual() {
             try {
                 const r = await ajusteAdmin("obtener_stock_manual");

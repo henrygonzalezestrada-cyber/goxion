@@ -63,8 +63,8 @@ Deno.serve(async(req)=>{
     }
 
     if(modo==="reclamar_cupon"){
-      const {data:gamif,error:gamifError}=await supabase.from("gamificacion").select("id,misiones_activas,descuento,cupon_reclamado,cupon_reclamado_at,cupon_ciclo,cupon_reclamado_ciclo").eq("cliente_id",clienteId).maybeSingle();
-      if(gamifError)throw gamifError;if(!gamif||gamif.misiones_activas!==true)return respuesta({ok:false,error:"No tienes un cupón activo para reclamar."},400);
+      const {data:gamif,error:gamifError}=await supabase.from("gamificacion").select("id,misiones_activas,descuento,tareas,cupon_reclamado,cupon_reclamado_at,cupon_ciclo,cupon_reclamado_ciclo").eq("cliente_id",clienteId).maybeSingle();
+      if(gamifError)throw gamifError;if(String(gamif?.tareas||"").split("\n").some(line=>/\[PUSH_PILOTO_[^\]]+\]\s*$/i.test(line)))return respuesta({ok:false,error:"El canje de esta misión piloto estará disponible después de validar su funcionamiento."},409);if(!gamif||gamif.misiones_activas!==true)return respuesta({ok:false,error:"No tienes un cupón activo para reclamar."},400);
       const ciclo=Math.max(1,Number(gamif.cupon_ciclo||1)),reclamadoCiclo=Math.max(0,Number(gamif.cupon_reclamado_ciclo||0));
       if(reclamadoCiclo>=ciclo)return respuesta({ok:true,ya_reclamado:true,cupon_reclamado:true,descuento:Number(gamif.descuento||0),ciclo,reclamado_at:gamif.cupon_reclamado_at});
       const ahora=new Date().toISOString();const {error}=await supabase.from("gamificacion").update({cupon_reclamado:true,cupon_reclamado_at:ahora,cupon_reclamado_ciclo:ciclo}).eq("id",gamif.id);if(error)throw error;

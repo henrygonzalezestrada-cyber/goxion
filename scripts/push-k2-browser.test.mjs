@@ -129,6 +129,9 @@ try {
       }else{
         await page.getByRole('button',{name:'Misiones',exact:true}).click();
         await page.getByText('Vista previa de misión de lanzamiento').waitFor();assert(await page.getByText('20%',{exact:false}).isVisible());await shot(page,'mission-preview');
+        await page.locator('#gxb-panel').evaluate(el=>el.setAttribute('data-gxb-push-pilot',''));
+        await page.getByText('Vista previa de misión de lanzamiento').waitFor({state:'detached'});
+        assert.equal(await page.locator('.gx-k3-mission').count(),0);
         await Promise.all([page.waitForRequest(r=>r.method()==='POST'&&r.postData()?.includes('"desactivar"')),page.evaluate(()=>{window.dispatchEvent(new Event('goxion:client-logout'));localStorage.removeItem('test-token')})]);
         assert.equal(await page.evaluate(()=>localStorage.getItem('goxion_push_pilot_device')),null);
         assert.equal(await page.evaluate(()=>localStorage.getItem('goxion_push_k3_feedback_local')),null);

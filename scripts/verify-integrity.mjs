@@ -13,9 +13,11 @@ const K3_MIRROR_ONLY_LINES = Object.freeze([
   '<link rel="manifest" href="./goxion-push-pilot.webmanifest">',
   '<link rel="apple-touch-icon" href="./Logo individual.png">',
   '<link rel="stylesheet" href="./assets/css/push-pilot.css?v=k3d-20261127">',
-  '<script src="./assets/js/ayuda/24-push-piloto.js?v=k3d-20261127"></script>',
+  '<script src="./assets/js/ayuda/24-push-piloto.js?v=k4a-20261127"></script>',
 ]);
 const K3_MIRROR_OWNER_LINES = Object.freeze([
+  ['<script src="./preview/mi-espacio-v2/official-feed-runtime-k3.js?v=k4a-20261127"></script>',
+   '<script src="./preview/mi-espacio-v2/official-feed-runtime.js?v=performance-20261126"></script>'],
   ['<script defer src="./preview/mi-espacio-v2/pulsoicon-preview-k3.js?v=k3d-20261127"></script>',
    '<script defer src="./preview/mi-espacio-v2/pulsoicon-preview.js?v=hero-states-f2-20261126"></script>'],
   ['<script id="goxion-client-notifications-realtime" src="./assets/js/ayuda/04-client-notifications-realtime-k3.js?v=k3d-20261127"></script>',
@@ -140,7 +142,7 @@ for (const page of PAGES) {
   }
   if (page === 'ayuda') {
     let expected = readFileSync(join(ROOT,CANDIDATE),'utf8');
-    // K3 remains strictly mirror-only; allow exactly four added and four versioned owner lines.
+    // K3 remains strictly mirror-only; allow exactly four added and five versioned owner lines.
     // Every other byte must continue to match the official page after normalization.
     for (const line of K3_MIRROR_ONLY_LINES) {
       const count = expected.split('\n').filter((value) => value === line).length;

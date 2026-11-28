@@ -12,7 +12,7 @@ assert(css.includes('.gxn-nav[data-mode="compact"]'));
 assert(!css.includes('function applyMissionReceipt'));
 for(const path of ['ayuda-aceptacion-v2.html','ayuda-espejo-feed-v2.html']){
  const html=read(path);
- assert.match(html,/<script src="\.\/preview\/mi-espacio-v2\/official-feed-runtime\.js\?v=[^"]+"><\/script>/);
+ assert.match(html,path==="ayuda-espejo-feed-v2.html"?/<script src="\.\/preview\/mi-espacio-v2\/official-feed-runtime-k3\.js\?v=[^"]+"><\/script>/:/<script src="\.\/preview\/mi-espacio-v2\/official-feed-runtime\.js\?v=[^"]+"><\/script>/);
  assert.match(html,/<link rel="stylesheet" href="\.\/preview\/mi-espacio-v2\/official-feed\.css\?v=[^"]+">/);
 }
 console.log('PASS: archivos JS/CSS y referencias de las dos rutas compartidas');
