@@ -7,7 +7,7 @@
  // La edición nueva es opt-in por configuración del HTML, no por URL ni storage.
  // La rama candidata la conserva apagada hasta autorización de lanzamiento.
  const mode=document.documentElement.getAttribute("data-gx-release-launch");
- const PILOT="casone",PILOT_VERSION="nov2026-mi-espacio-lanzamiento-pilot-k3b";
+ const PILOT="casone",PILOT_VERSION="nov2026-mi-espacio-lanzamiento-pilot-k3c";
  const GENERAL_VERSION="nov2026-mi-espacio-lanzamiento-v1",LEGACY_VERSION="nov2026-novedades-apiladas-v2-todos";
  let launch=mode==="enabled",pilot=false,VERSION=launch?GENERAL_VERSION:LEGACY_VERSION;
  const PREFIX="gx-release-seen:";
@@ -29,7 +29,7 @@
    {id:"catalog",title:"Encuentra tu",accent:"próximo favorito.",copy:"Explora plataformas, combos y promociones; elige tus servicios y revisa tu selección en el carrito.",art:"catalog"},
    {id:"support",title:"Estamos",accent:"más cerca.",copy:"Personaliza a Goxy, encuentra ayuda desde Soporte y comparte tu opinión para seguir mejorando.",art:"support"}
  ];
- const pushChapter={id:"push",title:"Siempre",accent:"conectado.",copy:"Tus pagos, servicios y recompensas, directo a tu teléfono.",art:"push"};
+ const pushChapter={id:"push",title:"Siempre",accent:"conectado.",copy:"Pagos, servicios y recompensas, directo a tu teléfono. Activa los avisos desde la campana.",art:"push"};
  let chapters=baseChapters;
  const $=(selector,root=document)=>root.querySelector(selector);
  const create=(tag,cls,text)=>{
@@ -435,18 +435,6 @@
      '<div class="gx-launch-copy">'+caption+
      '<h2 id="gx-release-v2-title">'+c.title+(c.accent?' <span>'+c.accent+'</span>':'')+'</h2>'+
      '<p class="gx-launch-description">'+c.copy+'</p></div>';
-   if(c.id==="push"){
-     const controls=create("div","gx-k3-launch-controls");
-     const cta=create("button","gx-k3-launch-cta",window.GOXION_PUSH_K3?.active()?"Configurar avisos":"Activar notificaciones");
-     const info=create("button","gx-k3-info");
-     info.type="button";info.setAttribute("aria-label","Información sobre la activación");info.setAttribute("aria-expanded","false");info.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/></svg>';
-     const tip=create("p","gx-k3-launch-note","Al terminar Novedades abriremos los ajustes. También puedes activarlas desde la campana.");
-     tip.hidden=true;
-     info.onclick=()=>{tip.hidden=!tip.hidden;info.setAttribute("aria-expanded",String(!tip.hidden));};
-     cta.type="button";cta.disabled=!window.GOXION_PUSH_K3?.canInvite();
-     cta.onclick=()=>{if(window.GOXION_PUSH_K3?.deferSettings()){cta.textContent="Listo · al terminar";cta.disabled=true;}};
-     controls.append(cta,info,tip);$(".gx-launch-copy",body).append(controls);
-   }
    if(c.id==="support")mountGoxyChapter($(".gx-launch-goxy-mount",body));
    body.scrollTop=0;
    const segments=[...overlay.querySelectorAll(".gx-launch-progress span")];
@@ -464,7 +452,6 @@
    const state=queue(),access=window.GOXION_LEGAL_V2?.getAccessState?.();
    if(launchGate(state,access)!=="ready"){dismiss(false);return;}
    exitLaunch();
-   window.GOXION_PUSH_K3?.releaseFinished();
    if(!$("#view-dashboard")?.classList.contains("active"))window.switchTab?.("inicio");
  }
  function mountLaunch(){
