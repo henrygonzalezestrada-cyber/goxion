@@ -21,7 +21,7 @@
     const j=await r.json().catch(()=>({}));if(!r.ok||!j.ok)throw Error(j.error||"No se pudo conectar");return j;
   }
   // K3 view state: the existing K2 transport stays authoritative. No business writes.
-  let gear,sheet,headerTitle,headerBack,headerInfo,settingsOpen=false,guideStep=0,afterRelease=false,openTimer=0,missionObserver;
+  let gear,sheet,headerTitle,headerBack,headerInfo,settingsOpen=false,guideStep=0,missionObserver,lastBellMode="",handleButton;
   const surveyKey="goxion_push_k3_feedback_local";
   const glyph=(d)=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+d+'"/></svg>';
   const icons={
@@ -32,11 +32,17 @@
     tabs:glyph("M7 7h13v14H7zM4 17H3V3h14v1"),
     reload:glyph("M20 7v6h-6M20 13a8 8 0 1 1-2.3-6"),
     tap:glyph("M12 3v5M3 9l5 2M21 9l-5 2M7 21l-1-5 5 2V9a2 2 0 0 1 4 0v5l2-1 4 2-2 6"),
-    bell:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg>',
+    bell:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="gx-k3-pulso-clapper" d="M10.268 21a2 2 0 0 0 3.464 0"/><path class="gx-k3-pulso-body" d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg>',
     share:glyph("M12 15V2m-4 4 4-4 4 4M7 8H4v13h16V8h-3"),
     plus:glyph("M12 8v8m-4-4h8M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"),
     check:glyph("m5 12 4 4L19 6"),
-    arrow:glyph("m14 6-6 6 6 6")
+    arrow:glyph("M19 12H5m7-7-7 7 7 7"),
+    chevron:glyph("m9 18 6-6-6-6"),
+    down:glyph("m6 9 6 6 6-6"),
+    bookmark:glyph("M6 3h12v18l-6-4-6 4z"),
+    glasses:glyph("M2 12h1m18 0h1M10 12h4M3 12a4 4 0 1 0 8 0 4 4 0 0 0-8 0m10 0a4 4 0 1 0 8 0 4 4 0 0 0-8 0"),
+    copy:glyph("M9 9h12v12H9zM5 15H3V3h12v2"),
+    close:glyph("M6 6l12 12M18 6 6 18")
   };
   // Original instructional diagrams, not OS screenshots. Large legible labels; no simulated controls.
   // Apple MX: https://support.apple.com/es-mx/guide/iphone/iphea86e5236/ios
@@ -44,10 +50,10 @@
   const logo='<img src="./Logo individual.png" alt="">';
   const guideSteps=[
     {title:"Toca Compartir",copy:"En Safari, abre el menú de página y toca Compartir. Si ves el icono de compartir directamente, úsalo.",hint:"Si llegaste desde WhatsApp, abre esta página en Safari.",art:'<div class="gx-k3-guide-art gx-k3-art-share"><div class="gx-k3-browser"><div class="gx-k3-browser-page">'+logo+'<b>GOXION</b></div><div class="gx-k3-browser-nav"><span>'+icons.arrow+'</span><div class="gx-k3-address"><span class="gx-k3-target">'+icons.menu+'<span class="gx-k3-step-number">1</span></span><small>GOXION</small>'+icons.reload+'</div><span>'+icons.tabs+'</span></div></div><div class="gx-k3-share-flyout gx-k3-target">'+icons.share+'<strong>Compartir</strong><span class="gx-k3-step-number">2</span></div></div>'},
-    {title:"Agrega GOXION a Inicio",copy:"Desliza hacia arriba hasta encontrar Agregar a Inicio.",hint:"¿No aparece? Al final del menú, toca Editar acciones y agrégala.",art:'<div class="gx-k3-guide-art gx-k3-art-menu"><div class="gx-k3-app-menu"><div class="gx-k3-handle"></div><div class="gx-k3-share-preview">'+logo+'<div><b>GOXION</b><small>Safari</small></div></div><div class="gx-k3-ios-row"><span>Copiar</span><span>▢</span></div><div class="gx-k3-ios-row"><span>Agregar a favoritos</span><span>☆</span></div><div class="gx-k3-ios-row gx-k3-target"><b>Agregar a Inicio</b>'+icons.plus+tapMarker+'</div><div class="gx-k3-ios-row gx-k3-menu-muted">Editar acciones</div></div><div class="gx-k3-scroll-label">↑ Desliza</div></div>'},
-    {title:"Crea tu icono",copy:"Deja activo Abrir como app web, si aparece. Toca Agregar.",hint:"No necesitas descargar nada de App Store.",art:'<div class="gx-k3-guide-art gx-k3-art-install"><div class="gx-k3-app-menu"><div class="gx-k3-ios-head"><span>Cancelar</span><b>Agregar a Inicio</b><span class="gx-k3-target gx-k3-add">Agregar'+tapMarker+'</span></div><div class="gx-k3-install-preview"><div class="gx-k3-app-icon">'+logo+'</div><div><b>GOXION Piloto</b><small>App web</small></div></div><div class="gx-k3-ios-row"><b>Abrir como app web</b><span class="gx-k3-demo-toggle"></span></div></div></div>'},
-    {title:"Abre GOXION desde Inicio",copy:"Sal de Safari y abre el nuevo icono de GOXION Piloto.",hint:"Si es necesario, vuelve a iniciar sesión.",art:'<div class="gx-k3-guide-art gx-k3-art-home"><div class="gx-k3-home-grid"><div class="gx-k3-home-placeholder"></div><div class="gx-k3-home-placeholder"></div><div class="gx-k3-home-placeholder"></div><div class="gx-k3-home-placeholder"></div><div class="gx-k3-home-placeholder"></div><div class="gx-k3-home-app"><div class="gx-k3-app-icon gx-k3-target">'+logo+tapMarker+'</div><b>GOXION Piloto</b></div><div class="gx-k3-home-placeholder"></div><div class="gx-k3-home-placeholder"></div></div><div class="gx-k3-handle gx-k3-home-handle"></div></div>'},
-    {title:"Activa tus avisos",copy:"En GOXION, toca la campana, abre Ajustes y pulsa Activar avisos. Confirma Permitir.",hint:"Puedes probar tus avisos y cambiar tus preferencias en cualquier momento.",art:'<div class="gx-k3-guide-art gx-k3-art-permit"><div class="gx-k3-go-header">'+logo+'<span>'+icons.bell+'</span><span class="gx-k3-target">'+icons.gear+tapMarker+'</span></div><div class="gx-k3-activate-example">Activar avisos '+icons.arrow+'</div><div class="gx-k3-permit-example">'+icons.bell+'<b>GOXION quiere enviarte notificaciones</b><div class="gx-k3-permit-choice"><span>No permitir</span><b class="gx-k3-target">Permitir'+tapMarker+'</b></div></div></div>'}
+    {title:"Agrega GOXION a Inicio",copy:"Si ves Ver más (la flecha hacia abajo), tócalo. Luego busca Agregar a Inicio.",hint:"Si el menú ya está expandido, desliza hasta Agregar a Inicio. Si no está, revisa Editar acciones al final de la lista.",art:'<div class="gx-k3-guide-art gx-k3-art-menu"><div class="gx-k3-app-menu gx-k3-expanded-share"><div class="gx-k3-share-preview">'+logo+'<div><b>GOXION</b><small>Compartir</small></div></div><div class="gx-k3-share-actions"><div><span>'+icons.copy+'</span><small>Copiar</small></div><div><span>'+icons.bookmark+'</span><small>Marcadores</small></div><div><span>'+icons.glasses+'</span><small>Lecturas</small></div><div><span class="gx-k3-target">'+icons.down+'<span class="gx-k3-step-number">1</span></span><small>Ver más</small></div></div><div class="gx-k3-expanded-list"><div class="gx-k3-ios-row"><span>☆</span><span>Agregar a Favoritos</span></div><div class="gx-k3-ios-row"><span>⌕</span><span>Buscar en la página</span></div><div class="gx-k3-ios-row gx-k3-target">'+icons.plus+'<b>Agregar a Inicio</b><span class="gx-k3-step-number">2</span></div></div></div></div>'},
+    {title:"Crea tu icono",copy:"Deja activo Abrir como app web, si aparece. Toca Agregar.",hint:"No necesitas descargar nada de App Store.",art:'<div class="gx-k3-guide-art gx-k3-art-install"><div class="gx-k3-app-menu"><div class="gx-k3-ios-head"><span class="gx-k3-os-close">'+icons.close+'</span><b>Agregar a Inicio</b><span class="gx-k3-target gx-k3-add">Agregar'+tapMarker+'</span></div><div class="gx-k3-install-preview"><div class="gx-k3-app-icon gx-k3-white-icon">'+logo+'</div><div><b>GOXION Piloto</b><small>App web</small></div></div><div class="gx-k3-ios-row"><b>Abrir como app web</b><span class="gx-k3-demo-toggle"></span></div></div></div>'},
+    {title:"Abre GOXION desde Inicio",copy:"Sal de Safari y abre el nuevo icono de GOXION Piloto.",hint:"Si es necesario, vuelve a iniciar sesión.",art:'<div class="gx-k3-guide-art gx-k3-art-home"><div class="gx-k3-home-grid"><div class="gx-k3-home-placeholder"></div><div class="gx-k3-home-placeholder"></div><div class="gx-k3-home-placeholder"></div><div class="gx-k3-home-placeholder"></div><div class="gx-k3-home-placeholder"></div><div class="gx-k3-home-app"><div class="gx-k3-app-icon gx-k3-white-icon gx-k3-target">'+logo+tapMarker+'</div><b>GOXION Piloto</b></div><div class="gx-k3-home-placeholder"></div><div class="gx-k3-home-placeholder"></div></div><div class="gx-k3-handle gx-k3-home-handle"></div></div>'},
+    {title:"Activa tus avisos",copy:"En GOXION, toca la campana, abre Ajustes y pulsa Activar avisos. Confirma Permitir.",hint:"Puedes probar tus avisos y cambiar tus preferencias en cualquier momento.",art:'<div class="gx-k3-guide-art gx-k3-art-permit"><div class="gx-k3-go-header">'+logo+'<span>'+icons.bell+'</span><span class="gx-k3-target">'+icons.gear+tapMarker+'</span></div><div class="gx-k3-activate-example">Activar avisos '+icons.chevron+'</div><div class="gx-k3-permit-example">'+icons.bell+'<b>GOXION quiere enviarte notificaciones</b><div class="gx-k3-permit-choice"><span>No permitir</span><b class="gx-k3-target">Permitir'+tapMarker+'</b></div></div></div>'}
   ];
   function survey(){try{const d=JSON.parse(localStorage.getItem(surveyKey)||"null");return d&&d.deviceId===saved()?.id&&Date.now()-d.at<7*86400000?d:null}catch{return null}}
   function setSurvey(v){try{v?localStorage.setItem(surveyKey,JSON.stringify(v)):localStorage.removeItem(surveyKey)}catch{}window.dispatchEvent(new Event("goxion:push-k3-feedback"));}
@@ -58,14 +64,6 @@
     if(!canInvite())return false;
     window.GOXION_CLIENT_NOTIFICATIONS?.open();mount();if(!panel)return false;
     settingsOpen=true;guide=false;guideStep=0;hideInfo();render();return true;
-  }
-  function deferSettings(){if(canInvite())afterRelease=true;return afterRelease}
-  function releaseFinished(){
-    clearTimeout(openTimer);if(!afterRelease)return;const current=token(),end=Date.now()+20000;
-    const attempt=()=>{if(!afterRelease||!canInvite()||current!==token()||Date.now()>end){afterRelease=false;return}
-      if(document.hidden||document.body.classList.contains("gx-v2-handoff-active")||document.body.classList.contains("no-scroll")||document.querySelector("dialog[open],#gx-release-overlay:not([hidden]),#gx-legal-consent[open]")){openTimer=setTimeout(attempt,350);return}
-      afterRelease=false;openSettings();};
-    openTimer=setTimeout(attempt,2300);
   }
   function syncMissionPreview(){
     const host=document.getElementById("gxb-panel"),content=document.getElementById("gxb-content");if(!host||!content)return;
@@ -91,6 +89,16 @@
       panel.querySelector("[data-guide-prev]").onclick=()=>{guideStep=Math.max(0,guideStep-1);hideInfo();render()};
       panel.querySelector("[data-guide-next]").onclick=()=>{if(guideStep===guideSteps.length-1){guide=false;guideStep=0}else guideStep++;hideInfo();render()};
       list.before(panel);
+      const originalHandle=sheet.querySelector(".gx-client-notif-handle");
+      if(originalHandle){
+        handleButton=document.createElement("button");handleButton.type="button";handleButton.className="gx-client-notif-handle gx-k3-drag-handle";handleButton.setAttribute("aria-label","Expandir notificaciones");handleButton.setAttribute("aria-expanded","false");originalHandle.replaceWith(handleButton);
+        const setExpanded=value=>{sheet.classList.toggle("gx-k3-expanded",value);handleButton.setAttribute("aria-expanded",String(value));handleButton.setAttribute("aria-label",value?"Reducir notificaciones":"Expandir notificaciones")};
+        let y=null,suppressClick=false;
+        handleButton.addEventListener("pointerdown",e=>{if(settingsOpen)return;y=e.clientY;suppressClick=false;handleButton.setPointerCapture?.(e.pointerId)});
+        handleButton.addEventListener("pointerup",e=>{if(y===null)return;const dy=e.clientY-y;y=null;if(Math.abs(dy)>20){suppressClick=true;setExpanded(dy<0)}});
+        handleButton.addEventListener("pointercancel",()=>{y=null});
+        handleButton.onclick=()=>{if(suppressClick){suppressClick=false;return}if(!settingsOpen)setExpanded(!sheet.classList.contains("gx-k3-expanded"))};
+      }
       const header=sheet.querySelector(".gx-client-notif-head"),close=header?.querySelector(".gx-client-notif-close");
       if(close){
         headerTitle=header.querySelector(".gx-client-notif-head-title")||header.querySelector("strong");
@@ -103,7 +111,7 @@
         close.before(group);group.append(gear,headerInfo,close);
         gear.onclick=()=>{settingsOpen=true;guide=false;guideStep=0;hideInfo();render();headerBack.focus({preventScroll:true})};
       }
-      if(sheet.classList.contains("gx-client-notif-sheet"))new MutationObserver(()=>{if(!sheet.classList.contains("show")&&settingsOpen){settingsOpen=false;guide=false;guideStep=0;hideInfo();render()}}).observe(sheet,{attributes:true,attributeFilter:["class"]});
+      if(sheet.classList.contains("gx-client-notif-sheet"))new MutationObserver(()=>{if(!sheet.classList.contains("show")){if(sheet.classList.contains("gx-k3-expanded")){sheet.classList.remove("gx-k3-expanded");handleButton?.setAttribute("aria-expanded","false");handleButton?.setAttribute("aria-label","Expandir notificaciones")}if(settingsOpen){settingsOpen=false;guide=false;guideStep=0;hideInfo();render()}}}).observe(sheet,{attributes:true,attributeFilter:["class"]});
       const missions=document.querySelector(".gxb-wrap");if(missions){missionObserver=new MutationObserver(syncMissionPreview);missionObserver.observe(missions,{childList:true,subtree:true,attributes:true,attributeFilter:["hidden","data-benefit"]});}
     }
     render();
@@ -122,8 +130,15 @@
     if(headerInfo)headerInfo.hidden=!next;
     if(headerTitle)headerTitle.textContent=next?(showGuide?"Activar en iPhone":"Ajustes"):"Notificaciones";
     sheet?.classList.toggle("gx-k3-settings-open",next);panel.hidden=!next;syncMissionPreview();
-    if(!next)return;
+    if(handleButton){handleButton.disabled=!allowed||next;handleButton.setAttribute("aria-hidden",String(!allowed||next));}
+    if(!next){lastBellMode="";return;}
     panel.dataset.mode=showGuide?"guide":active?"active":needsInstall?"install":denied?"denied":support?"inactive":"unsupported";
+    const mode=panel.dataset.mode;
+    if(mode!==lastBellMode){
+      lastBellMode=mode;panel.scrollTop=0;
+      const bell=panel.querySelector(".gx-k3-bell");bell.classList.remove("gx-k3-pulse-once");
+      if(!showGuide){void bell.offsetWidth;bell.classList.add("gx-k3-pulse-once")}
+    }
     panel.querySelector("[data-settings]").hidden=showGuide;
     panel.querySelector("[data-guide]").hidden=!showGuide;
     if(showGuide){
@@ -152,7 +167,7 @@
     panel.querySelector("[data-feedback]").hidden=survey()?.answer!=="pending";
     const status=panel.querySelector("[role=status]");status.textContent=notice;status.hidden=!notice;
   }
-  window.GOXION_PUSH_K3=Object.freeze({canInvite,active:()=>active,deferSettings,releaseFinished,feedbackItem,answerFeedback,openSettings});
+  window.GOXION_PUSH_K3=Object.freeze({canInvite,active:()=>active,feedbackItem,answerFeedback,openSettings});
   async function detach(current,keepEligible=false){
     const d=saved(),r=reg;generation++;owner="";reg=null;pub=null;active=false;busy=false;preparing=false;save(null);setSurvey(null);
     if(!keepEligible)eligible=false;render();
@@ -225,7 +240,7 @@
     void prepare();
   }
   window.addEventListener("goxion:client-ready",onReady);
-  window.addEventListener("goxion:client-logout",()=>{void detach(token()||owner);guide=false;guideStep=0;settingsOpen=false;afterRelease=false;clearTimeout(openTimer);options=false;notice="";categories=[...defaults]});
+  window.addEventListener("goxion:client-logout",()=>{void detach(token()||owner);guide=false;guideStep=0;settingsOpen=false;options=false;notice="";categories=[...defaults]});
   window.addEventListener("goxion:legal-state",e=>{const a=e.detail?.acceso;const was=blocked;blocked=a?.restringido===true||a?.bloquea_operaciones===true||a?.acceso_restringido===true;if(blocked&&!was)void detach(token());render();if(!blocked&&was)void prepare()});
   window.addEventListener("storage",()=>{if(token()!==owner){if(owner)void detach(owner);else void prepare()}});
   document.addEventListener("click",e=>{if(e.target.closest?.("#gx-client-notif-launch"))setTimeout(prepare,0)},true);

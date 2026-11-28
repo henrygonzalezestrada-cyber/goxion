@@ -1,17 +1,26 @@
 /* K3b · visual refinements only, in the single existing notification sheet. */
-.gx-push-pilot[hidden],.gx-push-pilot [hidden],.gx-k3-head-right [hidden],.gx-k3-back[hidden],#gx-release-overlay .gx-k3-launch-note[hidden]{display:none!important}
+.gx-push-pilot[hidden],.gx-push-pilot [hidden],.gx-k3-head-right [hidden],.gx-k3-back[hidden]{display:none!important}
 .gx-k3-head-right{grid-column:3;display:flex;align-items:center;justify-content:flex-end;gap:4px;justify-self:end}
 .gx-k3-gear,.gx-k3-info,.gx-k3-back{display:grid;place-items:center;width:44px;height:44px;flex:0 0 44px;padding:0;border:0;border-radius:50%;color:#c1cfe0;background:transparent;cursor:pointer}
 .gx-k3-gear svg,.gx-k3-info svg,.gx-k3-back svg{width:21px;height:21px;display:block;stroke:currentColor}
 .gx-k3-gear{color:#7ee1e7}
 .gx-k3-gear:active svg{transform:rotate(25deg)}
 .gx-k3-gear svg{transition:transform .25s cubic-bezier(.22,.82,.24,1)}
-.gx-k3-back{grid-column:1;grid-row:1;justify-self:start;color:#f5f8ff}
+.gx-k3-back{grid-column:1;grid-row:1;justify-self:start;color:#7ee1e7;position:relative;isolation:isolate}
+.gx-k3-back::before{content:"";position:absolute;inset:4.5px;border-radius:50%;background:rgba(255,255,255,.08);z-index:-1}
+.gx-k3-back svg{width:16px;height:16px;stroke-width:2}
+.gx-k3-back:active{transform:scale(.96)}
 .gx-k3-info[aria-expanded=true]{color:#7ee1e7}
 .gx-k3-settings-open>.gx-client-notif-list,.gx-k3-settings-open>#gx-client-notif-undo{display:none!important}
+.gx-client-notif-sheet:is(.gx-k3-settings-open,.gx-k3-expanded){--gx-notif-panel-max:var(--gx-notif-k3-room,calc(100dvh - 24px))}
 .gx-k3-settings-open{display:flex;flex-direction:column}
+.gx-k3-drag-handle{width:76px;height:12px;margin:2px auto 0;padding:0;border:0;display:block;position:relative;background:transparent;cursor:ns-resize;touch-action:none;flex:none}
+.gx-k3-drag-handle::before{content:"";position:absolute;left:20px;right:20px;top:4px;height:4px;border-radius:999px;background:rgba(255,255,255,.18)}
+.gx-k3-drag-handle:focus-visible{outline:2px solid #7ee1e7;outline-offset:2px}
+.gx-k3-drag-handle:disabled{cursor:default}
+.gx-k3-drag-handle[aria-expanded=true]::before{background:#7ee1e7}
 .gx-k3-settings-open .gx-client-notif-toolbar{grid-row:1;visibility:hidden;pointer-events:none}
-.gx-push-pilot{flex:1 1 auto;min-height:0;max-height:calc(var(--gx-notif-panel-max,74dvh) - 68px);overflow:auto;overscroll-behavior:contain;scrollbar-width:none;padding:8px 22px calc(20px + env(safe-area-inset-bottom));color:#f5f8ff;-webkit-overflow-scrolling:touch;font-family:Poppins,system-ui,sans-serif}
+.gx-push-pilot{flex:1 1 auto;min-height:0;max-height:calc(var(--gx-notif-panel-max,74dvh) - 80px);box-sizing:border-box;overflow:auto;overscroll-behavior:contain;scrollbar-width:none;padding:8px 22px calc(20px + env(safe-area-inset-bottom));color:#f5f8ff;-webkit-overflow-scrolling:touch;font-family:Poppins,system-ui,sans-serif}
 .gx-push-pilot::-webkit-scrollbar{display:none}
 .gx-push-pilot h3,.gx-push-pilot h4,.gx-push-pilot p{margin:0}
 .gx-push-pilot h3{font-size:23px;font-weight:700;letter-spacing:-.65px;line-height:1.2}
@@ -115,11 +124,6 @@
 .gx-k3-permit-example>b{font-size:14px;line-height:1.4}
 .gx-k3-permit-choice{display:flex;align-items:center;justify-content:center;gap:15px;font-size:12px;width:100%;color:#c1cfe0}
 .gx-k3-permit-choice b{padding:8px 12px}
-#gx-release-overlay .gx-k3-launch-controls{display:flex;align-items:center;gap:8px;margin-top:10px;position:relative}
-#gx-release-overlay .gx-k3-launch-cta{margin:0;min-height:44px;position:relative;isolation:isolate;padding:9px 15px;border:0;border-radius:999px;background:transparent;font:600 12px/1.3 Poppins,system-ui,sans-serif;color:#7ee1e7}
-#gx-release-overlay .gx-k3-launch-cta::before{content:"";position:absolute;inset:3px 0;border-radius:999px;background:rgba(255,255,255,.08);z-index:-1}
-#gx-release-overlay .gx-k3-launch-cta[disabled]{opacity:.7}
-#gx-release-overlay .gx-k3-launch-note{position:absolute;z-index:4;bottom:calc(100% + 6px);left:0;width:min(100%,270px);margin:0;font-size:12px;line-height:1.5;color:#eff2fa;background:#272833;box-shadow:0 8px 22px rgba(0,0,0,.35);padding:12px 14px;border-radius:14px}
 #gx-release-overlay .gx-launch-bell{color:var(--gx-launch-accent,#7ee1e7)}
 #gx-release-overlay .gx-pulso-bell-body{transform-origin:12px 3px;animation:gx-k3-pulso-ring 4.3s ease-in-out infinite}
 #gx-release-overlay .gx-pulso-bell-wave{animation:gx-k3-pulso-wave 4.3s ease-in-out infinite;transform-origin:center;--wave-x:1.5px}
@@ -142,8 +146,9 @@
 #gx-v2-feed .gx-state-panel[data-kind="push-feedback"] .focus-bottom{gap:6px}
 #gx-v2-feed .gx-state-panel[data-kind="push-feedback"] .focus-action{min-width:0;padding-inline:10px}
 #gx-v2-feed .gx-state-panel[data-kind="push-feedback"] .gx-k3-survey-yes{color:#84debb}
-#gx-v2-feed .gx-state-panel[data-kind="push-feedback"] .gx-k3-survey-back{flex:0 0 35px;min-width:35px;width:35px;height:35px;padding:0;display:grid;place-items:center}
-#gx-v2-feed .gx-state-panel[data-kind="push-feedback"] .gx-k3-survey-back svg{width:17px;height:17px}
+#gx-v2-feed .gx-state-panel[data-kind="push-feedback"] .gx-k3-survey-back{flex:0 0 44px;min-width:44px;width:44px;height:44px;padding:0;display:grid;place-items:center;position:relative;isolation:isolate;background:transparent!important;color:#7ee1e7}
+#gx-v2-feed .gx-state-panel[data-kind="push-feedback"] .gx-k3-survey-back::before{content:"";position:absolute;inset:4.5px;border-radius:50%;background:rgba(255,255,255,.08);z-index:-1}
+#gx-v2-feed .gx-state-panel[data-kind="push-feedback"] .gx-k3-survey-back svg{width:16px;height:16px;stroke-width:2}
 @media(max-width:360px){.gx-k3-mission-title strong{font-size:18px}}
 
 
@@ -153,3 +158,28 @@
 .gx-k3-mission-steps span.done::before{content:"✓";color:#111d19;background:#93d8b9;font-size:10px;line-height:12px;text-align:center}
 
 
+
+/* Both iOS share layouts: one compact illustration, numbered sequence, no client data. */
+.gx-k3-expanded-share{gap:8px}
+.gx-k3-share-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;align-items:start;text-align:center}
+.gx-k3-share-actions>div{display:grid;justify-items:center;gap:4px;min-width:0}
+.gx-k3-share-actions>div>span{display:grid;place-items:center;width:37px;height:37px;border-radius:50%;background:#3a3b45;color:#f0f2fa}
+.gx-k3-share-actions>div>span svg{width:20px;height:20px}
+.gx-k3-share-actions small{font-size:9px;line-height:1.25;color:#dfe3ef;white-space:nowrap}
+.gx-k3-share-actions .gx-k3-target{border-radius:50%}
+.gx-k3-expanded-list{display:grid;gap:2px;border-radius:12px;background:#3a3b45;padding:5px}
+.gx-k3-expanded-list .gx-k3-ios-row{justify-content:flex-start;gap:9px;min-height:31px;padding:5px 7px;background:transparent;font-size:12px}
+.gx-k3-expanded-list .gx-k3-ios-row>span:first-child{font-size:18px;width:20px;text-align:center}
+.gx-k3-expanded-list .gx-k3-ios-row svg{width:20px;height:20px}
+.gx-k3-ios-head .gx-k3-os-close{height:28px;width:28px;display:grid;place-items:center;background:#3a3b45;border-radius:50%}
+.gx-k3-ios-head .gx-k3-os-close svg{width:16px;height:16px}
+.gx-k3-ios-head .gx-k3-add{background:#4069b4!important;color:#fff!important;padding:8px 10px;border-radius:999px;box-shadow:none}
+.gx-k3-white-icon{background:#fff}
+.gx-k3-white-icon img{width:84%;height:84%;object-fit:contain}
+.gx-k3-tap{box-sizing:border-box}
+/* PulsoIcon Bell: body ring (origin 12,3), clapper slide (origin 12,21.5), one event only. */
+.gx-k3-pulse-once .gx-k3-pulso-body{transform-box:view-box;transform-origin:12px 3px;animation:gx-k3-bell-event .85s cubic-bezier(.22,.72,.25,1) both}
+.gx-k3-pulse-once .gx-k3-pulso-clapper{transform-box:view-box;transform-origin:12px 21.5px;animation:gx-k3-clapper-event .85s ease-in-out both .08s}
+@keyframes gx-k3-bell-event{0%,100%{transform:rotate(0)}18%{transform:rotate(-16deg)}36%{transform:rotate(13deg)}54%{transform:rotate(-8deg)}73%{transform:rotate(4deg)}}
+@keyframes gx-k3-clapper-event{0%,100%{transform:translateX(0)}22%{transform:translateX(1.5px)}45%{transform:translateX(-1.5px)}65%{transform:translateX(.7px)}}
+@media(prefers-reduced-motion:reduce){.gx-k3-pulse-once .gx-k3-pulso-body,.gx-k3-pulse-once .gx-k3-pulso-clapper{animation:none!important}.gx-k3-back:active{transform:none}}

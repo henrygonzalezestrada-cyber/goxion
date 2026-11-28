@@ -107,7 +107,7 @@ test("K3 conserva gate de edición, identidad y cola legal en el candidato",()=>
  const p={candidate:true,mode:"pilot",account:"casone"};
  const active=fixture(p);
  assert.equal(active.status(),"ready");
- assert.equal(active.version,"nov2026-mi-espacio-lanzamiento-pilot-k3b");
+ assert.equal(active.version,"nov2026-mi-espacio-lanzamiento-pilot-k3c");
  assert.equal(active.check(),1);
  assert.equal(fixture({...p,estado:"pendiente"}).held(),true);
  for(const changes of [{token:false},{profile:false},{estado:"rechazado"},{blocked:true},{modalAbierto:true},{account:"Casone"},{account:"otro"}])
