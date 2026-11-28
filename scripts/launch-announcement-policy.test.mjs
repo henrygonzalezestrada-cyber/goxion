@@ -105,8 +105,10 @@ test("edición oficial: reserva legal sólo durante novedades pendientes y cuent
 
 test("K3 conserva gate de edición, identidad y cola legal en el candidato",()=>{
  const p={candidate:true,mode:"pilot",account:"casone"};
- assert.equal(fixture(p).status(),"ready");
- assert.equal(fixture(p).version,"nov2026-mi-espacio-lanzamiento-pilot-k3");
+ const active=fixture(p);
+ assert.equal(active.status(),"ready");
+ assert.equal(active.version,"nov2026-mi-espacio-lanzamiento-pilot-k3");
+ assert.equal(active.check(),1);
  assert.equal(fixture({...p,estado:"pendiente"}).held(),true);
  for(const changes of [{token:false},{profile:false},{estado:"rechazado"},{blocked:true},{modalAbierto:true},{account:"Casone"},{account:"otro"}])
    assert.equal(fixture({...p,...changes}).status(),"skip");
