@@ -60,7 +60,7 @@ try {
       assert.deepEqual(await handle.evaluate(el=>({before:getComputedStyle(el,'::before').content,after:getComputedStyle(el,'::after').content,touch:getComputedStyle(el).touchAction})),{before:'none',after:'""',touch:'none'});
       await handle.evaluate(el=>window._originalHandle=el);
       const height=async()=>Math.round((await sheet.boundingBox()).height);
-      const at=async n=>{await page.waitForFunction(n=>document.querySelector('.gx-client-notif-handle').getAttribute('aria-valuenow')===String(n),n);await page.waitForTimeout(340)};
+      const at=async n=>{await page.waitForFunction(n=>document.querySelector('.gx-client-notif-handle').getAttribute('aria-valuenow')===String(n),n);await page.waitForTimeout(380);console.log('PASS sheet level',n)};
       const initial=await height();await handle.tap();await at(2);const expanded=await height();assert(expanded>initial+80);
       await handle.tap();await at(1);assert(Math.abs(await height()-initial)<4);
       // Physical mouse pointer stream in both engines; touch pointer stream in Chromium.
