@@ -78,15 +78,15 @@ try {
   assert.deepEqual(errors,[]);console.log('PASS',mode);await context.close();
  }
  // The existing release controller owns sequencing. K3 only adds one chapter for the active pilot.
- for(const gate of [true,false]){
+ for(const gate of [true,false,"late"]){
   const ctx=await browser.newContext({viewport:{width:375,height:812},reducedMotion:'reduce'});
-  await ctx.addInitScript(({gate})=>{localStorage.setItem('test-token','fixture');window.GOXION_CORE={STORAGE:{CLIENT_TOKEN:'test-token'}};window.getCurrentClientKey=()=> 'casone';window.globalClientesData={casone:{}};window.GOXION_LEGAL_V2={getQueueStatus:()=>({estado:'aceptado',modalAbierto:false}),getAccessState:()=>({})};window.GOXION_PUSH_K3={canInvite:()=>gate,active:()=>false,deferSettings:()=>{window._defer=true;return true},releaseFinished:()=>{window._finished=true}};},{gate});
+  await ctx.addInitScript(({gate})=>{localStorage.setItem('test-token','fixture');window.GOXION_CORE={STORAGE:{CLIENT_TOKEN:'test-token'}};window.getCurrentClientKey=()=> 'casone';window.globalClientesData={casone:{}};window.GOXION_LEGAL_V2={getQueueStatus:()=>({estado:'aceptado',modalAbierto:false}),getAccessState:()=>({})};window._gate=gate===true;window.GOXION_PUSH_K3={canInvite:()=>window._gate,active:()=>false,deferSettings:()=>{window._defer=true;return true},releaseFinished:()=>{window._finished=true}};},{gate});
   const page=await ctx.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.route(url,r=>r.fulfill({contentType:'text/html',body:'<!doctype html><html data-gx-release-launch="pilot"><body><main id=view-dashboard class=active>Feed</main><script>'+release+'</script></body></html>'}));
   await page.goto(url);const modal=page.locator('#gx-release-overlay');await modal.waitFor({state:'visible',timeout:7000});
-  const progress=modal.locator('.gx-launch-progress');assert.equal(await progress.getAttribute('aria-valuemax'),gate?'7':'6');
-  for(let j=0;j<5;j++)await modal.locator('.gx-launch-next').click();
-  if(gate){await modal.getByRole('heading',{name:'Siempre conectado.'}).waitFor();await modal.getByRole('button',{name:'Activar notificaciones'}).click();assert(await page.evaluate(()=>window._defer));await modal.locator('.gx-launch-next').click()}
-  await modal.locator('.gx-launch-next').click();assert(await page.evaluate(()=>window._finished));assert.deepEqual(errors,[]);console.log('PASS novedades',gate?'pilot-enabled':'closed-gate');await ctx.close();
+  const progress=modal.locator('.gx-launch-progress');assert.equal(await progress.getAttribute('aria-valuemax'),gate===true?'7':'6');
+  for(let j=0;j<5;j++){if(gate==="late"&&j===3)await page.evaluate(()=>window._gate=true);await modal.locator('.gx-launch-next').click();}
+  if(gate){assert.equal(await progress.getAttribute("aria-valuemax"),"7");await modal.getByRole('heading',{name:'Siempre conectado.'}).waitFor();await modal.getByRole('button',{name:'Activar notificaciones'}).click();assert(await page.evaluate(()=>window._defer));await modal.locator('.gx-launch-next').click()}
+  await modal.locator('.gx-launch-next').click();assert(await page.evaluate(()=>window._finished));assert.deepEqual(errors,[]);console.log('PASS novedades',gate==='late'?'late-server-gate':gate?'pilot-enabled':'closed-gate');await ctx.close();
  }
 }finally{await browser.close()}

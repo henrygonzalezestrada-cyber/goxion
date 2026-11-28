@@ -474,7 +474,17 @@
      '<footer class="gx-launch-footer"><button type="button" class="gx-launch-back">Atrás</button><button type="button" class="gx-launch-next">Comenzar</button></footer></section>'
    ].join("");
    const render=(i,direction)=>{if(i!==0&&overlay.dataset.entry){const pending=handoff;handoff=null;finishEntry();pending?.abort();}showChapter(i,direction);$(".gx-launch-progress",overlay).setAttribute("aria-valuenow",String(chapterIndex+1));};
-   const next=()=>{if(chapterIndex===chapters.length-1)finishLaunch();else render(chapterIndex+1,1);};
+   const next=()=>{
+     // The K2 eligibility request may finish after the initial logo handoff.
+     // Insert only before Support, only after server confirmation, without restarting the sequence.
+     if(pilot&&chapterIndex<chapters.length-1&&!chapters.some(c=>c.id==="push")&&window.GOXION_PUSH_K3?.canInvite()){
+       chapters=[...baseChapters.slice(0,-1),pushChapter,baseChapters.at(-1)];
+       const progress=$(".gx-launch-progress",overlay);
+       progress.innerHTML=chapters.map(()=>'<span></span>').join("");
+       progress.setAttribute("aria-valuemax",String(chapters.length));
+     }
+     if(chapterIndex===chapters.length-1)finishLaunch();else render(chapterIndex+1,1);
+   };
    const back=()=>{if(chapterIndex>0)render(chapterIndex-1,-1);};
    overlay.addEventListener("click",e=>{
      if(e.target.closest?.(".gx-launch-next"))next();

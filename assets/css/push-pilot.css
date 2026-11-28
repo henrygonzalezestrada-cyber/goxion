@@ -85,3 +85,8 @@
 .gx-k3-mission-steps span{display:flex;align-items:center;gap:7px}
 .gx-k3-mission-steps span::before{content:"";border-radius:50%;width:12px;height:12px;flex:0 0 12px;background:rgba(255,255,255,.15)}
 .gx-k3-mission-steps span.done::before{content:"✓";color:#111d19;background:#93d8b9;font-size:10px;line-height:12px;text-align:center}
+
+/* Preserve header geometry; inbox actions don't apply to the settings view. */
+.gx-k3-settings-open .gx-client-notif-toolbar{visibility:hidden}
+.gx-k3-buttons [data-test]{background:rgba(255,255,255,.08);color:#d6caff}
+.gx-k3-buttons [data-feedback]{color:#8de6cf}

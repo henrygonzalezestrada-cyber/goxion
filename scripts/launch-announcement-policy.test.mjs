@@ -7,8 +7,9 @@ import {execFileSync} from "node:child_process";
 import vm from "node:vm";
 
 const source=fs.readFileSync("preview/mi-espacio-v2/release-announcement.js","utf8");
+const candidateSource=fs.readFileSync("preview/mi-espacio-v2/release-announcement-k3.js","utf8");
 const oldVersion="nov2026-novedades-apiladas-v2-todos",version="nov2026-mi-espacio-lanzamiento-v1";
-function fixture({enabled=true,mode=enabled?"enabled":"off",account="a",query="",token=true,profile=true,estado="aceptado",deferido=false,modalAbierto=false,blocked=false,dialog=false,priorSeen="",tabDeferred=false,storageUnusable=false}={}){
+function fixture({enabled=true,mode=enabled?"enabled":"off",account="a",query="",token=true,profile=true,estado="aceptado",deferido=false,modalAbierto=false,blocked=false,dialog=false,priorSeen="",tabDeferred=false,storageUnusable=false,candidate=false}={}){
  const timers=new Map(),listeners=new Map(),local=new Map(),session=new Map();
  if(token)local.set("session","fixture");
  if(priorSeen)local.set("gx-release-seen:"+priorSeen+":"+account,"1");
@@ -25,7 +26,7 @@ function fixture({enabled=true,mode=enabled?"enabled":"off",account="a",query=""
   addEventListener:(event,cb)=>listeners.set(event,cb)};
  const context={window:win,document:doc,localStorage:storage,sessionStorage:{getItem:k=>session.get(k)||null,setItem:(k,v)=>session.set(k,v)},
   setTimeout:fn=>{timers.set(++timerId,fn);return timerId;},clearTimeout:id=>timers.delete(id),cancelAnimationFrame(){},console};
- vm.runInNewContext(source,context);
+ vm.runInNewContext(candidate?candidateSource:source,context);
  const check=()=>{
   win.GOXION_RELEASE_202610.refresh();
   for(const [id,fn] of [...timers]){timers.delete(id);try{fn();}catch(e){if(e.message!=="MOUNT_SENTINEL")throw e;}}
@@ -39,13 +40,15 @@ test("espejo piloto, aceptación apagada, y oficial promoción exacta",()=>{
  for(const path of ["ayuda-espejo-feed-v2.html","ayuda-aceptacion-v2.html"]){
   const html=fs.readFileSync(path,"utf8");
   assert.ok(html.includes('data-gx-release-launch="'+(path==="ayuda-espejo-feed-v2.html"?"pilot":"off")+'"'));
-  assert.equal((html.match(/release-announcement\.js\?/g)||[]).length,1);
+  assert.equal((html.match(/release-announcement(?:-k3)?\.js\?/g)||[]).length,1);
+  assert.equal((html.match(/release-announcement-k3\.js\?/g)||[]).length,path==="ayuda-espejo-feed-v2.html"?1:0);
  }
  const official=fs.readFileSync("ayuda.html","utf8");
  assert.match(official,/<html[^>]+data-gx-release-launch="enabled"/);
  assert.match(official,/preview\/mi-espacio-v2\/goxy-heads-mirror.bundle.js/);
  assert.doesNotMatch(official,/preview\/goxion-ai\/goxy-heads.bundle.js/);
  assert.equal((official.match(/release-announcement\.js\?/g)||[]).length,1);
+ assert.doesNotMatch(official,/release-announcement-k3\.js/);
  assert.match(fs.readFileSync("ayuda-espejo-feed-v2.html","utf8"),/preview\/mi-espacio-v2\/goxy-heads-mirror.bundle.js/);
  const off=fixture({enabled:false,query:"?launch=enabled&release-preview=1",priorSeen:oldVersion});
  assert.equal(off.version,oldVersion);assert.equal(off.check(),0);
@@ -98,4 +101,15 @@ test("edición oficial: reserva legal sólo durante novedades pendientes y cuent
  assert.equal(fixture({mode:"enabled",estado:"pendiente",modalAbierto:true}).held(),false);
  assert.equal(fixture({mode:"enabled",estado:"pendiente",deferido:true}).held(),false);
  assert.equal(fixture({mode:"enabled",estado:"pendiente",blocked:true}).held(),false);
+});
+
+test("K3 conserva gate de edición, identidad y cola legal en el candidato",()=>{
+ const p={candidate:true,mode:"pilot",account:"casone"};
+ assert.equal(fixture(p).status(),"ready");
+ assert.equal(fixture(p).version,"nov2026-mi-espacio-lanzamiento-pilot-k3");
+ assert.equal(fixture({...p,estado:"pendiente"}).held(),true);
+ for(const changes of [{token:false},{profile:false},{estado:"rechazado"},{blocked:true},{modalAbierto:true},{account:"Casone"},{account:"otro"}])
+   assert.equal(fixture({...p,...changes}).status(),"skip");
+ assert.equal(fixture({...p,estado:"sin_activar"}).status(),"waiting");
+ assert.equal(fixture({...p,dialog:true}).status(),"waiting");
 });

@@ -40,7 +40,7 @@
   ];
   function survey(){try{const d=JSON.parse(localStorage.getItem(surveyKey)||"null");return d&&d.deviceId===saved()?.id&&Date.now()-d.at<7*86400000?d:null}catch{return null}}
   function setSurvey(v){try{v?localStorage.setItem(surveyKey,JSON.stringify(v)):localStorage.removeItem(surveyKey)}catch{}window.dispatchEvent(new Event("goxion:push-k3-feedback"));}
-  function feedbackItem(clientId){const d=survey();return eligible&&active&&!blocked&&String(window.GOXION_V2_CLIENT_ID||"")===String(clientId)&&d?.answer==="pending"?{id:"push-feedback",kind:"push-feedback",title:"¿Recibiste nuestro aviso?",meta:"Tu experiencia nos ayuda a mejorar",detail:"Confirma si viste la notificación de prueba en tu teléfono.",name:"Notificaciones",tone:"neutral",priority:10}:null;}
+  function feedbackItem(clientId){const d=survey();return eligible&&active&&!blocked&&String(window.GOXION_V2_CLIENT_ID||"")===String(clientId)&&d?.answer==="pending"?{id:"push-feedback",kind:"push-feedback",title:"¿Recibiste nuestro aviso?",meta:"Confirma si viste la notificación de prueba.",detail:"",name:"Notificaciones",tone:"neutral",priority:10}:null;}
   function answerFeedback(yes){const d=survey();if(!d||d.answer!=="pending"||!eligible||!active||blocked)return false;setSurvey({...d,answer:yes?"yes":"no"});if(yes){const toast=document.getElementById("gxn-toast");if(toast?.hidden){const message="¡Gracias por confirmar!";toast.textContent=message;toast.hidden=false;setTimeout(()=>{if(toast.textContent===message)toast.hidden=true},2300)}}notice=yes?"¡Gracias por confirmar! Tu respuesta quedó en este dispositivo durante el piloto.":"Gracias por avisarnos. Revisa los permisos en Ajustes y vuelve a intentar cuando estés listo.";render();return true}
   function canInvite(){return eligible&&!blocked&&!!token()}
   function openSettings(){
@@ -60,7 +60,7 @@
     const host=document.getElementById("gxb-panel"),content=document.getElementById("gxb-content");if(!host||!content)return;
     const existing=content.querySelector(".gx-k3-mission");
     if(!canInvite()||host.hidden||host.dataset.benefit!=="mission"){existing?.remove();return}
-    if(existing){for(const row of existing.querySelectorAll("[data-mission-preview]")){const isDone=row.dataset.missionPreview==="configure"?active:row.dataset.missionPreview==="feedback"?["yes","no"].includes(survey()?.answer):false;row.classList.toggle("done",isDone)}return}
+    if(existing){for(const row of existing.querySelectorAll("[data-mission-preview]")){const isDone=row.dataset.missionPreview==="feedback"?["yes","no"].includes(survey()?.answer):active;row.classList.toggle("done",isDone)}return}
     const m=document.createElement("section");m.className="gx-k3-mission";
     m.innerHTML='<p class="gx-k3-mini-caption">Vista previa de misión de lanzamiento</p><div class="gx-k3-mission-title"><b>Conéctate a GOXION</b><strong>20% <small>OFF</small></strong></div><p>Propuesta: hasta $35 MXN. Aún no disponible para canje.</p><div class="gx-k3-mission-steps"><span data-mission-preview="learn">Conoce la función</span><span data-mission-preview="configure">Configura tus avisos</span><span data-mission-preview="feedback">Comparte tu experiencia</span></div><button type="button" class="gx-k3-action">Conoce los avisos</button>';
     m.querySelector("button").onclick=()=>openSettings();content.append(m);syncMissionPreview();
