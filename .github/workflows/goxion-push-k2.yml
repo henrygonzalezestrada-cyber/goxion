@@ -1,17 +1,24 @@
-name: GOXION · Push K2 piloto
+name: GOXION · Push K2/K3 espejo
 on:
   push:
-    branches: [feat/push-k2-pilot-20261127]
+    branches: [feat/push-k2-pilot-20261127, feat/push-k3-mirror-20261127]
   pull_request:
     branches: [main]
     paths:
       - 'assets/js/ayuda/24-push-piloto.js'
+      - 'assets/css/push-pilot.css'
+      - 'preview/mi-espacio-v2/*-k3.js'
       - 'goxion-push-pilot*'
       - 'supabase/functions/push-cliente/**'
       - 'scripts/push-k2*'
+      - '.github/workflows/goxion-push-k2.yml'
   workflow_dispatch:
 jobs:
   isolated:
+    strategy:
+      fail-fast: false
+      matrix:
+        engine: [chromium, webkit]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,9 +30,21 @@ jobs:
           node --test scripts/push-k2-policy.test.mjs
           node --check assets/js/ayuda/24-push-piloto.js
           node --check goxion-push-pilot-sw.js
+          node --check preview/mi-espacio-v2/hero-states-k3.js
+          node --check preview/mi-espacio-v2/release-announcement-k3.js
       - name: Install browser
         run: |
           npm install --no-save playwright
-          npx playwright install --with-deps chromium
-      - name: Server-gated UI, iOS guide, Android, preferences and logout
+          npx playwright install --with-deps ${{ matrix.engine }}
+      - name: Server-gated UI, iOS tutorial, Android, feedback, mission preview and logout
+        env:
+          BROWSER_ENGINE: ${{ matrix.engine }}
+          K3_SCREENSHOTS: /tmp/goxion-k3-shots
         run: node scripts/push-k2-browser.test.mjs
+      - name: Capturas de revisión (sólo fixtures)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: k3-visual-${{ matrix.engine }}
+          path: /tmp/goxion-k3-shots
+          if-no-files-found: ignore

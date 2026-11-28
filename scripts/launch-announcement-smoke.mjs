@@ -8,7 +8,7 @@ import { inflateSync } from "node:zlib";
 import { chromium, webkit } from "playwright";
 
 const cwd=process.cwd(), script="/preview/mi-espacio-v2/release-announcement.js",
- css="/preview/mi-espacio-v2/release-announcement.css", logo="/Logo individual.png";
+ candidateScript="/preview/mi-espacio-v2/release-announcement-k3.js",css="/preview/mi-espacio-v2/release-announcement.css", logo="/Logo individual.png";
 const oldVersion="nov2026-novedades-apiladas-v2-todos";
 const version="nov2026-mi-espacio-lanzamiento-v1";
 const oldSeen="gx-release-seen:"+oldVersion+":test-account";
@@ -19,7 +19,8 @@ for(const name of ["ayuda-espejo-feed-v2.html","ayuda-aceptacion-v2.html"]){
  const html=await readFile(resolve(cwd,name),"utf8");
  assert.ok(html.includes('data-gx-release-launch="'+(name==="ayuda-espejo-feed-v2.html"?"pilot":"off")+'"'));
  assert.match(html,/family=Poppins:/,"el candidato carga la fuente canónica");
- assert.equal((html.match(/release-announcement\.js\?/g)||[]).length,1,"un controlador por página");
+ assert.equal((html.match(/release-announcement(?:-k3)?\.js\?/g)||[]).length,1,"un controlador por página");
+ assert.equal((html.match(/release-announcement-k3\.js\?/g)||[]).length,name==="ayuda-espejo-feed-v2.html"?1:0);
  if(name==="ayuda-espejo-feed-v2.html")paletteButtons=html.match(/<button[^>]*data-goxy-color-choice="[^"]+"[^>]*>.*?<\/button>/g)||[];
 }
 const paletteColors=paletteButtons.map(button=>button.match(/--swatch:(#[0-9a-f]{6})/i)?.[1]);
@@ -27,9 +28,10 @@ assert.equal(paletteColors.length,5,"la prueba usa el selector de colores real d
 const official=await readFile(resolve(cwd,"ayuda.html"),"utf8");
 assert.match(official,/<html[^>]+data-gx-release-launch="enabled"/);
 assert.equal((official.match(/release-announcement\.js\?/g)||[]).length,1);
+assert.doesNotMatch(official,/release-announcement-k3\.js/);
 const intro="/preview/mi-espacio-v2/official-feed-intro.js",introCss="/preview/mi-espacio-v2/official-feed-intro.css";
 const robot="/preview/mi-espacio-v2/goxy-heads-mirror.bundle.js",legal="/assets/js/ayuda/21-legal-v2-documents.js";
-const allowed=new Map([[robot,"text/javascript"],[legal,"text/javascript"],[intro,"text/javascript"],[introCss,"text/css"],[script,"text/javascript"],[css,"text/css"],[logo,"image/png"]]);
+const allowed=new Map([[robot,"text/javascript"],[legal,"text/javascript"],[intro,"text/javascript"],[introCss,"text/css"],[script,"text/javascript"],[candidateScript,"text/javascript"],[css,"text/css"],[logo,"image/png"]]);
 const fixture=(params)=>{
  const edition=params.get("edition")==="pilot"?"pilot":params.get("edition")==="enabled"?"enabled":"off",startup=params.get("startup")==="1",scenario=params.get("scenario")||"accepted";
  const realLegal=scenario==="pending-real";
@@ -71,7 +73,7 @@ const fixture=(params)=>{
  window.switchTab=name=>{window.routeCalled=name;document.querySelector("#view-dashboard").classList.add("active")};
  document.getElementById("behind").focus();
  if(${scenario==="busy"}){const n=document.createElement("div");n.className="gx-auth-sheet show";document.body.append(n);window.addEventListener("load",()=>setTimeout(()=>n.remove(),850));}
- </script><script src="${robot}"></script><script>window.GOXY_ROBOT.mount(document.getElementById("gxn-goxy-slot"))</script><script src="${script}"></script>${realLegal?'<script src="'+legal+'"></script>':""}${startup?'<script src="'+intro+'"></script><script>window.addEventListener("load",()=>{document.querySelector("#gx-v2-sync").hidden=true;window.dispatchEvent(new Event("goxion:client-ready"));window.dispatchEvent(new Event("goxion:v2-feed:rendered"));'+(['late-legal','very-late-legal'].includes(scenario)?'setTimeout(()=>{window.fixtureState={estado:"aceptado",deferido:false,modalAbierto:false};window.dispatchEvent(new Event("goxion:legal-state"));},'+(scenario==='late-legal'?1250:3500)+');':'')+'})</script>':""}</body></html>`;
+ </script><script src="${robot}"></script><script>window.GOXY_ROBOT.mount(document.getElementById("gxn-goxy-slot"))</script><script src="${edition==="pilot"?candidateScript:script}"></script>${realLegal?'<script src="'+legal+'"></script>':""}${startup?'<script src="'+intro+'"></script><script>window.addEventListener("load",()=>{document.querySelector("#gx-v2-sync").hidden=true;window.dispatchEvent(new Event("goxion:client-ready"));window.dispatchEvent(new Event("goxion:v2-feed:rendered"));'+(['late-legal','very-late-legal'].includes(scenario)?'setTimeout(()=>{window.fixtureState={estado:"aceptado",deferido:false,modalAbierto:false};window.dispatchEvent(new Event("goxion:legal-state"));},'+(scenario==='late-legal'?1250:3500)+');':'')+'})</script>':""}</body></html>`;
 };
 const server=createServer(async(req,res)=>{
  const u=new URL(req.url,"http://localhost");
@@ -314,7 +316,7 @@ try{
    assert.equal(await pilotPage.locator("#gxn-goxy-slot").getAttribute("data-goxy-paused"),"false");
    assert.equal(await pilotPage.locator(".gx-launch-goxy-portrait").count(),0);
    assert.equal(await pilotPage.evaluate(()=>document.body.classList.contains("gx-launch-goxy-active")),false);
-   const pilotSeen="gx-release-seen:nov2026-mi-espacio-lanzamiento-pilot-v5:casone";
+   const pilotSeen="gx-release-seen:nov2026-mi-espacio-lanzamiento-pilot-k3:casone";
    assert.equal(await pilotPage.evaluate(k=>sessionStorage.getItem(k),pilotSeen),"1");
    assert.equal(await pilotPage.evaluate(()=>localStorage.getItem("gx-release-seen:nov2026-mi-espacio-lanzamiento-v1:casone")),null);
    await pilotPage.evaluate(()=>{localStorage.removeItem("fixture-session");window.dispatchEvent(new Event("goxion:client-logout"))});
