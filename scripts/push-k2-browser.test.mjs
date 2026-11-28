@@ -56,6 +56,7 @@ try {
         await panel.getByRole('heading',{name:title,exact:true}).waitFor();
         const art=panel.locator('[data-step-art]');assert(await art.isVisible());assert((await art.boundingBox()).width>=250);
         assert(!(await panel.locator('[data-step-hint]').isVisible()));
+        if(i===4){const marker=art.locator('.gx-k3-go-header .gx-k3-tap');assert((await marker.boundingBox()).width<20);assert(await art.locator('.gx-k3-go-header .gx-k3-target svg').isVisible());}
         await shot(page,'iphone-step-'+(i+1));if(i<4)await panel.getByRole('button',{name:'Siguiente'}).click();
       }
       await info.click();assert(await panel.locator('[data-step-hint]').isVisible());await info.click();

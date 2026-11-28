@@ -109,7 +109,7 @@
 .gx-k3-art-permit{flex-direction:column;gap:8px}.gx-k3-activate-example{width:100%;max-width:270px;display:flex;align-items:center;justify-content:center;gap:5px;padding:8px;border-radius:999px;background:rgba(255,255,255,.08);color:#7ee1e7;font-size:12px;font-weight:650}.gx-k3-activate-example svg{width:15px;height:15px;transform:rotate(180deg)}
 .gx-k3-go-header{display:flex;align-items:center;justify-content:flex-end;gap:10px;width:100%;max-width:270px;color:#c1cfe0}
 .gx-k3-go-header img{width:35px;height:35px;object-fit:contain;margin-right:auto}
-.gx-k3-go-header span{width:33px;height:33px;display:grid;place-items:center}
+.gx-k3-go-header>span{width:33px;height:33px;display:grid;place-items:center}
 .gx-k3-permit-example{width:100%;max-width:270px;background:#282a35;border-radius:17px;text-align:center;display:grid;justify-items:center;gap:9px;padding:13px;box-sizing:border-box;box-shadow:0 12px 26px rgba(0,0,0,.32)}
 .gx-k3-permit-example>svg{color:#bca9ff;width:31px;height:31px}
 .gx-k3-permit-example>b{font-size:14px;line-height:1.4}
