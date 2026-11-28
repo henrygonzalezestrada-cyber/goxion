@@ -87,9 +87,6 @@
 
     document.documentElement.style.setProperty("--gx-notif-vv-bottom",bottomGap+"px");
     document.documentElement.style.setProperty("--gx-notif-panel-max",panelMax+"px");
-    // K3: content-driven drawer expansion, bounded by the real visible viewport.
-    // The normal inbox keeps its original 78% cap; the settings view can use the extra space.
-    document.documentElement.style.setProperty("--gx-notif-k3-room",Math.max(250,Math.min(900,viewportHeight-24))+"px");
   }
 
   function bindNotificationViewport(){
@@ -115,6 +112,8 @@
     },{capture:true,passive:true});
     document.addEventListener("touchmove",event=>{
       if(!open()||!event.cancelable)return;
+      // The existing resizer owns this gesture (touch-action:none); never interrupt its pointer stream.
+      if(event.target.closest?.("#gx-client-notif-sheet .gx-client-notif-handle"))return;
       const list=scrollTarget(event.target);
       if(!list){event.preventDefault();return;}
       const finger=event.touches?.[0];
