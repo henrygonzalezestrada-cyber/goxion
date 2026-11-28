@@ -12,15 +12,10 @@
 .gx-k3-back:active{transform:scale(.96)}
 .gx-k3-info[aria-expanded=true]{color:#7ee1e7}
 .gx-k3-settings-open>.gx-client-notif-list,.gx-k3-settings-open>#gx-client-notif-undo{display:none!important}
-.gx-client-notif-sheet:is(.gx-k3-settings-open,.gx-k3-expanded){--gx-notif-panel-max:var(--gx-notif-k3-room,calc(100dvh - 24px))}
 .gx-k3-settings-open{display:flex;flex-direction:column}
-.gx-k3-drag-handle{width:76px;height:12px;margin:2px auto 0;padding:0;border:0;display:block;position:relative;background:transparent;cursor:ns-resize;touch-action:none;flex:none}
-.gx-k3-drag-handle::before{content:"";position:absolute;left:20px;right:20px;top:4px;height:4px;border-radius:999px;background:rgba(255,255,255,.18)}
-.gx-k3-drag-handle:focus-visible{outline:2px solid #7ee1e7;outline-offset:2px}
-.gx-k3-drag-handle:disabled{cursor:default}
-.gx-k3-drag-handle[aria-expanded=true]::before{background:#7ee1e7}
 .gx-k3-settings-open .gx-client-notif-toolbar{grid-row:1;visibility:hidden;pointer-events:none}
 .gx-push-pilot{flex:1 1 auto;min-height:0;max-height:calc(var(--gx-notif-panel-max,74dvh) - 80px);box-sizing:border-box;overflow:auto;overscroll-behavior:contain;scrollbar-width:none;padding:8px 22px calc(20px + env(safe-area-inset-bottom));color:#f5f8ff;-webkit-overflow-scrolling:touch;font-family:Poppins,system-ui,sans-serif}
+.gx-client-notif-sheet.gx-v2-resizable > .gx-push-pilot{max-height:none;touch-action:pan-y}
 .gx-push-pilot::-webkit-scrollbar{display:none}
 .gx-push-pilot h3,.gx-push-pilot h4,.gx-push-pilot p{margin:0}
 .gx-push-pilot h3{font-size:23px;font-weight:700;letter-spacing:-.65px;line-height:1.2}

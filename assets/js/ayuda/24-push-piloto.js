@@ -21,7 +21,7 @@
     const j=await r.json().catch(()=>({}));if(!r.ok||!j.ok)throw Error(j.error||"No se pudo conectar");return j;
   }
   // K3 view state: the existing K2 transport stays authoritative. No business writes.
-  let gear,sheet,headerTitle,headerBack,headerInfo,settingsOpen=false,guideStep=0,missionObserver,lastBellMode="",handleButton;
+  let gear,sheet,headerTitle,headerBack,headerInfo,settingsOpen=false,guideStep=0,missionObserver,lastBellMode="";
   const surveyKey="goxion_push_k3_feedback_local";
   const glyph=(d)=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+d+'"/></svg>';
   const icons={
@@ -89,16 +89,6 @@
       panel.querySelector("[data-guide-prev]").onclick=()=>{guideStep=Math.max(0,guideStep-1);hideInfo();render()};
       panel.querySelector("[data-guide-next]").onclick=()=>{if(guideStep===guideSteps.length-1){guide=false;guideStep=0}else guideStep++;hideInfo();render()};
       list.before(panel);
-      const originalHandle=sheet.querySelector(".gx-client-notif-handle");
-      if(originalHandle){
-        handleButton=document.createElement("button");handleButton.type="button";handleButton.className="gx-client-notif-handle gx-k3-drag-handle";handleButton.setAttribute("aria-label","Expandir notificaciones");handleButton.setAttribute("aria-expanded","false");originalHandle.replaceWith(handleButton);
-        const setExpanded=value=>{sheet.classList.toggle("gx-k3-expanded",value);handleButton.setAttribute("aria-expanded",String(value));handleButton.setAttribute("aria-label",value?"Reducir notificaciones":"Expandir notificaciones")};
-        let y=null,suppressClick=false;
-        handleButton.addEventListener("pointerdown",e=>{if(settingsOpen)return;y=e.clientY;suppressClick=false;handleButton.setPointerCapture?.(e.pointerId)});
-        handleButton.addEventListener("pointerup",e=>{if(y===null)return;const dy=e.clientY-y;y=null;if(Math.abs(dy)>20){suppressClick=true;setExpanded(dy<0)}});
-        handleButton.addEventListener("pointercancel",()=>{y=null});
-        handleButton.onclick=()=>{if(suppressClick){suppressClick=false;return}if(!settingsOpen)setExpanded(!sheet.classList.contains("gx-k3-expanded"))};
-      }
       const header=sheet.querySelector(".gx-client-notif-head"),close=header?.querySelector(".gx-client-notif-close");
       if(close){
         headerTitle=header.querySelector(".gx-client-notif-head-title")||header.querySelector("strong");
@@ -111,7 +101,7 @@
         close.before(group);group.append(gear,headerInfo,close);
         gear.onclick=()=>{settingsOpen=true;guide=false;guideStep=0;hideInfo();render();headerBack.focus({preventScroll:true})};
       }
-      if(sheet.classList.contains("gx-client-notif-sheet"))new MutationObserver(()=>{if(!sheet.classList.contains("show")){if(sheet.classList.contains("gx-k3-expanded")){sheet.classList.remove("gx-k3-expanded");handleButton?.setAttribute("aria-expanded","false");handleButton?.setAttribute("aria-label","Expandir notificaciones")}if(settingsOpen){settingsOpen=false;guide=false;guideStep=0;hideInfo();render()}}}).observe(sheet,{attributes:true,attributeFilter:["class"]});
+      if(sheet.classList.contains("gx-client-notif-sheet"))new MutationObserver(()=>{if(!sheet.classList.contains("show")){if(settingsOpen){settingsOpen=false;guide=false;guideStep=0;hideInfo();render()}}}).observe(sheet,{attributes:true,attributeFilter:["class"]});
       const missions=document.querySelector(".gxb-wrap");if(missions){missionObserver=new MutationObserver(syncMissionPreview);missionObserver.observe(missions,{childList:true,subtree:true,attributes:true,attributeFilter:["hidden","data-benefit"]});}
     }
     render();
@@ -130,7 +120,6 @@
     if(headerInfo)headerInfo.hidden=!next;
     if(headerTitle)headerTitle.textContent=next?(showGuide?"Activar en iPhone":"Ajustes"):"Notificaciones";
     sheet?.classList.toggle("gx-k3-settings-open",next);panel.hidden=!next;syncMissionPreview();
-    if(handleButton){handleButton.disabled=!allowed||next;handleButton.setAttribute("aria-hidden",String(!allowed||next));}
     if(!next){lastBellMode="";return;}
     panel.dataset.mode=showGuide?"guide":active?"active":needsInstall?"install":denied?"denied":support?"inactive":"unsupported";
     const mode=panel.dataset.mode;

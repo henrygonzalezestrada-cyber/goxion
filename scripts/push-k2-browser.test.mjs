@@ -6,6 +6,7 @@ import assert from 'node:assert/strict';
 import {readFileSync,mkdirSync} from 'node:fs';
 const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const source=read('assets/js/ayuda/24-push-piloto.js'),owner=read('assets/js/ayuda/04-client-notifications-realtime-k3.js');
+const pulso=read('preview/mi-espacio-v2/pulsoicon-preview-k3.js'),feedCss=read('preview/mi-espacio-v2/official-feed.css'),modalCss=read('assets/css/goxion-modal-headers.css');
 const hero=read('preview/mi-espacio-v2/hero-states-k3.js'),release=read('preview/mi-espacio-v2/release-announcement-k3.js');
 const css=read('assets/css/push-pilot.css'),notificationCss=read('assets/css/realtime-client-notifications.css'),releaseCss=read('preview/mi-espacio-v2/release-announcement.css');
 const browser=await playwright[engine].launch({headless:true,executablePath:process.env.CHROMIUM_PATH||undefined,...(engine==='chromium'?{args:['--no-sandbox']}:{})});
@@ -13,7 +14,7 @@ const url='https://fixture.invalid/ayuda-espejo-feed-v2.html',fixtureId='fixture
 const shot=async(page,name)=>{if(process.env.K3_SCREENSHOTS){mkdirSync(process.env.K3_SCREENSHOTS,{recursive:true});await page.screenshot({path:process.env.K3_SCREENSHOTS+'/'+name+'.png',animations:'disabled'});}};
 try {
  for(const mode of ['guest','outside-gate','iphone-web','iphone-installed','android','denied']){
-  const context=await browser.newContext({viewport:{width:375,height:812},reducedMotion:mode==='iphone-web'||mode==='iphone-installed'?'no-preference':'reduce'});
+  const context=await browser.newContext({viewport:{width:375,height:812},hasTouch:mode.startsWith('iphone'),reducedMotion:mode==='iphone-web'||mode==='iphone-installed'?'no-preference':'reduce'});
   await context.addInitScript(({mode,fixtureId})=>{
     window.GOXION_CORE={STORAGE:{CLIENT_TOKEN:'test-token'},endpoint:name=>{if(!['push-cliente','notificaciones-cliente'].includes(name))throw Error('Unexpected endpoint');return 'https://api.fixture.invalid/functions/v1/'+name}};
     window.GOXION_V2_CLIENT_ID=fixtureId;window.getCurrentClientKey=()=>mode==='guest'?'':fixtureId;
@@ -27,7 +28,7 @@ try {
     Object.defineProperty(navigator,'serviceWorker',{value:{register:async()=>{window._registered=++regCount;return reg},ready:Promise.resolve(reg),getRegistration:async()=>reg}});
   },{mode,fixtureId});
   const page=await context.newPage(),actions=[],errors=[];page.on('pageerror',e=>errors.push(e.message));
-  const fixture=`<!doctype html><html lang=es><head><meta name=viewport content="width=device-width, initial-scale=1"><style>*{box-sizing:border-box}body{margin:0;background:#0b0a10;color:#f7f5ff;font-family:system-ui;padding:16px}:root{--card-glass:#16161f;--neon-blue:#79e6fc;--gx-notif-panel-max:74dvh} .focus{position:relative;padding:16px;border-radius:22px;background:#22212b;height:168px}.focus-copy{max-width:75%}.focus-icon{position:absolute;right:20px;top:20px}.focus-bottom{display:flex;align-items:center;justify-content:center;gap:8px}.focus-action{border:0;background:#3b394b;border-radius:999px;color:#fff;padding:10px 13px;min-height:36px}.gx-state-panel{position:absolute;inset:0;background:#22212b;padding:16px;border-radius:22px;display:grid;grid-template-columns:1fr 75px;grid-template-rows:1fr auto}.gx-state-panel[hidden],.gx-state-panel [hidden],.gx-state-bubbles[hidden]{display:none!important}.gx-state-panel .focus-bottom{grid-column:1/-1}.gx-state-bubbles{display:flex;gap:5px}.gx-state-bubble{border:0;background:#3c334d;border-radius:50%;height:38px;width:38px;color:#d2bcff}.gx-state-art svg{width:30px;height:30px;fill:none;stroke:currentColor;stroke-width:1.8}.gx-state-hero-art{display:grid;place-items:center}.gx-state-hero-art svg{width:65px;height:65px}.gx-state-detail,.focus-meta{font-size:12px;color:#c8c1d6}.focus-title{font-size:21px;font-weight:650}.gx-state-panel[hidden]{display:none}.gxb-wrap{margin-top:16px}.gxb-panel{background:#22212b;padding:12px;border-radius:20px} ${notificationCss} ${css}</style></head><body class="gx-v2-private-visible"><main id="gx-v2-feed"><div class=focus id=focus><div class=focus-copy><div class=focus-title>Todo al corriente</div><span class=focus-meta>Fecha de pago</span></div><span class=focus-icon>✓</span><div class=focus-bottom><button class=focus-action>Ver mi cuenta</button></div></div><div class=gxb-wrap><button id=show-mission>Misiones</button><div id=gxb-panel class=gxb-panel data-benefit=mission hidden><div id=gxb-content>Misiones existentes</div></div></div></main><header class="app-header"><button id="header-action-btn"><span id=header-btn-text></span></button></header><output id=gxn-toast hidden></output><script>${hero}</script><script>window.hero=GOXION_HERO_STATES.create({card:document.querySelector('#focus'),logo:()=>'',storage:false});window.updateHero=()=>hero.update({cliente:{id:'${fixtureId}'},servicios:[],alertas:null},'clear');updateHero();document.querySelector('#show-mission').onclick=()=>document.querySelector('#gxb-panel').hidden=false;</script><script>${owner}</script><script>${source}</script></body></html>`;
+  const fixture=`<!doctype html><html lang=es><head><meta name=viewport content="width=device-width, initial-scale=1"><style>*{box-sizing:border-box}body{margin:0;background:#0b0a10;color:#f7f5ff;font-family:system-ui;padding:16px}:root{--card-glass:#16161f;--neon-blue:#79e6fc;--gx-notif-panel-max:74dvh} .focus{position:relative;padding:16px;border-radius:22px;background:#22212b;height:168px}.focus-copy{max-width:75%}.focus-icon{position:absolute;right:20px;top:20px}.focus-bottom{display:flex;align-items:center;justify-content:center;gap:8px}.focus-action{border:0;background:#3b394b;border-radius:999px;color:#fff;padding:10px 13px;min-height:36px}.gx-state-panel{position:absolute;inset:0;background:#22212b;padding:16px;border-radius:22px;display:grid;grid-template-columns:1fr 75px;grid-template-rows:1fr auto}.gx-state-panel[hidden],.gx-state-panel [hidden],.gx-state-bubbles[hidden]{display:none!important}.gx-state-panel .focus-bottom{grid-column:1/-1}.gx-state-bubbles{display:flex;gap:5px}.gx-state-bubble{border:0;background:#3c334d;border-radius:50%;height:38px;width:38px;color:#d2bcff}.gx-state-art svg{width:30px;height:30px;fill:none;stroke:currentColor;stroke-width:1.8}.gx-state-hero-art{display:grid;place-items:center}.gx-state-hero-art svg{width:65px;height:65px}.gx-state-detail,.focus-meta{font-size:12px;color:#c8c1d6}.focus-title{font-size:21px;font-weight:650}.gx-state-panel[hidden]{display:none}.gxb-wrap{margin-top:16px}.gxb-panel{background:#22212b;padding:12px;border-radius:20px} ${notificationCss} ${modalCss} ${feedCss} ${css}</style></head><body class="gx-v2-private-visible ${mode==='guest'?'':'gx-v2-client-session'}"><main id="gx-v2-feed"><div class=focus id=focus><div class=focus-copy><div class=focus-title>Todo al corriente</div><span class=focus-meta>Fecha de pago</span></div><span class=focus-icon>✓</span><div class=focus-bottom><button class=focus-action>Ver mi cuenta</button></div></div><div class=gxb-wrap><button id=show-mission>Misiones</button><div id=gxb-panel class=gxb-panel data-benefit=mission hidden><div id=gxb-content>Misiones existentes</div></div></div></main><header class="app-header"><button id="header-action-btn"><span id=header-btn-text></span></button></header><output id=gxn-toast hidden></output><script>${hero}</script><script>window.hero=GOXION_HERO_STATES.create({card:document.querySelector('#focus'),logo:()=>'',storage:false});window.updateHero=()=>hero.update({cliente:{id:'${fixtureId}'},servicios:[],alertas:null},'clear');updateHero();document.querySelector('#show-mission').onclick=()=>document.querySelector('#gxb-panel').hidden=false;</script><script>${owner}</script><script>${pulso}</script><script>${source}</script></body></html>`;
   await page.route(url,r=>r.fulfill({contentType:'text/html; charset=utf-8',body:fixture}));
   await page.route('https://api.fixture.invalid/functions/v1/push-cliente',async r=>{
     const headers={'Access-Control-Allow-Origin':'*','Access-Control-Allow-Headers':'content-type,x-client-token','Access-Control-Allow-Methods':'POST, OPTIONS'};
@@ -51,8 +52,30 @@ try {
   }else{
     await gear.waitFor({state:'visible'});
     if(mode==='iphone-web'){
-      const handle=page.getByRole('button',{name:'Expandir notificaciones'}),sheet=page.locator('#gx-client-notif-sheet');await page.locator('#gx-client-notif-list .gx-client-notif-item').first().waitFor();
-      const compact=(await sheet.boundingBox()).height;await handle.click();await page.waitForTimeout(100);assert((await sheet.boundingBox()).height>compact+20);await page.getByRole('button',{name:'Reducir notificaciones'}).click();
+      const handle=page.getByRole('slider',{name:'Altura del centro de notificaciones'}),sheet=page.locator('#gx-client-notif-sheet');
+      await page.locator('#gx-client-notif-list .gx-client-notif-item').first().waitFor();
+      await handle.waitFor();await page.waitForTimeout(350);
+      // Real production cascade, original resizer and real notification owner: exactly one painted bar.
+      assert.equal(await page.locator('.gx-client-notif-handle').count(),1);
+      assert.deepEqual(await handle.evaluate(el=>({before:getComputedStyle(el,'::before').content,after:getComputedStyle(el,'::after').content,touch:getComputedStyle(el).touchAction})),{before:'none',after:'""',touch:'none'});
+      await handle.evaluate(el=>window._originalHandle=el);
+      const height=async()=>Math.round((await sheet.boundingBox()).height);
+      const at=async n=>{await page.waitForFunction(n=>document.querySelector('.gx-client-notif-handle').getAttribute('aria-valuenow')===String(n),n);await page.waitForTimeout(340)};
+      const initial=await height();await handle.tap();await at(2);const expanded=await height();assert(expanded>initial+80);
+      await handle.tap();await at(1);assert(Math.abs(await height()-initial)<4);
+      // Physical mouse pointer stream in both engines; touch pointer stream in Chromium.
+      const drag=async dy=>{const b=await handle.boundingBox(),x=b.x+b.width/2,y=b.y+b.height/2;await page.mouse.move(x,y);await page.mouse.down();await page.mouse.move(x,y+dy,{steps:8});await page.mouse.up()};
+      await drag(200);await at(0);const compact=await height();assert(compact<initial-90);
+      await drag(-210);await at(1);assert(Math.abs(await height()-initial)<4);
+      if(engine==='chromium'){
+        const cdp=await context.newCDPSession(page);const b=await handle.boundingBox(),x=b.x+b.width/2,y=b.y+b.height/2;
+        await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y}]});
+        for(let i=1;i<=8;i++)await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x,y:y-180*i/8}]});
+        await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await at(2);assert(await height()>initial+80);
+        await handle.tap();await at(1);
+      }
+      await shot(page,'inbox-single-handle');
+      assert(await handle.evaluate(el=>window._originalHandle===el));
     }
     await gear.click();assert(await panel.isVisible());assert(!(await page.locator('#gx-client-notif-list').isVisible()));assert(!(await gear.isVisible()));assert.equal(await page.locator('.gx-client-notif-head-title').textContent(),'Ajustes');assert(await page.getByRole('button',{name:'Volver',exact:true}).isVisible());
     if(mode==='iphone-web'){
@@ -71,9 +94,9 @@ try {
         await shot(page,'iphone-step-'+(i+1));if(i<4)await panel.getByRole('button',{name:'Siguiente'}).click();
       }
       await info.click();assert(await panel.locator('[data-step-hint]').isVisible());await info.click();
-      await page.setViewportSize({width:375,height:480});await page.waitForTimeout(150);
+      await page.setViewportSize({width:375,height:480});await page.waitForTimeout(400);
       const geometry=await panel.evaluate(el=>({scroll:el.scrollHeight,client:el.clientHeight,room:parseFloat(getComputedStyle(el.closest('.gx-client-notif-sheet')).maxHeight),base:parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--gx-notif-panel-max'))}));
-      assert(geometry.room>geometry.base+40);assert(geometry.scroll>geometry.client);
+      assert(geometry.room>geometry.base+40);assert(geometry.scroll>geometry.client);assert.equal(await page.getByRole('slider',{name:'Altura del centro de notificaciones'}).getAttribute('aria-valuenow'),'2');
       const guard=await panel.evaluate(el=>{
         el.scrollTop=3;
         const touch=(type,y)=>{const e=new Event(type,{bubbles:true,cancelable:true});Object.defineProperty(e,'touches',{value:[{clientX:25,clientY:y}]});el.dispatchEvent(e);return e.defaultPrevented};
@@ -82,10 +105,10 @@ try {
         const wheelAllowed=!wheel.defaultPrevented;el.scrollTop=el.scrollHeight;touch('touchstart',150);const boundaryBlocked=touch('touchmove',90);
         return {touchAllowed,wheelAllowed,boundaryBlocked};
       });assert.deepEqual(guard,{touchAllowed:true,wheelAllowed:true,boundaryBlocked:true});
-      await page.setViewportSize({width:375,height:812});await page.waitForTimeout(100);
+      await page.setViewportSize({width:375,height:812});await page.waitForTimeout(400);
       assert(!await page.evaluate(()=>window._registered));await panel.getByRole('button',{name:'Entendido'}).click();
       assert(await panel.locator('[data-settings]').isVisible());assert(!(await panel.locator('[data-guide]').isVisible()));
-      await panel.getByRole('button',{name:'Cómo activar en iPhone'}).click();await page.getByRole('button',{name:'Volver',exact:true}).click();assert(await panel.locator('[data-settings]').isVisible());await page.getByRole('button',{name:'Volver',exact:true}).click();assert(await gear.isVisible());assert(await page.locator('#gx-client-notif-list').isVisible());
+      await panel.getByRole('button',{name:'Cómo activar en iPhone'}).click();await page.getByRole('button',{name:'Volver',exact:true}).click();assert(await panel.locator('[data-settings]').isVisible());await page.getByRole('button',{name:'Volver',exact:true}).click();assert(await gear.isVisible());assert(await page.locator('#gx-client-notif-list').isVisible());assert(await page.locator('.gx-client-notif-handle').evaluate(el=>el===window._originalHandle));await page.waitForTimeout(350);assert.equal(await page.getByRole('slider',{name:'Altura del centro de notificaciones'}).getAttribute('aria-valuenow'),'1');
     }else if(mode==='denied'){
       await panel.getByText('Los avisos están bloqueados',{exact:false}).waitFor();assert(!(await panel.getByRole('button',{name:'Activar avisos'}).isVisible()));await shot(page,'denied');
     }else{
