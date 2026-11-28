@@ -316,7 +316,7 @@ try{
    assert.equal(await pilotPage.locator("#gxn-goxy-slot").getAttribute("data-goxy-paused"),"false");
    assert.equal(await pilotPage.locator(".gx-launch-goxy-portrait").count(),0);
    assert.equal(await pilotPage.evaluate(()=>document.body.classList.contains("gx-launch-goxy-active")),false);
-   const pilotSeen="gx-release-seen:nov2026-mi-espacio-lanzamiento-pilot-k3:casone";
+   const pilotSeen="gx-release-seen:nov2026-mi-espacio-lanzamiento-pilot-k3b:casone";
    assert.equal(await pilotPage.evaluate(k=>sessionStorage.getItem(k),pilotSeen),"1");
    assert.equal(await pilotPage.evaluate(()=>localStorage.getItem("gx-release-seen:nov2026-mi-espacio-lanzamiento-v1:casone")),null);
    await pilotPage.evaluate(()=>{localStorage.removeItem("fixture-session");window.dispatchEvent(new Event("goxion:client-logout"))});

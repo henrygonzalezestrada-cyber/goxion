@@ -12,11 +12,11 @@ const CANDIDATE = 'ayuda-espejo-feed-v2.html';
 const K3_MIRROR_ONLY_LINES = Object.freeze([
   '<link rel="manifest" href="./goxion-push-pilot.webmanifest">',
   '<link rel="apple-touch-icon" href="./Logo individual.png">',
-  '<link rel="stylesheet" href="./assets/css/push-pilot.css?v=k3-20261127">',
-  '<script src="./assets/js/ayuda/24-push-piloto.js?v=k3-20261127"></script>',
+  '<link rel="stylesheet" href="./assets/css/push-pilot.css?v=k3b-20261127">',
+  '<script src="./assets/js/ayuda/24-push-piloto.js?v=k3b-20261127"></script>',
 ]);
 const K3_MIRROR_OWNER_LINES = Object.freeze([
-  ['<script id="goxion-release-launch" src="./preview/mi-espacio-v2/release-announcement-k3.js?v=k3-20261127"></script>',
+  ['<script id="goxion-release-launch" src="./preview/mi-espacio-v2/release-announcement-k3.js?v=k3b-20261127"></script>',
    '<script id="goxion-release-launch" src="./preview/mi-espacio-v2/release-announcement.js?v=pilot-sequence-v5-20261126"></script>'],
   ['<script src="./preview/mi-espacio-v2/hero-states-k3.js?v=k3-20261127"></script>',
    '<script src="./preview/mi-espacio-v2/hero-states.js?v=resolution-20261126"></script>'],

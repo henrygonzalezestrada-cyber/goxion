@@ -7,7 +7,7 @@
  // La edición nueva es opt-in por configuración del HTML, no por URL ni storage.
  // La rama candidata la conserva apagada hasta autorización de lanzamiento.
  const mode=document.documentElement.getAttribute("data-gx-release-launch");
- const PILOT="casone",PILOT_VERSION="nov2026-mi-espacio-lanzamiento-pilot-k3";
+ const PILOT="casone",PILOT_VERSION="nov2026-mi-espacio-lanzamiento-pilot-k3b";
  const GENERAL_VERSION="nov2026-mi-espacio-lanzamiento-v1",LEGACY_VERSION="nov2026-novedades-apiladas-v2-todos";
  let launch=mode==="enabled",pilot=false,VERSION=launch?GENERAL_VERSION:LEGACY_VERSION;
  const PREFIX="gx-release-seen:";
@@ -29,7 +29,7 @@
    {id:"catalog",title:"Encuentra tu",accent:"próximo favorito.",copy:"Explora plataformas, combos y promociones; elige tus servicios y revisa tu selección en el carrito.",art:"catalog"},
    {id:"support",title:"Estamos",accent:"más cerca.",copy:"Personaliza a Goxy, encuentra ayuda desde Soporte y comparte tu opinión para seguir mejorando.",art:"support"}
  ];
- const pushChapter={id:"push",title:"Siempre",accent:"conectado.",copy:"Recibe avisos de tus servicios, pagos y recompensas directamente en tu teléfono. Tú eliges cuáles recibir.",art:"push"};
+ const pushChapter={id:"push",title:"Siempre",accent:"conectado.",copy:"Tus pagos, servicios y recompensas, directo a tu teléfono.",art:"push"};
  let chapters=baseChapters;
  const $=(selector,root=document)=>root.querySelector(selector);
  const create=(tag,cls,text)=>{
@@ -242,7 +242,8 @@
    benefits:'<div class="gx-launch-benefit-icons"><span>⭐</span><span>🎁</span><span>🎯</span></div>',
    services:'<div class="gx-launch-pulso gx-launch-calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round"><g class="gx-pulso-calendar-case"><path d="M21 7.338V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2h2.338"/><path d="M3 9h5.859"/></g><path class="gx-pulso-calendar-ring gx-pulso-ring-a" d="M16 2v3"/><path class="gx-pulso-calendar-ring gx-pulso-ring-b" d="M8 2v3"/><circle class="gx-pulso-clock-dial" cx="16" cy="16" r="6"/><path class="gx-pulso-clock-hand" d="M16 14v2.2l1.6 1"/></svg></div>',
    catalog:'<div class="gx-launch-pulso gx-launch-catalog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round"><g class="gx-pulso-bag"><path d="M3.103 6.034h17.794"/><path d="M3.4 5.467a2 2 0 0 0-.4 1.2V20a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6.667a2 2 0 0 0-.4-1.2l-2-2.667A2 2 0 0 0 17 2H7a2 2 0 0 0-1.6.8z"/><path class="gx-pulso-bag-handle" pathLength="1" d="M16 10a4 4 0 0 1-8 0"/></g></svg></div>',
-   push:'<div class="gx-k3-launch-bell"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4M3 7l1-3m16 0 1 3"/></svg></div>',
+   // PulsoIcon bell-ring · ISC · CityPulso, source 123b920e (see PULSOICON-LICENSE.txt).
+   push:'<div class="gx-launch-pulso gx-launch-bell"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round"><g class="gx-pulso-bell-body"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></g><path class="gx-pulso-bell-wave gx-pulso-wave-right" d="M22 8c0-2.3-.8-4.3-2-6"/><path class="gx-pulso-bell-wave gx-pulso-wave-left" d="M4 2C2.8 3.7 2 5.7 2 8"/></svg></div>' ,
    support:'<div class="gx-launch-goxy-mount"></div>'  
  };
  // The original robot-heads renderer is mounted once, at its native large size.
@@ -437,10 +438,14 @@
    if(c.id==="push"){
      const controls=create("div","gx-k3-launch-controls");
      const cta=create("button","gx-k3-launch-cta",window.GOXION_PUSH_K3?.active()?"Configurar avisos":"Activar notificaciones");
-     const tip=create("p","gx-k3-launch-note","Puedes hacerlo al terminar Novedades o más tarde en la campana.");
+     const info=create("button","gx-k3-info");
+     info.type="button";info.setAttribute("aria-label","Información sobre la activación");info.setAttribute("aria-expanded","false");info.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/></svg>';
+     const tip=create("p","gx-k3-launch-note","Al terminar Novedades abriremos los ajustes. También puedes activarlas desde la campana.");
+     tip.hidden=true;
+     info.onclick=()=>{tip.hidden=!tip.hidden;info.setAttribute("aria-expanded",String(!tip.hidden));};
      cta.type="button";cta.disabled=!window.GOXION_PUSH_K3?.canInvite();
-     cta.onclick=()=>{if(window.GOXION_PUSH_K3?.deferSettings()){cta.textContent="Listo · al terminar";cta.disabled=true;tip.textContent="Abriremos los ajustes cuando termine la presentación.";}};
-     controls.append(cta,tip);$(".gx-launch-copy",body).append(controls);
+     cta.onclick=()=>{if(window.GOXION_PUSH_K3?.deferSettings()){cta.textContent="Listo · al terminar";cta.disabled=true;}};
+     controls.append(cta,info,tip);$(".gx-launch-copy",body).append(controls);
    }
    if(c.id==="support")mountGoxyChapter($(".gx-launch-goxy-mount",body));
    body.scrollTop=0;
