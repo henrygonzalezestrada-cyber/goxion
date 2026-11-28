@@ -56,3 +56,9 @@ test('native round renders without competing preview; no write-enabled client ne
  assert.match(readFileSync('assets/js/ayuda/24-push-piloto.js','utf8'),/host\.hasAttribute\("data-gxb-push-pilot"\)/);
  assert.match(readFileSync('admin.html','utf8'),/onclick="gxActivatePushMissionPilot\(\)">Activar en Casone/);
 });
+
+test('legacy beta endpoint also blocks pilot coupon without changing earlier coupon behavior',async()=>{
+ const f=fixture('mi-espacio-beta');Object.assign(f.g,{tareas:tasks,misiones_version:9,cupon_ciclo:5,cupon_reclamado:false,descuento:20});
+ assert.equal((await f.call({modo:'reclamar_cupon'})).status,409);assert.equal(f.writes.length,0);
+ f.g.tareas='Catálogo [CATALOGO]';f.g.cupon_ciclo=4;const r=await f.call({modo:'reclamar_cupon'});assert.equal(r.status,200);assert.equal(r.body.ya_reclamado,true);assert.equal(f.writes.length,0)
+});
